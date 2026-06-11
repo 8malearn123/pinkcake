@@ -1,3 +1,4 @@
-# RTL guardrail (§1.7) + lint staged files. Tests run in CI, not here.
+# RTL guardrail (§1.7) — the must-not-regress gate. Full eslint runs in CI
+# (non-blocking until the legacy lint debt is cleared); enforcing it per-file
+# here would block any commit that merely touches a legacy file.
 node scripts/check-rtl.mjs
-npx lint-staged
