@@ -154,7 +154,7 @@ export function Sidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 right-4 z-50 lg:hidden"
+        className="fixed top-4 start-4 z-50 lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -171,7 +171,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed lg:sticky top-0 right-0 h-screen w-72 bg-sidebar text-sidebar-foreground z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col',
+          'fixed lg:sticky top-0 start-0 h-screen w-72 bg-sidebar text-sidebar-foreground z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col',
           isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
         )}
       >
