@@ -44,9 +44,11 @@
     --rose: 340 45% 55%;
     --blush: 350 30% 96%;
     --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 38 15% 15%;
     --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
 
     /* Status Colors */
     --status-pending: 38 92% 50%;

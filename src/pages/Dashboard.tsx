@@ -1,5 +1,5 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { StatsCard } from '@/components/dashboard/StatsCard';
+import { PageHeader, StatTile, EmptyState, LoadingState, SectionHeading } from '@/components/ds';
 import { OrdersTable } from '@/components/dashboard/OrdersTable';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useOrders';
 import {
@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   ChefHat,
   Plus,
-  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -59,56 +58,39 @@ export default function Dashboard() {
   return (
     <MainLayout>
       <div className="space-y-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">لوحة التحكم</h1>
-            <p className="text-muted-foreground mt-1">مرحباً، هذا ملخص اليوم</p>
-          </div>
-          <Link to="/orders/new">
-            <Button className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
-              <Plus className="w-5 h-5 ml-2" />
-              طلب جديد
-            </Button>
-          </Link>
-        </div>
+        <PageHeader
+          title="لوحة التحكم"
+          description="مرحباً، هذا ملخص اليوم"
+          actions={
+            <Link to="/orders/new">
+              <Button className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
+                <Plus className="w-5 h-5 ml-2" />
+                طلب جديد
+              </Button>
+            </Link>
+          }
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
-            title="إجمالي الطلبات"
-            value={orders?.length || 0}
-            icon={<ClipboardList className="w-7 h-7 text-white" />}
-          />
-          <StatsCard
-            title="بانتظار الاعتماد"
-            value={pendingOrders}
-            icon={<Clock className="w-7 h-7 text-white" />}
-          />
-          <StatsCard
-            title="قيد التجهيز"
-            value={preparingOrders}
-            icon={<ChefHat className="w-7 h-7 text-white" />}
-          />
-          <StatsCard
-            title="تم التسليم اليوم"
-            value={completedToday}
-            icon={<CheckCircle2 className="w-7 h-7 text-white" />}
-          />
+          <StatTile label="إجمالي الطلبات" value={orders?.length || 0} icon={ClipboardList} tone="primary" />
+          <StatTile label="بانتظار الاعتماد" value={pendingOrders} icon={Clock} tone="warning" />
+          <StatTile label="قيد التجهيز" value={preparingOrders} icon={ChefHat} tone="info" />
+          <StatTile label="تم التسليم اليوم" value={completedToday} icon={CheckCircle2} tone="success" />
         </div>
 
         {/* Recent Orders */}
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold">آخر الطلبات</h2>
-            <Link to="/orders" className="text-primary hover:underline font-medium">
-              عرض الكل
-            </Link>
-          </div>
+          <SectionHeading
+            title="آخر الطلبات"
+            action={
+              <Link to="/orders" className="text-primary hover:underline font-medium">
+                عرض الكل
+              </Link>
+            }
+          />
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
+            <LoadingState label="جاري تحميل الطلبات..." />
           ) : mappedOrders && mappedOrders.length > 0 ? (
             <OrdersTable
               orders={mappedOrders}
@@ -116,9 +98,11 @@ export default function Dashboard() {
               onSendPaymentLink={handleSendPaymentLink}
             />
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              لا توجد طلبات بعد
-            </div>
+            <EmptyState
+              icon={ClipboardList}
+              title="لا توجد طلبات بعد"
+              description="عندما يصل طلب جديد سيظهر هنا مباشرة"
+            />
           )}
         </div>
       </div>
