@@ -18,6 +18,7 @@ import {
   QrCode,
   Truck,
   Cake,
+  Palette,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarLogo } from './SidebarLogo';
@@ -122,10 +123,16 @@ const menuItems: MenuItem[] = [
     path: '/users',
     allowedRoles: ['admin']
   },
-  { 
-    icon: Settings, 
-    label: 'الإعدادات', 
+  {
+    icon: Settings,
+    label: 'الإعدادات',
     path: '/settings',
+    allowedRoles: ['admin']
+  },
+  {
+    icon: Palette,
+    label: 'دليل التصميم',
+    path: '/design-system',
     allowedRoles: ['admin']
   },
 ];

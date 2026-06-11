@@ -34,6 +34,7 @@ import BranchLive from "./pages/BranchLive";
 import Driver from "./pages/Driver";
 import CustomOrders from "./pages/CustomOrders";
 import CakeCustomizer from "./pages/CakeCustomizer";
+import DesignSystem from "./pages/DesignSystem";
 import LozaHome from "./pages/loza/LozaHome";
 import LozaCustomizer from "./pages/loza/LozaCustomizer";
 import LozaCakeDetails from "./pages/loza/LozaCakeDetails";
@@ -232,6 +233,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRoles={['admin', 'customer_support']}>
                     <CustomOrders />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/design-system"
+                element={
+                  <ProtectedRoute requiredRoles={['admin']}>
+                    <DesignSystem />
                   </ProtectedRoute>
                 }
               />
