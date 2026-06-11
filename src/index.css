@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=DM+Serif+Display&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Pink Cake Theme - Rose & Blush */
+    --background: 350 25% 98%;
+    --foreground: 350 25% 15%;
+
+    --card: 350 30% 99%;
+    --card-foreground: 350 25% 15%;
+
+    --popover: 350 30% 99%;
+    --popover-foreground: 350 25% 15%;
+
+    --primary: 359 31% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 350 20% 94%;
+    --secondary-foreground: 350 25% 25%;
+
+    --muted: 350 15% 95%;
+    --muted-foreground: 350 15% 45%;
+
+    --accent: 340 45% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 350 20% 90%;
+    --input: 350 20% 90%;
+    --ring: 359 31% 61%;
+
+    --radius: 0.75rem;
+
+    /* Custom Colors */
+    --pink: 359 31% 61%;
+    --pink-light: 359 35% 75%;
+    --pink-dark: 359 31% 50%;
+    --rose: 340 45% 55%;
+    --blush: 350 30% 96%;
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 15% 15%;
+    --info: 199 89% 48%;
+
+    /* Status Colors */
+    --status-pending: 38 92% 50%;
+    --status-paid: 142 71% 45%;
+    --status-preparing: 199 89% 48%;
+    --status-ready: 262 83% 58%;
+    --status-delivered: 142 76% 36%;
+
+    --sidebar-background: 350 30% 12%;
+    --sidebar-foreground: 350 20% 95%;
+    --sidebar-primary: 359 31% 61%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 350 25% 18%;
+    --sidebar-accent-foreground: 350 20% 95%;
+    --sidebar-border: 350 20% 20%;
+    --sidebar-ring: 359 31% 61%;
+  }
+
+  .dark {
+    --background: 350 25% 8%;
+    --foreground: 350 20% 95%;
+
+    --card: 350 25% 10%;
+    --card-foreground: 350 20% 95%;
+
+    --popover: 350 25% 10%;
+    --popover-foreground: 350 20% 95%;
+
+    --primary: 359 31% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 350 20% 18%;
+    --secondary-foreground: 350 20% 90%;
+
+    --muted: 350 20% 15%;
+    --muted-foreground: 350 15% 60%;
+
+    --accent: 340 45% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 350 20% 18%;
+    --input: 350 20% 18%;
+    --ring: 359 31% 61%;
+  }
+
+  /* ── LOZA THEME — gold / cream / brown (scoped via .loza-theme) ── */
+  .loza-theme {
+    --background: 36 50% 96%;
+    --foreground: 25 38% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 25 38% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 38% 17%;
+    --primary: 43 56% 54%;
+    --primary-foreground: 25 38% 17%;
+    --secondary: 36 60% 78%;
+    --secondary-foreground: 25 38% 17%;
+    --muted: 33 40% 92%;
+    --muted-foreground: 26 36% 30%;
+    --accent: 25 38% 26%;
+    --accent-foreground: 36 50% 96%;
+    --destructive: 0 65% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 33 40% 87%;
+    --input: 33 40% 87%;
+    --ring: 43 56% 54%;
+    --radius: 1rem;
+
+    --loza-gold: 43 56% 54%;
+    --loza-gold-light: 43 70% 78%;
+    --loza-gold-dark: 38 65% 33%;
+    --loza-cream: 36 50% 96%;
+    --loza-brown: 25 38% 17%;
+    --loza-brown-soft: 26 36% 30%;
+
+    font-family: 'Tajawal', 'Cairo', sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-loza-gold {
+    background: linear-gradient(135deg, hsl(var(--loza-gold-light)) 0%, hsl(var(--loza-gold)) 50%, hsl(var(--loza-gold-dark)) 100%);
+  }
+  .gradient-loza-header {
+    background: linear-gradient(135deg, hsl(var(--loza-brown)) 0%, hsl(var(--loza-brown-soft)) 100%);
+  }
+  .text-gradient-loza {
+    background: linear-gradient(135deg, hsl(var(--loza-gold-dark)) 0%, hsl(var(--loza-gold)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .shadow-loza {
+    box-shadow: 0 8px 30px -8px hsl(var(--loza-gold) / 0.4);
+  }
+  .shadow-loza-lift {
+    box-shadow: 0 20px 50px -15px hsl(var(--loza-brown) / 0.25), 0 8px 20px -8px hsl(var(--loza-gold) / 0.2);
+  }
+  .font-loza-display {
+    font-family: 'DM Serif Display', 'Tajawal', serif;
+  }
+
+  /* 3D Cake preview */
+  .cake-stage {
+    perspective: 1200px;
+    perspective-origin: 50% 40%;
+  }
+  .cake-3d {
+    transform-style: preserve-3d;
+    animation: cake-spin 18s linear infinite;
+  }
+  .cake-tier {
+    transform-style: preserve-3d;
+    position: absolute;
+    left: 50%;
+  }
+  .cake-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+  }
+  @keyframes cake-spin {
+    from { transform: rotateX(62deg) rotateZ(0deg); }
+    to   { transform: rotateX(62deg) rotateZ(360deg); }
+  }
+  .candle-flicker {
+    animation: flicker 1.4s ease-in-out infinite alternate;
+    transform-origin: 50% 100%;
+  }
+  @keyframes flicker {
+    0%   { transform: scale(1) rotate(-2deg); opacity: 0.95; }
+    100% { transform: scale(1.08) rotate(3deg); opacity: 1; }
+  }
+  .sparkle {
+    animation: sparkle 2.4s ease-in-out infinite;
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50%      { opacity: 1;   transform: scale(1.1); }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    direction: rtl;
+  }
+
+  body {
+    @apply bg-background text-foreground font-cairo antialiased;
+  }
+
+  /* Arabic-first display font (this is an RTL app). Latin chars still render nicely in Cairo. */
+  .font-display {
+    font-family: 'Cairo', 'Tajawal', 'Instrument Serif', serif;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  /* Opt-in for Latin serif display where needed */
+  .font-display-latin {
+    font-family: 'Instrument Serif', 'DM Serif Display', serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+
+}
+
+@layer utilities {
+  .gradient-blush-warm {
+    background: linear-gradient(135deg, hsl(350 35% 96%) 0%, hsl(355 50% 88%) 50%, hsl(359 35% 78%) 100%);
+  }
+  .gradient-rose-deep {
+    background: linear-gradient(135deg, hsl(359 31% 61%) 0%, hsl(340 38% 42%) 60%, hsl(20 25% 18%) 100%);
+  }
+  .gradient-cocoa {
+    background: linear-gradient(135deg, hsl(25 30% 22%) 0%, hsl(20 28% 14%) 100%);
+  }
+  .shadow-rose-glow {
+    box-shadow: 0 24px 60px -28px hsl(359 31% 50% / 0.55), 0 8px 24px -12px hsl(359 31% 61% / 0.25);
+  }
+  .shadow-soft-lift {
+    box-shadow: 0 18px 40px -22px hsl(350 30% 20% / 0.20), 0 4px 12px -6px hsl(350 30% 20% / 0.10);
+  }
+  .ring-blush {
+    box-shadow: inset 0 0 0 1px hsl(350 35% 90%);
+  }
+  .noise-overlay {
+    background-image: radial-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+  .marquee {
+    animation: marquee 28s linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-md border border-border/50 shadow-lg;
+  }
+
+  .gradient-pink {
+    background: linear-gradient(135deg, hsl(var(--pink)) 0%, hsl(var(--rose)) 100%);
+  }
+
+  .gradient-warm {
+    background: linear-gradient(135deg, hsl(359 31% 61%) 0%, hsl(340 45% 55%) 100%);
+  }
+
+  .text-gradient-pink {
+    background: linear-gradient(135deg, hsl(var(--pink)) 0%, hsl(var(--rose)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .shadow-warm {
+    box-shadow: 0 10px 40px -10px hsl(var(--primary) / 0.3);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .status-badge {
+    @apply px-3 py-1.5 rounded-full text-sm font-medium inline-flex items-center gap-2;
+  }
+
+  .status-pending {
+    @apply bg-amber-100 text-amber-800;
+  }
+
+  .status-awaiting-payment {
+    @apply bg-orange-100 text-orange-800;
+  }
+
+  .status-paid {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .status-preparing {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .status-ready-to-ship {
+    @apply bg-indigo-100 text-indigo-800;
+  }
+
+  .status-in-transit {
+    @apply bg-purple-100 text-purple-800;
+  }
+
+  .status-ready-pickup {
+    @apply bg-teal-100 text-teal-800;
+  }
+
+  .status-completed {
+    @apply bg-emerald-100 text-emerald-800;
+  }
+
+  .status-custom-pending {
+    @apply bg-pink-100 text-pink-800;
+  }
+
+  .status-custom-approved {
+    @apply bg-cyan-100 text-cyan-800;
+  }
+
+  .status-custom-rejected {
+    @apply bg-red-100 text-red-800;
+  }
+}
