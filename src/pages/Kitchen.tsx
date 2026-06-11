@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { LoadingState, ErrorState } from '@/components/ds';
 import { useKitchenOrders, useUpdateKitchenOrderStatus, useMarkOrderReady, useSendToBranch } from '@/hooks/useKitchenOrders';
 import { useCustomOrdersForReview } from '@/hooks/useCustomOrders';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -58,7 +59,7 @@ export default function Kitchen() {
   const [showBarcodeOrderId, setShowBarcodeOrderId] = useState<string | null>(null);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
   
-  const { data: kitchenOrders = [], isLoading, error } = useKitchenOrders();
+  const { data: kitchenOrders = [], isLoading, error, refetch } = useKitchenOrders();
   const { data: customOrders = [], isLoading: customLoading } = useCustomOrdersForReview();
   const updateStatus = useUpdateKitchenOrderStatus();
   const markReady = useMarkOrderReady();
@@ -89,9 +90,7 @@ export default function Kitchen() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        </div>
+        <LoadingState label="جاري تحميل الطلبات..." />
       </MainLayout>
     );
   }
@@ -99,9 +98,10 @@ export default function Kitchen() {
   if (error) {
     return (
       <MainLayout>
-        <div className="text-center py-16">
-          <p className="text-destructive">حدث خطأ في تحميل الطلبات</p>
-        </div>
+        <ErrorState
+          title="حدث خطأ في تحميل الطلبات"
+          onRetry={() => refetch()}
+        />
       </MainLayout>
     );
   }

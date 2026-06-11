@@ -1,5 +1,5 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader, StatTile, EmptyState, LoadingState, SectionHeading } from '@/components/ds';
+import { PageHeader, StatTile, EmptyState, LoadingState, ErrorState, SectionHeading } from '@/components/ds';
 import { OrdersTable } from '@/components/dashboard/OrdersTable';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useOrders';
 import {
@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { OrderStatus } from '@/types/order';
 
 export default function Dashboard() {
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading, isError, refetch } = useOrders();
   const updateStatus = useUpdateOrderStatus();
 
   const handleApprove = (orderId: string) => {
@@ -91,6 +91,8 @@ export default function Dashboard() {
           />
           {isLoading ? (
             <LoadingState label="جاري تحميل الطلبات..." />
+          ) : isError ? (
+            <ErrorState title="تعذّر تحميل الطلبات" onRetry={() => refetch()} />
           ) : mappedOrders && mappedOrders.length > 0 ? (
             <OrdersTable
               orders={mappedOrders}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader, StatTile, EmptyState, LoadingState, SectionCard, SectionHeading } from '@/components/ds';
+import { PageHeader, StatTile, EmptyState, LoadingState, ErrorState, SkeletonList, SectionCard, SectionHeading } from '@/components/ds';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -341,7 +341,23 @@ export default function DesignSystem() {
                   />
                 </div>
               </div>
+              <div>
+                <h3 className="font-semibold mb-3">ErrorState — فشل التحميل (مع إعادة المحاولة)</h3>
+                <div className="border border-dashed border-border rounded-xl">
+                  <ErrorState onRetry={() => {}} />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3">Skeleton — هيكل التحميل</h3>
+                <SkeletonList rows={2} />
+              </div>
             </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              كل قائمة أو منطقة تجلب بيانات يجب أن تغطّي الحالات الثلاث:{' '}
+              <ClassChip>isLoading → LoadingState/Skeleton</ClassChip>،{' '}
+              <ClassChip>isError → ErrorState (onRetry=refetch)</ClassChip>، والفراغ{' '}
+              <ClassChip>EmptyState</ClassChip>.
+            </p>
 
             <div>
               <h3 className="font-semibold mb-3">SectionHeading — فوق الجداول والمحتوى المُبطّق</h3>
