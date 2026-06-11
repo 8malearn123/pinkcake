@@ -1,0 +1,3 @@
+# RTL guardrail (§1.7) + lint staged files. Tests run in CI, not here.
+node scripts/check-rtl.mjs
+npx lint-staged
