@@ -5,3 +5,8 @@ verify_jwt = false
 
 [functions.admin-impersonate]
 verify_jwt = false
+
+# Called by a Database Webhook (no user JWT); protected by NOTIFICATION_WEBHOOK_SECRET.
+[functions.send-notification]
+verify_jwt = false
+

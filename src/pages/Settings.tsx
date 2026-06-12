@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ColorPicker } from '@/components/settings/ColorPicker';
 import { PresetColors } from '@/components/settings/PresetColors';
+import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { useSettings } from '@/contexts/SettingsContext';
-import { Settings as SettingsIcon, Store, Palette, RotateCcw, Save, Check } from 'lucide-react';
+import { NOTIFICATIONS_UI_ENABLED } from '@/lib/featureFlags';
+import { Settings as SettingsIcon, Store, Palette, RotateCcw, Save, Check, Bell } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 export default function Settings() {
@@ -61,7 +63,7 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="store" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className={NOTIFICATIONS_UI_ENABLED ? 'grid w-full max-w-xl grid-cols-3' : 'grid w-full max-w-md grid-cols-2'}>
             <TabsTrigger value="store" className="gap-2">
               <Store className="w-4 h-4" />
               المتجر
@@ -70,6 +72,12 @@ export default function Settings() {
               <Palette className="w-4 h-4" />
               الألوان
             </TabsTrigger>
+            {NOTIFICATIONS_UI_ENABLED && (
+              <TabsTrigger value="notifications" className="gap-2">
+                <Bell className="w-4 h-4" />
+                الإشعارات
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="store" className="mt-6">
@@ -220,6 +228,12 @@ export default function Settings() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {NOTIFICATIONS_UI_ENABLED && (
+            <TabsContent value="notifications" className="mt-6">
+              <NotificationSettings />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </MainLayout>

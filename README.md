@@ -43,6 +43,11 @@ service-role key belongs only in Edge Functions.
 | `VITE_SUPABASE_PROJECT_ID` | Supabase project ref |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Anon/publishable key (public by design) |
 | `VITE_ENABLE_LOZA` | Toggle the experimental Loza marketplace (`/loza/*`). Defaults: on in dev, off in prod |
+| `VITE_ENABLE_NOTIFICATIONS` | Show the Settings → Notifications tab. `"false"` hides it; shown otherwise |
+
+> Order notifications (customer SMS/WhatsApp) are configured and enabled from
+> **Settings → Notifications**, and run server‑side. Provider API keys live only
+> as Edge Function secrets — see [`docs/notifications.md`](docs/notifications.md).
 
 ## Scripts
 
@@ -52,6 +57,7 @@ service-role key belongs only in Edge Functions.
 | `npm run build` | Production build |
 | `npm run lint` | ESLint over the repo |
 | `npm run check:rtl` | RTL guardrail (§1.7) — fails on new physical-direction utilities |
+| `npm run notify:sync` / `notify:check` | Sync (or verify) the notification core → Edge Function mirror |
 | `npm test` / `npm run test:watch` | Vitest |
 | `npm run verify` | `check:rtl` + `lint` + `test` (run before pushing) |
 | `npm run preview` | Preview the production build |
@@ -91,7 +97,7 @@ src/
   types/              Shared types (order.ts: statuses, labels, colors)
 supabase/
   migrations/         Timestamped SQL (schema, RLS, SECURITY DEFINER RPCs)
-  functions/          Edge Functions (admin-impersonate, create-user, submit-contact)
+  functions/          Edge Functions (admin-impersonate, create-user, submit-contact, send-notification)
 ```
 
 ### Conventions (condensed)

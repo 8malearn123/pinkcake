@@ -15,3 +15,12 @@ export const LOZA_ENABLED: boolean = (() => {
   if (flag === 'false') return false;
   return import.meta.env.DEV;
 })();
+
+/**
+ * Order notifications admin UI (Track T4). Controls whether the "Notifications"
+ * tab is shown in Settings; the actual sending is gated server-side by the
+ * `notification_settings.enabled` row. Shown by default — set
+ * VITE_ENABLE_NOTIFICATIONS="false" to hide the tab entirely.
+ */
+export const NOTIFICATIONS_UI_ENABLED: boolean =
+  import.meta.env.VITE_ENABLE_NOTIFICATIONS !== 'false';
