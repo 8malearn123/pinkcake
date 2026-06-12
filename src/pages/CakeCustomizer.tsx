@@ -220,8 +220,9 @@ export default function CakeCustomizer() {
                   <button
                     onClick={() => s.id < step && setStep(s.id)}
                     disabled={s.id > step}
+                    aria-label={s.title}
                     className={cn(
-                      'flex flex-col items-center gap-1.5 transition-all',
+                      'flex flex-col items-center gap-1.5 transition-all p-1.5 -m-1.5',
                       s.id <= step ? 'cursor-pointer' : 'cursor-not-allowed'
                     )}
                   >

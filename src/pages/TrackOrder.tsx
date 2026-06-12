@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useSettings } from '@/contexts/SettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { OrderStatusTimeline } from '@/components/orders/OrderStatusTimeline';
@@ -37,6 +38,7 @@ interface TrackedOrder {
 }
 
 export default function TrackOrder() {
+  const { settings } = useSettings();
   const [searchParams] = useSearchParams();
   const trackingCode = searchParams.get('code') || '';
   const [searchCode, setSearchCode] = useState(trackingCode);
@@ -124,7 +126,7 @@ export default function TrackOrder() {
             <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center">
               <Cookie className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold">حلويات السعادة</h1>
+            <h1 className="text-xl font-bold">{settings.storeName}</h1>
           </div>
         </div>
       </header>

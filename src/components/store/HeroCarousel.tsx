@@ -120,14 +120,14 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
         <button
           onClick={() => go(-1)}
           aria-label="السابق"
-          className="absolute start-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
+          className="absolute start-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
         <button
           onClick={() => go(1)}
           aria-label="التالي"
-          className="absolute end-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
+          className="absolute end-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -139,11 +139,15 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
               key={i}
               onClick={() => setIndex(i)}
               aria-label={`الشريحة ${i + 1}`}
-              className={cn(
-                'h-1.5 rounded-full transition-all',
-                i === index ? 'w-8 bg-background' : 'w-1.5 bg-background/40'
-              )}
-            />
+              className="p-4 -m-2.5 flex items-center"
+            >
+              <span
+                className={cn(
+                  'h-1.5 rounded-full transition-all',
+                  i === index ? 'w-8 bg-background' : 'w-1.5 bg-background/40'
+                )}
+              />
+            </button>
           ))}
         </div>
       </div>
