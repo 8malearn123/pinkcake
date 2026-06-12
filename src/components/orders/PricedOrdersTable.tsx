@@ -54,7 +54,7 @@ export function PricedOrdersTable() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-mono">{order.order_number}</CardTitle>
-                <Badge variant="secondary" className="bg-cyan-100 text-cyan-700">
+                <Badge variant="secondary" className="bg-info/10 text-info">
                   تم التسعير
                 </Badge>
               </div>

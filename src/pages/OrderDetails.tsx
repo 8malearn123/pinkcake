@@ -92,7 +92,7 @@ export default function OrderDetails() {
               {order.status === 'pending_approval' && (
                 <Button
                   onClick={handleApprove}
-                  className="gradient-gold text-white"
+                  className="gradient-pink text-white"
                   disabled={updateStatus.isPending}
                 >
                   {updateStatus.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
@@ -103,7 +103,7 @@ export default function OrderDetails() {
                 <Button
                   onClick={handleSendWhatsApp}
                   variant="outline"
-                  className="border-green-500 text-green-600 hover:bg-green-50"
+                  className="border-success text-success hover:bg-success/10"
                 >
                   <MessageCircle className="w-4 h-4 me-2" />
                   إرسال واتساب

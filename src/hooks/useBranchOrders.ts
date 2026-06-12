@@ -82,7 +82,7 @@ export const BRANCH_STATUS_LABELS: Record<string, string> = {
 };
 
 export const BRANCH_STATUS_COLORS: Record<string, string> = {
-  in_transit: 'bg-blue-100 text-blue-800',
-  ready_for_pickup: 'bg-amber-100 text-amber-800',
-  completed: 'bg-green-100 text-green-800',
+  in_transit: 'bg-info/10 text-info',
+  ready_for_pickup: 'bg-warning/10 text-warning',
+  completed: 'bg-success/10 text-success',
 };

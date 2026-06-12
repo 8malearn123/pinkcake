@@ -59,9 +59,9 @@ const statusIcons: Record<SubmissionStatus, React.ReactNode> = {
 };
 
 const statusColors: Record<SubmissionStatus, string> = {
-  new: 'bg-amber-100 text-amber-800',
-  in_progress: 'bg-blue-100 text-blue-800',
-  closed: 'bg-green-100 text-green-800',
+  new: 'bg-warning/10 text-warning',
+  in_progress: 'bg-info/10 text-info',
+  closed: 'bg-success/10 text-success',
 };
 
 export default function ContactSubmissions() {
@@ -140,34 +140,34 @@ export default function ContactSubmissions() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Clock className="w-4 h-4 text-amber-500" />
+                <Clock className="w-4 h-4 text-warning" />
                 جديد
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-amber-600">{newCount}</div>
+              <div className="text-2xl font-bold text-warning">{newCount}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Loader2 className="w-4 h-4 text-blue-500" />
+                <Loader2 className="w-4 h-4 text-info" />
                 قيد المتابعة
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{inProgressCount}</div>
+              <div className="text-2xl font-bold text-info">{inProgressCount}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-success" />
                 مغلق
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-success">
                 {submissions?.filter(s => s.status === 'closed').length || 0}
               </div>
             </CardContent>

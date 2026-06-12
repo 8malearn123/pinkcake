@@ -70,7 +70,7 @@ export function OrdersTable({ orders, onApprove, onSendPaymentLink }: OrdersTabl
                       <Button
                         size="sm"
                         onClick={() => onApprove?.(order.id)}
-                        className="gradient-gold text-white hover:opacity-90"
+                        className="gradient-pink text-white hover:opacity-90"
                       >
                         اعتماد
                       </Button>

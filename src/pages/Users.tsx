@@ -113,8 +113,8 @@ export default function Users() {
           <Card className="col-span-1">
             <CardContent className="pt-4 pb-3 px-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
-                  <Shield className="w-4 h-4 text-purple-600" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Shield className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <p className="text-xl font-bold">{stats.admins}</p>
@@ -126,8 +126,8 @@ export default function Users() {
           <Card className="col-span-1">
             <CardContent className="pt-4 pb-3 px-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                  <UserCheck className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
+                  <UserCheck className="w-4 h-4 text-info" />
                 </div>
                 <div>
                   <p className="text-xl font-bold">{stats.callCenter}</p>
@@ -139,8 +139,8 @@ export default function Users() {
           <Card className="col-span-1">
             <CardContent className="pt-4 pb-3 px-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                  <ChefHat className="w-4 h-4 text-orange-600" />
+                <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
+                  <ChefHat className="w-4 h-4 text-warning" />
                 </div>
                 <div>
                   <p className="text-xl font-bold">{stats.kitchen}</p>
@@ -152,8 +152,8 @@ export default function Users() {
           <Card className="col-span-1">
             <CardContent className="pt-4 pb-3 px-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                  <Store className="w-4 h-4 text-green-600" />
+                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+                  <Store className="w-4 h-4 text-success" />
                 </div>
                 <div>
                   <p className="text-xl font-bold">{stats.branch}</p>
@@ -165,8 +165,8 @@ export default function Users() {
           <Card className="col-span-1">
             <CardContent className="pt-4 pb-3 px-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center shrink-0">
-                  <Truck className="w-4 h-4 text-cyan-600" />
+                <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
+                  <Truck className="w-4 h-4 text-info" />
                 </div>
                 <div>
                   <p className="text-xl font-bold">{stats.drivers}</p>
@@ -178,8 +178,8 @@ export default function Users() {
           <Card className="col-span-1">
             <CardContent className="pt-4 pb-3 px-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center shrink-0">
-                  <HeadphonesIcon className="w-4 h-4 text-teal-600" />
+                <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
+                  <HeadphonesIcon className="w-4 h-4 text-info" />
                 </div>
                 <div>
                   <p className="text-xl font-bold">{stats.support}</p>
@@ -191,8 +191,8 @@ export default function Users() {
           <Card className="col-span-1">
             <CardContent className="pt-4 pb-3 px-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center shrink-0">
-                  <UserCircle className="w-4 h-4 text-pink-600" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <UserCircle className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <p className="text-xl font-bold">{stats.customers}</p>

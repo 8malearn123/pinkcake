@@ -70,9 +70,9 @@ const BRANCH_STATUS_LABELS: Record<string, string> = {
 };
 
 const BRANCH_STATUS_COLORS: Record<string, string> = {
-  in_transit: 'bg-blue-100 text-blue-800',
-  ready_for_pickup: 'bg-amber-100 text-amber-800',
-  completed: 'bg-green-100 text-green-800',
+  in_transit: 'bg-info/10 text-info',
+  ready_for_pickup: 'bg-warning/10 text-warning',
+  completed: 'bg-success/10 text-success',
 };
 
 export default function BranchOrders() {
@@ -268,8 +268,8 @@ export default function BranchOrders() {
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <Truck className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center">
+                  <Truck className="w-6 h-6 text-info" />
                 </div>
                 <div>
                   <p className="text-3xl font-bold">{stats.inTransit}</p>
@@ -285,8 +285,8 @@ export default function BranchOrders() {
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                  <HandCoins className="w-6 h-6 text-amber-600" />
+                <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
+                  <HandCoins className="w-6 h-6 text-warning" />
                 </div>
                 <div>
                   <p className="text-3xl font-bold">{stats.readyForPickup}</p>
@@ -302,8 +302,8 @@ export default function BranchOrders() {
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                  <CheckCircle2 className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-success" />
                 </div>
                 <div>
                   <p className="text-3xl font-bold">{stats.completed}</p>

@@ -148,54 +148,54 @@ export default function BranchLive() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <Card className="bg-blue-500/10 border-blue-500/20">
+          <Card className="bg-info/10 border-info">
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <Truck className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-full bg-info/20 flex items-center justify-center">
+                  <Truck className="w-5 h-5 text-info" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">في الطريق</p>
-                  <p className="text-2xl font-bold text-blue-600">{incomingOrders.length}</p>
+                  <p className="text-2xl font-bold text-info">{incomingOrders.length}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-green-500/10 border-green-500/20">
+          <Card className="bg-success/10 border-success">
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 text-success" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">جاهز للاستلام</p>
-                  <p className="text-2xl font-bold text-green-600">{readyOrders.length}</p>
+                  <p className="text-2xl font-bold text-success">{readyOrders.length}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-orange-500/10 border-orange-500/20">
+          <Card className="bg-warning/10 border-warning">
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-orange-600" />
+                <div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-warning" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">طلبات اليوم</p>
-                  <p className="text-2xl font-bold text-orange-600">{todayOrders.length}</p>
+                  <p className="text-2xl font-bold text-warning">{todayOrders.length}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-purple-500/10 border-purple-500/20">
+          <Card className="bg-primary/10 border-primary">
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <Package className="w-5 h-5 text-purple-600" />
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Package className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">إجمالي الطلبات</p>
-                  <p className="text-2xl font-bold text-purple-600">{orders.length}</p>
+                  <p className="text-2xl font-bold text-primary">{orders.length}</p>
                 </div>
               </div>
             </CardContent>
@@ -243,7 +243,7 @@ export default function BranchLive() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {incomingOrders.map((order) => (
                   <Card key={order.id} className="overflow-hidden">
-                    <CardHeader className="pb-3 bg-blue-500/5">
+                    <CardHeader className="pb-3 bg-info/5">
                       <div className="flex items-center justify-between">
                         <CardTitle className="font-mono text-lg">{order.order_number}</CardTitle>
                         <StatusBadge status={order.status as OrderStatus} showIcon={false} />
@@ -314,7 +314,7 @@ export default function BranchLive() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {readyOrders.map((order) => (
                   <Card key={order.id} className="overflow-hidden">
-                    <CardHeader className="pb-3 bg-green-500/5">
+                    <CardHeader className="pb-3 bg-success/5">
                       <div className="flex items-center justify-between">
                         <CardTitle className="font-mono text-lg">{order.order_number}</CardTitle>
                         <StatusBadge status={order.status as OrderStatus} showIcon={false} />
@@ -339,7 +339,7 @@ export default function BranchLive() {
                       </div>
 
                       <div className="pt-2">
-                        <p className="text-xs text-green-600 flex items-center gap-1">
+                        <p className="text-xs text-success flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
                           جاهز لاستلام العميل
                         </p>

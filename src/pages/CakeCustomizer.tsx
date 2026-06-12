@@ -97,9 +97,9 @@ const PRINT_PRICE = 15;
 // ── Reusable design tokens ──────────────────────────────────────────────
 const CARD_BASE =
   'group relative rounded-2xl border bg-card text-start transition-all duration-200 ' +
-  'hover:border-primary/40 hover:shadow-[0_8px_24px_-12px_rgba(190,123,124,0.25)]';
+  'hover:border-primary/40 hover:shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.25)]';
 const CARD_SELECTED =
-  'border-primary ring-2 ring-primary/20 shadow-[0_8px_24px_-12px_rgba(190,123,124,0.4)] bg-primary/[0.03]';
+  'border-primary ring-2 ring-primary/20 shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.4)] bg-primary/[0.03]';
 const CARD_IDLE = 'border-border/60';
 
 const SelectedTick = () => (
@@ -229,7 +229,7 @@ export default function CakeCustomizer() {
                     <div
                       className={cn(
                         'w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold transition-all border',
-                        isActive && 'bg-primary text-primary-foreground border-primary scale-110 shadow-[0_4px_12px_-2px_rgba(190,123,124,0.5)]',
+                        isActive && 'bg-primary text-primary-foreground border-primary scale-110 shadow-[0_4px_12px_-2px_hsl(var(--primary)/0.5)]',
                         isDone && 'bg-primary/10 text-primary border-primary/30',
                         !isActive && !isDone && 'bg-muted/40 text-muted-foreground border-transparent'
                       )}
@@ -489,7 +489,7 @@ export default function CakeCustomizer() {
             <Button
               onClick={next}
               disabled={!canProceed}
-              className="gap-1.5 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_rgba(190,123,124,0.6)] disabled:opacity-40 disabled:shadow-none"
+              className="gap-1.5 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)] disabled:opacity-40 disabled:shadow-none"
             >
               التالي
               <ChevronLeft className="w-4 h-4" />
@@ -497,7 +497,7 @@ export default function CakeCustomizer() {
           ) : (
             <Button
               onClick={handleSubmit}
-              className="gap-2 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_rgba(190,123,124,0.6)]"
+              className="gap-2 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)]"
             >
               <ShoppingCart className="w-4 h-4" />
               إرسال الطلب

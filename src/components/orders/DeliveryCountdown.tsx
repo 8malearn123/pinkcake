@@ -54,7 +54,7 @@ export function DeliveryCountdown({ deliveryDate, deliveryTime, status, compact 
   if (status === 'completed') {
     return (
       <div className={cn(
-        'flex items-center gap-1.5 text-emerald-600',
+        'flex items-center gap-1.5 text-success',
         compact ? 'text-xs' : 'text-sm'
       )}>
         <CheckCircle2 className={cn(compact ? 'w-3 h-3' : 'w-4 h-4')} />
@@ -72,9 +72,9 @@ export function DeliveryCountdown({ deliveryDate, deliveryTime, status, compact 
   const isWarning = !isOverdue && !isUrgent && timeLeft.total < 6 * 60 * 60 * 1000; // Less than 6 hours
 
   const getStatusColor = () => {
-    if (isOverdue) return 'text-red-600 bg-red-50';
-    if (isUrgent) return 'text-orange-600 bg-orange-50';
-    if (isWarning) return 'text-amber-600 bg-amber-50';
+    if (isOverdue) return 'text-destructive bg-destructive/10';
+    if (isUrgent) return 'text-warning bg-warning/10';
+    if (isWarning) return 'text-warning bg-warning/10';
     return 'text-primary bg-primary/10';
   };
 

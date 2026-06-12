@@ -63,7 +63,7 @@ export function AdminStatusOverride({ orderId, currentStatus }: AdminStatusOverr
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
+        <Button variant="outline" className="border-warning text-warning hover:bg-warning/10">
           <Shield className="w-4 h-4 me-2" />
           تغيير الحالة (مدير)
         </Button>
@@ -71,7 +71,7 @@ export function AdminStatusOverride({ orderId, currentStatus }: AdminStatusOverr
       <DialogContent className="sm:max-w-md" dir="rtl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-amber-500" />
+            <Shield className="w-5 h-5 text-warning" />
             تغيير حالة الطلب
           </DialogTitle>
           <DialogDescription>
@@ -120,8 +120,8 @@ export function AdminStatusOverride({ orderId, currentStatus }: AdminStatusOverr
             )}
           </div>
           
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-            <p className="text-sm text-amber-800">
+          <div className="bg-warning/10 border border-warning/30 rounded-lg p-3">
+            <p className="text-sm text-warning">
               ⚠️ سيتم تسجيل هذا التغيير كـ "تجاوز إداري" في سجل الطلب
             </p>
           </div>
@@ -134,7 +134,7 @@ export function AdminStatusOverride({ orderId, currentStatus }: AdminStatusOverr
           <Button 
             onClick={handleSubmit}
             disabled={!reason.trim() || newStatus === currentStatus || changeStatus.isPending}
-            className="bg-amber-500 hover:bg-amber-600"
+            className="bg-warning hover:bg-warning"
           >
             {changeStatus.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
             تأكيد التغيير

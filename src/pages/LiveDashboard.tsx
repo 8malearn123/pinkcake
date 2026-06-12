@@ -34,22 +34,22 @@ import { Enums } from '@/integrations/supabase/types';
 type OrderStatus = Enums<'order_status'>;
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; icon: React.ReactNode; color: string; bgColor: string }> = {
-  pending_approval: { label: 'بانتظار الموافقة', icon: <Clock className="w-4 h-4" />, color: 'text-amber-600', bgColor: 'bg-amber-100' },
-  awaiting_payment: { label: 'بانتظار الدفع', icon: <CreditCard className="w-4 h-4" />, color: 'text-orange-600', bgColor: 'bg-orange-100' },
-  paid: { label: 'تم الدفع', icon: <DollarSign className="w-4 h-4" />, color: 'text-green-600', bgColor: 'bg-green-100' },
-  preparing: { label: 'قيد التحضير', icon: <ChefHat className="w-4 h-4" />, color: 'text-blue-600', bgColor: 'bg-blue-100' },
-  ready_to_ship: { label: 'جاهز للشحن', icon: <Package className="w-4 h-4" />, color: 'text-indigo-600', bgColor: 'bg-indigo-100' },
-  in_transit: { label: 'في الطريق', icon: <Truck className="w-4 h-4" />, color: 'text-purple-600', bgColor: 'bg-purple-100' },
-  ready_for_pickup: { label: 'جاهز للاستلام', icon: <Bell className="w-4 h-4" />, color: 'text-teal-600', bgColor: 'bg-teal-100' },
-  completed: { label: 'مكتمل', icon: <CheckCircle2 className="w-4 h-4" />, color: 'text-emerald-600', bgColor: 'bg-emerald-100' },
-  custom_pending_review: { label: 'طلب مخصص - بانتظار المراجعة', icon: <Clock className="w-4 h-4" />, color: 'text-pink-600', bgColor: 'bg-pink-100' },
-  custom_chef_approved: { label: 'طلب مخصص - تمت الموافقة', icon: <CheckCircle2 className="w-4 h-4" />, color: 'text-cyan-600', bgColor: 'bg-cyan-100' },
-  custom_rejected: { label: 'طلب مخصص - مرفوض', icon: <Clock className="w-4 h-4" />, color: 'text-red-600', bgColor: 'bg-red-100' },
-  sent_to_chef: { label: 'أُرسل للشيف', icon: <ChefHat className="w-4 h-4" />, color: 'text-pink-600', bgColor: 'bg-pink-100' },
-  chef_priced: { label: 'تم التسعير', icon: <DollarSign className="w-4 h-4" />, color: 'text-cyan-600', bgColor: 'bg-cyan-100' },
-  pricing_sent_to_customer: { label: 'بانتظار رد العميل', icon: <Clock className="w-4 h-4" />, color: 'text-orange-600', bgColor: 'bg-orange-100' },
-  customer_accepted: { label: 'قُبل السعر', icon: <CheckCircle2 className="w-4 h-4" />, color: 'text-green-600', bgColor: 'bg-green-100' },
-  customer_rejected: { label: 'رُفض السعر', icon: <Clock className="w-4 h-4" />, color: 'text-red-600', bgColor: 'bg-red-100' },
+  pending_approval: { label: 'بانتظار الموافقة', icon: <Clock className="w-4 h-4" />, color: 'text-warning', bgColor: 'bg-warning/10' },
+  awaiting_payment: { label: 'بانتظار الدفع', icon: <CreditCard className="w-4 h-4" />, color: 'text-warning', bgColor: 'bg-warning/10' },
+  paid: { label: 'تم الدفع', icon: <DollarSign className="w-4 h-4" />, color: 'text-success', bgColor: 'bg-success/10' },
+  preparing: { label: 'قيد التحضير', icon: <ChefHat className="w-4 h-4" />, color: 'text-info', bgColor: 'bg-info/10' },
+  ready_to_ship: { label: 'جاهز للشحن', icon: <Package className="w-4 h-4" />, color: 'text-info', bgColor: 'bg-info/10' },
+  in_transit: { label: 'في الطريق', icon: <Truck className="w-4 h-4" />, color: 'text-primary', bgColor: 'bg-primary/10' },
+  ready_for_pickup: { label: 'جاهز للاستلام', icon: <Bell className="w-4 h-4" />, color: 'text-info', bgColor: 'bg-info/10' },
+  completed: { label: 'مكتمل', icon: <CheckCircle2 className="w-4 h-4" />, color: 'text-success', bgColor: 'bg-success/10' },
+  custom_pending_review: { label: 'طلب مخصص - بانتظار المراجعة', icon: <Clock className="w-4 h-4" />, color: 'text-primary', bgColor: 'bg-primary/10' },
+  custom_chef_approved: { label: 'طلب مخصص - تمت الموافقة', icon: <CheckCircle2 className="w-4 h-4" />, color: 'text-info', bgColor: 'bg-info/10' },
+  custom_rejected: { label: 'طلب مخصص - مرفوض', icon: <Clock className="w-4 h-4" />, color: 'text-destructive', bgColor: 'bg-destructive/10' },
+  sent_to_chef: { label: 'أُرسل للشيف', icon: <ChefHat className="w-4 h-4" />, color: 'text-primary', bgColor: 'bg-primary/10' },
+  chef_priced: { label: 'تم التسعير', icon: <DollarSign className="w-4 h-4" />, color: 'text-info', bgColor: 'bg-info/10' },
+  pricing_sent_to_customer: { label: 'بانتظار رد العميل', icon: <Clock className="w-4 h-4" />, color: 'text-warning', bgColor: 'bg-warning/10' },
+  customer_accepted: { label: 'قُبل السعر', icon: <CheckCircle2 className="w-4 h-4" />, color: 'text-success', bgColor: 'bg-success/10' },
+  customer_rejected: { label: 'رُفض السعر', icon: <Clock className="w-4 h-4" />, color: 'text-destructive', bgColor: 'bg-destructive/10' },
 };
 
 export default function LiveDashboard() {
@@ -73,9 +73,9 @@ export default function LiveDashboard() {
   };
 
   const getEventIcon = (event: RealtimeEvent) => {
-    if (event.type === 'INSERT') return <ArrowUp className="w-4 h-4 text-green-500" />;
-    if (event.type === 'DELETE') return <ArrowDown className="w-4 h-4 text-red-500" />;
-    return <Minus className="w-4 h-4 text-blue-500" />;
+    if (event.type === 'INSERT') return <ArrowUp className="w-4 h-4 text-success" />;
+    if (event.type === 'DELETE') return <ArrowDown className="w-4 h-4 text-destructive" />;
+    return <Minus className="w-4 h-4 text-info" />;
   };
 
   const getEventLabel = (event: RealtimeEvent) => {
@@ -111,7 +111,7 @@ export default function LiveDashboard() {
             {/* Connection Status */}
             <div className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-lg',
-              isConnected ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              isConnected ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
             )}>
               {isConnected ? (
                 <>
@@ -127,7 +127,7 @@ export default function LiveDashboard() {
             </div>
             {/* Current Time */}
             <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg">
-              <Radio className="w-4 h-4 text-red-500 animate-pulse" />
+              <Radio className="w-4 h-4 text-destructive animate-pulse" />
               <span className="font-mono text-lg font-bold">
                 {format(currentTime, 'HH:mm:ss')}
               </span>
@@ -156,9 +156,9 @@ export default function LiveDashboard() {
               <Card className="bg-gradient-to-br from-amber-100 to-amber-50">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <Clock className="w-8 h-8 mx-auto text-amber-600 mb-2" />
-                    <p className="text-3xl font-bold text-amber-700">{stats.pendingApproval}</p>
-                    <p className="text-sm text-amber-600">بانتظار الموافقة</p>
+                    <Clock className="w-8 h-8 mx-auto text-warning mb-2" />
+                    <p className="text-3xl font-bold text-warning">{stats.pendingApproval}</p>
+                    <p className="text-sm text-warning">بانتظار الموافقة</p>
                   </div>
                 </CardContent>
               </Card>
@@ -166,9 +166,9 @@ export default function LiveDashboard() {
               <Card className="bg-gradient-to-br from-blue-100 to-blue-50">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <ChefHat className="w-8 h-8 mx-auto text-blue-600 mb-2" />
-                    <p className="text-3xl font-bold text-blue-700">{stats.paid + stats.preparing}</p>
-                    <p className="text-sm text-blue-600">قيد التجهيز</p>
+                    <ChefHat className="w-8 h-8 mx-auto text-info mb-2" />
+                    <p className="text-3xl font-bold text-info">{stats.paid + stats.preparing}</p>
+                    <p className="text-sm text-info">قيد التجهيز</p>
                   </div>
                 </CardContent>
               </Card>
@@ -176,9 +176,9 @@ export default function LiveDashboard() {
               <Card className="bg-gradient-to-br from-purple-100 to-purple-50">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <Truck className="w-8 h-8 mx-auto text-purple-600 mb-2" />
-                    <p className="text-3xl font-bold text-purple-700">{stats.readyToShip + stats.inTransit}</p>
-                    <p className="text-sm text-purple-600">في التوصيل</p>
+                    <Truck className="w-8 h-8 mx-auto text-primary mb-2" />
+                    <p className="text-3xl font-bold text-primary">{stats.readyToShip + stats.inTransit}</p>
+                    <p className="text-sm text-primary">في التوصيل</p>
                   </div>
                 </CardContent>
               </Card>
@@ -186,9 +186,9 @@ export default function LiveDashboard() {
               <Card className="bg-gradient-to-br from-green-100 to-green-50">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <CheckCircle2 className="w-8 h-8 mx-auto text-green-600 mb-2" />
-                    <p className="text-3xl font-bold text-green-700">{stats.completed}</p>
-                    <p className="text-sm text-green-600">مكتمل</p>
+                    <CheckCircle2 className="w-8 h-8 mx-auto text-success mb-2" />
+                    <p className="text-3xl font-bold text-success">{stats.completed}</p>
+                    <p className="text-sm text-success">مكتمل</p>
                   </div>
                 </CardContent>
               </Card>
@@ -196,9 +196,9 @@ export default function LiveDashboard() {
               <Card className="bg-gradient-to-br from-emerald-100 to-emerald-50">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <TrendingUp className="w-8 h-8 mx-auto text-emerald-600 mb-2" />
-                    <p className="text-xl font-bold text-emerald-700">{formatCurrency(stats.todayRevenue)}</p>
-                    <p className="text-sm text-emerald-600">إيرادات اليوم</p>
+                    <TrendingUp className="w-8 h-8 mx-auto text-success mb-2" />
+                    <p className="text-xl font-bold text-success">{formatCurrency(stats.todayRevenue)}</p>
+                    <p className="text-sm text-success">إيرادات اليوم</p>
                   </div>
                 </CardContent>
               </Card>
@@ -257,7 +257,7 @@ export default function LiveDashboard() {
               <Card className="lg:col-span-1">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Bell className="w-5 h-5 text-amber-500" />
+                    <Bell className="w-5 h-5 text-warning" />
                     تتطلب انتباهك
                     {urgentOrders.length > 0 && (
                       <Badge variant="destructive" className="ms-2">
@@ -270,7 +270,7 @@ export default function LiveDashboard() {
                   <ScrollArea className="h-[400px]">
                     {urgentOrders.length === 0 ? (
                       <div className="text-center py-12 text-muted-foreground">
-                        <CheckCircle2 className="w-12 h-12 mx-auto mb-4 text-green-500" />
+                        <CheckCircle2 className="w-12 h-12 mx-auto mb-4 text-success" />
                         <p>لا توجد طلبات معلقة</p>
                         <p className="text-sm mt-1">جميع الطلبات تمت معالجتها</p>
                       </div>
@@ -279,12 +279,12 @@ export default function LiveDashboard() {
                         {urgentOrders.map((order) => (
                           <div
                             key={order.id}
-                            className="p-4 rounded-lg border border-amber-200 bg-amber-50/50 hover:bg-amber-100/50 transition-colors cursor-pointer"
+                            className="p-4 rounded-lg border border-warning/30 bg-warning/50 hover:bg-warning/50 transition-colors cursor-pointer"
                             onClick={() => navigate(`/orders/${order.id}`)}
                           >
                             <div className="flex items-center justify-between mb-2">
                               <span className="font-mono font-bold">{order.order_number}</span>
-                              <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
+                              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
                                 {STATUS_CONFIG[order.status as OrderStatus]?.label}
                               </Badge>
                             </div>

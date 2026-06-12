@@ -247,7 +247,7 @@ export function NewOrderForm() {
                 ))}
             </SelectContent>
           </Select>
-          <Button type="button" onClick={addProduct} className="gradient-gold text-white">
+          <Button type="button" onClick={addProduct} className="gradient-pink text-white">
             <Plus className="w-4 h-4 me-1" />
             إضافة
           </Button>
@@ -333,7 +333,7 @@ export function NewOrderForm() {
         </Button>
         <Button
           type="submit"
-          className="gradient-gold text-white px-8"
+          className="gradient-pink text-white px-8"
           disabled={createOrder.isPending}
         >
           {createOrder.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
