@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader, StatTile, EmptyState, LoadingState, SectionCard, SectionHeading } from '@/components/ds';
+import { PageHeader, StatTile, EmptyState, LoadingState, ErrorState, SkeletonList, SectionCard, SectionHeading } from '@/components/ds';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -237,7 +237,7 @@ export default function DesignSystem() {
           <div className="space-y-5">
             <div className="flex flex-wrap items-center gap-3">
               <Button className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
-                <Plus className="w-5 h-5 ml-2" />
+                <Plus className="w-5 h-5 me-2" />
                 الإجراء الرئيسي (CTA)
               </Button>
               <Button>افتراضي</Button>
@@ -256,7 +256,7 @@ export default function DesignSystem() {
             <div className="rounded-xl bg-muted/50 p-4 text-sm text-muted-foreground space-y-1 leading-relaxed">
               <p>• زر CTA المتدرّج (<ClassChip>gradient-pink text-white shadow-warm</ClassChip>): واحد فقط لكل شاشة، للإجراء الأهم.</p>
               <p>• <ClassChip>destructive</ClassChip> للحذف والإلغاء النهائي فقط، ومعه تأكيد دائماً.</p>
-              <p>• الأيقونة قبل النص بهامش <ClassChip>ml-2</ClassChip> (الواجهة RTL).</p>
+              <p>• الأيقونة قبل النص بهامش <ClassChip>me-2</ClassChip> (الواجهة RTL).</p>
             </div>
           </div>
         </SectionCard>
@@ -270,7 +270,7 @@ export default function DesignSystem() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="ds-phone">رقم الجوال</Label>
-              <Input id="ds-phone" dir="ltr" className="text-left" placeholder="05xxxxxxxx" />
+              <Input id="ds-phone" dir="ltr" className="text-left" placeholder="05xxxxxxxx" />{/* rtl-ok: LTR phone field */}
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="ds-notes">ملاحظات</Label>
@@ -303,7 +303,7 @@ export default function DesignSystem() {
                   description="تابع الطلبات الجاهزة للتجهيز"
                   actions={
                     <Button className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
-                      <Plus className="w-5 h-5 ml-2" />
+                      <Plus className="w-5 h-5 me-2" />
                       طلب جديد
                     </Button>
                   }
@@ -341,7 +341,23 @@ export default function DesignSystem() {
                   />
                 </div>
               </div>
+              <div>
+                <h3 className="font-semibold mb-3">ErrorState — فشل التحميل (مع إعادة المحاولة)</h3>
+                <div className="border border-dashed border-border rounded-xl">
+                  <ErrorState onRetry={() => {}} />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3">Skeleton — هيكل التحميل</h3>
+                <SkeletonList rows={2} />
+              </div>
             </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              كل قائمة أو منطقة تجلب بيانات يجب أن تغطّي الحالات الثلاث:{' '}
+              <ClassChip>isLoading → LoadingState/Skeleton</ClassChip>،{' '}
+              <ClassChip>isError → ErrorState (onRetry=refetch)</ClassChip>، والفراغ{' '}
+              <ClassChip>EmptyState</ClassChip>.
+            </p>
 
             <div>
               <h3 className="font-semibold mb-3">SectionHeading — فوق الجداول والمحتوى المُبطّق</h3>
@@ -372,7 +388,7 @@ export default function DesignSystem() {
           icon={Sparkles}
           action={
             <Button variant="outline" size="sm" onClick={() => setMotionKey((k) => k + 1)}>
-              <RotateCcw className="w-4 h-4 ml-2" />
+              <RotateCcw className="w-4 h-4 me-2" />
               إعادة التشغيل
             </Button>
           }

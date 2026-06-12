@@ -207,12 +207,13 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   driver: 'سائق توصيل',
 };
 
+/* مميّزة بصرياً لكل دور — من الرموز الدلالية فقط (accent/muted يوسّعان التنويع) */
 export const ROLE_COLORS: Record<AppRole, string> = {
-  admin: 'bg-purple-100 text-purple-800',
-  call_center: 'bg-blue-100 text-blue-800',
-  kitchen: 'bg-orange-100 text-orange-800',
-  branch: 'bg-green-100 text-green-800',
-  customer: 'bg-pink-100 text-pink-800',
-  customer_support: 'bg-teal-100 text-teal-800',
-  driver: 'bg-cyan-100 text-cyan-800',
+  admin: 'bg-primary/10 text-primary',
+  call_center: 'bg-info/10 text-info',
+  kitchen: 'bg-warning/10 text-warning',
+  branch: 'bg-success/10 text-success',
+  customer: 'bg-accent/10 text-accent',
+  customer_support: 'bg-info/10 text-info',
+  driver: 'bg-muted text-muted-foreground',
 };

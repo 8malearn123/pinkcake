@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useSettings } from '@/contexts/SettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { OrderStatusTimeline } from '@/components/orders/OrderStatusTimeline';
@@ -37,6 +38,7 @@ interface TrackedOrder {
 }
 
 export default function TrackOrder() {
+  const { settings } = useSettings();
   const [searchParams] = useSearchParams();
   const trackingCode = searchParams.get('code') || '';
   const [searchCode, setSearchCode] = useState(trackingCode);
@@ -121,10 +123,10 @@ export default function TrackOrder() {
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
               <Cookie className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold">حلويات السعادة</h1>
+            <h1 className="text-xl font-bold">{settings.storeName}</h1>
           </div>
         </div>
       </header>
@@ -140,7 +142,7 @@ export default function TrackOrder() {
               placeholder="أدخل رقم التتبع..."
               className="text-center"
             />
-            <Button type="submit" className="gradient-gold text-white" disabled={searching}>
+            <Button type="submit" className="gradient-pink text-white" disabled={searching}>
               {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
             </Button>
           </form>
@@ -233,7 +235,7 @@ export default function TrackOrder() {
             <div className="glass-card rounded-2xl p-6 text-center">
               <p className="text-muted-foreground mb-3">لديك استفسار؟</p>
               <Button variant="outline" className="border-primary text-primary">
-                <Phone className="w-4 h-4 ml-2" />
+                <Phone className="w-4 h-4 me-2" />
                 اتصل بنا
               </Button>
             </div>

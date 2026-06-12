@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Environment — never commit real secrets; copy .env.example → .env
+.env
+.env*.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -281,19 +281,19 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
                         <SelectContent>
                           <SelectItem value="feasible">
                             <span className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-green-500" />
+                              <Check className="h-4 w-4 text-success" />
                               ممكن التنفيذ
                             </span>
                           </SelectItem>
                           <SelectItem value="needs_modification">
                             <span className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-yellow-500" />
+                              <Clock className="h-4 w-4 text-warning" />
                               يحتاج تعديل
                             </span>
                           </SelectItem>
                           <SelectItem value="not_feasible">
                             <span className="flex items-center gap-2">
-                              <X className="h-4 w-4 text-red-500" />
+                              <X className="h-4 w-4 text-destructive" />
                               غير ممكن
                             </span>
                           </SelectItem>
@@ -427,7 +427,7 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
               >
                 {reviewOrder.isPending ? (
                   <>
-                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
                     جاري الإرسال...
                   </>
                 ) : feasibility === 'not_feasible' ? (

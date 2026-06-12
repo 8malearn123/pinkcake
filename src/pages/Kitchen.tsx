@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { LoadingState, ErrorState } from '@/components/ds';
 import { useKitchenOrders, useUpdateKitchenOrderStatus, useMarkOrderReady, useSendToBranch } from '@/hooks/useKitchenOrders';
 import { useCustomOrdersForReview } from '@/hooks/useCustomOrders';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -58,7 +59,7 @@ export default function Kitchen() {
   const [showBarcodeOrderId, setShowBarcodeOrderId] = useState<string | null>(null);
   const [reviewOrder, setReviewOrder] = useState<any>(null);
   
-  const { data: kitchenOrders = [], isLoading, error } = useKitchenOrders();
+  const { data: kitchenOrders = [], isLoading, error, refetch } = useKitchenOrders();
   const { data: customOrders = [], isLoading: customLoading } = useCustomOrdersForReview();
   const updateStatus = useUpdateKitchenOrderStatus();
   const markReady = useMarkOrderReady();
@@ -89,9 +90,7 @@ export default function Kitchen() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        </div>
+        <LoadingState label="جاري تحميل الطلبات..." />
       </MainLayout>
     );
   }
@@ -99,9 +98,10 @@ export default function Kitchen() {
   if (error) {
     return (
       <MainLayout>
-        <div className="text-center py-16">
-          <p className="text-destructive">حدث خطأ في تحميل الطلبات</p>
-        </div>
+        <ErrorState
+          title="حدث خطأ في تحميل الطلبات"
+          onRetry={() => refetch()}
+        />
       </MainLayout>
     );
   }
@@ -113,7 +113,7 @@ export default function Kitchen() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl gradient-pink flex items-center justify-center">
             <ChefHat className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -128,14 +128,14 @@ export default function Kitchen() {
               <ChefHat className="w-4 h-4" />
               الطلبات العادية
               {kitchenOrders.length > 0 && (
-                <Badge variant="secondary" className="mr-1">{kitchenOrders.length}</Badge>
+                <Badge variant="secondary" className="ms-1">{kitchenOrders.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="custom" className="flex items-center gap-2">
               <Cake className="w-4 h-4" />
               طلبات مخصصة
               {customOrders.length > 0 && (
-                <Badge variant="destructive" className="mr-1">{customOrders.length}</Badge>
+                <Badge variant="destructive" className="ms-1">{customOrders.length}</Badge>
               )}
             </TabsTrigger>
           </TabsList>
@@ -236,13 +236,13 @@ export default function Kitchen() {
                     {order.status === 'paid' && (
                       <Button 
                         onClick={() => handleStartPreparing(order.id)}
-                        className="w-full gradient-gold text-white"
+                        className="w-full gradient-pink text-white"
                         disabled={isLoaderActive}
                       >
                         {updateStatus.isPending ? (
-                          <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                          <Loader2 className="w-4 h-4 me-1 animate-spin" />
                         ) : (
-                          <ChefHat className="w-4 h-4 ml-1" />
+                          <ChefHat className="w-4 h-4 me-1" />
                         )}
                         بدء التجهيز
                       </Button>
@@ -254,9 +254,9 @@ export default function Kitchen() {
                         disabled={isLoaderActive}
                       >
                         {markReady.isPending ? (
-                          <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                          <Loader2 className="w-4 h-4 me-1 animate-spin" />
                         ) : (
-                          <CheckCircle2 className="w-4 h-4 ml-1" />
+                          <CheckCircle2 className="w-4 h-4 me-1" />
                         )}
                         تم التجهيز (إنشاء باركود)
                       </Button>
@@ -268,7 +268,7 @@ export default function Kitchen() {
                           variant="outline" 
                           className="w-full"
                         >
-                          <QrCode className="w-4 h-4 ml-1" />
+                          <QrCode className="w-4 h-4 me-1" />
                           {showBarcodeOrderId === order.id ? 'إخفاء الباركود' : 'عرض الباركود للسائق'}
                         </Button>
                         <Button 
@@ -278,9 +278,9 @@ export default function Kitchen() {
                           disabled={isLoaderActive}
                         >
                           {sendToBranch.isPending ? (
-                            <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                            <Loader2 className="w-4 h-4 me-1 animate-spin" />
                           ) : (
-                            <ArrowLeft className="w-4 h-4 ml-1" />
+                            <ArrowLeft className="w-4 h-4 me-1" />
                           )}
                           إرسال للفرع
                         </Button>
@@ -316,9 +316,9 @@ export default function Kitchen() {
           </TabsContent>
 
           <TabsContent value="custom" className="space-y-6 mt-6">
-            <Alert className="border-pink-300 bg-pink-50">
-              <Cake className="h-4 w-4 text-pink-600" />
-              <AlertDescription className="text-pink-800">
+            <Alert className="border-primary/30 bg-primary/10">
+              <Cake className="h-4 w-4 text-primary" />
+              <AlertDescription className="text-primary">
                 <strong>طلبات مخصصة:</strong> هذه الطلبات تتطلب مراجعة وتحديد السعر ووقت التحضير قبل إرسالها للعميل للموافقة.
               </AlertDescription>
             </Alert>
@@ -335,17 +335,17 @@ export default function Kitchen() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {customOrders.map((order) => (
-                  <Card key={order.id} className="p-5 border-pink-200 bg-gradient-to-br from-pink-50 to-white hover:shadow-lg transition-shadow">
+                  <Card key={order.id} className="p-5 border-primary/30 bg-gradient-to-br from-pink-50 to-white hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-4">
-                      <span className="font-mono font-bold text-pink-600">{order.order_number}</span>
-                      <Badge variant="outline" className="bg-pink-100 text-pink-700 border-pink-300">
+                      <span className="font-mono font-bold text-primary">{order.order_number}</span>
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                         بانتظار المراجعة
                       </Badge>
                     </div>
 
                     <div className="space-y-3 mb-4">
                       <div className="flex items-center gap-2 text-sm">
-                        <Cake className="w-4 h-4 text-pink-500" />
+                        <Cake className="w-4 h-4 text-primary" />
                         <span className="font-medium">{order.product_type}</span>
                       </div>
                       {order.occasion && (
@@ -407,9 +407,9 @@ export default function Kitchen() {
 
                     <Button 
                       onClick={() => setReviewOrder(order)}
-                      className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                      className="w-full bg-primary hover:bg-primary text-white"
                     >
-                      <Cake className="w-4 h-4 ml-1" />
+                      <Cake className="w-4 h-4 me-1" />
                       مراجعة الطلب
                     </Button>
                   </Card>

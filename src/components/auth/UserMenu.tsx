@@ -50,7 +50,7 @@ export function UserMenu() {
           <div className="w-10 h-10 rounded-full bg-sidebar-primary flex items-center justify-center">
             <span className="text-sidebar-primary-foreground font-bold">{initials}</span>
           </div>
-          <div className="text-right">
+          <div className="text-start">
             <p className="font-medium text-sidebar-foreground">{displayName}</p>
             <p className="text-xs text-sidebar-foreground/60">{user.email}</p>
           </div>
@@ -60,7 +60,7 @@ export function UserMenu() {
         <DropdownMenuLabel>حسابي</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
-          <LogOut className="w-4 h-4 ml-2" />
+          <LogOut className="w-4 h-4 me-2" />
           تسجيل الخروج
         </DropdownMenuItem>
       </DropdownMenuContent>

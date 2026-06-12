@@ -15,7 +15,7 @@ interface StatTileProps {
   className?: string;
 }
 
-/* الألوان من الرموز الدلالية فقط — ممنوع text-blue-600 وأخواتها */
+/* الألوان من الرموز الدلالية فقط — ممنوع ألوان Tailwind الخام */
 const TONE_STYLES: Record<StatTone, { iconBox: string; value: string }> = {
   neutral: { iconBox: 'bg-muted text-muted-foreground', value: 'text-foreground' },
   primary: { iconBox: 'gradient-pink text-white shadow-warm', value: 'text-foreground' },

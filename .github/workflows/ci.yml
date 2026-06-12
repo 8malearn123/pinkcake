@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # RTL guardrail (§1.7) — fails on any new physical-direction utility
+      # or a <Sidebar> without an explicit side=.
+      - name: RTL guardrail
+        run: npm run check:rtl
+
+      # Informational until the legacy lint debt is cleared in a dedicated
+      # card. New/changed files are kept clean by the lint-staged pre-commit
+      # hook (eslint --max-warnings=0).
+      - name: Lint (non-blocking)
+        run: npm run lint
+        continue-on-error: true
+
+      # Includes the RTL app-shell smoke test that locks the sidebar on the right.
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build

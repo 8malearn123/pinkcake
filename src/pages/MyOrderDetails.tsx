@@ -145,9 +145,9 @@ export default function MyOrderDetails() {
               </div>
               <Badge variant={isPaid ? 'default' : 'secondary'} className="rounded-full">
                 {isPaid ? (
-                  <><CheckCircle2 className="w-3 h-3 ml-1" /> تم الدفع</>
+                  <><CheckCircle2 className="w-3 h-3 me-1" /> تم الدفع</>
                 ) : (
-                  <><AlertCircle className="w-3 h-3 ml-1" /> بانتظار الدفع</>
+                  <><AlertCircle className="w-3 h-3 me-1" /> بانتظار الدفع</>
                 )}
               </Badge>
             </div>
@@ -175,7 +175,7 @@ export default function MyOrderDetails() {
             {order.branch_address && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">العنوان</span>
-                <span className="font-medium text-left">{order.branch_address}</span>
+                <span className="font-medium text-end">{order.branch_address}</span>
               </div>
             )}
             {order.delivery_date && (
@@ -238,7 +238,7 @@ export default function MyOrderDetails() {
         {/* Back to Store */}
         <div className="text-center pt-2">
           <Button variant="outline" onClick={() => navigate('/store')} className="rounded-full px-6 h-11">
-            <Store className="w-4 h-4 ml-2" />
+            <Store className="w-4 h-4 me-2" />
             العودة للمتجر
           </Button>
         </div>

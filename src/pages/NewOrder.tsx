@@ -12,7 +12,7 @@ export default function NewOrder() {
         <div className="mb-8">
           <Link to="/orders">
             <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground">
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 me-2" />
               العودة للطلبات
             </Button>
           </Link>

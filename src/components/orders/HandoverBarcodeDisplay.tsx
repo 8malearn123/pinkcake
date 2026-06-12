@@ -46,9 +46,9 @@ export function HandoverBarcodeDisplay({
         <Button 
           onClick={handleGenerate}
           disabled={generateBarcode.isPending}
-          className="gradient-gold text-white"
+          className="gradient-pink text-white"
         >
-          {generateBarcode.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+          {generateBarcode.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
           إنشاء باركود التسليم
         </Button>
       </Card>
@@ -84,7 +84,7 @@ export function HandoverBarcodeDisplay({
         size="sm"
         onClick={() => refetch()}
       >
-        <RefreshCw className="w-4 h-4 ml-1" />
+        <RefreshCw className="w-4 h-4 me-1" />
         تحديث
       </Button>
     </Card>

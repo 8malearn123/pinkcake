@@ -166,19 +166,19 @@ export default function Products() {
         {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="البحث عن منتج..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10"
+              className="ps-10"
             />
           </div>
 
           {/* Sort */}
           <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
             <SelectTrigger className="w-52">
-              <ArrowUpDown className="w-4 h-4 ml-2" />
+              <ArrowUpDown className="w-4 h-4 me-2" />
               <SelectValue placeholder="الترتيب" />
             </SelectTrigger>
             <SelectContent className="bg-popover border shadow-md">
@@ -212,7 +212,7 @@ export default function Products() {
                 >
                   {category}
                   {selectedCategory === category && (
-                    <X className="w-3 h-3 mr-1" />
+                    <X className="w-3 h-3 ms-1" />
                   )}
                 </Badge>
               ))}

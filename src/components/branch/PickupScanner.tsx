@@ -142,12 +142,12 @@ export function PickupScanner() {
           <div className="flex gap-2">
             {!isScanning ? (
               <Button onClick={startScanner} className="flex-1">
-                <Camera className="w-4 h-4 ml-2" />
+                <Camera className="w-4 h-4 me-2" />
                 بدء المسح
               </Button>
             ) : (
               <Button onClick={stopScanner} variant="outline" className="flex-1">
-                <CameraOff className="w-4 h-4 ml-2" />
+                <CameraOff className="w-4 h-4 me-2" />
                 إيقاف المسح
               </Button>
             )}
@@ -267,9 +267,9 @@ export function PickupScanner() {
                         disabled={processPickup.isPending}
                       >
                         {processPickup.isPending ? (
-                          <Loader2 className="w-5 h-5 animate-spin ml-2" />
+                          <Loader2 className="w-5 h-5 animate-spin me-2" />
                         ) : (
-                          <CheckCircle2 className="w-5 h-5 ml-2" />
+                          <CheckCircle2 className="w-5 h-5 me-2" />
                         )}
                         تأكيد الاستلام
                       </Button>

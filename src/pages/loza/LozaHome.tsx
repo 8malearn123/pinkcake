@@ -75,7 +75,7 @@ export default function LozaHome() {
             </Link>
             <Button variant="ghost" size="icon" className="rounded-full relative">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-destructive" />
+              <span className="absolute top-1.5 end-1.5 w-2 h-2 rounded-full bg-destructive" />
             </Button>
           </div>
         </div>
@@ -103,7 +103,7 @@ export default function LozaHome() {
                   i === bannerIdx ? 'opacity-100' : 'opacity-0 pointer-events-none'
                 )}
               >
-                <div className="absolute -left-6 -bottom-6 text-[120px] opacity-20 select-none">{b.emoji}</div>
+                <div className="absolute -end-6 -bottom-6 text-[120px] opacity-20 select-none">{b.emoji}</div>
                 <Sparkles className="w-5 h-5 text-white/80 mb-2" />
                 <h2 className="text-2xl font-bold text-white font-loza-display">{b.title}</h2>
                 <p className="text-white/90 text-sm mt-1">{b.subtitle}</p>
@@ -112,7 +112,7 @@ export default function LozaHome() {
                 </span>
               </Link>
             ))}
-            <div className="absolute bottom-3 right-1/2 translate-x-1/2 flex gap-1.5">
+            <div className="absolute bottom-3 start-1/2 translate-x-1/2 flex gap-1.5">
               {BANNERS.map((_, i) => (
                 <button
                   key={i}
@@ -169,11 +169,11 @@ export default function LozaHome() {
                       {cake.emoji}
                     </span>
                     {cake.tag && (
-                      <span className="absolute top-2 right-2 text-[10px] font-bold gradient-loza-gold text-[hsl(var(--loza-brown))] px-2 py-0.5 rounded-full">
+                      <span className="absolute top-2 start-2 text-[10px] font-bold gradient-loza-gold text-[hsl(var(--loza-brown))] px-2 py-0.5 rounded-full">
                         ★ {cake.tag}
                       </span>
                     )}
-                    <span className="absolute bottom-2 left-2 bg-[hsl(var(--loza-brown))]/90 text-white text-[11px] font-bold px-2 py-1 rounded-full">
+                    <span className="absolute bottom-2 end-2 bg-[hsl(var(--loza-brown))]/90 text-white text-[11px] font-bold px-2 py-1 rounded-full">
                       {cake.price} ر.س
                     </span>
                   </div>
@@ -249,7 +249,7 @@ export default function LozaHome() {
           to="/loza/customize"
           className="block rounded-3xl overflow-hidden shadow-loza-lift gradient-loza-header p-6 text-white relative"
         >
-          <div className="absolute -right-4 -bottom-4 text-[110px] opacity-15">✨</div>
+          <div className="absolute -start-4 -bottom-4 text-[110px] opacity-15">✨</div>
           <h3 className="text-xl font-bold font-loza-display">صمّم كيكتك بنفسك</h3>
           <p className="text-white/80 text-sm mt-1">شكل، نكهة، لون، تصميم، وكتابة — بخمس خطوات</p>
           <span className="mt-3 inline-flex items-center gap-1 px-4 py-2 rounded-full bg-primary text-[hsl(var(--loza-brown))] text-sm font-bold">

@@ -150,7 +150,7 @@ export function ProductReviewDialog({
                     <Star
                       className={`w-6 h-6 transition-colors ${
                         star <= (hoverRating || rating)
-                          ? 'fill-yellow-400 text-yellow-400'
+                          ? 'fill-warning text-warning'
                           : 'fill-muted text-muted-foreground'
                       }`}
                     />
@@ -173,7 +173,7 @@ export function ProductReviewDialog({
                 size="sm"
               >
                 {submitReview.isPending && (
-                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                 )}
                 {myReview ? 'تحديث التقييم' : 'إرسال التقييم'}
               </Button>
@@ -214,7 +214,7 @@ export function ProductReviewDialog({
                             key={star}
                             className={`w-3 h-3 ${
                               star <= review.rating
-                                ? 'fill-yellow-400 text-yellow-400'
+                                ? 'fill-warning text-warning'
                                 : 'fill-muted text-muted'
                             }`}
                           />

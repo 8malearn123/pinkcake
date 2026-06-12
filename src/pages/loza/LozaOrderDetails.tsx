@@ -93,9 +93,9 @@ export default function LozaOrderDetails() {
             </span>
           </div>
           <div className="relative">
-            <div className="absolute right-4 top-3 bottom-3 w-0.5 bg-border" />
+            <div className="absolute start-4 top-3 bottom-3 w-0.5 bg-border" />
             <div
-              className="absolute right-4 top-3 w-0.5 gradient-loza-gold transition-all duration-700"
+              className="absolute start-4 top-3 w-0.5 gradient-loza-gold transition-all duration-700"
               style={{ height: `${(stageIdx / (STAGES.length - 1)) * 100}%` }}
             />
             <ul className="space-y-4">
@@ -103,7 +103,7 @@ export default function LozaOrderDetails() {
                 const done = i <= stageIdx;
                 const current = i === stageIdx;
                 return (
-                  <li key={s.key} className="relative flex items-center gap-3 pr-2">
+                  <li key={s.key} className="relative flex items-center gap-3 ps-2">
                     <div
                       className={cn(
                         'w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 z-10 transition-all',

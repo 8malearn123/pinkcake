@@ -128,7 +128,7 @@ export default function ForgotPassword() {
                   />
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+                    {isLoading && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
                     إرسال رابط إعادة التعيين
                   </Button>
                 </form>
@@ -138,7 +138,7 @@ export default function ForgotPassword() {
             <div className="mt-6 pt-4 border-t text-center">
               <Link to="/auth">
                 <Button variant="ghost" className="text-sm">
-                  <ArrowRight className="w-4 h-4 ml-1" />
+                  <ArrowRight className="w-4 h-4 me-1" />
                   العودة لتسجيل الدخول
                 </Button>
               </Link>

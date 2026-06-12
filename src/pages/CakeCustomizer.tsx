@@ -23,8 +23,8 @@ import {
   PenLine,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import CakeBase3DIcon from '@/components/loza/CakeBase3DIcon';
-import OrderSummaryCanvas from '@/components/loza/OrderSummaryCanvas';
+import CakeBase3DIcon from '@/components/cake/CakeBase3DIcon';
+import OrderSummaryCanvas from '@/components/cake/OrderSummaryCanvas';
 
 const FLAVOR_TONES: Record<string, string> = {
   vanilla: '#F5E6C4',
@@ -96,14 +96,14 @@ const PRINT_PRICE = 15;
 
 // ── Reusable design tokens ──────────────────────────────────────────────
 const CARD_BASE =
-  'group relative rounded-2xl border bg-card text-right transition-all duration-200 ' +
-  'hover:border-primary/40 hover:shadow-[0_8px_24px_-12px_rgba(190,123,124,0.25)]';
+  'group relative rounded-2xl border bg-card text-start transition-all duration-200 ' +
+  'hover:border-primary/40 hover:shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.25)]';
 const CARD_SELECTED =
-  'border-primary ring-2 ring-primary/20 shadow-[0_8px_24px_-12px_rgba(190,123,124,0.4)] bg-primary/[0.03]';
+  'border-primary ring-2 ring-primary/20 shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.4)] bg-primary/[0.03]';
 const CARD_IDLE = 'border-border/60';
 
 const SelectedTick = () => (
-  <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-sm z-10">
+  <div className="absolute top-3 end-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-sm z-10">
     <Check className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={3} />
   </div>
 );
@@ -201,10 +201,10 @@ export default function CakeCustomizer() {
             </span>
           </div>
 
-          <div className="text-left min-w-[72px]">
+          <div className="text-end min-w-[72px]">
             <div className="text-[10px] text-muted-foreground uppercase tracking-wider">الإجمالي</div>
             <div className="text-lg font-bold text-primary leading-tight">
-              {totalPrice}<span className="text-xs font-medium text-muted-foreground mr-1">ر.س</span>
+              {totalPrice}<span className="text-xs font-medium text-muted-foreground ms-1">ر.س</span>
             </div>
           </div>
         </div>
@@ -220,15 +220,16 @@ export default function CakeCustomizer() {
                   <button
                     onClick={() => s.id < step && setStep(s.id)}
                     disabled={s.id > step}
+                    aria-label={s.title}
                     className={cn(
-                      'flex flex-col items-center gap-1.5 transition-all',
+                      'flex flex-col items-center gap-1.5 transition-all p-1.5 -m-1.5',
                       s.id <= step ? 'cursor-pointer' : 'cursor-not-allowed'
                     )}
                   >
                     <div
                       className={cn(
                         'w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold transition-all border',
-                        isActive && 'bg-primary text-primary-foreground border-primary scale-110 shadow-[0_4px_12px_-2px_rgba(190,123,124,0.5)]',
+                        isActive && 'bg-primary text-primary-foreground border-primary scale-110 shadow-[0_4px_12px_-2px_hsl(var(--primary)/0.5)]',
                         isDone && 'bg-primary/10 text-primary border-primary/30',
                         !isActive && !isDone && 'bg-muted/40 text-muted-foreground border-transparent'
                       )}
@@ -445,7 +446,7 @@ export default function CakeCustomizer() {
                       placeholder="مثال: كل سنة وأنتِ طيبة"
                       className="text-base rounded-xl border-border/70 h-12"
                     />
-                    <div className="text-[11px] text-muted-foreground text-left">{state.text.length}/40</div>
+                    <div className="text-[11px] text-muted-foreground text-end">{state.text.length}/40</div>
                   </div>
                 )}
 
@@ -458,7 +459,7 @@ export default function CakeCustomizer() {
                     rows={4}
                     className="rounded-xl border-border/70 resize-none"
                   />
-                  <div className="text-[11px] text-muted-foreground text-left">{state.notes.length}/200</div>
+                  <div className="text-[11px] text-muted-foreground text-end">{state.notes.length}/200</div>
                 </div>
               </div>
             )}
@@ -467,7 +468,7 @@ export default function CakeCustomizer() {
       </main>
 
       {/* ── Sticky bottom navigation ──────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/90 backdrop-blur-xl border-t border-border/60">
+      <div className="fixed bottom-0 end-0 start-0 z-40 bg-background/90 backdrop-blur-xl border-t border-border/60">
         <div className="container mx-auto px-5 py-3 flex items-center justify-between gap-3">
           <Button
             variant="outline"
@@ -488,7 +489,7 @@ export default function CakeCustomizer() {
             <Button
               onClick={next}
               disabled={!canProceed}
-              className="gap-1.5 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_rgba(190,123,124,0.6)] disabled:opacity-40 disabled:shadow-none"
+              className="gap-1.5 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)] disabled:opacity-40 disabled:shadow-none"
             >
               التالي
               <ChevronLeft className="w-4 h-4" />
@@ -496,7 +497,7 @@ export default function CakeCustomizer() {
           ) : (
             <Button
               onClick={handleSubmit}
-              className="gap-2 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_rgba(190,123,124,0.6)]"
+              className="gap-2 rounded-full h-12 px-7 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.6)]"
             >
               <ShoppingCart className="w-4 h-4" />
               إرسال الطلب

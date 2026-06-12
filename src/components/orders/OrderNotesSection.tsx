@@ -43,7 +43,7 @@ export function OrderNotesSection({ orderId }: OrderNotesSectionProps) {
             size="sm"
             onClick={() => setIsAdding(true)}
           >
-            <Plus className="w-4 h-4 ml-1" />
+            <Plus className="w-4 h-4 me-1" />
             إضافة ملاحظة
           </Button>
         )}
@@ -74,7 +74,7 @@ export function OrderNotesSection({ orderId }: OrderNotesSectionProps) {
               onClick={handleAddNote}
               disabled={!newNote.trim() || addNote.isPending}
             >
-              {addNote.isPending && <Loader2 className="w-4 h-4 ml-1 animate-spin" />}
+              {addNote.isPending && <Loader2 className="w-4 h-4 me-1 animate-spin" />}
               حفظ الملاحظة
             </Button>
           </div>
@@ -106,7 +106,7 @@ export function OrderNotesSection({ orderId }: OrderNotesSectionProps) {
                   {format(new Date(note.created_at), 'dd MMM yyyy HH:mm', { locale: ar })}
                 </div>
               </div>
-              <p className="text-sm pr-10">{note.note_content}</p>
+              <p className="text-sm ps-10">{note.note_content}</p>
             </Card>
           ))}
         </div>

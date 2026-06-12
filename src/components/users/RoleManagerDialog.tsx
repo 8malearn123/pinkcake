@@ -64,7 +64,7 @@ export function RoleManagerDialog({
                   <Badge
                     key={role}
                     variant="secondary"
-                    className={`${ROLE_COLORS[role]} gap-1 pl-1`}
+                    className={`${ROLE_COLORS[role]} gap-1 pe-1`}
                   >
                     {ROLE_LABELS[role]}
                     <Button

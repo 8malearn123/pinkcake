@@ -178,7 +178,7 @@ export default function ResetPassword() {
                   />
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+                    {isLoading && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
                     تحديث كلمة المرور
                   </Button>
                 </form>

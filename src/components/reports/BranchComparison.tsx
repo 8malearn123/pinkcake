@@ -110,11 +110,11 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
   const getPerformanceIndicator = (value: number, average: number) => {
     const diff = ((value - average) / average) * 100;
     if (diff > 10) {
-      return { icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-100', label: 'فوق المتوسط' };
+      return { icon: TrendingUp, color: 'text-success', bg: 'bg-success/10', label: 'فوق المتوسط' };
     } else if (diff < -10) {
-      return { icon: TrendingDown, color: 'text-red-600', bg: 'bg-red-100', label: 'تحت المتوسط' };
+      return { icon: TrendingDown, color: 'text-destructive', bg: 'bg-destructive/10', label: 'تحت المتوسط' };
     }
-    return { icon: Minus, color: 'text-amber-600', bg: 'bg-amber-100', label: 'متوسط' };
+    return { icon: Minus, color: 'text-warning', bg: 'bg-warning/10', label: 'متوسط' };
   };
 
   const getRank = (branchId: string, sortedList: BranchPerformance[]) => {
@@ -135,11 +135,11 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
     <div className="space-y-6">
       {/* Top Performers */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-2 border-yellow-300 bg-gradient-to-br from-yellow-50 to-amber-50">
+        <Card className="border-2 border-warning/30 bg-gradient-to-br from-yellow-50 to-amber-50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
-                <Award className="w-6 h-6 text-yellow-600" />
+              <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
+                <Award className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">الأعلى إيرادات</p>
@@ -152,16 +152,16 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-blue-300 bg-gradient-to-br from-blue-50 to-cyan-50">
+        <Card className="border-2 border-info/30 bg-gradient-to-br from-blue-50 to-cyan-50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                <Target className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center">
+                <Target className="w-6 h-6 text-info" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">الأكثر طلبات</p>
                 <p className="text-lg font-bold">{sortedByOrders[0]?.branch_name || '-'}</p>
-                <p className="text-sm text-blue-600 font-medium">
+                <p className="text-sm text-info font-medium">
                   {sortedByOrders[0]?.orders || 0} طلب
                 </p>
               </div>
@@ -169,16 +169,16 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50">
+        <Card className="border-2 border-success/30 bg-gradient-to-br from-green-50 to-emerald-50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-success" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">الأعلى متوسط طلب</p>
                 <p className="text-lg font-bold">{sortedByAvg[0]?.branch_name || '-'}</p>
-                <p className="text-sm text-green-600 font-medium">
+                <p className="text-sm text-success font-medium">
                   {formatCurrency(sortedByAvg[0]?.avgOrderValue || 0)}
                 </p>
               </div>
@@ -186,16 +186,16 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-violet-50">
+        <Card className="border-2 border-primary/30 bg-gradient-to-br from-purple-50 to-violet-50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Store className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Store className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">الأعلى معدل إنجاز</p>
                 <p className="text-lg font-bold">{sortedByCompletion[0]?.branch_name || '-'}</p>
-                <p className="text-sm text-purple-600 font-medium">
+                <p className="text-sm text-primary font-medium">
                   {sortedByCompletion[0]?.completionRate.toFixed(1) || 0}%
                 </p>
               </div>
@@ -300,10 +300,10 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                   const rank = getRank(branch.branch_id, sortedByRevenue);
 
                   return (
-                    <TableRow key={branch.branch_id} className={index === 0 ? 'bg-yellow-50/50' : ''}>
+                    <TableRow key={branch.branch_id} className={index === 0 ? 'bg-warning/50' : ''}>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {rank === 1 && <Award className="w-4 h-4 text-yellow-500" />}
+                          {rank === 1 && <Award className="w-4 h-4 text-warning" />}
                           <span className="font-medium">{branch.branch_name}</span>
                         </div>
                       </TableCell>
@@ -319,9 +319,9 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                         <Badge
                           variant={rank === 1 ? 'default' : rank === 2 ? 'secondary' : 'outline'}
                           className={cn(
-                            rank === 1 && 'bg-yellow-500 hover:bg-yellow-600',
-                            rank === 2 && 'bg-gray-400 hover:bg-gray-500',
-                            rank === 3 && 'bg-amber-600 hover:bg-amber-700 text-white'
+                            rank === 1 && 'bg-warning hover:bg-warning',
+                            rank === 2 && 'bg-muted-foreground/20 hover:bg-muted-foreground/20',
+                            rank === 3 && 'bg-warning hover:bg-warning text-white'
                           )}
                         >
                           #{rank}
@@ -344,8 +344,8 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                             <div
                               className={cn(
                                 'h-full rounded-full',
-                                branch.completionRate >= 80 ? 'bg-green-500' :
-                                branch.completionRate >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                                branch.completionRate >= 80 ? 'bg-success' :
+                                branch.completionRate >= 50 ? 'bg-warning' : 'bg-destructive'
                               )}
                               style={{ width: `${branch.completionRate}%` }}
                             />

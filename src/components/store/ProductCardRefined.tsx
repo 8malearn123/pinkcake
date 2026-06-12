@@ -39,7 +39,7 @@ export function ProductCardRefined({
         )}
 
         {product.category && (
-          <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-background/85 backdrop-blur text-[10px] font-medium text-foreground tracking-wide">
+          <span className="absolute top-3 start-3 px-2.5 py-1 rounded-full bg-background/85 backdrop-blur text-[10px] font-medium text-foreground tracking-wide">
             {product.category}
           </span>
         )}
@@ -50,7 +50,7 @@ export function ProductCardRefined({
               e.stopPropagation();
               onOpenReviews?.();
             }}
-            className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background/85 backdrop-blur text-[11px] font-medium"
+            className="absolute top-3 end-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background/85 backdrop-blur text-[11px] font-medium"
           >
             <Star className="w-3 h-3 fill-warning text-warning" />
             <span>{rating.average_rating}</span>

@@ -62,7 +62,7 @@ function LozaShellInner({ children }: { children: ReactNode }) {
                               )}
                             />
                             {t.key === 'cart' && count > 0 && (
-                              <span className="absolute -top-1 -left-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-white text-[10px] font-bold flex items-center justify-center">
+                              <span className="absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-white text-[10px] font-bold flex items-center justify-center">
                                 {count}
                               </span>
                             )}

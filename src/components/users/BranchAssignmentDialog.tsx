@@ -110,7 +110,7 @@ export function BranchAssignmentDialog({
                   </SelectContent>
                 </Select>
                 <Button onClick={handleAssign} disabled={!selectedBranch || isLoading}>
-                  {isLoading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                  {isLoading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
                   تعيين
                 </Button>
               </div>

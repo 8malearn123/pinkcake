@@ -103,7 +103,7 @@ export function ImpersonationModal({ open, onOpenChange, targetUser }: Impersona
             <Button type="submit" disabled={isLoading || !secretCode.trim()}>
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   جاري التحقق...
                 </>
               ) : (

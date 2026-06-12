@@ -74,7 +74,7 @@ export default function OrderDetails() {
         <div>
           <Link to="/orders">
             <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground">
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 me-2" />
               العودة للطلبات
             </Button>
           </Link>
@@ -92,10 +92,10 @@ export default function OrderDetails() {
               {order.status === 'pending_approval' && (
                 <Button
                   onClick={handleApprove}
-                  className="gradient-gold text-white"
+                  className="gradient-pink text-white"
                   disabled={updateStatus.isPending}
                 >
-                  {updateStatus.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+                  {updateStatus.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
                   اعتماد الطلب
                 </Button>
               )}
@@ -103,9 +103,9 @@ export default function OrderDetails() {
                 <Button
                   onClick={handleSendWhatsApp}
                   variant="outline"
-                  className="border-green-500 text-green-600 hover:bg-green-50"
+                  className="border-success text-success hover:bg-success/10"
                 >
-                  <MessageCircle className="w-4 h-4 ml-2" />
+                  <MessageCircle className="w-4 h-4 me-2" />
                   إرسال واتساب
                 </Button>
               )}
@@ -116,7 +116,7 @@ export default function OrderDetails() {
                   variant="outline"
                   onClick={() => setShowTransferDialog(true)}
                 >
-                  <ArrowLeftRight className="w-4 h-4 ml-2" />
+                  <ArrowLeftRight className="w-4 h-4 me-2" />
                   نقل الطلب
                 </Button>
               )}

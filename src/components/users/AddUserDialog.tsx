@@ -147,7 +147,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-green-600">
+            <DialogTitle className="flex items-center gap-2 text-success">
               <CheckCheck className="w-5 h-5" />
               تم إنشاء المستخدم بنجاح
             </DialogTitle>
@@ -167,7 +167,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
                   onClick={() => handleCopy('email')}
                 >
                   {copiedField === 'email' ? (
-                    <CheckCheck className="w-4 h-4 text-green-600" />
+                    <CheckCheck className="w-4 h-4 text-success" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}
@@ -185,7 +185,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
                   onClick={() => handleCopy('password')}
                 >
                   {copiedField === 'password' ? (
-                    <CheckCheck className="w-4 h-4 text-green-600" />
+                    <CheckCheck className="w-4 h-4 text-success" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}
@@ -193,8 +193,8 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
               </div>
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <p className="text-sm text-amber-800">
+            <div className="bg-warning/10 border border-warning/30 rounded-lg p-3">
+              <p className="text-sm text-warning">
                 ⚠️ تأكد من إرسال بيانات الدخول للمستخدم بشكل آمن. لن تتمكن من عرض كلمة المرور مرة أخرى.
               </p>
             </div>
@@ -362,7 +362,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
               >
                 {createUserMutation.isPending ? (
                   <>
-                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 me-2 animate-spin" />
                     جاري الإنشاء...
                   </>
                 ) : (

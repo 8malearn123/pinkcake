@@ -37,7 +37,7 @@ export default function LozaWishlist() {
               <article key={c.id} className="group bg-card rounded-3xl shadow-loza overflow-hidden border border-border/40 relative">
                 <button
                   onClick={() => toggleWish(c.id)}
-                  className="absolute top-2 left-2 z-10 w-8 h-8 rounded-full bg-white/95 flex items-center justify-center shadow-loza"
+                  className="absolute top-2 end-2 z-10 w-8 h-8 rounded-full bg-white/95 flex items-center justify-center shadow-loza"
                 >
                   <Heart className="w-4 h-4 fill-destructive text-destructive" />
                 </button>

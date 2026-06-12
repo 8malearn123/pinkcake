@@ -33,16 +33,16 @@ export default function LozaSearch() {
             <ArrowRight className="w-5 h-5" />
           </Link>
           <div className="flex-1 relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="ابحث عن كيكة، نكهة، أو متجر..."
-              className="w-full pr-10 pl-10 py-2.5 rounded-full border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full ps-10 pe-10 py-2.5 rounded-full border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
             {q && (
-              <button onClick={() => setQ('')} className="absolute left-3 top-1/2 -translate-y-1/2">
+              <button onClick={() => setQ('')} className="absolute end-3 top-1/2 -translate-y-1/2">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             )}
@@ -105,7 +105,7 @@ export default function LozaSearch() {
               >
                 <div className="relative h-28 bg-gradient-to-br from-[hsl(var(--loza-gold-light))] to-[hsl(var(--loza-cream))] flex items-center justify-center">
                   <span className="text-5xl group-hover:scale-110 transition-transform">{c.emoji}</span>
-                  <span className="absolute bottom-2 left-2 bg-[hsl(var(--loza-brown))]/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  <span className="absolute bottom-2 end-2 bg-[hsl(var(--loza-brown))]/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                     {c.price} ر.س
                   </span>
                 </div>

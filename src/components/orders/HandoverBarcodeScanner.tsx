@@ -114,16 +114,16 @@ export function HandoverBarcodeScanner({
       {scanResult && (
         <div className={`p-4 rounded-lg flex items-center gap-3 ${
           scanResult === 'success' 
-            ? 'bg-green-50 border border-green-200' 
-            : 'bg-red-50 border border-red-200'
+            ? 'bg-success/10 border border-success/30' 
+            : 'bg-destructive/10 border border-destructive/30'
         }`}>
           {scanResult === 'success' ? (
-            <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+            <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0" />
           ) : (
-            <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+            <XCircle className="w-6 h-6 text-destructive flex-shrink-0" />
           )}
           <div className="flex-1">
-            <p className={scanResult === 'success' ? 'text-green-800' : 'text-red-800'}>
+            <p className={scanResult === 'success' ? 'text-success' : 'text-destructive'}>
               {scanMessage}
             </p>
           </div>
@@ -142,7 +142,7 @@ export function HandoverBarcodeScanner({
             className="w-full"
             onClick={() => setShowManualInput(true)}
           >
-            <Keyboard className="w-4 h-4 ml-2" />
+            <Keyboard className="w-4 h-4 me-2" />
             إدخال الكود يدوياً
           </Button>
         </div>
@@ -164,7 +164,7 @@ export function HandoverBarcodeScanner({
               disabled={!manualCode.trim() || scanBarcode.isPending}
               className="flex-1"
             >
-              {scanBarcode.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+              {scanBarcode.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
               تأكيد
             </Button>
             <Button

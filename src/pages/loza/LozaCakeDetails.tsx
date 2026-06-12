@@ -43,11 +43,11 @@ export default function LozaCakeDetails() {
       <section className="relative h-80 bg-gradient-to-br from-[hsl(var(--loza-gold-light))] via-[hsl(var(--loza-cream))] to-[hsl(var(--loza-gold))]/40 overflow-hidden">
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/95 shadow-loza flex items-center justify-center"
+          className="absolute top-4 start-4 z-10 w-10 h-10 rounded-full bg-white/95 shadow-loza flex items-center justify-center"
         >
           <ArrowRight className="w-5 h-5" />
         </button>
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
+        <div className="absolute top-4 end-4 z-10 flex gap-2">
           <button
             onClick={() => toggleWish(cake.id)}
             className="w-10 h-10 rounded-full bg-white/95 shadow-loza flex items-center justify-center"
@@ -62,7 +62,7 @@ export default function LozaCakeDetails() {
           <span className="text-[180px] drop-shadow-2xl animate-float">{cake.emoji}</span>
         </div>
         {cake.tag && (
-          <span className="absolute bottom-4 right-4 gradient-loza-gold text-[hsl(var(--loza-brown))] text-xs font-bold px-3 py-1 rounded-full shadow-loza">
+          <span className="absolute bottom-4 start-4 gradient-loza-gold text-[hsl(var(--loza-brown))] text-xs font-bold px-3 py-1 rounded-full shadow-loza">
             ★ {cake.tag}
           </span>
         )}
@@ -78,7 +78,7 @@ export default function LozaCakeDetails() {
                 🏪 {cake.vendor}
               </Link>
             </div>
-            <div className="text-left">
+            <div className="text-end">
               <div className="text-2xl font-extrabold text-gradient-loza">{unitPrice} ر.س</div>
               <div className="text-[10px] text-muted-foreground">للحبة</div>
             </div>
@@ -225,7 +225,7 @@ export default function LozaCakeDetails() {
             }}
             className="rounded-full gradient-loza-gold text-[hsl(var(--loza-brown))] border-0 font-bold px-6 hover:opacity-90"
           >
-            <ShoppingBag className="w-4 h-4 ml-1" />
+            <ShoppingBag className="w-4 h-4 me-1" />
             أضف للسلة
           </Button>
         </div>

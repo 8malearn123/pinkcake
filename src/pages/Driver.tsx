@@ -63,7 +63,7 @@ export default function Driver() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-cyan-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-info flex items-center justify-center">
             <Truck className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -162,17 +162,17 @@ export default function Driver() {
                       
                       <div className="flex flex-wrap gap-2">
                         {!order.handover_from_kitchen && order.status === 'ready_to_ship' && (
-                          <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">
+                          <span className="text-xs bg-warning/10 text-warning px-2 py-1 rounded">
                             بانتظار الاستلام من المطبخ
                           </span>
                         )}
                         {order.handover_from_kitchen && !order.handover_to_branch && (
-                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          <span className="text-xs bg-info/10 text-info px-2 py-1 rounded">
                             في الطريق للفرع
                           </span>
                         )}
                         {order.handover_to_branch && order.order_type === 'home_delivery' && (
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                          <span className="text-xs bg-success/10 text-success px-2 py-1 rounded">
                             جاهز للتوصيل للعميل
                           </span>
                         )}

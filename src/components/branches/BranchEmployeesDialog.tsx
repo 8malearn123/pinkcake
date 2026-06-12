@@ -137,7 +137,7 @@ export function BranchEmployeesDialog({
               </p>
               <Select value={roleFilter} onValueChange={setRoleFilter}>
                 <SelectTrigger className="w-36 h-8 text-xs">
-                  <Filter className="w-3 h-3 ml-1" />
+                  <Filter className="w-3 h-3 me-1" />
                   <SelectValue placeholder="تصفية" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border shadow-md">

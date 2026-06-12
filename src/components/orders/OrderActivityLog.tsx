@@ -9,11 +9,11 @@ interface OrderActivityLogProps {
 }
 
 const ACTION_LABELS: Record<string, { label: string; color: string }> = {
-  created: { label: 'إنشاء الطلب', color: 'bg-blue-100 text-blue-800' },
-  status_changed: { label: 'تغيير الحالة', color: 'bg-amber-100 text-amber-800' },
-  transferred: { label: 'نقل الطلب', color: 'bg-purple-100 text-purple-800' },
-  note_added: { label: 'إضافة ملاحظة', color: 'bg-green-100 text-green-800' },
-  updated: { label: 'تحديث', color: 'bg-gray-100 text-gray-800' },
+  created: { label: 'إنشاء الطلب', color: 'bg-info/10 text-info' },
+  status_changed: { label: 'تغيير الحالة', color: 'bg-warning/10 text-warning' },
+  transferred: { label: 'نقل الطلب', color: 'bg-primary/10 text-primary' },
+  note_added: { label: 'إضافة ملاحظة', color: 'bg-success/10 text-success' },
+  updated: { label: 'تحديث', color: 'bg-muted text-muted-foreground' },
 };
 
 export function OrderActivityLog({ orderId }: OrderActivityLogProps) {

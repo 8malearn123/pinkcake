@@ -225,7 +225,7 @@ export default function Store() {
             <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow">
               <Cake className="w-5 h-5 text-primary-foreground" />
             </div>
-            <div className="hidden sm:block text-right leading-tight">
+            <div className="hidden sm:block text-start leading-tight">
               <div className="font-display text-lg">{settings.storeName}</div>
               <div className="text-[10px] text-muted-foreground tracking-widest uppercase">
                 Patisserie
@@ -235,17 +235,17 @@ export default function Store() {
 
           {/* Search */}
           <div className="flex-1 max-w-md mx-auto relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحثي عن كيكة أو نكهة..."
-              className="pr-10 h-10 rounded-full bg-secondary/60 border-transparent focus-visible:bg-card"
+              className="ps-10 h-10 rounded-full bg-secondary/60 border-transparent focus-visible:bg-card"
             />
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-1.5 mr-auto">
+          <div className="flex items-center gap-1.5 ms-auto">
             <Button
               variant="ghost"
               size="sm"
@@ -285,7 +285,7 @@ export default function Store() {
                 <Button variant="outline" size="icon" className="relative rounded-full border-border h-10 w-10">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow">
+                    <span className="absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow">
                       {cartCount}
                     </span>
                   )}
@@ -340,7 +340,7 @@ export default function Store() {
                                 onClick={() => updateQuantity(item.product.id, 1)}>
                                 <Plus className="w-3 h-3" />
                               </Button>
-                              <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive mr-auto"
+                              <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive ms-auto"
                                 onClick={() => removeFromCart(item.product.id)}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
@@ -381,12 +381,12 @@ export default function Store() {
         {/* Mobile search */}
         <div className="md:hidden px-4 pb-3">
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحثي عن كيكة..."
-              className="pr-10 h-10 rounded-full bg-secondary/60 border-transparent"
+              className="ps-10 h-10 rounded-full bg-secondary/60 border-transparent"
             />
           </div>
         </div>
@@ -576,7 +576,7 @@ export default function Store() {
               disabled={createOrder.isPending}
               className="rounded-full bg-foreground text-background hover:bg-foreground/90"
             >
-              {createOrder.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+              {createOrder.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
               {user ? 'تأكيد الطلب' : 'تسجيل الدخول للمتابعة'}
             </Button>
           </DialogFooter>
