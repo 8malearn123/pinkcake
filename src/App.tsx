@@ -1,3 +1,5 @@
+import { lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,48 +11,68 @@ import { ImpersonationProvider } from "./contexts/ImpersonationContext";
 import { ImpersonationBanner } from "./components/admin/ImpersonationBanner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { LOZA_ENABLED } from "./lib/featureFlags";
-import Dashboard from "./pages/Dashboard";
-import Orders from "./pages/Orders";
-import NewOrder from "./pages/NewOrder";
-import OrderDetails from "./pages/OrderDetails";
-import TrackOrder from "./pages/TrackOrder";
-import Kitchen from "./pages/Kitchen";
-import BranchOrders from "./pages/BranchOrders";
-import Reports from "./pages/Reports";
-import LiveDashboard from "./pages/LiveDashboard";
-import Settings from "./pages/Settings";
-import Products from "./pages/Products";
-import Branches from "./pages/Branches";
-import Users from "./pages/Users";
-import Login from "./pages/Login";
-import Store from "./pages/Store";
-import MyOrders from "./pages/MyOrders";
-import MyOrderDetails from "./pages/MyOrderDetails";
-import CustomerProfile from "./pages/CustomerProfile";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import ContactSubmissions from "./pages/ContactSubmissions";
-import BranchPickupScanner from "./pages/BranchPickupScanner";
-import BranchLive from "./pages/BranchLive";
-import Driver from "./pages/Driver";
-import CustomOrders from "./pages/CustomOrders";
-import CakeCustomizer from "./pages/CakeCustomizer";
-import DesignSystem from "./pages/DesignSystem";
-import LozaHome from "./pages/loza/LozaHome";
-import LozaCustomizer from "./pages/loza/LozaCustomizer";
-import LozaCakeDetails from "./pages/loza/LozaCakeDetails";
-import LozaCart from "./pages/loza/LozaCart";
-import LozaCheckout from "./pages/loza/LozaCheckout";
-import LozaOrders from "./pages/loza/LozaOrders";
-import LozaOrderDetails from "./pages/loza/LozaOrderDetails";
-import LozaProfile from "./pages/loza/LozaProfile";
-import LozaSearch from "./pages/loza/LozaSearch";
-import LozaVendor from "./pages/loza/LozaVendor";
-import LozaWishlist from "./pages/loza/LozaWishlist";
-import LozaPlaceholder from "./pages/loza/LozaPlaceholder";
-import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Route components are code-split: each page ships in its own lazy chunk so the
+// initial bundle stays small and heavy routes (Reports, Store, customizers) load
+// on demand.
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Orders = lazy(() => import("./pages/Orders"));
+const NewOrder = lazy(() => import("./pages/NewOrder"));
+const OrderDetails = lazy(() => import("./pages/OrderDetails"));
+const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+const Kitchen = lazy(() => import("./pages/Kitchen"));
+const BranchOrders = lazy(() => import("./pages/BranchOrders"));
+const Reports = lazy(() => import("./pages/Reports"));
+const LiveDashboard = lazy(() => import("./pages/LiveDashboard"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Products = lazy(() => import("./pages/Products"));
+const Branches = lazy(() => import("./pages/Branches"));
+const Users = lazy(() => import("./pages/Users"));
+const Login = lazy(() => import("./pages/Login"));
+const Store = lazy(() => import("./pages/Store"));
+const MyOrders = lazy(() => import("./pages/MyOrders"));
+const MyOrderDetails = lazy(() => import("./pages/MyOrderDetails"));
+const CustomerProfile = lazy(() => import("./pages/CustomerProfile"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ContactSubmissions = lazy(() => import("./pages/ContactSubmissions"));
+const BranchPickupScanner = lazy(() => import("./pages/BranchPickupScanner"));
+const BranchLive = lazy(() => import("./pages/BranchLive"));
+const Driver = lazy(() => import("./pages/Driver"));
+const CustomOrders = lazy(() => import("./pages/CustomOrders"));
+const CakeCustomizer = lazy(() => import("./pages/CakeCustomizer"));
+const DesignSystem = lazy(() => import("./pages/DesignSystem"));
+const LozaHome = lazy(() => import("./pages/loza/LozaHome"));
+const LozaCustomizer = lazy(() => import("./pages/loza/LozaCustomizer"));
+const LozaCakeDetails = lazy(() => import("./pages/loza/LozaCakeDetails"));
+const LozaCart = lazy(() => import("./pages/loza/LozaCart"));
+const LozaCheckout = lazy(() => import("./pages/loza/LozaCheckout"));
+const LozaOrders = lazy(() => import("./pages/loza/LozaOrders"));
+const LozaOrderDetails = lazy(() => import("./pages/loza/LozaOrderDetails"));
+const LozaProfile = lazy(() => import("./pages/loza/LozaProfile"));
+const LozaSearch = lazy(() => import("./pages/loza/LozaSearch"));
+const LozaVendor = lazy(() => import("./pages/loza/LozaVendor"));
+const LozaWishlist = lazy(() => import("./pages/loza/LozaWishlist"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000, // 30s — avoid immediate refetches on remount
+      gcTime: 5 * 60_000, // keep cache 5 min after unused
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+function RouteFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -62,6 +84,7 @@ const App = () => (
             <Sonner />
             <ImpersonationBanner />
             <BrowserRouter>
+            <Suspense fallback={<RouteFallback />}>
             <Routes>
               {/* Public Store - Landing Page */}
               <Route path="/" element={<Store />} />
@@ -252,6 +275,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </ImpersonationProvider>

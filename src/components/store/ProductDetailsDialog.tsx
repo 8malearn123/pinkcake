@@ -208,7 +208,7 @@ export function ProductDetailsDialog({
                           currentImageIndex === idx ? 'border-primary' : 'border-transparent'
                         )}
                       >
-                        <img src={img.url} alt="" className="w-full h-full object-cover" />
+                        <img src={img.url} alt="" loading="lazy" className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>
