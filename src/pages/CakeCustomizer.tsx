@@ -23,8 +23,8 @@ import {
   PenLine,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import CakeBase3DIcon from '@/components/loza/CakeBase3DIcon';
-import OrderSummaryCanvas from '@/components/loza/OrderSummaryCanvas';
+import CakeBase3DIcon from '@/components/cake/CakeBase3DIcon';
+import OrderSummaryCanvas from '@/components/cake/OrderSummaryCanvas';
 
 const FLAVOR_TONES: Record<string, string> = {
   vanilla: '#F5E6C4',

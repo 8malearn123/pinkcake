@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ImpersonationProvider } from "./contexts/ImpersonationContext";
 import { ImpersonationBanner } from "./components/admin/ImpersonationBanner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { LOZA_ENABLED } from "./lib/featureFlags";
 import Dashboard from "./pages/Dashboard";
 import Orders from "./pages/Orders";
 import NewOrder from "./pages/NewOrder";
@@ -67,18 +68,22 @@ const App = () => (
               <Route path="/store" element={<Store />} />
               <Route path="/customize" element={<CakeCustomizer />} />
 
-              {/* Loza — Dessert Marketplace */}
-              <Route path="/loza" element={<LozaHome />} />
-              <Route path="/loza/search" element={<LozaSearch />} />
-              <Route path="/loza/customize" element={<LozaCustomizer />} />
-              <Route path="/loza/cake/:id" element={<LozaCakeDetails />} />
-              <Route path="/loza/vendor/:id" element={<LozaVendor />} />
-              <Route path="/loza/cart" element={<LozaCart />} />
-              <Route path="/loza/checkout" element={<LozaCheckout />} />
-              <Route path="/loza/orders" element={<LozaOrders />} />
-              <Route path="/loza/orders/:id" element={<LozaOrderDetails />} />
-              <Route path="/loza/profile" element={<LozaProfile />} />
-              <Route path="/loza/wishlist" element={<LozaWishlist />} />
+              {/* Loza — Dessert Marketplace (flag-gated; off in prod by default) */}
+              {LOZA_ENABLED && (
+                <>
+                  <Route path="/loza" element={<LozaHome />} />
+                  <Route path="/loza/search" element={<LozaSearch />} />
+                  <Route path="/loza/customize" element={<LozaCustomizer />} />
+                  <Route path="/loza/cake/:id" element={<LozaCakeDetails />} />
+                  <Route path="/loza/vendor/:id" element={<LozaVendor />} />
+                  <Route path="/loza/cart" element={<LozaCart />} />
+                  <Route path="/loza/checkout" element={<LozaCheckout />} />
+                  <Route path="/loza/orders" element={<LozaOrders />} />
+                  <Route path="/loza/orders/:id" element={<LozaOrderDetails />} />
+                  <Route path="/loza/profile" element={<LozaProfile />} />
+                  <Route path="/loza/wishlist" element={<LozaWishlist />} />
+                </>
+              )}
               
               {/* Unified Login */}
               <Route path="/login" element={<Login />} />
