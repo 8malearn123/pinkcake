@@ -62,7 +62,7 @@ export default function LozaOrders() {
                         📅 {o.deliveryDate} • {o.deliveryTime}
                       </p>
                     </div>
-                    <div className="text-left">
+                    <div className="text-end">
                       <div className="font-extrabold text-gradient-loza">{o.total} ر.س</div>
                       <span className={cn('inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-bold', s.color)}>
                         {s.emoji} {s.label}

@@ -128,21 +128,21 @@ export default function LozaCheckout() {
         <Section title="موعد التسليم">
           <div className="grid grid-cols-2 gap-2">
             <div className="relative">
-              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Calendar className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 min={new Date().toISOString().slice(0, 10)}
-                className="w-full pr-10 pl-3 py-2.5 rounded-2xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full ps-10 pe-3 py-2.5 rounded-2xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
             <div className="relative">
-              <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Clock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <select
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="w-full pr-10 pl-3 py-2.5 rounded-2xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none"
+                className="w-full ps-10 pe-3 py-2.5 rounded-2xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none"
               >
                 {TIMES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -199,13 +199,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ icon: Icon, value, onChange, placeholder, type = 'text' }: any) {
   return (
     <div className="relative">
-      <Icon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <Icon className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pr-10 pl-3 py-2.5 rounded-2xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+        className="w-full ps-10 pe-3 py-2.5 rounded-2xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
       />
     </div>
   );
@@ -237,7 +237,7 @@ function PayBtn({ icon: Icon, label, value, current, onSelect }: any) {
       )}
     >
       <Icon className="w-5 h-5 text-primary" />
-      <span className="text-sm font-bold flex-1 text-right">{label}</span>
+      <span className="text-sm font-bold flex-1 text-start">{label}</span>
       <div className={cn('w-5 h-5 rounded-full border-2 flex items-center justify-center', active ? 'border-primary bg-primary' : 'border-border')}>
         {active && <Check className="w-3 h-3 text-primary-foreground" />}
       </div>

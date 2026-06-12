@@ -96,7 +96,7 @@ export function OrderTransferDialog({
               onClick={handleTransfer}
               disabled={!selectedBranchId || transferOrder.isPending}
             >
-              {transferOrder.isPending && <Loader2 className="w-4 h-4 ml-1 animate-spin" />}
+              {transferOrder.isPending && <Loader2 className="w-4 h-4 me-1 animate-spin" />}
               نقل الطلب
             </Button>
           </div>

@@ -260,7 +260,7 @@ export default function LiveDashboard() {
                     <Bell className="w-5 h-5 text-amber-500" />
                     تتطلب انتباهك
                     {urgentOrders.length > 0 && (
-                      <Badge variant="destructive" className="mr-2">
+                      <Badge variant="destructive" className="ms-2">
                         {urgentOrders.length}
                       </Badge>
                     )}

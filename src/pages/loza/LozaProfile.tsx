@@ -81,7 +81,7 @@ export default function LozaProfile() {
           <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center">
             <LogOut className="w-4 h-4 text-destructive" />
           </div>
-          <span className="flex-1 text-right text-sm font-medium text-destructive">تسجيل الخروج</span>
+          <span className="flex-1 text-start text-sm font-medium text-destructive">تسجيل الخروج</span>
         </button>
 
         <p className="text-center text-[10px] text-muted-foreground py-4">

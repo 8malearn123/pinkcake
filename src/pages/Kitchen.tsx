@@ -128,14 +128,14 @@ export default function Kitchen() {
               <ChefHat className="w-4 h-4" />
               الطلبات العادية
               {kitchenOrders.length > 0 && (
-                <Badge variant="secondary" className="mr-1">{kitchenOrders.length}</Badge>
+                <Badge variant="secondary" className="ms-1">{kitchenOrders.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="custom" className="flex items-center gap-2">
               <Cake className="w-4 h-4" />
               طلبات مخصصة
               {customOrders.length > 0 && (
-                <Badge variant="destructive" className="mr-1">{customOrders.length}</Badge>
+                <Badge variant="destructive" className="ms-1">{customOrders.length}</Badge>
               )}
             </TabsTrigger>
           </TabsList>
@@ -240,9 +240,9 @@ export default function Kitchen() {
                         disabled={isLoaderActive}
                       >
                         {updateStatus.isPending ? (
-                          <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                          <Loader2 className="w-4 h-4 me-1 animate-spin" />
                         ) : (
-                          <ChefHat className="w-4 h-4 ml-1" />
+                          <ChefHat className="w-4 h-4 me-1" />
                         )}
                         بدء التجهيز
                       </Button>
@@ -254,9 +254,9 @@ export default function Kitchen() {
                         disabled={isLoaderActive}
                       >
                         {markReady.isPending ? (
-                          <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                          <Loader2 className="w-4 h-4 me-1 animate-spin" />
                         ) : (
-                          <CheckCircle2 className="w-4 h-4 ml-1" />
+                          <CheckCircle2 className="w-4 h-4 me-1" />
                         )}
                         تم التجهيز (إنشاء باركود)
                       </Button>
@@ -268,7 +268,7 @@ export default function Kitchen() {
                           variant="outline" 
                           className="w-full"
                         >
-                          <QrCode className="w-4 h-4 ml-1" />
+                          <QrCode className="w-4 h-4 me-1" />
                           {showBarcodeOrderId === order.id ? 'إخفاء الباركود' : 'عرض الباركود للسائق'}
                         </Button>
                         <Button 
@@ -278,9 +278,9 @@ export default function Kitchen() {
                           disabled={isLoaderActive}
                         >
                           {sendToBranch.isPending ? (
-                            <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                            <Loader2 className="w-4 h-4 me-1 animate-spin" />
                           ) : (
-                            <ArrowLeft className="w-4 h-4 ml-1" />
+                            <ArrowLeft className="w-4 h-4 me-1" />
                           )}
                           إرسال للفرع
                         </Button>
@@ -409,7 +409,7 @@ export default function Kitchen() {
                       onClick={() => setReviewOrder(order)}
                       className="w-full bg-pink-600 hover:bg-pink-700 text-white"
                     >
-                      <Cake className="w-4 h-4 ml-1" />
+                      <Cake className="w-4 h-4 me-1" />
                       مراجعة الطلب
                     </Button>
                   </Card>

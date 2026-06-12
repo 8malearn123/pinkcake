@@ -79,7 +79,7 @@ const Row = ({
     </div>
     <div
       className={cn(
-        'text-sm font-semibold text-left truncate max-w-[60%]',
+        'text-sm font-semibold text-end truncate max-w-[60%]',
         empty ? 'text-muted-foreground/60 font-normal italic text-xs' : 'text-foreground'
       )}
     >
@@ -113,11 +113,11 @@ export default function OrderSummaryCanvas({
       <div className="mx-6 mb-5 relative rounded-2xl overflow-hidden aspect-[5/4] bg-gradient-to-br from-[hsl(var(--blush))]/35 via-card to-secondary/25 border border-border/40">
         {/* Soft blurred orbs */}
         <div
-          className="absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl opacity-50"
+          className="absolute -top-10 -start-10 w-40 h-40 rounded-full blur-3xl opacity-50"
           style={{ background: accent }}
         />
         <div
-          className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full blur-3xl opacity-30"
+          className="absolute -bottom-10 -end-10 w-32 h-32 rounded-full blur-3xl opacity-30"
           style={{ background: state.colors[1] || accent }}
         />
 
@@ -200,7 +200,7 @@ export default function OrderSummaryCanvas({
         </div>
         <div className="text-2xl font-display font-bold text-primary tabular-nums">
           {totalPrice}
-          <span className="text-xs font-medium text-muted-foreground mr-1">ر.س</span>
+          <span className="text-xs font-medium text-muted-foreground ms-1">ر.س</span>
         </div>
       </div>
     </div>

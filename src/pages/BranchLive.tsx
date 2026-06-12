@@ -140,7 +140,7 @@ export default function BranchLive() {
               آخر تحديث: {lastRefresh.toLocaleTimeString('ar-SA')}
             </span>
             <Button variant="outline" size="sm" onClick={handleRefresh}>
-              <RefreshCw className="w-4 h-4 ml-1" />
+              <RefreshCw className="w-4 h-4 me-1" />
               تحديث
             </Button>
           </div>

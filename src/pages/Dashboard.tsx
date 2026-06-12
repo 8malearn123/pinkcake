@@ -64,7 +64,7 @@ export default function Dashboard() {
           actions={
             <Link to="/orders/new">
               <Button className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
-                <Plus className="w-5 h-5 ml-2" />
+                <Plus className="w-5 h-5 me-2" />
                 طلب جديد
               </Button>
             </Link>

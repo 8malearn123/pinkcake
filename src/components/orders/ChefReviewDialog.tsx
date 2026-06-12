@@ -427,7 +427,7 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
               >
                 {reviewOrder.isPending ? (
                   <>
-                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
                     جاري الإرسال...
                   </>
                 ) : feasibility === 'not_feasible' ? (

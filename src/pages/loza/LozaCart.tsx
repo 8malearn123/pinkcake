@@ -138,7 +138,7 @@ export default function LozaCart() {
               onClick={() => navigate('/loza/checkout', { state: { discount, delivery } })}
               className="rounded-full gradient-loza-gold text-[hsl(var(--loza-brown))] border-0 font-bold px-6"
             >
-              <ShoppingBag className="w-4 h-4 ml-1" />
+              <ShoppingBag className="w-4 h-4 me-1" />
               متابعة الدفع ←
             </Button>
           </div>

@@ -23,13 +23,13 @@ export function OrdersTable({ orders, onApprove, onSendPaymentLink }: OrdersTabl
         <table className="w-full">
           <thead>
             <tr className="border-b border-border bg-muted/50">
-              <th className="text-right p-4 font-semibold text-foreground">رقم الطلب</th>
-              <th className="text-right p-4 font-semibold text-foreground">العميل</th>
-              <th className="text-right p-4 font-semibold text-foreground">الفرع</th>
-              <th className="text-right p-4 font-semibold text-foreground">المبلغ</th>
-              <th className="text-right p-4 font-semibold text-foreground">موعد الاستلام</th>
-              <th className="text-right p-4 font-semibold text-foreground">الحالة</th>
-              <th className="text-right p-4 font-semibold text-foreground">الإجراءات</th>
+              <th className="text-start p-4 font-semibold text-foreground">رقم الطلب</th>
+              <th className="text-start p-4 font-semibold text-foreground">العميل</th>
+              <th className="text-start p-4 font-semibold text-foreground">الفرع</th>
+              <th className="text-start p-4 font-semibold text-foreground">المبلغ</th>
+              <th className="text-start p-4 font-semibold text-foreground">موعد الاستلام</th>
+              <th className="text-start p-4 font-semibold text-foreground">الحالة</th>
+              <th className="text-start p-4 font-semibold text-foreground">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -83,7 +83,7 @@ export function OrdersTable({ orders, onApprove, onSendPaymentLink }: OrdersTabl
                         onClick={() => onSendPaymentLink?.(order.id)}
                         className="border-primary text-primary hover:bg-primary/10"
                       >
-                        <Send className="w-4 h-4 ml-1" />
+                        <Send className="w-4 h-4 me-1" />
                         إرسال رابط الدفع
                       </Button>
                     )}

@@ -111,7 +111,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
             type="button"
             variant="destructive"
             size="icon"
-            className="absolute -top-2 -left-2 h-7 w-7"
+            className="absolute -top-2 -end-2 h-7 w-7"
             onClick={handleRemove}
             disabled={disabled || isUploading}
           >

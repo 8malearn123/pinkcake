@@ -46,7 +46,7 @@ export function CategoryBar({ categories, selectedCategory, onSelectCategory }: 
     <div className="relative">
       {/* Left Arrow */}
       {showLeftArrow && (
-        <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center bg-gradient-to-r from-background via-background to-transparent pr-4">
+        <div className="absolute end-0 top-0 bottom-0 z-10 flex items-center bg-gradient-to-r from-background via-background to-transparent ps-4">
           <Button
             size="icon"
             variant="ghost"
@@ -93,7 +93,7 @@ export function CategoryBar({ categories, selectedCategory, onSelectCategory }: 
 
       {/* Right Arrow */}
       {showRightArrow && (
-        <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center bg-gradient-to-l from-background via-background to-transparent pl-4">
+        <div className="absolute start-0 top-0 bottom-0 z-10 flex items-center bg-gradient-to-l from-background via-background to-transparent pe-4">
           <Button
             size="icon"
             variant="ghost"

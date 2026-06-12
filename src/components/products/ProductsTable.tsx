@@ -140,14 +140,14 @@ function SortableRow({ product, onEdit, onDeleteClick, formatPrice }: SortableRo
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-popover border shadow-md">
             <DropdownMenuItem onClick={() => onEdit(product)}>
-              <Pencil className="w-4 h-4 ml-2" />
+              <Pencil className="w-4 h-4 me-2" />
               تعديل
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
               onClick={() => onDeleteClick(product.id)}
             >
-              <Trash2 className="w-4 h-4 ml-2" />
+              <Trash2 className="w-4 h-4 me-2" />
               حذف
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -57,7 +57,7 @@ export function FloatingContactButton() {
   return (
     <>
       {/* Floating Button */}
-      <div className="fixed bottom-6 left-6 z-50">
+      <div className="fixed bottom-6 end-6 z-50">
         <AnimatePresence>
           {menuOpen && (
             <motion.div
@@ -65,13 +65,13 @@ export function FloatingContactButton() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
               transition={{ duration: 0.2 }}
-              className="absolute bottom-16 left-0 bg-card border rounded-xl shadow-xl p-2 w-64 space-y-1"
+              className="absolute bottom-16 end-0 bg-card border rounded-xl shadow-xl p-2 w-64 space-y-1"
             >
               {contactOptions.map((option) => (
                 <button
                   key={option.type}
                   onClick={() => handleOptionClick(option.type)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-right"
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-start"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
                     {option.icon}

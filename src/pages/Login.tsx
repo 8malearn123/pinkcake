@@ -293,12 +293,12 @@ export default function Login() {
                           <FormLabel>البريد الإلكتروني</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                              <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                               <Input
                                 type="email"
                                 placeholder="example@email.com"
                                 autoComplete="email"
-                                className="pr-10"
+                                className="ps-10"
                                 {...field}
                               />
                             </div>
@@ -328,7 +328,7 @@ export default function Login() {
                     />
 
                     <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+                      {isLoading && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
                       تسجيل الدخول
                     </Button>
                   </form>
@@ -355,10 +355,10 @@ export default function Login() {
                           <FormLabel>الاسم الكامل</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                              <User className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                               <Input
                                 placeholder="أدخل اسمك"
-                                className="pr-10"
+                                className="ps-10"
                                 {...field}
                               />
                             </div>
@@ -376,12 +376,12 @@ export default function Login() {
                           <FormLabel>رقم الجوال</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                              <Phone className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                               <Input
                                 type="tel"
                                 placeholder="05xxxxxxxx"
                                 dir="ltr"
-                                className="pr-10 text-right"
+                                className="ps-10 text-start"
                                 {...field}
                               />
                             </div>
@@ -399,12 +399,12 @@ export default function Login() {
                           <FormLabel>البريد الإلكتروني</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                              <Mail className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                               <Input
                                 type="email"
                                 placeholder="example@email.com"
                                 autoComplete="email"
-                                className="pr-10"
+                                className="ps-10"
                                 {...field}
                               />
                             </div>
@@ -441,10 +441,10 @@ export default function Login() {
                           <FormLabel>العنوان (اختياري)</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                              <MapPin className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                               <Input
                                 placeholder="المدينة، الحي"
-                                className="pr-10"
+                                className="ps-10"
                                 {...field}
                               />
                             </div>
@@ -455,7 +455,7 @@ export default function Login() {
                     />
 
                     <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+                      {isLoading && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
                       إنشاء حساب
                     </Button>
                   </form>
@@ -495,7 +495,7 @@ export default function Login() {
                     type="button"
                     disabled={isLoading}
                     onClick={() => handleDemoLogin(acc.email)}
-                    className="group relative flex items-center gap-2 rounded-lg border bg-card p-2.5 text-right transition-all hover:border-primary hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="group relative flex items-center gap-2 rounded-lg border bg-card p-2.5 text-start transition-all hover:border-primary hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className={`flex-shrink-0 w-8 h-8 rounded-md bg-gradient-to-br ${acc.color} flex items-center justify-center text-white shadow-sm`}>
                       <Icon className="w-4 h-4" />

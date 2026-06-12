@@ -316,12 +316,12 @@ export default function BranchOrders() {
 
         {/* Search */}
         <div className="relative max-w-md">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="البحث برقم الطلب أو اسم العميل..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10"
+            className="ps-10"
           />
         </div>
 
@@ -421,7 +421,7 @@ export default function BranchOrders() {
                                     handleStatusChange(order.id, getNextStatus(order.status)!)
                                   }
                                 >
-                                  <CheckCircle2 className="w-4 h-4 ml-2" />
+                                  <CheckCircle2 className="w-4 h-4 me-2" />
                                   {getNextStatusLabel(order.status)}
                                 </DropdownMenuItem>
                               )}

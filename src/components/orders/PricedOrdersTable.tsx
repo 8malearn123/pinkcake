@@ -103,7 +103,7 @@ export function PricedOrdersTable() {
                   className="flex-1"
                   onClick={() => setSelectedOrder(order)}
                 >
-                  <Eye className="w-4 h-4 ml-1" />
+                  <Eye className="w-4 h-4 me-1" />
                   التفاصيل
                 </Button>
                 <Button
@@ -112,7 +112,7 @@ export function PricedOrdersTable() {
                   onClick={() => setConfirmSend(order.id)}
                   disabled={sendPricing.isPending}
                 >
-                  <Send className="w-4 h-4 ml-1" />
+                  <Send className="w-4 h-4 me-1" />
                   إرسال للعميل
                 </Button>
               </div>
@@ -139,9 +139,9 @@ export function PricedOrdersTable() {
               disabled={sendPricing.isPending}
             >
               {sendPricing.isPending ? (
-                <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                <Loader2 className="w-4 h-4 me-1 animate-spin" />
               ) : (
-                <Send className="w-4 h-4 ml-1" />
+                <Send className="w-4 h-4 me-1" />
               )}
               إرسال
             </Button>

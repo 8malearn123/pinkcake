@@ -221,7 +221,7 @@ export function ContactForm({ submissionType, onSuccess }: ContactFormProps) {
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+          {isSubmitting && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
           إرسال
         </Button>
       </form>

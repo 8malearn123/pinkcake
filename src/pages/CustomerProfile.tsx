@@ -213,7 +213,7 @@ export default function CustomerProfile() {
                     required
                     maxLength={20}
                     dir="ltr"
-                    className="text-left"
+                    className="text-end"
                   />
                 </div>
 
@@ -240,9 +240,9 @@ export default function CustomerProfile() {
                   disabled={updateProfile.isPending}
                 >
                   {updateProfile.isPending ? (
-                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   ) : (
-                    <Save className="w-4 h-4 ml-2" />
+                    <Save className="w-4 h-4 me-2" />
                   )}
                   حفظ التغييرات
                 </Button>

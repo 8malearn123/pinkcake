@@ -358,7 +358,7 @@ export default function Reports() {
                 <Filter className="w-4 h-4" />
                 فلاتر متقدمة
                 {(filters.branchIds.length > 0 || filters.statuses.length > 0) && (
-                  <Badge variant="secondary" className="mr-1">
+                  <Badge variant="secondary" className="ms-1">
                     {filters.branchIds.length + filters.statuses.length}
                   </Badge>
                 )}

@@ -173,7 +173,7 @@ export function ProductReviewDialog({
                 size="sm"
               >
                 {submitReview.isPending && (
-                  <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                 )}
                 {myReview ? 'تحديث التقييم' : 'إرسال التقييم'}
               </Button>

@@ -120,20 +120,20 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
         <button
           onClick={() => go(-1)}
           aria-label="السابق"
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
+          className="absolute start-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
         <button
           onClick={() => go(1)}
           aria-label="التالي"
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
+          className="absolute end-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/15 hover:bg-background/25 backdrop-blur border border-background/20 flex items-center justify-center text-background transition"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
         {/* Dots */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-5 end-1/2 -translate-x-1/2 flex gap-2">
           {slides.map((_, i) => (
             <button
               key={i}

@@ -25,7 +25,7 @@ export function ImpersonationBanner() {
     .join(', ');
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100] bg-destructive text-destructive-foreground px-4 py-2 shadow-lg">
+    <div className="fixed top-0 end-0 start-0 z-[100] bg-destructive text-destructive-foreground px-4 py-2 shadow-lg">
       <div className="container mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 animate-pulse" />
@@ -33,12 +33,12 @@ export function ImpersonationBanner() {
             ⚠️ وضع التحكم الإداري — أنت تعمل كـ{' '}
             <span className="font-bold underline">{impersonatedUser.fullName || 'مستخدم'}</span>
             {rolesDisplay && (
-              <span className="opacity-90 text-xs md:text-sm mr-2 bg-destructive-foreground/20 px-2 py-0.5 rounded">
+              <span className="opacity-90 text-xs md:text-sm ms-2 bg-destructive-foreground/20 px-2 py-0.5 rounded">
                 ({rolesDisplay})
               </span>
             )}
             {impersonatedUser.branchName && (
-              <span className="opacity-90 text-xs md:text-sm mr-2">
+              <span className="opacity-90 text-xs md:text-sm ms-2">
                 — {impersonatedUser.branchName}
               </span>
             )}

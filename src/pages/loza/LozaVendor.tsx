@@ -22,7 +22,7 @@ export default function LozaVendor() {
   return (
     <LozaShell>
       <section className={`relative h-56 bg-gradient-to-br ${vendor.cover} text-white overflow-hidden`}>
-        <Link to="/loza" className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/95 text-[hsl(var(--loza-brown))] flex items-center justify-center">
+        <Link to="/loza" className="absolute top-4 start-4 z-10 w-10 h-10 rounded-full bg-white/95 text-[hsl(var(--loza-brown))] flex items-center justify-center">
           <ArrowRight className="w-5 h-5" />
         </Link>
         <div className="absolute inset-0 flex items-center justify-center">

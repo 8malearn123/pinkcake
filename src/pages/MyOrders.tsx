@@ -87,7 +87,7 @@ export default function MyOrders() {
             <h3 className="font-display text-3xl mb-2">لا توجد طلبات بعد</h3>
             <p className="text-muted-foreground mb-6 text-sm">ابدأي رحلتك الحلوة معنا الآن</p>
             <Button onClick={() => navigate('/store')} className="rounded-full px-6 h-11 bg-foreground text-background hover:bg-foreground/90">
-              <Store className="w-4 h-4 ml-2" />
+              <Store className="w-4 h-4 me-2" />
               تصفّحي المنتجات
             </Button>
           </div>
@@ -151,7 +151,7 @@ export default function MyOrders() {
                     </div>
                     <Button variant="ghost" size="sm" className="rounded-full text-primary hover:text-primary hover:bg-primary/10">
                       التفاصيل
-                      <ChevronLeft className="w-4 h-4 mr-1" />
+                      <ChevronLeft className="w-4 h-4 ms-1" />
                     </Button>
                   </div>
                 </CardContent>

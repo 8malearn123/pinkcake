@@ -156,7 +156,7 @@ export function NewOrderForm() {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="أدخل اسم العميل"
-              className="text-right"
+              className="text-start"
               required
             />
           </div>
@@ -167,7 +167,7 @@ export function NewOrderForm() {
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
               placeholder="05xxxxxxxx"
-              className="text-right"
+              className="text-start"
               dir="ltr"
               required
             />
@@ -179,7 +179,7 @@ export function NewOrderForm() {
               value={customerAddress}
               onChange={(e) => setCustomerAddress(e.target.value)}
               placeholder="أدخل عنوان العميل"
-              className="text-right"
+              className="text-start"
             />
           </div>
         </div>
@@ -248,7 +248,7 @@ export function NewOrderForm() {
             </SelectContent>
           </Select>
           <Button type="button" onClick={addProduct} className="gradient-gold text-white">
-            <Plus className="w-4 h-4 ml-1" />
+            <Plus className="w-4 h-4 me-1" />
             إضافة
           </Button>
         </div>
@@ -287,7 +287,7 @@ export function NewOrderForm() {
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>
-                  <p className="font-bold w-24 text-left">{item.totalPrice} ر.س</p>
+                  <p className="font-bold w-24 text-end">{item.totalPrice} ر.س</p>
                   <Button
                     type="button"
                     variant="ghost"
@@ -336,7 +336,7 @@ export function NewOrderForm() {
           className="gradient-gold text-white px-8"
           disabled={createOrder.isPending}
         >
-          {createOrder.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+          {createOrder.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
           إنشاء الطلب
         </Button>
       </div>

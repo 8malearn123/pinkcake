@@ -33,7 +33,7 @@ export function ProductCard({ product, rating, onAddToCart, onViewDetails }: Pro
         
         {/* Category Badge */}
         {product.category && (
-          <Badge className="absolute top-2 right-2 text-xs" variant="secondary">
+          <Badge className="absolute top-2 start-2 text-xs" variant="secondary">
             {product.category}
           </Badge>
         )}
@@ -77,7 +77,7 @@ export function ProductCard({ product, rating, onAddToCart, onViewDetails }: Pro
             onAddToCart();
           }}
         >
-          <Plus className="w-4 h-4 ml-1" />
+          <Plus className="w-4 h-4 me-1" />
           أضف للسلة
         </Button>
       </CardFooter>

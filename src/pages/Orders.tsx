@@ -74,7 +74,7 @@ export default function Orders() {
           </div>
           <Link to="/orders/new">
             <Button className="gradient-pink text-white shadow-warm">
-              <Plus className="w-5 h-5 ml-2" />
+              <Plus className="w-5 h-5 me-2" />
               طلب جديد
             </Button>
           </Link>
@@ -84,17 +84,17 @@ export default function Orders() {
         <div className="glass-card rounded-2xl p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 placeholder="بحث بالاسم أو رقم الطلب..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10"
+                className="ps-10"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-[200px]">
-                <Filter className="w-4 h-4 ml-2" />
+                <Filter className="w-4 h-4 me-2" />
                 <SelectValue placeholder="تصفية الحالة" />
               </SelectTrigger>
               <SelectContent>

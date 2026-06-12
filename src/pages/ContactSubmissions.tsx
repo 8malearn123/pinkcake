@@ -229,12 +229,12 @@ export default function ContactSubmissions() {
                             </div>
                           </TableCell>
                           <TableCell className="font-medium">{submission.customer_name}</TableCell>
-                          <TableCell dir="ltr" className="text-right">{submission.phone}</TableCell>
+                          <TableCell dir="ltr" className="text-right">{/* rtl-ok: LTR phone */}{submission.phone}</TableCell>
                           <TableCell className="max-w-[200px] truncate">{submission.message}</TableCell>
                           <TableCell>
                             <Badge className={statusColors[submission.status]}>
                               {statusIcons[submission.status]}
-                              <span className="mr-1">{statusLabels[submission.status]}</span>
+                              <span className="ms-1">{statusLabels[submission.status]}</span>
                             </Badge>
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
@@ -338,7 +338,7 @@ export default function ContactSubmissions() {
               إغلاق
             </Button>
             <Button onClick={handleSaveNotes} disabled={updateSubmission.isPending}>
-              {updateSubmission.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+              {updateSubmission.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
               حفظ الملاحظات
             </Button>
           </DialogFooter>

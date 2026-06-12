@@ -171,13 +171,13 @@ export function ProductDetailsDialog({
                         <>
                           <button
                             onClick={prevImage}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center hover:bg-background transition-colors"
+                            className="absolute end-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center hover:bg-background transition-colors"
                           >
                             <ChevronLeft className="w-5 h-5" />
                           </button>
                           <button
                             onClick={nextImage}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center hover:bg-background transition-colors"
+                            className="absolute start-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center hover:bg-background transition-colors"
                           >
                             <ChevronRight className="w-5 h-5" />
                           </button>
@@ -190,7 +190,7 @@ export function ProductDetailsDialog({
                     </div>
                   )}
                   {product.category && (
-                    <Badge className="absolute top-3 right-3" variant="secondary">
+                    <Badge className="absolute top-3 start-3" variant="secondary">
                       {product.category}
                     </Badge>
                   )}
@@ -249,7 +249,7 @@ export function ProductDetailsDialog({
                       <div key={option.id} className="space-y-2">
                         <Label className="font-medium">
                           {option.option_name}
-                          {option.is_required && <span className="text-destructive mr-1">*</span>}
+                          {option.is_required && <span className="text-destructive ms-1">*</span>}
                         </Label>
                         
                         {option.option_type === 'single' ? (
@@ -275,7 +275,7 @@ export function ProductDetailsDialog({
                                 >
                                   {value.value_name}
                                   {value.price_adjustment !== 0 && (
-                                    <span className="mr-1 text-xs">
+                                    <span className="ms-1 text-xs">
                                       ({value.price_adjustment > 0 ? '+' : ''}{value.price_adjustment} ر.س)
                                     </span>
                                   )}
@@ -300,7 +300,7 @@ export function ProductDetailsDialog({
                                 >
                                   {value.value_name}
                                   {value.price_adjustment !== 0 && (
-                                    <span className="mr-1 text-xs">
+                                    <span className="ms-1 text-xs">
                                       ({value.price_adjustment > 0 ? '+' : ''}{value.price_adjustment} ر.س)
                                     </span>
                                   )}

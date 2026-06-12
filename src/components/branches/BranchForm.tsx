@@ -139,7 +139,7 @@ export function BranchForm({
 
             <div className="flex gap-3 pt-4">
               <Button type="submit" disabled={isLoading} className="flex-1">
-                {isLoading && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+                {isLoading && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
                 {branch ? 'حفظ التغييرات' : 'إضافة الفرع'}
               </Button>
               <Button

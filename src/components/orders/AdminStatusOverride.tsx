@@ -64,7 +64,7 @@ export function AdminStatusOverride({ orderId, currentStatus }: AdminStatusOverr
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
-          <Shield className="w-4 h-4 ml-2" />
+          <Shield className="w-4 h-4 me-2" />
           تغيير الحالة (مدير)
         </Button>
       </DialogTrigger>
@@ -136,7 +136,7 @@ export function AdminStatusOverride({ orderId, currentStatus }: AdminStatusOverr
             disabled={!reason.trim() || newStatus === currentStatus || changeStatus.isPending}
             className="bg-amber-500 hover:bg-amber-600"
           >
-            {changeStatus.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+            {changeStatus.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
             تأكيد التغيير
           </Button>
         </DialogFooter>

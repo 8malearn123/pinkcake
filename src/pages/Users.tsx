@@ -222,12 +222,12 @@ export default function Users() {
             </TabsList>
 
             <div className="relative w-full sm:w-72">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="البحث عن مستخدم..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10"
+                className="ps-10"
               />
             </div>
           </div>

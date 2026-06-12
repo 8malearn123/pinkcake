@@ -94,7 +94,7 @@ export function CustomOrderStatusTimeline({ currentStatus }: CustomOrderStatusTi
             {index < steps.length - 1 && (
               <div
                 className={cn(
-                  'absolute top-4 right-1/2 w-full h-0.5',
+                  'absolute top-4 start-1/2 w-full h-0.5',
                   step.status === 'completed' ? 'bg-primary' : 'bg-muted'
                 )}
                 style={{ transform: 'translateX(50%)' }}

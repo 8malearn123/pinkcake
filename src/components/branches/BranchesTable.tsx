@@ -111,7 +111,7 @@ export function BranchesTable({
                     >
                       <Users className="w-4 h-4" />
                       <span>عرض</span>
-                      <Badge variant="secondary" className="mr-1 h-5 min-w-5 px-1.5 text-xs">
+                      <Badge variant="secondary" className="ms-1 h-5 min-w-5 px-1.5 text-xs">
                         {employeeCounts?.[branch.id] || 0}
                       </Badge>
                     </Button>
@@ -125,14 +125,14 @@ export function BranchesTable({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-popover border shadow-md">
                         <DropdownMenuItem onClick={() => onEdit(branch)}>
-                          <Pencil className="w-4 h-4 ml-2" />
+                          <Pencil className="w-4 h-4 me-2" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
                           onClick={() => setDeleteId(branch.id)}
                         >
-                          <Trash2 className="w-4 h-4 ml-2" />
+                          <Trash2 className="w-4 h-4 me-2" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>

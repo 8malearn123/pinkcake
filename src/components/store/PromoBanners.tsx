@@ -13,10 +13,10 @@ export function PromoBanners({ onCustomize, onShop }: PromoBannersProps) {
       {/* Big banner */}
       <button
         onClick={onCustomize}
-        className="group relative md:col-span-2 overflow-hidden rounded-3xl bg-gradient-to-bl from-primary/90 via-primary to-accent text-primary-foreground p-7 md:p-9 text-right shadow-soft-lift min-h-[200px]"
+        className="group relative md:col-span-2 overflow-hidden rounded-3xl bg-gradient-to-bl from-primary/90 via-primary to-accent text-primary-foreground p-7 md:p-9 text-start shadow-soft-lift min-h-[200px]"
       >
-        <div className="absolute -bottom-8 -left-8 w-56 h-56 rounded-full bg-background/10 blur-2xl" />
-        <div className="absolute top-4 left-4 noise-overlay opacity-30 inset-0" />
+        <div className="absolute -bottom-8 -end-8 w-56 h-56 rounded-full bg-background/10 blur-2xl" />
+        <div className="absolute top-4 end-4 noise-overlay opacity-30 inset-0" />
         <div className="relative z-10 max-w-md">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-background/20 backdrop-blur text-xs">
             <Palette className="w-3.5 h-3.5" />
@@ -36,7 +36,7 @@ export function PromoBanners({ onCustomize, onShop }: PromoBannersProps) {
         <img
           src={promoSlice}
           alt=""
-          className="absolute -bottom-6 -right-6 w-44 h-44 md:w-56 md:h-56 object-contain opacity-80 group-hover:scale-105 transition-transform duration-500"
+          className="absolute -bottom-6 -start-6 w-44 h-44 md:w-56 md:h-56 object-contain opacity-80 group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
       </button>
@@ -44,7 +44,7 @@ export function PromoBanners({ onCustomize, onShop }: PromoBannersProps) {
       {/* Side banner */}
       <button
         onClick={onShop}
-        className="group relative overflow-hidden rounded-3xl bg-card border border-border/60 p-6 text-right shadow-soft-lift min-h-[200px]"
+        className="group relative overflow-hidden rounded-3xl bg-card border border-border/60 p-6 text-start shadow-soft-lift min-h-[200px]"
       >
         <img
           src={hero2}

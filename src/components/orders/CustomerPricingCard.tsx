@@ -105,7 +105,7 @@ export function CustomerPricingCard({ order }: CustomerPricingCardProps) {
               onClick={() => setShowRejectDialog(true)}
               disabled={respondToPricing.isPending}
             >
-              <X className="w-4 h-4 ml-1" />
+              <X className="w-4 h-4 me-1" />
               رفض السعر
             </Button>
             <Button
@@ -114,9 +114,9 @@ export function CustomerPricingCard({ order }: CustomerPricingCardProps) {
               disabled={respondToPricing.isPending}
             >
               {respondToPricing.isPending ? (
-                <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                <Loader2 className="w-4 h-4 me-1 animate-spin" />
               ) : (
-                <Check className="w-4 h-4 ml-1" />
+                <Check className="w-4 h-4 me-1" />
               )}
               قبول والدفع
             </Button>
@@ -158,9 +158,9 @@ export function CustomerPricingCard({ order }: CustomerPricingCardProps) {
               disabled={respondToPricing.isPending}
             >
               {respondToPricing.isPending ? (
-                <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                <Loader2 className="w-4 h-4 me-1 animate-spin" />
               ) : (
-                <X className="w-4 h-4 ml-1" />
+                <X className="w-4 h-4 me-1" />
               )}
               تأكيد الرفض
             </Button>

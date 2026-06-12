@@ -142,7 +142,7 @@ export function HandoverBarcodeScanner({
             className="w-full"
             onClick={() => setShowManualInput(true)}
           >
-            <Keyboard className="w-4 h-4 ml-2" />
+            <Keyboard className="w-4 h-4 me-2" />
             إدخال الكود يدوياً
           </Button>
         </div>
@@ -164,7 +164,7 @@ export function HandoverBarcodeScanner({
               disabled={!manualCode.trim() || scanBarcode.isPending}
               className="flex-1"
             >
-              {scanBarcode.isPending && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
+              {scanBarcode.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
               تأكيد
             </Button>
             <Button

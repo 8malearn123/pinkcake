@@ -145,11 +145,11 @@ export function UsersTable({
                         <DropdownMenuLabel>إدارة المستخدم</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => onManageRoles(targetUser)}>
-                          <Shield className="w-4 h-4 ml-2" />
+                          <Shield className="w-4 h-4 me-2" />
                           إدارة الأدوار
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onManageBranch(targetUser)}>
-                          <MapPin className="w-4 h-4 ml-2" />
+                          <MapPin className="w-4 h-4 me-2" />
                           تعيين فرع
                         </DropdownMenuItem>
                         {canImpersonate(targetUser) && (
@@ -162,7 +162,7 @@ export function UsersTable({
                               })}
                               className="text-primary"
                             >
-                              <UserCog className="w-4 h-4 ml-2" />
+                              <UserCog className="w-4 h-4 me-2" />
                               الدخول كـ هذا المستخدم
                             </DropdownMenuItem>
                           </>

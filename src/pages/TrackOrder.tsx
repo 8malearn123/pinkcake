@@ -233,7 +233,7 @@ export default function TrackOrder() {
             <div className="glass-card rounded-2xl p-6 text-center">
               <p className="text-muted-foreground mb-3">لديك استفسار؟</p>
               <Button variant="outline" className="border-primary text-primary">
-                <Phone className="w-4 h-4 ml-2" />
+                <Phone className="w-4 h-4 me-2" />
                 اتصل بنا
               </Button>
             </div>

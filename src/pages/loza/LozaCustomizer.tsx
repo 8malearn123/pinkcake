@@ -196,7 +196,7 @@ export default function LozaCustomizer() {
             <div className="text-[11px] text-muted-foreground">الخطوة {step} من 5</div>
             <h1 className="font-bold font-loza-display text-base leading-tight">{STEPS[step - 1].title}</h1>
           </div>
-          <div className="text-left min-w-[80px]">
+          <div className="text-end min-w-[80px]">
             <div className="text-[10px] text-muted-foreground">السعر</div>
             <div className="text-base font-extrabold text-gradient-loza">{total} ر.س</div>
           </div>
@@ -254,8 +254,8 @@ export default function LozaCustomizer() {
         {/* 2D Live Preview */}
         <div className="relative h-80 rounded-3xl overflow-hidden shadow-loza-lift bg-gradient-to-br from-[hsl(var(--loza-cream))] via-white to-[hsl(var(--loza-gold-light)/0.3)]">
           {/* decorative blobs */}
-          <div className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-[hsl(var(--loza-gold)/0.15)] blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-56 h-56 rounded-full bg-[hsl(var(--loza-brown)/0.1)] blur-3xl" />
+          <div className="absolute -top-20 -start-20 w-56 h-56 rounded-full bg-[hsl(var(--loza-gold)/0.15)] blur-3xl" />
+          <div className="absolute -bottom-20 -end-20 w-56 h-56 rounded-full bg-[hsl(var(--loza-brown)/0.1)] blur-3xl" />
 
           <Cake2DPreview
             baseId={s.baseId}
@@ -267,7 +267,7 @@ export default function LozaCustomizer() {
           />
 
           {/* Top labels */}
-          <div className="absolute top-3 right-3 flex gap-1.5">
+          <div className="absolute top-3 start-3 flex gap-1.5">
             {s.designId && (
               <span className="bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow">
                 {DESIGNS.find((d) => d.id === s.designId)?.emoji}
@@ -280,7 +280,7 @@ export default function LozaCustomizer() {
               </span>
             )}
           </div>
-          <div className="absolute top-3 left-3 bg-white/80 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+          <div className="absolute top-3 end-3 bg-white/80 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-medium text-muted-foreground flex items-center gap-1">
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
             معاينة مباشرة
           </div>
@@ -308,14 +308,14 @@ export default function LozaCustomizer() {
                       key={b.id}
                       onClick={() => setS((p) => ({ ...p, baseId: b.id }))}
                       className={cn(
-                        'group relative p-3 rounded-2xl border-2 bg-card text-right transition-all duration-300 overflow-hidden',
+                        'group relative p-3 rounded-2xl border-2 bg-card text-start transition-all duration-300 overflow-hidden',
                         'hover:-translate-y-1 hover:shadow-loza',
                         sel ? 'border-primary shadow-loza-lift bg-gradient-to-br from-card to-[hsl(var(--loza-gold-light)/0.25)]'
                             : 'border-border',
                       )}
                     >
                       {sel && (
-                        <div className="absolute top-2 left-2 w-6 h-6 rounded-full gradient-loza-gold flex items-center justify-center shadow z-10">
+                        <div className="absolute top-2 end-2 w-6 h-6 rounded-full gradient-loza-gold flex items-center justify-center shadow z-10">
                           <Check className="w-3.5 h-3.5 text-[hsl(var(--loza-brown))]" strokeWidth={3} />
                         </div>
                       )}
@@ -361,7 +361,7 @@ export default function LozaCustomizer() {
                       )}
                     >
                       {sel && (
-                        <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full gradient-loza-gold flex items-center justify-center shadow z-10">
+                        <div className="absolute -top-1.5 -end-1.5 w-5 h-5 rounded-full gradient-loza-gold flex items-center justify-center shadow z-10">
                           <Check className="w-3 h-3 text-[hsl(var(--loza-brown))]" strokeWidth={3} />
                         </div>
                       )}
@@ -472,14 +472,14 @@ export default function LozaCustomizer() {
                       key={d.id}
                       onClick={() => setS((p) => ({ ...p, designId: d.id }))}
                       className={cn(
-                        'p-4 rounded-2xl border-2 bg-card text-right transition-all duration-300 relative',
+                        'p-4 rounded-2xl border-2 bg-card text-start transition-all duration-300 relative',
                         'hover:-translate-y-1',
                         sel ? 'border-primary shadow-loza-lift bg-gradient-to-br from-card to-[hsl(var(--loza-gold-light)/0.2)]'
                             : 'border-border',
                       )}
                     >
                       {sel && (
-                        <div className="absolute top-2 left-2 w-6 h-6 rounded-full gradient-loza-gold flex items-center justify-center shadow">
+                        <div className="absolute top-2 end-2 w-6 h-6 rounded-full gradient-loza-gold flex items-center justify-center shadow">
                           <Check className="w-3.5 h-3.5 text-[hsl(var(--loza-brown))]" strokeWidth={3} />
                         </div>
                       )}
@@ -552,7 +552,7 @@ export default function LozaCustomizer() {
                   rows={3}
                   className="mt-2 resize-none"
                 />
-                <div className="text-[10px] text-muted-foreground text-left mt-1">{s.notes.length}/200</div>
+                <div className="text-[10px] text-muted-foreground text-end mt-1">{s.notes.length}/200</div>
               </div>
 
               {/* Summary */}
@@ -598,7 +598,7 @@ export default function LozaCustomizer() {
             disabled={step === 1}
             className="rounded-full border-border hover:bg-muted"
           >
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <ChevronRight className="w-4 h-4 me-1" />
             السابق
           </Button>
           <div className="flex-1 text-center">
@@ -612,14 +612,14 @@ export default function LozaCustomizer() {
               className="rounded-full gradient-loza-gold text-[hsl(var(--loza-brown))] border-0 font-bold hover:opacity-90 disabled:opacity-50 px-6"
             >
               التالي
-              <ChevronLeft className="w-4 h-4 mr-1" />
+              <ChevronLeft className="w-4 h-4 ms-1" />
             </Button>
           ) : (
             <Button
               onClick={submit}
               className="rounded-full gradient-loza-gold text-[hsl(var(--loza-brown))] border-0 font-bold hover:opacity-90 px-5"
             >
-              <ShoppingCart className="w-4 h-4 ml-1" />
+              <ShoppingCart className="w-4 h-4 me-1" />
               أضف للسلة
             </Button>
           )}
@@ -642,7 +642,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-3">
       <span className="opacity-80 shrink-0">{label}</span>
-      <span className="font-medium text-left truncate">{value}</span>
+      <span className="font-medium text-end truncate">{value}</span>
     </div>
   );
 }
