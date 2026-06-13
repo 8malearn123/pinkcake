@@ -38,6 +38,21 @@ data, so you can build and test the UI without Supabase. A "وضع تجريبي"
 backend instead, `cp .env.example .env`, fill in the Supabase values, and set
 `VITE_DEMO_MODE="false"`. Full wiring guide: [`HANDOFF.md`](HANDOFF.md).
 
+## Preview & test on Vercel
+
+`vercel.json` adds the SPA rewrite so client-side routes (`/dashboard`, `/track`, …)
+work on refresh/deep-link. To make the hosted app run the full UI without a
+backend, set one environment variable in **Vercel → Settings → Environment
+Variables** (Preview + Production):
+
+```
+VITE_DEMO_MODE = true
+```
+
+Every push/PR then gets a Vercel preview that renders all screens on mock data.
+When the backend is wired, set it to `false` and add the real Supabase vars
+(scope them to Production if you want previews to stay on demo data).
+
 ## Environment variables
 
 All are build-time `VITE_*` values (exposed to the browser — that is expected; the anon
