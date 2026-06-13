@@ -10,9 +10,23 @@ import {
 
 /**
  * Visible only in demo mode. Marks the app as running on mock data and lets you
- * preview any role's screens (reloads so routing/guards re-evaluate). Renders
- * nothing in real mode, so it tree-shakes out of production builds.
+ * preview any role's screens. Renders nothing in real mode, so it tree-shakes
+ * out of production builds.
  */
+
+// Where each role "lands" — switching role navigates here so the change is
+// actually visible (the public store looks identical for every role). Mirrors
+// getRoleLandingPage in ProtectedRoute.
+const ROLE_LANDING: Record<DemoRole, string> = {
+  admin: '/dashboard',
+  call_center: '/dashboard',
+  customer_support: '/submissions',
+  kitchen: '/kitchen',
+  branch: '/branch-orders',
+  driver: '/driver',
+  customer: '/store',
+};
+
 export function DemoModeBadge() {
   if (!DEMO_MODE) return null;
 
@@ -26,8 +40,11 @@ export function DemoModeBadge() {
         id="demo-role"
         value={getDemoRole()}
         onChange={(e) => {
-          setDemoRole(e.target.value as DemoRole);
-          window.location.reload();
+          const role = e.target.value as DemoRole;
+          setDemoRole(role);
+          // Full navigation to the role's landing page → reloads, re-evaluates
+          // guards, and drops you straight into that role's screens.
+          window.location.href = ROLE_LANDING[role];
         }}
         className="bg-transparent font-medium text-foreground outline-none cursor-pointer"
         aria-label="تبديل الدور التجريبي"
