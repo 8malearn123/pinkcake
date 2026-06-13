@@ -295,7 +295,7 @@ export function NewOrderForm() {
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
+                      size="icon" aria-label="إنقاص الكمية"
                       className="h-8 w-8"
                       onClick={() => updateQuantity(item.productId, -1)}
                     >
@@ -305,7 +305,7 @@ export function NewOrderForm() {
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
+                      size="icon" aria-label="زيادة الكمية"
                       className="h-8 w-8"
                       onClick={() => updateQuantity(item.productId, 1)}
                     >
@@ -316,7 +316,7 @@ export function NewOrderForm() {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
+                    size="icon" aria-label="حذف المنتج"
                     className="text-destructive hover:bg-destructive/10"
                     onClick={() => removeItem(item.productId)}
                   >

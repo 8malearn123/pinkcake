@@ -46,7 +46,7 @@ export function RevealPhoneButton({ profileId, userName }: RevealPhoneButtonProp
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
+                size="icon" aria-label="إظهار رقم الجوال"
                 className="h-6 w-6"
                 onClick={handleReveal}
               >

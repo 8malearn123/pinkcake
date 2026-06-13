@@ -408,7 +408,7 @@ export default function BranchOrders() {
                             <DropdownMenuTrigger asChild>
                               <Button
                                 variant="ghost"
-                                size="icon"
+                                size="icon" aria-label="خيارات"
                                 disabled={updateStatus.isPending}
                               >
                                 <MoreHorizontal className="w-4 h-4" />

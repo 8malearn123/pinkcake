@@ -189,7 +189,7 @@ export default function LozaCustomizer() {
       {/* Sticky Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="container mx-auto max-w-3xl px-4 py-3 flex items-center justify-between gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/loza')} className="rounded-full hover:bg-muted">
+          <Button variant="ghost" size="icon" aria-label="إغلاق" onClick={() => navigate('/loza')} className="rounded-full hover:bg-muted">
             <X className="w-5 h-5" />
           </Button>
           <div className="text-center flex-1">

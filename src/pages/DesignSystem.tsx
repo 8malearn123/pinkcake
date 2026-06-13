@@ -251,7 +251,7 @@ export default function DesignSystem() {
               <Button size="lg">كبير</Button>
               <Button size="default">عادي</Button>
               <Button size="sm">صغير</Button>
-              <Button size="icon"><Plus className="w-4 h-4" /></Button>
+              <Button size="icon" aria-label="إضافة"><Plus className="w-4 h-4" /></Button>
             </div>
             <div className="rounded-xl bg-muted/50 p-4 text-sm text-muted-foreground space-y-1 leading-relaxed">
               <p>• زر CTA المتدرّج (<ClassChip>gradient-pink text-white shadow-warm</ClassChip>): واحد فقط لكل شاشة، للإجراء الأهم.</p>

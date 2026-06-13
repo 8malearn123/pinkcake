@@ -110,7 +110,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
           <Button
             type="button"
             variant="destructive"
-            size="icon"
+            size="icon" aria-label="حذف الصورة"
             className="absolute -top-2 -end-2 h-7 w-7"
             onClick={handleRemove}
             disabled={disabled || isUploading}

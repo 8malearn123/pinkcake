@@ -88,6 +88,8 @@ export function FloatingContactButton() {
 
         <Button
           size="lg"
+          aria-label={menuOpen ? 'إغلاق قائمة التواصل' : 'تواصل معنا'}
+          aria-expanded={menuOpen}
           className="rounded-full h-14 w-14 shadow-lg gradient-pink hover:scale-105 transition-transform"
           onClick={() => setMenuOpen(!menuOpen)}
         >

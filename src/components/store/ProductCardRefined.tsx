@@ -78,6 +78,7 @@ export function ProductCardRefined({
           </div>
           <Button
             size="icon"
+            aria-label="أضف إلى العربة"
             onClick={(e) => {
               e.stopPropagation();
               onAddToCart();
