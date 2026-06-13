@@ -35,13 +35,20 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
+import { Reveal } from '@/components/Reveal';
 import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
+import { AnnouncementBar } from '@/components/store/AnnouncementBar';
 import { HeroCarousel } from '@/components/store/HeroCarousel';
 import { PromoStrip } from '@/components/store/PromoStrip';
-import { PromoBanners } from '@/components/store/PromoBanners';
 import { CategoryChips } from '@/components/store/CategoryChips';
 import { ProductCardRefined } from '@/components/store/ProductCardRefined';
+import { DesignYourCake } from '@/components/store/DesignYourCake';
+import { ShopByOccasion } from '@/components/store/ShopByOccasion';
+import { HowItWorks } from '@/components/store/HowItWorks';
+import { Testimonials } from '@/components/store/Testimonials';
+import { StoreFooter } from '@/components/store/StoreFooter';
+import { BackToTop } from '@/components/store/BackToTop';
 import {
   ShoppingCart,
   Plus,
@@ -58,6 +65,9 @@ import {
   LogIn,
   Search,
   Sparkles,
+  ArrowLeft,
+  Truck,
+  ShieldCheck,
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -156,6 +166,17 @@ export default function Store() {
     productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const scrollToDesign = () => {
+    const el = document.getElementById('design');
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+  };
+
+  // The on-page configurator is a teaser; it leads into the full custom-order flow.
+  const handleDesignAdd = (total: number) => {
+    toast({ title: 'كيكتكِ المخصّصة', description: `الإجمالي التقديري ${total} ر.س — تابعي التخصيص لإتمام الطلب` });
+    navigate('/customize');
+  };
+
   const handleCheckout = async () => {
     if (!user) {
       const pendingOrderData = { cart, branchId: selectedBranch, deliveryDate, deliveryTime };
@@ -214,22 +235,19 @@ export default function Store() {
 
   return (
     <div className="min-h-screen bg-background">
+      <AnnouncementBar />
+
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
         <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center gap-4">
           {/* Brand */}
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2.5 shrink-0"
-          >
-            <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2.5 shrink-0 press group">
+            <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105">
               <Cake className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="hidden sm:block text-start leading-tight">
               <div className="font-display text-lg">{settings.storeName}</div>
-              <div className="text-[10px] text-muted-foreground tracking-widest uppercase">
-                Patisserie
-              </div>
+              <div className="text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
             </div>
           </button>
 
@@ -250,7 +268,7 @@ export default function Store() {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/customize')}
-              className="hidden sm:inline-flex gap-1.5 text-primary hover:text-primary hover:bg-primary/10 rounded-full"
+              className="hidden sm:inline-flex gap-1.5 text-primary hover:text-primary hover:bg-primary/10 rounded-full press"
             >
               <Sparkles className="w-4 h-4" />
               صمّمي كيكتك
@@ -258,23 +276,18 @@ export default function Store() {
 
             {user ? (
               <>
-                <Button variant="ghost" size="icon" onClick={() => navigate('/my-profile')} aria-label="حسابي">
+                <Button variant="ghost" size="icon" onClick={() => navigate('/my-profile')} aria-label="حسابي" className="press">
                   <User className="w-5 h-5" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => navigate('/my-orders')} aria-label="طلباتي">
+                <Button variant="ghost" size="icon" onClick={() => navigate('/my-orders')} aria-label="طلباتي" className="press">
                   <Package className="w-5 h-5" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => signOut()} aria-label="خروج" className="hidden sm:inline-flex">
+                <Button variant="ghost" size="icon" onClick={() => signOut()} aria-label="خروج" className="hidden sm:inline-flex press">
                   <LogOut className="w-5 h-5" />
                 </Button>
               </>
             ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/login')}
-                className="gap-2 rounded-full"
-              >
+              <Button variant="ghost" size="sm" onClick={() => navigate('/login')} className="gap-2 rounded-full press">
                 <LogIn className="w-4 h-4" />
                 <span className="hidden sm:inline">دخول</span>
               </Button>
@@ -282,10 +295,13 @@ export default function Store() {
 
             <Sheet open={cartOpen} onOpenChange={setCartOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="عربة التسوق" className="relative rounded-full border-border h-10 w-10">
+                <Button variant="outline" size="icon" aria-label="عربة التسوق" className="relative rounded-full border-border h-10 w-10 press hover:border-primary/50 hover:bg-primary/5">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow">
+                    <span
+                      key={cartCount}
+                      className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow"
+                    >
                       {cartCount}
                     </span>
                   )}
@@ -315,11 +331,7 @@ export default function Store() {
                       <Card key={item.product.id} className="p-3 border-border/60">
                         <div className="flex gap-3">
                           {item.product.image_url ? (
-                            <img
-                              src={item.product.image_url}
-                              alt={item.product.name}
-                              className="w-16 h-16 rounded-xl object-cover"
-                            />
+                            <img src={item.product.image_url} alt={item.product.name} className="w-16 h-16 rounded-xl object-cover" />
                           ) : (
                             <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center">
                               <Cake className="w-6 h-6 text-muted-foreground" />
@@ -331,17 +343,14 @@ export default function Store() {
                               {item.product.price} <span className="text-xs text-muted-foreground">ر.س</span>
                             </p>
                             <div className="flex items-center gap-2 mt-2">
-                              <Button size="icon" variant="outline" aria-label="إنقاص الكمية" className="h-7 w-7 rounded-full"
-                                onClick={() => updateQuantity(item.product.id, -1)}>
+                              <Button size="icon" variant="outline" aria-label="إنقاص الكمية" className="h-7 w-7 rounded-full" onClick={() => updateQuantity(item.product.id, -1)}>
                                 <Minus className="w-3 h-3" />
                               </Button>
                               <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
-                              <Button size="icon" variant="outline" aria-label="زيادة الكمية" className="h-7 w-7 rounded-full"
-                                onClick={() => updateQuantity(item.product.id, 1)}>
+                              <Button size="icon" variant="outline" aria-label="زيادة الكمية" className="h-7 w-7 rounded-full" onClick={() => updateQuantity(item.product.id, 1)}>
                                 <Plus className="w-3 h-3" />
                               </Button>
-                              <Button size="icon" variant="ghost" aria-label="إزالة المنتج" className="h-7 w-7 text-destructive ms-auto"
-                                onClick={() => removeFromCart(item.product.id)}>
+                              <Button size="icon" variant="ghost" aria-label="إزالة المنتج" className="h-7 w-7 text-destructive ms-auto" onClick={() => removeFromCart(item.product.id)}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
                             </div>
@@ -394,33 +403,27 @@ export default function Store() {
 
       {/* ── Main ── */}
       <main className="container mx-auto px-4 lg:px-6 py-6 lg:py-10 space-y-8 lg:space-y-12">
-        {/* Hero */}
-        <HeroCarousel
-          onShopClick={scrollToProducts}
-          onCustomizeClick={() => navigate('/customize')}
-        />
+        <Reveal>
+          <HeroCarousel onShopClick={scrollToProducts} onCustomizeClick={() => navigate('/customize')} />
+        </Reveal>
 
-        {/* Promo strip */}
-        <PromoStrip />
-
-        {/* Promo banners */}
-        <PromoBanners onCustomize={() => navigate('/customize')} onShop={scrollToProducts} />
+        <Reveal>
+          <PromoStrip />
+        </Reveal>
 
         {/* Category & products */}
         <section ref={productsRef} className="space-y-5 scroll-mt-24">
-          <div className="flex items-end justify-between flex-wrap gap-3">
-            <div>
-              <div className="text-xs text-primary tracking-widest uppercase font-medium">
-                مجموعتنا
+          <Reveal>
+            <div className="flex items-end justify-between flex-wrap gap-3">
+              <div>
+                <div className="text-xs text-primary tracking-widest uppercase font-medium">مجموعتنا</div>
+                <h2 className="font-display text-4xl md:text-5xl mt-1 leading-none">كيكات مختارة بعناية</h2>
               </div>
-              <h2 className="font-display text-4xl md:text-5xl mt-1 leading-none">
-                كيكات مختارة بعناية
-              </h2>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                تشكيلة محدثة من أكثر من {products?.length || 0} منتج فاخر، اختاري ما يناسب لحظتك.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground max-w-xs">
-              تشكيلة محدثة من أكثر من {products?.length || 0} منتج فاخر، اختاري ما يناسب لحظتك.
-            </p>
-          </div>
+          </Reveal>
 
           <CategoryChips categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
 
@@ -449,49 +452,74 @@ export default function Store() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
-              {filteredProducts.map((product) => {
-                const rating = ratingsMap?.[product.id];
-                return (
-                  <ProductCardRefined
-                    key={product.id}
-                    product={product}
-                    rating={rating}
-                    onAddToCart={() => addToCart(product)}
-                    onOpenReviews={() => {
-                      setSelectedProductForReview(product);
-                      setReviewDialogOpen(true);
-                    }}
-                  />
-                );
-              })}
+              {filteredProducts.map((product) => (
+                <ProductCardRefined
+                  key={product.id}
+                  product={product}
+                  rating={ratingsMap?.[product.id]}
+                  onAddToCart={() => addToCart(product)}
+                  onOpenReviews={() => {
+                    setSelectedProductForReview(product);
+                    setReviewDialogOpen(true);
+                  }}
+                />
+              ))}
             </div>
           )}
         </section>
 
-        {/* Footer note */}
-        <section className="rounded-3xl gradient-cocoa text-background p-8 md:p-12 text-center shadow-soft-lift relative overflow-hidden">
-          <div className="absolute inset-0 noise-overlay opacity-30" />
-          <div className="relative z-10 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-background/15 backdrop-blur text-xs tracking-widest uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
-              تجربة استثنائية
+        {/* Design your cake */}
+        <Reveal>
+          <DesignYourCake onAddCustom={handleDesignAdd} />
+        </Reveal>
+
+        {/* Shop by occasion */}
+        <Reveal>
+          <ShopByOccasion onShop={scrollToProducts} />
+        </Reveal>
+
+        {/* How it works */}
+        <Reveal>
+          <HowItWorks />
+        </Reveal>
+
+        {/* Testimonials */}
+        <Reveal>
+          <Testimonials />
+        </Reveal>
+
+        {/* Final CTA */}
+        <Reveal>
+          <section className="rounded-[2rem] gradient-cocoa text-white p-8 md:p-14 text-center shadow-soft-lift relative overflow-hidden">
+            <div className="absolute inset-0 noise-overlay opacity-30" />
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-xs tracking-widest uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                تجربة استثنائية
+              </div>
+              <h3 className="font-display text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تبدأ بقطعة كيك</h3>
+              <p className="mt-3 text-white/75 leading-relaxed max-w-lg mx-auto">
+                من أعياد الميلاد إلى المناسبات الخاصة، نحضّر لكِ كل طلب بحبٍّ وعناية.
+              </p>
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+                <button onClick={scrollToProducts} className="group press sheen rounded-full ps-8 pe-6 h-[52px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors flex items-center gap-2">
+                  تسوّقي الآن <ArrowLeft className="cta-arrow w-4 h-4" />
+                </button>
+                <button onClick={scrollToDesign} className="press rounded-full px-8 h-[52px] bg-white/10 border border-white/30 text-white hover:bg-white/20 font-medium transition-colors">
+                  صمّمي كيكتكِ
+                </button>
+              </div>
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-white/70 text-xs">
+                <span className="inline-flex items-center gap-1.5"><Truck className="w-4 h-4 text-primary" /> توصيل مجاني فوق ٢٠٠ ر.س</span>
+                <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" /> تحضير خلال ٢٤ ساعة</span>
+                <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> دفع آمن ١٠٠٪</span>
+              </div>
             </div>
-            <h3 className="font-display text-3xl md:text-5xl mt-4 leading-tight">
-              لحظات الفرح تبدأ بقطعة كيك
-            </h3>
-            <p className="mt-3 text-background/75 leading-relaxed">
-              من أعياد الميلاد إلى المناسبات الخاصة، نحضّر لكِ كل طلب بحب وعناية.
-            </p>
-            <Button
-              size="lg"
-              onClick={() => navigate('/customize')}
-              className="mt-6 rounded-full px-8 h-12 bg-background text-foreground hover:bg-background/90"
-            >
-              ابدأي رحلتك معنا
-            </Button>
-          </div>
-        </section>
+          </section>
+        </Reveal>
       </main>
+
+      <StoreFooter storeName={settings.storeName} onNavigate={navigate} onShop={scrollToProducts} />
 
       {/* ── Checkout Dialog ── */}
       <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
@@ -593,6 +621,7 @@ export default function Store() {
       )}
 
       <FloatingContactButton />
+      <BackToTop />
     </div>
   );
 }

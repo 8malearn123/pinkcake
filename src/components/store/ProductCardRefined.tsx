@@ -1,5 +1,5 @@
-import { Cake, Plus, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { Cake, Plus, Check, Star, Heart } from 'lucide-react';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { cn } from '@/lib/utils';
 
@@ -15,15 +15,23 @@ export function ProductCardRefined({
   product,
   rating,
   onAddToCart,
-  onViewDetails,
   onOpenReviews,
 }: ProductCardRefinedProps) {
+  const [fav, setFav] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  const handleAdd = () => {
+    onAddToCart();
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1300);
+  };
+
   return (
-    <article className="group relative bg-card rounded-3xl overflow-hidden border border-border/60 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 shadow-soft-lift">
+    <article className="product-card group relative bg-card rounded-3xl overflow-hidden border border-border/60 hover:border-primary/40 shadow-soft-lift">
       {/* Image */}
-      <button
-        onClick={onViewDetails}
-        className="block aspect-[4/5] relative overflow-hidden bg-gradient-to-br from-blush to-secondary w-full"
+      <div
+        className="block aspect-[4/5] relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--secondary)))' }}
       >
         {product.image_url ? (
           <img
@@ -44,29 +52,37 @@ export function ProductCardRefined({
           </span>
         )}
 
-        {rating && rating.review_count > 0 && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenReviews?.();
-            }}
-            className="absolute top-3 end-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background/85 backdrop-blur text-[11px] font-medium"
-          >
-            <Star className="w-3 h-3 fill-warning text-warning" />
-            <span>{rating.average_rating}</span>
-          </button>
-        )}
+        <button
+          onClick={() => setFav((f) => !f)}
+          aria-label="أضيفي للمفضلة"
+          aria-pressed={fav}
+          className={cn(
+            'fav-btn press absolute top-3 end-3 w-9 h-9 rounded-full bg-background/85 backdrop-blur flex items-center justify-center',
+            fav && 'is-fav'
+          )}
+        >
+          <Heart className="w-4 h-4 text-foreground/70" />
+        </button>
 
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-card/95 via-card/30 to-transparent pointer-events-none" />
-      </button>
+        <div
+          className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
+          style={{ background: 'linear-gradient(to top, hsl(var(--card)/0.95), transparent)' }}
+        />
+      </div>
 
       {/* Content */}
       <div className="p-4 -mt-6 relative z-10">
+        {rating && rating.review_count > 0 && (
+          <button onClick={onOpenReviews} className="flex items-center gap-1 text-[11px] text-muted-foreground mb-1">
+            <Star className="w-3 h-3 fill-warning text-warning" />
+            <span className="font-medium text-foreground">{rating.average_rating}</span>
+            <span>· تقييم</span>
+          </button>
+        )}
+
         <h3 className="font-display text-xl leading-tight line-clamp-1">{product.name}</h3>
         {product.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mt-1.5 leading-relaxed">
-            {product.description}
-          </p>
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-1.5 leading-relaxed">{product.description}</p>
         )}
 
         <div className="flex items-end justify-between mt-4 gap-2">
@@ -76,21 +92,18 @@ export function ProductCardRefined({
               {product.price} <span className="text-xs text-muted-foreground font-sans">ر.س</span>
             </div>
           </div>
-          <Button
-            size="icon"
+          <button
+            onClick={handleAdd}
             aria-label="أضف إلى العربة"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart();
-            }}
             className={cn(
-              'rounded-full h-11 w-11 shrink-0 shadow-rose-glow',
-              'bg-foreground text-background hover:bg-foreground/90 hover:scale-105 transition-transform'
+              'add-btn press relative rounded-full h-11 w-11 shrink-0 shadow-rose-glow bg-foreground text-background',
+              'hover:bg-foreground/90 hover:scale-105 transition-transform flex items-center justify-center overflow-hidden',
+              added && 'added'
             )}
-            aria-label="أضف للسلة"
           >
-            <Plus className="w-5 h-5" />
-          </Button>
+            <Plus className="icon-plus w-5 h-5" />
+            <Check className="icon-check w-5 h-5" />
+          </button>
         </div>
       </div>
     </article>

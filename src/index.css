@@ -341,3 +341,95 @@
     @apply bg-red-100 text-red-800;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Store home — enhancement pass (ported from the Claude.design mockup).
+   Motion is gated behind prefers-reduced-motion. Colors use our tokens only.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@layer utilities {
+  /* Scroll reveal */
+  .reveal { opacity: 0; transform: translateY(26px); }
+  .reveal.reveal-in { opacity: 1; transform: none; transition: opacity 0.7s var(--ease-out-soft), transform 0.7s var(--ease-out-soft); }
+
+  /* Press feedback */
+  .press { transition: transform 0.12s var(--ease-out-soft); }
+  .press:active { transform: scale(0.94); }
+
+  /* Hero carousel */
+  .hero-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 1s var(--ease-out-soft), visibility 1s; }
+  .hero-slide.hero-active { opacity: 1; visibility: visible; }
+  .hero-slide img { transform: scale(1.05); }
+  .hero-slide.hero-active img { animation: kenburns 8s ease-out forwards; }
+  .hero-slide.hero-active .hero-text > * { opacity: 0; transform: translateY(18px); animation: heroIn 0.8s var(--ease-out-soft) forwards; }
+  .hero-slide.hero-active .hero-text > *:nth-child(1) { animation-delay: 0.15s; }
+  .hero-slide.hero-active .hero-text > *:nth-child(2) { animation-delay: 0.28s; }
+  .hero-slide.hero-active .hero-text > *:nth-child(3) { animation-delay: 0.41s; }
+  .hero-slide.hero-active .hero-text > *:nth-child(4) { animation-delay: 0.54s; }
+  .hero-slide.hero-active .hero-text > *:nth-child(5) { animation-delay: 0.64s; }
+  .hero-dot { transition: width 0.45s var(--ease-out-soft), background-color 0.45s ease; }
+
+  /* Shimmer sweep on light CTAs */
+  .sheen { position: relative; overflow: hidden; }
+  .sheen::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40%; inset-inline-start: -60%; background: linear-gradient(115deg, transparent, hsl(0 0% 100% / 0.45), transparent); transform: skewX(-18deg); }
+  .sheen:hover::after { animation: sheenMove 0.9s var(--ease-out-soft); }
+
+  /* CTA arrow nudge (RTL → nudges left) */
+  .cta-arrow { transition: transform 0.35s var(--ease-out-soft); }
+  .group:hover .cta-arrow { transform: translateX(-5px); }
+
+  /* Product card */
+  .product-card { transition: transform 0.45s var(--ease-out-soft), box-shadow 0.45s var(--ease-out-soft), border-color 0.35s ease; }
+  .product-card:hover { transform: translateY(-6px); }
+  .fav-btn svg { transition: transform 0.35s var(--ease-spring), color 0.25s ease, fill 0.25s ease; }
+  .fav-btn.is-fav svg { color: hsl(var(--accent)); fill: hsl(var(--accent)); animation: favPop 0.45s var(--ease-spring); }
+  .add-btn .icon-plus { transition: opacity 0.25s ease, transform 0.35s var(--ease-spring); }
+  .add-btn .icon-check { position: absolute; opacity: 0; transform: scale(0.4) rotate(-20deg); transition: opacity 0.25s ease, transform 0.35s var(--ease-spring); }
+  .add-btn.added .icon-plus { opacity: 0; transform: scale(0.4) rotate(20deg); }
+  .add-btn.added .icon-check { opacity: 1; transform: scale(1) rotate(0); }
+  .add-btn.added { background: hsl(var(--accent)); }
+  .badge-pop { animation: badgePop 0.4s var(--ease-spring); }
+
+  /* Occasion + testimonial cards */
+  .occasion { transition: transform 0.45s var(--ease-out-soft), box-shadow 0.45s var(--ease-out-soft); }
+  .occasion:hover { transform: translateY(-6px); box-shadow: 0 28px 60px -28px hsl(350 30% 20% / 0.4); }
+  .occasion img { transition: transform 0.8s var(--ease-out-soft); }
+  .occasion:hover img { transform: scale(1.09); }
+  .occasion .go { transition: opacity 0.35s ease, transform 0.35s var(--ease-out-soft); opacity: 0; transform: translateX(6px); }
+  .occasion:hover .go { opacity: 1; transform: none; }
+  .tcard { transition: transform 0.4s var(--ease-out-soft), box-shadow 0.4s var(--ease-out-soft); }
+  .tcard:hover { transform: translateY(-4px); box-shadow: 0 26px 50px -28px hsl(350 30% 20% / 0.3); }
+
+  /* Cake configurator preview */
+  .tier { position: relative; margin: 0 auto; border-radius: 16px 16px 9px 9px;
+    background: linear-gradient(180deg, color-mix(in srgb, hsl(var(--cake)) 78%, white), hsl(var(--cake)));
+    box-shadow: inset 0 -9px 16px -8px rgba(60,30,20,0.35), inset 0 7px 12px -7px rgba(255,255,255,0.65);
+    transition: background 0.5s ease, width 0.5s var(--ease-spring), height 0.5s var(--ease-spring), opacity 0.4s ease; }
+  .tier::before { content: ""; position: absolute; inset-inline: -4px; top: -8px; height: 17px; border-radius: 11px;
+    background: hsl(var(--frost)); box-shadow: 0 4px 7px -4px rgba(60,30,20,0.25); }
+  .plate { height: 16px; border-radius: 50%; margin-top: 2px;
+    background: radial-gradient(ellipse at 50% 30%, #fff, hsl(var(--secondary)));
+    box-shadow: 0 20px 30px -16px rgba(60,30,20,0.45); }
+  .candle { width: 5px; height: 26px; border-radius: 3px; background: linear-gradient(180deg, #fff, hsl(var(--primary))); position: relative; }
+  .flame { position: absolute; top: -9px; inset-inline-start: 50%; transform: translateX(-50%); width: 7px; height: 10px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: radial-gradient(circle at 50% 70%, hsl(45 100% 75%), hsl(35 95% 55%)); }
+  .berry { width: 11px; height: 11px; border-radius: 50%; box-shadow: inset 0 -2px 3px rgba(0,0,0,0.25); }
+  .cake.cake-pop { animation: cakePop 0.55s var(--ease-spring); }
+}
+
+@keyframes kenburns { from { transform: scale(1.05); } to { transform: scale(1.16); } }
+@keyframes heroIn { to { opacity: 1; transform: none; } }
+@keyframes sheenMove { to { inset-inline-start: 120%; } }
+@keyframes favPop { 0% { transform: scale(1); } 40% { transform: scale(1.45); } 100% { transform: scale(1); } }
+@keyframes badgePop { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.25); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes cakePop { 0% { transform: scale(1); } 35% { transform: scale(1.05) translateY(-5px); } 100% { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.reveal-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .hero-slide.hero-active img { animation: none; transform: scale(1.05); }
+  .hero-slide.hero-active .hero-text > * { animation: none; opacity: 1; transform: none; }
+  .sheen::after { display: none; }
+}
