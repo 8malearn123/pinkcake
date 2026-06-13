@@ -27,9 +27,16 @@ git clone https://github.com/uxsalem/Pink_Cacke.git
 cd Pink_Cacke
 nvm use            # optional, picks up .nvmrc
 npm ci
-cp .env.example .env   # then fill in your Supabase project values
-npm run dev            # http://localhost:8080
+npm run dev            # http://localhost:8080 — runs in demo mode, no backend needed
 ```
+
+### Demo mode (frontend/design work — no backend)
+
+With **no `.env`**, the app boots in **demo mode**: every screen renders on mock
+data, so you can build and test the UI without Supabase. A "وضع تجريبي" badge
+(bottom-start) lets you preview any **role's** screens. To connect the real
+backend instead, `cp .env.example .env`, fill in the Supabase values, and set
+`VITE_DEMO_MODE="false"`. Full wiring guide: [`HANDOFF.md`](HANDOFF.md).
 
 ## Environment variables
 
