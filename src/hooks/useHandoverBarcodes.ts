@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 // Hook for generating handover barcode
 export function useGenerateHandoverBarcode() {
@@ -17,11 +17,11 @@ export function useGenerateHandoverBarcode() {
       return data as string;
     },
     onSuccess: (data, variables) => {
-      toast.success('تم إنشاء الباركود بنجاح');
+      toast({ title: 'تم إنشاء الباركود بنجاح' });
       queryClient.invalidateQueries({ queryKey: ['handover-barcode', variables.orderId] });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     },
   });
 }
@@ -78,14 +78,14 @@ export function useScanHandoverBarcode() {
       return result;
     },
     onSuccess: (data) => {
-      toast.success(`تم تأكيد ${getBarcodeTypeLabel(data.barcode_type || '')} للطلب ${data.order_number}`);
+      toast({ title: `تم تأكيد ${getBarcodeTypeLabel(data.barcode_type || '')} للطلب ${data.order_number}` });
       queryClient.invalidateQueries({ queryKey: ['driver-orders'] });
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['branch-orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     },
   });
 }
@@ -121,12 +121,12 @@ export function useAdminChangeOrderStatus() {
       return data;
     },
     onSuccess: () => {
-      toast.success('تم تغيير حالة الطلب بنجاح');
+      toast({ title: 'تم تغيير حالة الطلب بنجاح' });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['order'] });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     },
   });
 }
