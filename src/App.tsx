@@ -9,6 +9,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ImpersonationProvider } from "./contexts/ImpersonationContext";
 import { ImpersonationBanner } from "./components/admin/ImpersonationBanner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { DemoModeBadge } from "./components/demo/DemoModeBadge";
 import { LOZA_ENABLED } from "./lib/featureFlags";
 
 // Route components are code-split: each page ships in its own lazy chunk so the
@@ -80,6 +81,7 @@ const App = () => (
         <ImpersonationProvider>
           <TooltipProvider>
             <Toaster />
+            <DemoModeBadge />
             <ImpersonationBanner />
             <BrowserRouter>
             <Suspense fallback={<RouteFallback />}>

@@ -8,13 +8,16 @@ import "@fontsource/work-sans/600.css";
 import "@fontsource/work-sans/700.css";
 import "./index.css";
 import { checkSupabaseEnv } from "./lib/env";
+import { DEMO_MODE } from "./lib/demo/config";
 import { SetupRequired } from "./components/SetupRequired";
 import { AppErrorBoundary, CrashScreen } from "./components/AppErrorBoundary";
 
 const root = createRoot(document.getElementById("root")!);
 const env = checkSupabaseEnv();
 
-if (!env.ok) {
+// In demo mode the app runs entirely on mock data, so real Supabase env isn't
+// required — boot straight into the app.
+if (!DEMO_MODE && !env.ok) {
   // Show an actionable setup screen instead of letting the Supabase client throw
   // at import time (which would render a blank white page).
   root.render(<SetupRequired missing={env.missing} />);

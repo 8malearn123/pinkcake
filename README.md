@@ -27,9 +27,31 @@ git clone https://github.com/uxsalem/Pink_Cacke.git
 cd Pink_Cacke
 nvm use            # optional, picks up .nvmrc
 npm ci
-cp .env.example .env   # then fill in your Supabase project values
-npm run dev            # http://localhost:8080
+npm run dev            # http://localhost:8080 — runs in demo mode, no backend needed
 ```
+
+### Demo mode (frontend/design work — no backend)
+
+With **no `.env`**, the app boots in **demo mode**: every screen renders on mock
+data, so you can build and test the UI without Supabase. A "وضع تجريبي" badge
+(bottom-start) lets you preview any **role's** screens. To connect the real
+backend instead, `cp .env.example .env`, fill in the Supabase values, and set
+`VITE_DEMO_MODE="false"`. Full wiring guide: [`HANDOFF.md`](HANDOFF.md).
+
+## Preview & test on Vercel
+
+`vercel.json` adds the SPA rewrite so client-side routes (`/dashboard`, `/track`, …)
+work on refresh/deep-link. To make the hosted app run the full UI without a
+backend, set one environment variable in **Vercel → Settings → Environment
+Variables** (Preview + Production):
+
+```
+VITE_DEMO_MODE = true
+```
+
+Every push/PR then gets a Vercel preview that renders all screens on mock data.
+When the backend is wired, set it to `false` and add the real Supabase vars
+(scope them to Production if you want previews to stay on demo data).
 
 ## Environment variables
 
