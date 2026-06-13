@@ -69,11 +69,11 @@ export default function LozaHome() {
           </button>
           <div className="flex items-center gap-1">
             <Link to="/loza/search">
-              <Button variant="ghost" size="icon" className="rounded-full">
+              <Button variant="ghost" size="icon" aria-label="بحث" className="rounded-full">
                 <Search className="w-5 h-5" />
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" className="rounded-full relative">
+            <Button variant="ghost" size="icon" aria-label="الإشعارات" className="rounded-full relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 end-1.5 w-2 h-2 rounded-full bg-destructive" />
             </Button>

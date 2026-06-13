@@ -61,7 +61,7 @@ export function OrdersTable({ orders, onApprove, onSendPaymentLink }: OrdersTabl
                 <td className="p-4">
                   <div className="flex items-center gap-2">
                     <Link to={`/orders/${order.id}`}>
-                      <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                      <Button variant="ghost" size="icon" aria-label="عرض" className="hover:bg-primary/10">
                         <Eye className="w-4 h-4" />
                       </Button>
                     </Link>
@@ -90,7 +90,7 @@ export function OrdersTable({ orders, onApprove, onSendPaymentLink }: OrdersTabl
                     
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" aria-label="خيارات">
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>

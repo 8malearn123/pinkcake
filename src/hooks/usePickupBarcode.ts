@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 // Hook for customers to get their pickup code
 export function useMyPickupCode(orderId: string | undefined) {
@@ -70,12 +70,12 @@ export function useProcessPickup() {
       return result;
     },
     onSuccess: (data) => {
-      toast.success(`تم تأكيد استلام الطلب ${data.order_number}`);
+      toast({ title: `تم تأكيد استلام الطلب ${data.order_number}` });
       queryClient.invalidateQueries({ queryKey: ['branch-orders'] });
       queryClient.invalidateQueries({ queryKey: ['order-by-pickup-code'] });
     },
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     },
   });
 }

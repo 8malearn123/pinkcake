@@ -282,7 +282,7 @@ export default function Store() {
 
             <Sheet open={cartOpen} onOpenChange={setCartOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="relative rounded-full border-border h-10 w-10">
+                <Button variant="outline" size="icon" aria-label="عربة التسوق" className="relative rounded-full border-border h-10 w-10">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow">
@@ -331,16 +331,16 @@ export default function Store() {
                               {item.product.price} <span className="text-xs text-muted-foreground">ر.س</span>
                             </p>
                             <div className="flex items-center gap-2 mt-2">
-                              <Button size="icon" variant="outline" className="h-7 w-7 rounded-full"
+                              <Button size="icon" variant="outline" aria-label="إنقاص الكمية" className="h-7 w-7 rounded-full"
                                 onClick={() => updateQuantity(item.product.id, -1)}>
                                 <Minus className="w-3 h-3" />
                               </Button>
                               <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
-                              <Button size="icon" variant="outline" className="h-7 w-7 rounded-full"
+                              <Button size="icon" variant="outline" aria-label="زيادة الكمية" className="h-7 w-7 rounded-full"
                                 onClick={() => updateQuantity(item.product.id, 1)}>
                                 <Plus className="w-3 h-3" />
                               </Button>
-                              <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive ms-auto"
+                              <Button size="icon" variant="ghost" aria-label="إزالة المنتج" className="h-7 w-7 text-destructive ms-auto"
                                 onClick={() => removeFromCart(item.product.id)}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>

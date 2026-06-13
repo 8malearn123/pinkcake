@@ -321,6 +321,7 @@ export function ProductDetailsDialog({
                     <Button
                       size="icon"
                       variant="outline"
+                      aria-label="إنقاص الكمية"
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     >
                       <Minus className="w-4 h-4" />
@@ -329,6 +330,7 @@ export function ProductDetailsDialog({
                     <Button
                       size="icon"
                       variant="outline"
+                      aria-label="زيادة الكمية"
                       onClick={() => setQuantity((q) => q + 1)}
                     >
                       <Plus className="w-4 h-4" />

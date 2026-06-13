@@ -71,7 +71,7 @@ export function BranchAssignmentDialog({
                 <span>{currentBranch.branch_name || 'فرع غير معروف'}</span>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon" aria-label="إزالة الفرع"
                   className="h-8 w-8 text-destructive hover:text-destructive"
                   onClick={handleRemove}
                   disabled={isLoading}

@@ -142,7 +142,7 @@ export default function TrackOrder() {
               placeholder="أدخل رقم التتبع..."
               className="text-center"
             />
-            <Button type="submit" className="gradient-pink text-white" disabled={searching}>
+            <Button type="submit" aria-label="بحث" className="gradient-pink text-white" disabled={searching}>
               {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
             </Button>
           </form>

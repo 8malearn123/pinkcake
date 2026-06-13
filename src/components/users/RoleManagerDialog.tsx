@@ -69,7 +69,7 @@ export function RoleManagerDialog({
                     {ROLE_LABELS[role]}
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="icon" aria-label="إزالة الدور"
                       className="h-4 w-4 p-0 hover:bg-transparent"
                       onClick={() => handleRemoveRole(role)}
                       disabled={isLoading}

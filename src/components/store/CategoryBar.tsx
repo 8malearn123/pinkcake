@@ -50,6 +50,7 @@ export function CategoryBar({ categories, selectedCategory, onSelectCategory }: 
           <Button
             size="icon"
             variant="ghost"
+            aria-label="تمرير لليسار"
             className="h-8 w-8"
             onClick={() => scroll('left')}
           >
@@ -97,6 +98,7 @@ export function CategoryBar({ categories, selectedCategory, onSelectCategory }: 
           <Button
             size="icon"
             variant="ghost"
+            aria-label="تمرير لليمين"
             className="h-8 w-8"
             onClick={() => scroll('right')}
           >

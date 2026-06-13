@@ -200,7 +200,7 @@ export function ProductForm({
                         </FormControl>
                         <Button
                           type="button"
-                          size="icon"
+                          size="icon" aria-label="إضافة تصنيف"
                           variant="outline"
                           onClick={handleAddNewCategory}
                         >

@@ -153,7 +153,7 @@ export function Sidebar() {
       {/* Mobile Toggle */}
       <Button
         variant="ghost"
-        size="icon"
+        size="icon" aria-label="القائمة"
         className="fixed top-4 start-4 z-50 lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >

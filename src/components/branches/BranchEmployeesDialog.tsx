@@ -193,7 +193,7 @@ export function BranchEmployeesDialog({
                     </div>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="icon" aria-label="إزالة الموظف"
                       className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                       onClick={() => handleRemove(emp.user_id)}
                       disabled={isLoading}

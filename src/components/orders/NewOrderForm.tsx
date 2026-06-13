@@ -14,6 +14,8 @@ import {
 import { useBranches } from '@/hooks/useBranches';
 import { useProducts } from '@/hooks/useProducts';
 import { useCreateOrder, CreateOrderData } from '@/hooks/useOrders';
+import { toast } from '@/hooks/use-toast';
+import { validateKsaPhone } from '@/lib/validation';
 import { Plus, Minus, Trash2, ShoppingBag, Loader2 } from 'lucide-react';
 
 interface OrderItemLocal {
@@ -39,6 +41,7 @@ export function NewOrderForm() {
   const [notes, setNotes] = useState('');
   const [orderItems, setOrderItems] = useState<OrderItemLocal[]>([]);
   const [selectedProduct, setSelectedProduct] = useState('');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const addProduct = () => {
     if (!selectedProduct) return;
@@ -96,16 +99,30 @@ export function NewOrderForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !customerName ||
-      !customerPhone ||
-      !branchId ||
-      !pickupDate ||
-      !pickupTime ||
-      orderItems.length === 0
-    ) {
+    if (!customerName || !customerPhone || !branchId || !pickupDate || !pickupTime) {
+      toast({
+        title: 'حقول ناقصة',
+        description: 'يرجى تعبئة جميع الحقول المطلوبة (*).',
+        variant: 'destructive',
+      });
       return;
     }
+    if (orderItems.length === 0) {
+      toast({
+        title: 'لا توجد منتجات',
+        description: 'أضف منتجاً واحداً على الأقل إلى الطلب.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const phoneMsg = validateKsaPhone(customerPhone);
+    if (phoneMsg) {
+      setPhoneError(phoneMsg);
+      toast({ title: 'رقم جوال غير صحيح', description: phoneMsg, variant: 'destructive' });
+      return;
+    }
+    setPhoneError(null);
 
     const orderData: CreateOrderData = {
       customerName,
@@ -165,12 +182,20 @@ export function NewOrderForm() {
             <Input
               id="customerPhone"
               value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
+              onChange={(e) => {
+                setCustomerPhone(e.target.value);
+                if (phoneError) setPhoneError(null);
+              }}
               placeholder="05xxxxxxxx"
               className="text-start"
               dir="ltr"
               required
+              aria-invalid={!!phoneError}
+              aria-describedby={phoneError ? 'customerPhone-error' : undefined}
             />
+            {phoneError && (
+              <p id="customerPhone-error" className="text-sm text-destructive">{phoneError}</p>
+            )}
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="customerAddress">العنوان (اختياري)</Label>
@@ -270,7 +295,7 @@ export function NewOrderForm() {
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
+                      size="icon" aria-label="إنقاص الكمية"
                       className="h-8 w-8"
                       onClick={() => updateQuantity(item.productId, -1)}
                     >
@@ -280,7 +305,7 @@ export function NewOrderForm() {
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
+                      size="icon" aria-label="زيادة الكمية"
                       className="h-8 w-8"
                       onClick={() => updateQuantity(item.productId, 1)}
                     >
@@ -291,7 +316,7 @@ export function NewOrderForm() {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
+                    size="icon" aria-label="حذف المنتج"
                     className="text-destructive hover:bg-destructive/10"
                     onClick={() => removeItem(item.productId)}
                   >

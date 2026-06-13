@@ -163,7 +163,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
                 <Input value={createdUserCredentials.email} readOnly dir="ltr" />
                 <Button
                   variant="outline"
-                  size="icon"
+                  size="icon" aria-label="نسخ البريد الإلكتروني"
                   onClick={() => handleCopy('email')}
                 >
                   {copiedField === 'email' ? (
@@ -181,7 +181,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
                 <Input value={createdUserCredentials.password} readOnly dir="ltr" type="password" />
                 <Button
                   variant="outline"
-                  size="icon"
+                  size="icon" aria-label="نسخ كلمة المرور"
                   onClick={() => handleCopy('password')}
                 >
                   {copiedField === 'password' ? (
