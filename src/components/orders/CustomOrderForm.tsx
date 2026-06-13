@@ -27,10 +27,11 @@ import { useCreateCustomOrder, CustomOrderFormData } from '@/hooks/useCustomOrde
 import { Upload, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { nameSchema, ksaPhoneSchema } from '@/lib/validation';
 
 const customOrderSchema = z.object({
-  customerName: z.string().min(2, 'الاسم مطلوب'),
-  customerPhone: z.string().min(10, 'رقم الهاتف غير صحيح'),
+  customerName: nameSchema,
+  customerPhone: ksaPhoneSchema,
   customerAddress: z.string().optional(),
   branchId: z.string().min(1, 'اختر الفرع'),
   pickupDate: z.string().min(1, 'تاريخ الاستلام مطلوب'),

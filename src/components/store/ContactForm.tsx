@@ -14,13 +14,14 @@ import {
 } from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { nameSchema, ksaPhoneSchema, optionalEmailSchema } from '@/lib/validation';
 import { useState, useRef, useEffect } from 'react';
 import { Loader2, CheckCircle } from 'lucide-react';
 
 const contactSchema = z.object({
-  customer_name: z.string().trim().min(2, 'الاسم مطلوب (حرفين على الأقل)').max(100, 'الاسم طويل جداً'),
-  phone: z.string().trim().min(9, 'رقم الجوال غير صحيح').max(15, 'رقم الجوال غير صحيح'),
-  email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),
+  customer_name: nameSchema,
+  phone: ksaPhoneSchema,
+  email: optionalEmailSchema,
   message: z.string().trim().min(10, 'الرسالة قصيرة جداً (10 أحرف على الأقل)').max(1000, 'الرسالة طويلة جداً'),
 });
 
