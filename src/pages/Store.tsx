@@ -171,10 +171,16 @@ export default function Store() {
     if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
   };
 
-  // The on-page configurator is a teaser; it leads into the full custom-order flow.
+  // Quick-add the on-page design as a custom cake line in the cart.
   const handleDesignAdd = (total: number) => {
-    toast({ title: 'كيكتكِ المخصّصة', description: `الإجمالي التقديري ${total} ر.س — تابعي التخصيص لإتمام الطلب` });
-    navigate('/customize');
+    addToCart({
+      id: `custom-${Date.now()}`,
+      name: 'كيكة مخصّصة حسب التصميم',
+      description: null,
+      price: total,
+      category: 'تصميم خاص',
+      image_url: null,
+    });
   };
 
   const handleCheckout = async () => {
@@ -470,7 +476,7 @@ export default function Store() {
 
         {/* Design your cake */}
         <Reveal>
-          <DesignYourCake onAddCustom={handleDesignAdd} />
+          <DesignYourCake onAddCustom={handleDesignAdd} onCustomizeMore={() => navigate('/customize')} />
         </Reveal>
 
         {/* Shop by occasion */}
