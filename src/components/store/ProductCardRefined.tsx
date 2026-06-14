@@ -15,6 +15,7 @@ export function ProductCardRefined({
   product,
   rating,
   onAddToCart,
+  onViewDetails,
   onOpenReviews,
 }: ProductCardRefinedProps) {
   const [fav, setFav] = useState(false);
@@ -57,7 +58,7 @@ export function ProductCardRefined({
           aria-label="أضيفي للمفضلة"
           aria-pressed={fav}
           className={cn(
-            'fav-btn press absolute top-3 end-3 w-9 h-9 rounded-full bg-background/85 backdrop-blur flex items-center justify-center',
+            'fav-btn press absolute top-3 end-3 z-[2] w-9 h-9 rounded-full bg-background/85 backdrop-blur flex items-center justify-center',
             fav && 'is-fav'
           )}
         >
@@ -68,6 +69,14 @@ export function ProductCardRefined({
           className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
           style={{ background: 'linear-gradient(to top, hsl(var(--card)/0.95), transparent)' }}
         />
+
+        {onViewDetails && (
+          <button
+            onClick={onViewDetails}
+            aria-label={`عرض تفاصيل ${product.name}`}
+            className="absolute inset-0 z-[1] cursor-pointer"
+          />
+        )}
       </div>
 
       {/* Content */}
@@ -80,7 +89,13 @@ export function ProductCardRefined({
           </button>
         )}
 
-        <h3 className="font-display text-xl leading-tight line-clamp-1">{product.name}</h3>
+        {onViewDetails ? (
+          <button onClick={onViewDetails} className="block text-start w-full press">
+            <h3 className="font-display text-xl leading-tight line-clamp-1 hover:text-primary transition-colors">{product.name}</h3>
+          </button>
+        ) : (
+          <h3 className="font-display text-xl leading-tight line-clamp-1">{product.name}</h3>
+        )}
         {product.description && (
           <p className="text-xs text-muted-foreground line-clamp-2 mt-1.5 leading-relaxed">{product.description}</p>
         )}

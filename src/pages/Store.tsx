@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePublicStoreProducts, usePublicStoreBranches } from '@/hooks/usePublicStore';
-import { useCreateCustomerOrder, CartItem, StoreProduct } from '@/hooks/useCustomerStore';
+import { useCreateCustomerOrder, StoreProduct } from '@/hooks/useCustomerStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
+import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
@@ -82,7 +83,15 @@ export default function Store() {
   const { data: branches } = usePublicStoreBranches();
   const createOrder = useCreateCustomerOrder();
 
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const {
+    cart,
+    addToCart,
+    updateQuantity,
+    removeFromCart,
+    setCart,
+    count: cartCount,
+    total: cartTotal,
+  } = useStoreCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -97,6 +106,7 @@ export default function Store() {
 
   const productsRef = useRef<HTMLDivElement>(null);
   const pendingOrder = location.state?.pendingOrder;
+  const openCartOnArrival = location.state?.openCart;
 
   const productIds = useMemo(() => products?.map((p) => p.id) || [], [products]);
   const { data: ratingsMap } = useProductRatings(productIds);
@@ -128,39 +138,15 @@ export default function Store() {
       if (pendingOrder.cart?.length > 0) setCheckoutOpen(true);
       window.history.replaceState({}, document.title);
     }
-  }, [pendingOrder, user]);
+  }, [pendingOrder, user, setCart]);
 
-  const addToCart = (product: StoreProduct) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-    toast({ title: 'تمت الإضافة', description: `${product.name} تمت إضافته للسلة` });
-  };
-
-  const updateQuantity = (productId: string, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.product.id === productId
-            ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-            : item,
-        )
-        .filter((item) => item.quantity > 0),
-    );
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  };
-
-  const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  // Arriving from the product details page via "view cart" opens the cart sheet.
+  useEffect(() => {
+    if (openCartOnArrival) {
+      setCartOpen(true);
+      window.history.replaceState({}, document.title);
+    }
+  }, [openCartOnArrival]);
 
   const scrollToProducts = () => {
     productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -464,6 +450,7 @@ export default function Store() {
                   product={product}
                   rating={ratingsMap?.[product.id]}
                   onAddToCart={() => addToCart(product)}
+                  onViewDetails={() => navigate(`/product/${product.id}`)}
                   onOpenReviews={() => {
                     setSelectedProductForReview(product);
                     setReviewDialogOpen(true);

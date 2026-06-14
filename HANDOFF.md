@@ -71,6 +71,16 @@ The SMS/WhatsApp notification slice is already built (server-side Edge Function 
 migration + admin UI). Its own deploy guide is in
 [`docs/notifications.md`](docs/notifications.md).
 
+## Storefront cart & product details (frontend-only)
+
+The public storefront cart lives entirely in the client: `StoreCartProvider`
+(`src/contexts/StoreCartContext.tsx`) holds it as React state and is shared across
+the landing page (`/`, `/store`) and the product details page (`/product/:id`).
+No backend is involved until checkout, which still calls the existing
+`create_customer_order` RPC. Nothing here needs wiring — the data it renders comes
+from the same `get_products_for_public_store` / `get_product_rating` RPCs the store
+already uses.
+
 ## Quick checklist
 
 - [ ] Add real Supabase env, set `VITE_DEMO_MODE="false"`
