@@ -311,9 +311,16 @@
 }
 
 /* Embedded compact preview (home "design your cake" section). Neutralises the
-   page-level frame styles so only the shared cake illustration applies. */
+   page-level frame styles so only the shared cake illustration applies, and
+   centers + enlarges the cake to match the /customize stage. */
 .cake-studio.cz-embed {
   margin: 0; height: auto; min-height: 0; background: none;
-  display: flex; align-items: flex-end; justify-content: center; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; font-family: inherit;
 }
-.cake-studio.cz-embed .cake-wrap { transform: scale(0.82); }
+/* Scale a non-animated wrapper (not .cake-wrap, whose transform is driven by the
+   cz_float/settle animations) so the enlargement actually takes effect — mirrors
+   the /customize .scene { transform: scale() } pattern. */
+.cake-studio.cz-embed .cz-scene { display: flex; align-items: center; justify-content: center; transform: scale(1.08); }
+@media (min-width: 880px) {
+  .cake-studio.cz-embed .cz-scene { transform: scale(1.18); }
+}

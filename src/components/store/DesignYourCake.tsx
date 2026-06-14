@@ -153,7 +153,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
 
           {/* Live premium preview (shared with /customize) */}
           <div
-            className="relative order-1 md:order-2 min-h-[360px] md:min-h-full flex items-end justify-center overflow-hidden"
+            className="relative order-1 md:order-2 min-h-[420px] md:min-h-[480px] flex items-center justify-center overflow-hidden"
             style={{ background: STAGE_BG }}
           >
             <div className="absolute inset-0 noise-overlay opacity-30" />
@@ -161,10 +161,12 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
               <span className="w-1.5 h-1.5 rounded-full bg-accent" /> معاينة حيّة
             </div>
 
-            <div className="cake-studio cz-embed relative z-[5] w-full pb-12">
-              <div className="cake-wrap" ref={wrapRef}>
-                <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />
-                <div className="stand" dangerouslySetInnerHTML={{ __html: art.stand }} />
+            <div className="cake-studio cz-embed relative z-[5] w-full pb-10">
+              <div className="cz-scene">
+                <div className="cake-wrap" ref={wrapRef}>
+                  <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />
+                  <div className="stand" dangerouslySetInnerHTML={{ __html: art.stand }} />
+                </div>
               </div>
             </div>
 
