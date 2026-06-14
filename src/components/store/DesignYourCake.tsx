@@ -1,77 +1,47 @@
-import { useState, type CSSProperties } from 'react';
-import { Wand2, Minus, Cherry, Flower2, Flame, ShoppingBag, ArrowLeft, BadgeCheck, type LucideIcon } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import '@/components/cake/cakeStudio.css';
+import {
+  SHAPES, FLAVORS, COLORS, DESIGNS, buildCake, price, type CakeConfig,
+} from '@/lib/cakeBuilder';
+import { Wand2, ShoppingBag, SlidersHorizontal, Users } from 'lucide-react';
 
-const SIZE_BASE = 120;
+// A complete (compatible) config so the live cake renders immediately and the
+// selections carry straight into /customize.
+const initial: CakeConfig = {
+  shape: SHAPES[1],   // classic
+  flavor: FLAVORS[0], // vanilla bourbon
+  color: COLORS[1],   // blush
+  design: DESIGNS[0], // minimal
+  text: '',
+  addons: { candle: false, topper: false },
+};
 
-interface SizeOpt { val: string; label: string; add: number; note: string }
-interface FlavorOpt { val: string; label: string; cake: string; frost: string; add: number }
-interface ToppingOpt { val: string; label: string; add: number; icon: LucideIcon }
+const STAGE_BG =
+  'radial-gradient(70% 56% at 50% 30%, hsl(28 44% 97.5%), transparent 72%), linear-gradient(180deg, hsl(28 30% 97%), hsl(20 18% 93.5%))';
 
-const SIZES: SizeOpt[] = [
-  { val: 'small', label: 'صغيرة', add: 0, note: 'صغيرة · 8–10 أشخاص' },
-  { val: 'medium', label: 'وسط', add: 60, note: 'وسط · 15–20 شخص' },
-  { val: 'large', label: 'كبيرة', add: 140, note: 'كبيرة · 25–30 شخص' },
-];
-
-const FLAVORS: FlavorOpt[] = [
-  { val: 'vanilla', label: 'فانيلا', cake: '40 58% 84%', frost: '40 55% 95%', add: 0 },
-  { val: 'chocolate', label: 'شوكولاتة', cake: '25 36% 36%', frost: '28 30% 55%', add: 20 },
-  { val: 'strawberry', label: 'فراولة', cake: '345 62% 80%', frost: '345 70% 92%', add: 15 },
-  { val: 'redvelvet', label: 'ريد فيلفت', cake: '355 55% 46%', frost: '350 42% 92%', add: 25 },
-  { val: 'lotus', label: 'لوتس', cake: '30 46% 58%', frost: '32 50% 80%', add: 30 },
-];
-
-const TOPPINGS: ToppingOpt[] = [
-  { val: 'none', label: 'بدون', add: 0, icon: Minus },
-  { val: 'berries', label: 'توت طازج', add: 25, icon: Cherry },
-  { val: 'roses', label: 'ورد سكّري', add: 35, icon: Flower2 },
-  { val: 'candles', label: 'شموع', add: 10, icon: Flame },
-];
-
-function Topping({ kind }: { kind: string }) {
-  if (kind === 'berries') {
-    const colors = ['355 60% 45%', '340 55% 55%', '355 60% 45%', '280 35% 55%', '355 60% 45%'];
-    return (
-      <>
-        {colors.map((c, i) => (
-          <span key={i} className="berry" style={{ background: `hsl(${c})`, marginBottom: i % 2 ? 6 : 0 }} />
-        ))}
-      </>
-    );
-  }
-  if (kind === 'roses') {
-    return (
-      <>
-        {['345 55% 72%', '350 50% 80%', '345 55% 72%'].map((c, i) => (
-          <span
-            key={i}
-            className="berry"
-            style={{ width: 15, height: 15, background: `radial-gradient(circle at 35% 30%, #fff6, transparent 60%), hsl(${c})` }}
-          />
-        ))}
-      </>
-    );
-  }
-  if (kind === 'candles') {
-    return (
-      <>
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="candle"><span className="flame" /></span>
-        ))}
-      </>
-    );
-  }
-  return null;
+interface DesignYourCakeProps {
+  onAddCustom: (total: number, summary: string) => void;
+  onCustomizeMore: (cfg: CakeConfig) => void;
 }
 
-export function DesignYourCake({ onAddCustom }: { onAddCustom: (total: number) => void }) {
-  const [size, setSize] = useState<SizeOpt>(SIZES[1]);
-  const [flavor, setFlavor] = useState<FlavorOpt>(FLAVORS[1]);
-  const [topping, setTopping] = useState<ToppingOpt>(TOPPINGS[0]);
-  const total = SIZE_BASE + size.add + flavor.add + topping.add;
+export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeProps) {
+  const [cfg, setCfg] = useState<CakeConfig>(initial);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
-  const cakeStyle = { '--cake': flavor.cake, '--frost': flavor.frost } as CSSProperties;
+  const total = price(cfg);
+  const art = useMemo(() => buildCake(cfg), [cfg]);
+  const summary = [cfg.shape?.name, cfg.flavor?.name, cfg.color.name].filter(Boolean).join(' · ');
+
+  useEffect(() => {
+    const w = wrapRef.current;
+    if (!w) return;
+    w.classList.remove('settle');
+    void w.offsetWidth;
+    w.classList.add('settle');
+  }, [art]);
+
+  const set = (patch: Partial<CakeConfig>) => setCfg((c) => ({ ...c, ...patch }));
 
   return (
     <section id="design" className="scroll-mt-24">
@@ -87,75 +57,75 @@ export function DesignYourCake({ onAddCustom }: { onAddCustom: (total: number) =
             </div>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّمي كيكتكِ المثالية</h2>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-md">
-              اختاري الحجم والنكهة واللمسة الأخيرة، وشاهدي كيكتكِ تتشكّل أمامكِ لحظة بلحظة.
+              اختاري الشكل والنكهة واللون، وشاهدي كيكتكِ تتشكّل أمامكِ — ثم خصّصيها أكثر بكل التفاصيل.
             </p>
 
-            {/* Size */}
+            {/* Shape */}
             <div className="mt-7">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold">الحجم</span>
-                <span className="text-xs text-muted-foreground">{size.note}</span>
-              </div>
+              <div className="text-sm font-semibold mb-2">الشكل</div>
               <div className="grid grid-cols-3 gap-2">
-                {SIZES.map((s) => (
+                {SHAPES.map((sh) => (
                   <button
-                    key={s.val}
-                    onClick={() => setSize(s)}
+                    key={sh.id}
+                    onClick={() => set({ shape: sh })}
                     className={cn(
-                      'press rounded-xl border py-2.5 text-sm transition-colors',
-                      size.val === s.val ? 'border-primary bg-primary/[0.08] font-semibold' : 'border-border bg-card'
+                      'press rounded-xl border px-2 py-2.5 text-center transition-colors',
+                      cfg.shape?.id === sh.id ? 'border-primary bg-primary/[0.08]' : 'border-border bg-card',
                     )}
                   >
-                    {s.label}
+                    <div className="text-[13px] font-bold leading-tight">{sh.name}</div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5"><bdi dir="ltr">{sh.serves}</bdi></div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Flavor */}
+            {/* Flavour */}
             <div className="mt-5">
               <div className="text-sm font-semibold mb-2">النكهة</div>
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex flex-wrap gap-2">
                 {FLAVORS.map((f) => (
                   <button
-                    key={f.val}
-                    onClick={() => setFlavor(f)}
+                    key={f.id}
+                    onClick={() => set({ flavor: f })}
                     className={cn(
-                      'press inline-flex items-center gap-2 rounded-full border ps-2 pe-3.5 py-1.5 text-sm transition-colors',
-                      flavor.val === f.val ? 'border-primary bg-primary/[0.08] font-semibold' : 'border-border bg-card'
+                      'press inline-flex items-center gap-2 rounded-full border ps-2 pe-3 py-1.5 text-[13px] transition-colors',
+                      cfg.flavor?.id === f.id ? 'border-primary bg-primary/[0.08] font-semibold' : 'border-border bg-card',
                     )}
                   >
-                    <span className="w-4 h-4 rounded-full" style={{ background: `hsl(${f.cake})` }} />
-                    {f.label}
+                    <span className="w-4 h-4 rounded-full shrink-0 ring-1 ring-border/60" style={{ background: f.dot }} />
+                    {f.name}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Topping */}
+            {/* Colour */}
             <div className="mt-5">
-              <div className="text-sm font-semibold mb-2">اللمسة الأخيرة</div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {TOPPINGS.map((t) => {
-                  const Icon = t.icon;
-                  return (
-                    <button
-                      key={t.val}
-                      onClick={() => setTopping(t)}
+              <div className="text-sm font-semibold mb-2">لون الكريمة</div>
+              <div className="flex flex-wrap gap-x-3 gap-y-2">
+                {COLORS.map((col) => (
+                  <button
+                    key={col.id}
+                    onClick={() => set({ color: col })}
+                    aria-label={col.name}
+                    className="press flex flex-col items-center gap-1 w-12"
+                  >
+                    <span
                       className={cn(
-                        'press rounded-xl border py-2.5 text-sm flex items-center justify-center gap-1.5 transition-colors',
-                        topping.val === t.val ? 'border-primary bg-primary/[0.08] font-semibold' : 'border-border bg-card'
+                        'w-9 h-9 rounded-full border-2 border-card shadow-inner transition-transform',
+                        cfg.color.id === col.id ? 'outline outline-2 outline-primary outline-offset-2 scale-105' : 'ring-1 ring-border/60',
                       )}
-                    >
-                      <Icon className="w-4 h-4" /> {t.label}
-                    </button>
-                  );
-                })}
+                      style={{ background: col.c }}
+                    />
+                    <span className={cn('text-[10px]', cfg.color.id === col.id ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{col.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Price + CTA */}
-            <div className="mt-7 flex flex-wrap items-center gap-4">
+            {/* Price + actions */}
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               <div className="shrink-0">
                 <div className="text-[10px] text-muted-foreground uppercase tracking-widest">الإجمالي التقديري</div>
                 <div className="font-display text-3xl text-primary leading-none mt-1">
@@ -164,34 +134,50 @@ export function DesignYourCake({ onAddCustom }: { onAddCustom: (total: number) =
                 </div>
               </div>
               <button
-                onClick={() => onAddCustom(total)}
-                className="group press sheen flex-1 min-w-[210px] rounded-full h-[52px] px-7 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2"
+                onClick={() => onAddCustom(total, summary)}
+                className="group press sheen flex-1 min-w-[170px] rounded-full h-[52px] px-6 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2"
               >
-                <ShoppingBag className="w-5 h-5" /> أضيفي تصميمكِ إلى العربة <ArrowLeft className="cta-arrow w-4 h-4" />
+                <ShoppingBag className="w-5 h-5" /> أضيفي إلى العربة
+              </button>
+              <button
+                onClick={() => onCustomizeMore(cfg)}
+                className="press rounded-full h-[52px] px-5 border border-border bg-card text-foreground font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
+              >
+                <SlidersHorizontal className="w-4 h-4 text-primary" /> خصّصيها أكثر
               </button>
             </div>
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <BadgeCheck className="w-4 h-4 text-primary" /> تعديلات مجانية غير محدودة قبل التأكيد
+            <div className="mt-3 text-xs text-muted-foreground">
+              «خصّصيها أكثر» تنقلكِ إلى الاستوديو الكامل مع تصميمكِ الحالي — لإضافة الزينة والرسالة والمزيد.
             </div>
           </div>
 
-          {/* Live preview */}
-          <div className="relative order-1 md:order-2 min-h-[340px] md:min-h-full flex items-end justify-center p-8 overflow-hidden">
+          {/* Live premium preview (shared with /customize) */}
+          <div
+            className="relative order-1 md:order-2 min-h-[360px] md:min-h-full flex items-end justify-center overflow-hidden"
+            style={{ background: STAGE_BG }}
+          >
             <div className="absolute inset-0 noise-overlay opacity-30" />
-            <div className="absolute top-6 end-6 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-card/80 backdrop-blur border border-border/60 text-[11px] text-muted-foreground">
+            <div className="absolute top-5 end-5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-card/85 backdrop-blur border border-border/60 text-[11px] text-muted-foreground">
               <span className="w-1.5 h-1.5 rounded-full bg-accent" /> معاينة حيّة
             </div>
-            <div className="relative z-10 w-full flex flex-col items-center justify-end pb-2">
-              <div className="cake flex flex-col items-center justify-end" style={cakeStyle}>
-                <div className="topping flex items-end justify-center gap-1.5 mb-[-3px] min-h-[20px]">
-                  <Topping kind={topping.val} />
-                </div>
-                <div className={cn('tier', size.val !== 'large' && 'hidden')} style={{ width: 96, height: 54 }} />
-                <div className={cn('tier', size.val === 'small' && 'hidden')} style={{ width: 140, height: 62 }} />
-                <div className="tier" style={{ width: 188, height: 72 }} />
+
+            <div className="cake-studio cz-embed relative z-[5] w-full pb-12">
+              <div className="cake-wrap" ref={wrapRef}>
+                <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />
+                <div className="stand" dangerouslySetInnerHTML={{ __html: art.stand }} />
               </div>
-              <div className="plate" style={{ width: 236 }} />
             </div>
+
+            {cfg.shape && (
+              <div className="absolute bottom-5 inset-x-0 z-10 flex justify-center px-4">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card/90 backdrop-blur border border-border/60 text-[11.5px] shadow-soft-lift">
+                  <Users className="w-3.5 h-3.5 text-primary" />
+                  <span>تكفي <b className="font-bold text-foreground"><bdi dir="ltr">{cfg.shape.serves}</bdi></b></span>
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
+                  <span>جاهزة خلال <b className="font-bold text-foreground">{cfg.shape.lead}</b></span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

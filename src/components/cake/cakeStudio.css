@@ -309,3 +309,11 @@
 .cake-studio .cz-frame {max-width: 1180px; }
 .cake-studio .scene {transform: scale(1.32); }
 }
+
+/* Embedded compact preview (home "design your cake" section). Neutralises the
+   page-level frame styles so only the shared cake illustration applies. */
+.cake-studio.cz-embed {
+  margin: 0; height: auto; min-height: 0; background: none;
+  display: flex; align-items: flex-end; justify-content: center; font-family: inherit;
+}
+.cake-studio.cz-embed .cake-wrap { transform: scale(0.82); }
