@@ -44,6 +44,7 @@ import { PromoStrip } from '@/components/store/PromoStrip';
 import { CategoryChips } from '@/components/store/CategoryChips';
 import { ProductCardRefined } from '@/components/store/ProductCardRefined';
 import { DesignYourCake } from '@/components/store/DesignYourCake';
+import { type CakeConfig } from '@/lib/cakeBuilder';
 import { ShopByOccasion } from '@/components/store/ShopByOccasion';
 import { HowItWorks } from '@/components/store/HowItWorks';
 import { Testimonials } from '@/components/store/Testimonials';
@@ -171,17 +172,20 @@ export default function Store() {
     if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
   };
 
-  // Quick-add the on-page design as a custom cake line in the cart.
-  const handleDesignAdd = (total: number) => {
+  // Quick-add the on-page design as a custom cake line.
+  const handleDesignAdd = (total: number, summary: string) => {
     addToCart({
       id: `custom-${Date.now()}`,
       name: 'كيكة مخصّصة حسب التصميم',
-      description: null,
+      description: summary,
       price: total,
       category: 'تصميم خاص',
       image_url: null,
     });
   };
+
+  // "خصّصيها أكثر" — carry the current design into the full studio.
+  const handleCustomizeMore = (cfg: CakeConfig) => navigate('/customize', { state: { initial: cfg } });
 
   const handleCheckout = async () => {
     if (!user) {
@@ -476,7 +480,7 @@ export default function Store() {
 
         {/* Design your cake */}
         <Reveal>
-          <DesignYourCake onAddCustom={handleDesignAdd} onCustomizeMore={() => navigate('/customize')} />
+          <DesignYourCake onAddCustom={handleDesignAdd} onCustomizeMore={handleCustomizeMore} />
         </Reveal>
 
         {/* Shop by occasion */}

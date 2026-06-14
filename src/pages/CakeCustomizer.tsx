@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import '@/components/cake/cakeStudio.css';
@@ -25,8 +25,15 @@ const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 
 export default function CakeCustomizer() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(0);
-  const [cfg, setCfg] = useState<CakeConfig>(initial);
+  const location = useLocation();
+  // Continue a design started in the home "design your cake" section.
+  const incoming = (location.state as { initial?: CakeConfig } | null)?.initial;
+  const [step, setStep] = useState(incoming?.shape ? 3 : 0);
+  const [cfg, setCfg] = useState<CakeConfig>(
+    incoming
+      ? { ...initial, ...incoming, addons: { ...initial.addons, ...incoming.addons } }
+      : initial,
+  );
   const [done, setDone] = useState(false);
 
   const wrapRef = useRef<HTMLDivElement>(null);
