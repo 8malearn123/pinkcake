@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Wand2, Minus, Cherry, Flower2, Flame, ShoppingBag, ArrowLeft, BadgeCheck, type LucideIcon } from 'lucide-react';
+import { Wand2, Minus, Cherry, Flower2, Flame, ShoppingBag, SlidersHorizontal, BadgeCheck, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SIZE_BASE = 120;
@@ -65,7 +65,13 @@ function Topping({ kind }: { kind: string }) {
   return null;
 }
 
-export function DesignYourCake({ onAddCustom }: { onAddCustom: (total: number) => void }) {
+export function DesignYourCake({
+  onAddCustom,
+  onCustomizeMore,
+}: {
+  onAddCustom: (total: number) => void;
+  onCustomizeMore: () => void;
+}) {
   const [size, setSize] = useState<SizeOpt>(SIZES[1]);
   const [flavor, setFlavor] = useState<FlavorOpt>(FLAVORS[1]);
   const [topping, setTopping] = useState<ToppingOpt>(TOPPINGS[0]);
@@ -165,9 +171,15 @@ export function DesignYourCake({ onAddCustom }: { onAddCustom: (total: number) =
               </div>
               <button
                 onClick={() => onAddCustom(total)}
-                className="group press sheen flex-1 min-w-[210px] rounded-full h-[52px] px-7 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2"
+                className="group press sheen flex-1 min-w-[180px] rounded-full h-[52px] px-6 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2"
               >
-                <ShoppingBag className="w-5 h-5" /> أضيفي تصميمكِ إلى العربة <ArrowLeft className="cta-arrow w-4 h-4" />
+                <ShoppingBag className="w-5 h-5" /> أضيفي إلى العربة
+              </button>
+              <button
+                onClick={onCustomizeMore}
+                className="press rounded-full h-[52px] px-5 border border-border bg-card text-foreground font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
+              >
+                <SlidersHorizontal className="w-4 h-4 text-primary" /> خصّصيها أكثر
               </button>
             </div>
             <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
