@@ -1,0 +1,311 @@
+/* Cake Studio — scoped styles for /customize (ported from the Claude.design v2
+   rebuild). Namespaced under .cake-studio to avoid generic-class collisions. */
+
+.cake-studio {
+  --gold: 36 44% 56%; --gold-deep: 33 40% 42%; --line: 345 14% 88%;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1); --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+.cake-studio * {box-sizing: border-box; }
+.cake-studio {margin: 0; height: 100%; }
+.cake-studio {font-family: 'Tajawal', 'Cairo', sans-serif;
+      background:
+        radial-gradient(120% 70% at 50% 0%, hsl(28 40% 96%), transparent 55%),
+        hsl(28 22% 90%);
+      color: hsl(var(--foreground));
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+      display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.cake-studio .cairo {font-family: 'Cairo', sans-serif; }
+.cake-studio .serif {font-family: 'DM Serif Display', serif; font-weight: 400; }
+.cake-studio .num {font-family: 'DM Serif Display', serif; font-feature-settings: 'lnum'; }
+.cake-studio .cz-frame {position: relative; width: 100%; max-width: 432px; height: 100dvh; max-height: 936px;
+      background: hsl(var(--background)); overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: 0 50px 130px -50px hsl(350 40% 25% / 0.5), 0 0 0 1px hsl(var(--border) / 0.5); }
+@media (min-width: 452px) {
+.cake-studio .cz-frame {border-radius: 32px; }
+}
+.cake-studio header.app {position: relative; z-index: 30; flex: none; background: hsl(var(--background));
+      border-bottom: 1px solid hsl(var(--line) / 0.7); padding: env(safe-area-inset-top) 0 0; }
+.cake-studio .hrow {display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 12px; }
+.cake-studio .ghost-btn {width: 40px; height: 40px; border-radius: 999px; border: 1px solid hsl(var(--line));
+      background: hsl(var(--card)); color: hsl(var(--muted-foreground)); display: grid; place-items: center;
+      cursor: pointer; flex: none; transition: transform .15s var(--ease), color .2s, border-color .2s; }
+.cake-studio .ghost-btn:hover {color: hsl(var(--foreground)); border-color: hsl(var(--primary) / .35); }
+.cake-studio .ghost-btn:active {transform: scale(.92); }
+.cake-studio .hmid {text-align: center; line-height: 1; }
+.cake-studio .hmid .wm {font-size: 11px; letter-spacing: .04em; color: hsl(var(--muted-foreground)); font-weight: 500; }
+.cake-studio .hmid .ttl {font-family: 'Cairo'; font-size: 16px; font-weight: 800; margin-top: 3px; }
+.cake-studio .htotal {text-align: end; min-width: 84px; }
+.cake-studio .htotal .lbl {font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+.cake-studio .htotal .val {font-size: 22px; color: hsl(var(--primary)); line-height: 1; margin-top: 2px; }
+.cake-studio .htotal .val .cur {font-family: 'Tajawal'; font-size: 11px; font-weight: 600; color: hsl(var(--muted-foreground)); margin-inline-start: 3px; }
+.cake-studio .rail {padding: 0 18px 13px; display: flex; align-items: center; gap: 12px; }
+.cake-studio .rail .count {font-size: 15px; color: hsl(var(--foreground)); letter-spacing: .02em; flex: none; }
+.cake-studio .rail .count .tot {color: hsl(var(--muted-foreground)); font-size: 12px; }
+.cake-studio .rail .count .cap {font-family: 'Cairo'; font-size: 11px; font-weight: 700; color: hsl(var(--primary)); display: block; margin-top: 1px; }
+.cake-studio .segs {display: flex; gap: 5px; flex: 1; }
+.cake-studio .seg {height: 4px; border-radius: 999px; background: hsl(var(--line)); flex: 1; overflow: hidden; position: relative; }
+.cake-studio .seg i {position: absolute; inset: 0; inset-inline-end: 100%; background: linear-gradient(90deg, hsl(var(--pink)), hsl(var(--rose)));
+      border-radius: 999px; transition: inset-inline-end .5s var(--ease); }
+.cake-studio .seg.fill i {inset-inline-end: 0; }
+.cake-studio .seg.active i {inset-inline-end: 0; }
+.cake-studio .stage {position: relative; flex: none; height: 39vh; min-height: 256px; max-height: 340px; overflow: hidden;
+      background:
+        radial-gradient(70% 56% at 50% 30%, hsl(28 44% 97.5%), transparent 72%),
+        linear-gradient(180deg, hsl(28 30% 97%), hsl(20 18% 93.5%)); }
+.cake-studio .stage::after {content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(180deg, transparent 60%, hsl(20 18% 90% / .5)); }
+.cake-studio .spot {position: absolute; top: 8%; left: 50%; transform: translateX(-50%); width: 64%; height: 56%;
+      border-radius: 50%; background: radial-gradient(circle, hsl(0 0% 100% / .75), transparent 66%); filter: blur(6px); pointer-events: none; }
+.cake-studio .scene {position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 52px; }
+.cake-studio .cake-wrap {position: relative; display: flex; flex-direction: column; align-items: center; transform-origin: 50% 100%; }
+.cake-studio .cake-wrap {animation: cz_float 7s ease-in-out infinite; }
+@keyframes cz_float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.cake-studio .cake-wrap.settle {animation: cz_settle .55s var(--spring); }
+@keyframes cz_settle { 0% { transform: scale(.93) translateY(5px); } 55% { transform: scale(1.025); } 100% { transform: scale(1); } }
+.cake-studio .cake {display: flex; flex-direction: column; align-items: center; position: relative; }
+.cake-studio .tier {position: relative; }
+.cake-studio .tier .body {width: var(--w); height: var(--h); border-radius: 6px 6px 10px 10px; position: relative; overflow: hidden;
+      background:
+        repeating-linear-gradient(180deg, hsl(0 0% 100% / .05) 0 1px, transparent 1px 7px),
+        linear-gradient(90deg, hsl(345 25% 30% / .20) 0%, hsl(0 0% 100% / .26) 24%, hsl(0 0% 100% / .04) 52%, hsl(345 25% 30% / .07) 72%, hsl(345 25% 30% / .24) 100%),
+        var(--c);
+      box-shadow: inset 0 -13px 18px -10px hsl(345 30% 22% / .30), inset 0 10px 12px -8px hsl(0 0% 100% / .55), inset 0 -2px 0 hsl(345 25% 30% / .12); }
+.cake-studio .tier .top {position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--th) * -0.5);
+      width: var(--w); height: var(--th); border-radius: 50%;
+      background: radial-gradient(ellipse at 50% 26%, hsl(0 0% 100% / .62), hsl(0 0% 100% / 0) 70%), var(--c);
+      box-shadow: 0 6px 8px -5px hsl(345 30% 22% / .28), inset 0 2px 5px hsl(0 0% 100% / .55), inset 0 -3px 6px -2px hsl(345 25% 30% / .18); }
+.cake-studio .tier .seam {position: absolute; left: 50%; transform: translateX(-50%); top: -3px; width: calc(var(--w) - 6px); height: 8px;
+      border-radius: 50%; background: hsl(345 30% 22% / .12); filter: blur(3px); }
+.cake-studio .deco {position: absolute; inset: 0; pointer-events: none; }
+.cake-studio .stand {position: relative; margin-top: 2px; display: flex; flex-direction: column; align-items: center; }
+.cake-studio .stand .plate {width: var(--pw); height: 12px; border-radius: 50%;
+      background: radial-gradient(ellipse at 50% 28%, #fff, hsl(30 16% 90%)); box-shadow: 0 3px 4px -2px hsl(345 25% 30% / .25); }
+.cake-studio .stand .stem {width: 13px; height: 18px; background: linear-gradient(90deg, hsl(345 12% 80%), #fff 42%, hsl(345 12% 84%)); margin-top: -2px; }
+.cake-studio .stand .base {width: calc(var(--pw) * 0.66); height: 9px; border-radius: 50%; margin-top: -1px;
+      background: radial-gradient(ellipse at 50% 32%, #fff, hsl(30 14% 88%)); }
+.cake-studio .contact {width: calc(var(--pw) * 0.92); height: 16px; border-radius: 50%; margin-top: 4px;
+      background: radial-gradient(ellipse at 50% 50%, hsl(345 25% 30% / .26), transparent 70%); filter: blur(4px); }
+.cake-studio .bit {position: absolute; transform-origin: center; }
+.cake-studio .bit {animation: cz_drop .5s var(--spring); }
+@keyframes cz_drop { 0% { transform: translateY(-10px) scale(.6); } }
+.cake-studio .pearl {border-radius: 50%; background: radial-gradient(circle at 36% 30%, #fff, hsl(345 10% 86%)); box-shadow: 0 1px 1px hsl(345 20% 40% / .3); }
+.cake-studio .pearl.gold {background: radial-gradient(circle at 36% 30%, hsl(44 70% 84%), hsl(var(--gold-deep))); }
+.cake-studio .gold-fleck {background: linear-gradient(120deg, hsl(44 78% 80%), hsl(var(--gold-deep))); box-shadow: 0 1px 2px hsl(var(--gold-deep) / .4); }
+.cake-studio .berry {background: radial-gradient(circle at 35% 28%, hsl(352 64% 62%), hsl(348 60% 36%)); border-radius: 52% 52% 50% 50%; box-shadow: inset 0 -2px 3px hsl(348 60% 25% / .5); }
+.cake-studio .leaf {background: linear-gradient(120deg, hsl(140 26% 54%), hsl(145 28% 40%)); border-radius: 0 80% 0 80%; }
+.cake-studio .sprinkle {border-radius: 2px; }
+.cake-studio .choco {background: linear-gradient(90deg, hsl(25 42% 27%), hsl(22 38% 17%)); border-radius: 40%; box-shadow: inset 0 0 2px hsl(0 0% 0% / .4); }
+.cake-studio .rose {border-radius: 50%;
+      background:
+        radial-gradient(circle at 42% 36%, hsl(0 0% 100% / .55), transparent 42%),
+        radial-gradient(circle at 50% 50%, transparent 0 6%, hsl(345 28% 26% / .13) 7% 9%, transparent 10% 20%,
+          hsl(345 28% 26% / .11) 21% 23%, transparent 24% 36%, hsl(345 28% 26% / .09) 37% 39%, transparent 40% 54%,
+          hsl(345 28% 26% / .08) 55% 57%, transparent 58%),
+        var(--rc, hsl(350 42% 80%));
+      box-shadow: inset 0 0 5px hsl(0 0% 100% / .5), 0 2px 3px hsl(345 25% 30% / .25); }
+.cake-studio .drip {position: absolute; left: 50%; transform: translateX(-50%); top: -4px; z-index: 4; }
+.cake-studio .drip {animation: cz_drip .55s var(--ease); }
+@keyframes cz_drip { from { transform: translate(-50%, -7px); } }
+.cake-studio .candle {position: absolute; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; flex-direction: column; align-items: center; }
+.cake-studio .candle .stick {width: 5px; height: 30px; border-radius: 3px; background: repeating-linear-gradient(135deg, hsl(351 40% 70%) 0 5px, #fff 5px 10px); }
+.cake-studio .candle .flame {width: 8px; height: 12px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+      background: radial-gradient(circle at 50% 70%, #fff6cf, hsl(40 92% 58%) 55%, hsl(20 88% 52%)); margin-bottom: -2px; }
+.cake-studio .candle .flame {animation: cz_flick .4s ease-in-out infinite alternate; transform-origin: 50% 90%; }
+@keyframes cz_flick { from { transform: scale(1) rotate(-3deg); } to { transform: scale(1.06,1.12) rotate(3deg); } }
+.cake-studio .numform {font-family: 'DM Serif Display', serif; line-height: .8; position: relative; filter: drop-shadow(0 10px 13px hsl(345 25% 30% / .35)); }
+.cake-studio .cupcake {display: flex; flex-direction: column; align-items: center; }
+.cake-studio .cup-swirl {width: 100px; height: 66px; border-radius: 50% 50% 46% 46% / 64% 64% 36% 36%;
+      background: linear-gradient(90deg, hsl(345 25% 30% / .16), hsl(0 0% 100% / .3) 30%, hsl(345 25% 30% / .14)), var(--c);
+      box-shadow: inset 0 -9px 13px -7px hsl(345 30% 22% / .3); position: relative; }
+.cake-studio .cup-liner {width: 94px; height: 50px; clip-path: polygon(9% 0, 91% 0, 80% 100%, 20% 100%);
+      background: repeating-linear-gradient(90deg, hsl(345 42% 72%) 0 9px, hsl(345 38% 64%) 9px 18px); margin-top: -3px; }
+.cake-studio .msg {position: absolute; left: 50%; transform: translateX(-50%); z-index: 5; text-align: center;
+      font-family: 'Cairo'; font-weight: 700; line-height: 1.2; color: var(--ink, hsl(343 42% 44%));
+      text-shadow: 0 1px 0 hsl(0 0% 100% / .5), 0 1.5px 2px hsl(345 25% 30% / .22); max-width: 86%; }
+.cake-studio .msg {animation: cz_pipe .5s var(--ease); }
+@keyframes cz_pipe { from { transform: translate(-50%, 4px); } }
+.cake-studio .stage-cap {position: absolute; inset-block-end: 14px; inset-inline: 0; display: flex; justify-content: center; }
+.cake-studio .stage-cap .pill {display: inline-flex; align-items: center; gap: 9px; padding: 7px 15px; border-radius: 999px; white-space: nowrap;
+      background: hsl(var(--card) / .9); backdrop-filter: blur(8px); border: 1px solid hsl(var(--line));
+      font-size: 11.5px; font-weight: 500; color: hsl(var(--secondary-foreground)); box-shadow: 0 6px 18px -10px hsl(345 25% 30% / .35); }
+.cake-studio .stage-cap .pill b {font-weight: 700; color: hsl(var(--foreground)); }
+.cake-studio .stage-cap .pill .dot {width: 3px; height: 3px; border-radius: 50%; background: hsl(var(--muted-foreground) / .5); }
+.cake-studio .stage-cap .pill svg {width: 14px; height: 14px; color: hsl(var(--primary)); }
+.cake-studio .ph-hint {position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: hsl(var(--muted-foreground)); padding: 0 40px; }
+.cake-studio .live-pill {position: absolute; inset-block-start: 14px; inset-inline-end: 14px; z-index: 6; display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; color: hsl(var(--muted-foreground));
+      background: hsl(var(--card) / .82); backdrop-filter: blur(8px); border: 1px solid hsl(var(--line)); box-shadow: 0 6px 18px -10px hsl(345 25% 30% / .3); }
+.cake-studio .live-pill .ld {width: 6px; height: 6px; border-radius: 50%; background: hsl(var(--accent)); }
+.cake-studio .live-pill .ld {animation: cz_livePulse 2.2s ease-in-out infinite; }
+@keyframes cz_livePulse { 0%,100% { box-shadow: 0 0 0 0 hsl(var(--accent) / .5); } 50% { box-shadow: 0 0 0 5px hsl(var(--accent) / 0); } }
+.cake-studio .panel {flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 18px 124px; }
+.cake-studio .panel::-webkit-scrollbar {width: 0; }
+.cake-studio .shead {margin-bottom: 17px; }
+.cake-studio .shead .kick {display: inline-flex; align-items: center; gap: 6px; font-family: 'Cairo'; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: hsl(var(--primary)); background: hsl(var(--primary) / .1); padding: 6px 12px; border-radius: 999px; }
+.cake-studio .shead .kick svg {width: 13px; height: 13px; }
+.cake-studio .shead h2 {font-family: 'Cairo'; margin: 6px 0 4px; font-size: 24px; font-weight: 800; letter-spacing: -.01em; }
+.cake-studio .shead p {margin: 0; font-size: 13.5px; color: hsl(var(--muted-foreground)); line-height: 1.5; }
+.cake-studio .sect {animation: none; }
+.cake-studio .sect {animation: cz_rise .5s var(--ease); }
+@keyframes cz_rise { from { transform: translateY(10px); } }
+.cake-studio .grid {display: grid; gap: 12px; }
+.cake-studio .cols-2 {grid-template-columns: 1fr 1fr; }
+.cake-studio .cols-3 {grid-template-columns: 1fr 1fr 1fr; }
+.cake-studio .card {position: relative; text-align: start; cursor: pointer; border: 1px solid hsl(var(--line));
+      background: hsl(var(--card)); border-radius: 18px; padding: 13px; overflow: hidden;
+      transition: transform .16s var(--ease), border-color .25s, box-shadow .3s; }
+.cake-studio .card:hover {border-color: hsl(var(--primary) / .4); }
+.cake-studio .card:active {transform: scale(.97); }
+.cake-studio .card.sel {border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary)), 0 16px 30px -20px hsl(var(--primary) / .55); }
+.cake-studio .card .thumb {height: 96px; border-radius: 13px; display: grid; place-items: end center; padding-bottom: 8px; overflow: hidden;
+      background: radial-gradient(80% 70% at 50% 36%, hsl(28 38% 97%), hsl(28 22% 93%)); margin-bottom: 11px; }
+.cake-studio .card .nm {font-family: 'Cairo'; font-size: 14px; font-weight: 800; line-height: 1.2; }
+.cake-studio .card .meta {font-size: 11.5px; color: hsl(var(--muted-foreground)); margin-top: 3px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.cake-studio .card .meta svg {width: 13px; height: 13px; color: hsl(var(--primary)); flex: none; }
+.cake-studio .card .meta .d {width: 3px; height: 3px; border-radius: 50%; background: hsl(var(--muted-foreground) / .5); }
+.cake-studio .card .pr {font-size: 12px; color: hsl(var(--secondary-foreground)); margin-top: 8px; font-weight: 500; }
+.cake-studio .card .pr .v {font-family: 'DM Serif Display', serif; color: hsl(var(--foreground)); font-size: 15px; }
+.cake-studio .tick {position: absolute; inset-block-start: 10px; inset-inline-end: 10px; width: 22px; height: 22px; border-radius: 999px;
+      background: hsl(var(--primary)); color: #fff; display: grid; place-items: center; opacity: 0; transform: scale(.4);
+      transition: opacity .25s, transform .35s var(--spring); z-index: 3; }
+.cake-studio .tick svg {width: 12px; height: 12px; }
+.cake-studio .card.sel .tick, .cake-studio .design.sel .tick {opacity: 1; transform: scale(1); }
+.cake-studio .mini-tier {border-radius: 6px 6px 4px 4px; margin: 0 auto;
+      background: linear-gradient(90deg, hsl(345 25% 30% / .12), hsl(0 0% 100% / .3) 30%, hsl(345 25% 30% / .12)), var(--mc, hsl(40 38% 91%));
+      box-shadow: inset 0 -4px 6px -3px hsl(345 30% 25% / .3); }
+.cake-studio .mini-plate {height: 5px; border-radius: 50%; margin: 1px auto 0; background: radial-gradient(ellipse at 50% 30%, #fff, hsl(30 14% 89%)); }
+.cake-studio .frow {display: flex; align-items: center; gap: 13px; width: 100%; cursor: pointer; text-align: start;
+      border: 1px solid hsl(var(--line)); background: hsl(var(--card)); border-radius: 16px; padding: 12px 14px;
+      transition: transform .16s var(--ease), border-color .25s, box-shadow .3s; }
+.cake-studio .frow:active {transform: scale(.985); }
+.cake-studio .frow.sel {border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary)), 0 12px 24px -18px hsl(var(--primary) / .5); }
+.cake-studio .fdot {width: 40px; height: 40px; border-radius: 13px; flex: none; box-shadow: inset 0 -4px 7px hsl(345 25% 25% / .25), inset 0 2px 3px hsl(0 0% 100% / .4); }
+.cake-studio .fmeta {flex: 1; }
+.cake-studio .fmeta .nm {font-family: 'Cairo'; font-size: 14.5px; font-weight: 800; }
+.cake-studio .fmeta .ds {font-size: 12px; color: hsl(var(--muted-foreground)); margin-top: 1px; }
+.cake-studio .frow .pr {font-size: 12px; color: hsl(var(--muted-foreground)); font-weight: 500; }
+.cake-studio .fradio {width: 21px; height: 21px; border-radius: 999px; border: 1.5px solid hsl(var(--line)); flex: none; display: grid; place-items: center; transition: border-color .25s; }
+.cake-studio .frow.sel .fradio {border-color: hsl(var(--primary)); }
+.cake-studio .fradio i {width: 11px; height: 11px; border-radius: 999px; background: hsl(var(--primary)); transform: scale(0); transition: transform .3s var(--spring); }
+.cake-studio .frow.sel .fradio i {transform: scale(1); }
+.cake-studio .swatches {display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 13px; }
+.cake-studio .sw {cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cake-studio .sw .dot {width: 100%; aspect-ratio: 1; border-radius: 50%; position: relative;
+      box-shadow: inset 0 -7px 11px -5px hsl(345 25% 25% / .35), inset 0 5px 7px hsl(0 0% 100% / .55), 0 7px 15px -9px hsl(345 25% 30% / .4);
+      border: 3px solid hsl(var(--card)); outline: 1px solid hsl(var(--line)); transition: transform .2s var(--spring); }
+.cake-studio .sw:active .dot {transform: scale(.9); }
+.cake-studio .sw.sel .dot {transform: scale(1.05); outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }
+.cake-studio .sw .nm {font-size: 11.5px; font-weight: 500; color: hsl(var(--muted-foreground)); }
+.cake-studio .sw.sel .nm {color: hsl(var(--foreground)); font-weight: 700; }
+.cake-studio .design {position: relative; cursor: pointer; text-align: center; border: 1px solid hsl(var(--line));
+      background: hsl(var(--card)); border-radius: 16px; padding: 15px 8px 12px; overflow: hidden;
+      transition: transform .16s var(--ease), border-color .25s, box-shadow .3s; }
+.cake-studio .design:active {transform: scale(.97); }
+.cake-studio .design.sel {border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary)), 0 12px 24px -18px hsl(var(--primary) / .5); }
+.cake-studio .design .ic {width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 50%; display: grid; place-items: center;
+      background: radial-gradient(70% 70% at 50% 35%, hsl(28 36% 97%), hsl(350 30% 94%)); position: relative; overflow: hidden; color: hsl(var(--rose)); }
+.cake-studio .design .ic svg {width: 22px; height: 22px; }
+.cake-studio .design .nm {font-family: 'Cairo'; font-size: 12.5px; font-weight: 800; }
+.cake-studio .design .pr {font-size: 11px; color: hsl(var(--muted-foreground)); margin-top: 2px; }
+.cake-studio .msg-input {width: 100%; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); border-radius: 16px;
+      padding: 15px 16px; font-family: 'Cairo'; font-size: 16px; font-weight: 700; color: hsl(var(--foreground));
+      text-align: center; transition: border-color .25s, box-shadow .25s; outline: none; }
+.cake-studio .msg-input:focus {border-color: hsl(var(--primary)); box-shadow: 0 0 0 4px hsl(var(--primary) / .1); }
+.cake-studio .msg-input::placeholder {color: hsl(var(--muted-foreground)); font-weight: 400; }
+.cake-studio .cc {text-align: end; font-size: 11px; color: hsl(var(--muted-foreground)); margin-top: 7px; }
+.cake-studio .chips {display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+.cake-studio .chip {cursor: pointer; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); border-radius: 999px;
+      padding: 8px 15px; font-family: 'Cairo'; font-size: 13px; font-weight: 600; color: hsl(var(--secondary-foreground));
+      transition: transform .14s var(--ease), border-color .2s, background .2s, color .2s; }
+.cake-studio .chip:active {transform: scale(.95); }
+.cake-studio .chip:hover {border-color: hsl(var(--primary) / .4); }
+.cake-studio .chip.sel {background: hsl(var(--primary)); color: #fff; border-color: hsl(var(--primary)); }
+.cake-studio .flabel {font-family: 'Cairo'; font-size: 13px; font-weight: 800; color: hsl(var(--secondary-foreground)); margin: 22px 0 11px; display: flex; align-items: center; gap: 8px; }
+.cake-studio .flabel svg {width: 16px; height: 16px; color: hsl(var(--primary)); }
+.cake-studio .flabel .opt {font-weight: 500; font-size: 11px; color: hsl(var(--muted-foreground)); font-family: 'Tajawal'; }
+.cake-studio .addons {display: flex; flex-direction: column; gap: 10px; }
+.cake-studio .addon {display: flex; align-items: center; gap: 13px; cursor: pointer; border: 1px solid hsl(var(--line));
+      background: hsl(var(--card)); border-radius: 15px; padding: 12px 14px; transition: border-color .2s, box-shadow .3s, transform .14s var(--ease); }
+.cake-studio .addon:active {transform: scale(.99); }
+.cake-studio .addon.on {border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary)); }
+.cake-studio .addon .ac {width: 38px; height: 38px; border-radius: 11px; flex: none; display: grid; place-items: center;
+      background: radial-gradient(70% 70% at 50% 35%, hsl(28 36% 97%), hsl(350 30% 94%)); color: hsl(var(--rose)); }
+.cake-studio .addon .ac svg {width: 19px; height: 19px; }
+.cake-studio .addon .am {flex: 1; }
+.cake-studio .addon .am .nm {font-family: 'Cairo'; font-size: 13.5px; font-weight: 800; }
+.cake-studio .addon .am .ds {font-size: 11.5px; color: hsl(var(--muted-foreground)); }
+.cake-studio .addon .ap {font-size: 12px; color: hsl(var(--muted-foreground)); font-weight: 500; }
+.cake-studio .check {width: 24px; height: 24px; border-radius: 7px; border: 1.5px solid hsl(var(--line)); flex: none; display: grid; place-items: center; transition: all .2s; color: transparent; }
+.cake-studio .addon.on .check {background: hsl(var(--primary)); border-color: hsl(var(--primary)); color: #fff; }
+.cake-studio .check svg {width: 13px; height: 13px; }
+.cake-studio .summary {border: 1px solid hsl(var(--line)); background: hsl(var(--card)); border-radius: 18px; overflow: hidden; }
+.cake-studio .srow {display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; border-top: 1px solid hsl(var(--line) / .7); }
+.cake-studio .srow:first-child {border-top: none; }
+.cake-studio .srow .k {display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+.cake-studio .srow .k svg {width: 15px; height: 15px; color: hsl(var(--primary)); }
+.cake-studio .srow .v {font-family: 'Cairo'; font-size: 13px; font-weight: 700; text-align: end; }
+.cake-studio .srow .v.muted {color: hsl(var(--muted-foreground)); font-weight: 500; }
+.cake-studio .stotal {display: flex; align-items: center; justify-content: space-between; padding: 15px 16px; background: hsl(var(--blush) / .5); }
+.cake-studio .stotal .k {font-family: 'Cairo'; font-weight: 800; }
+.cake-studio .stotal .v {color: hsl(var(--primary)); }
+.cake-studio .stotal .v .big {font-family: 'DM Serif Display', serif; font-size: 25px; }
+.cake-studio .stotal .v .cur {font-size: 12px; color: hsl(var(--muted-foreground)); margin-inline-start: 3px; }
+.cake-studio .assure {display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: hsl(var(--muted-foreground)); margin-top: 12px; padding: 0 2px; }
+.cake-studio .assure svg {width: 14px; height: 14px; color: hsl(140 30% 45%); flex: none; }
+.cake-studio .botnav {position: absolute; inset-inline: 0; inset-block-end: 0; z-index: 30; background: hsl(var(--background) / .94);
+      backdrop-filter: blur(14px); border-top: 1px solid hsl(var(--line)); padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+      display: flex; align-items: center; gap: 12px; }
+.cake-studio .btn {display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 999px;
+      font-family: 'Cairo'; font-size: 15px; font-weight: 800; cursor: pointer; border: none;
+      transition: transform .14s var(--ease), box-shadow .3s, background .25s, opacity .25s; }
+.cake-studio .btn:active {transform: scale(.97); }
+.cake-studio .btn svg {width: 18px; height: 18px; }
+.cake-studio .btn-prev {flex: none; width: 52px; background: hsl(var(--card)); border: 1px solid hsl(var(--line)); color: hsl(var(--muted-foreground)); }
+.cake-studio .btn-prev:hover {color: hsl(var(--foreground)); border-color: hsl(var(--primary) / .4); }
+.cake-studio .btn-prev.hide {opacity: 0; pointer-events: none; width: 0; padding: 0; margin: 0; border: none; }
+.cake-studio .btn-next {flex: 1; background: linear-gradient(135deg, hsl(var(--pink)), hsl(var(--rose))); color: #fff;
+      box-shadow: 0 14px 30px -12px hsl(var(--primary) / .6); }
+.cake-studio .btn-next.commit {background: hsl(var(--foreground)); color: hsl(var(--background)); box-shadow: 0 16px 32px -12px hsl(var(--foreground) / .55); }
+.cake-studio .btn-next:disabled {opacity: .42; box-shadow: none; cursor: not-allowed; }
+.cake-studio .btn-next .pp {font-family: 'DM Serif Display', serif; opacity: .92; font-size: 14px; }
+.cake-studio .btn-next .pp .cur {font-family: 'Tajawal'; font-size: 11px; }
+.cake-studio #confetti {position: absolute; inset: 0; z-index: 80; pointer-events: none; }
+.cake-studio .success {position: absolute; inset: 0; z-index: 70; display: none; place-items: center; text-align: center;
+      background: hsl(var(--background) / .82); backdrop-filter: blur(10px); padding: 30px; }
+.cake-studio .success.show {display: grid; }
+.cake-studio .success.show {animation: cz_rise .45s var(--ease); }
+.cake-studio .success .badge {width: 88px; height: 88px; border-radius: 999px; display: grid; place-items: center; margin: 0 auto 20px;
+      background: linear-gradient(135deg, hsl(var(--pink)), hsl(var(--rose))); color: #fff; box-shadow: 0 22px 44px -16px hsl(var(--primary) / .65); }
+.cake-studio .success .badge {animation: cz_pop .6s var(--spring); }
+.cake-studio .success .badge svg {width: 42px; height: 42px; }
+@keyframes cz_pop { 0% { transform: scale(0) rotate(-25deg); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.cake-studio .success h3 {font-family: 'Cairo'; font-size: 23px; font-weight: 900; margin: 0 0 9px; }
+.cake-studio .success p {font-size: 13.5px; color: hsl(var(--muted-foreground)); margin: 0 0 24px; max-width: 290px; line-height: 1.6; }
+.cake-studio .success .again {cursor: pointer; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); color: hsl(var(--foreground));
+      border-radius: 999px; padding: 13px 26px; font-family: 'Cairo'; font-weight: 800; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) {
+.cake-studio * {animation-duration: .001s !important; }
+}
+@media (min-width: 880px) {
+.cake-studio {padding: 28px; }
+.cake-studio .cz-frame {max-width: 1080px; width: 100%; height: 88vh; max-height: 800px; border-radius: 30px;
+        display: grid;
+        grid-template-columns: minmax(400px, 0.92fr) 1.1fr;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-areas: "header stage" "panel stage" "botnav stage"; }
+.cake-studio header.app {grid-area: header; }
+.cake-studio .panel {grid-area: panel; padding: 26px 30px 30px; }
+.cake-studio .botnav {grid-area: botnav; position: static; padding: 16px 30px; }
+.cake-studio .stage {grid-area: stage; height: auto; min-height: 0; max-height: none;
+        border-block-end: none; border-inline-start: 1px solid hsl(var(--line) / .7); }
+.cake-studio .scene {align-items: center; padding-bottom: 0; transform: scale(1.2); }
+.cake-studio .stage-cap {inset-block-end: 30px; }
+.cake-studio .live-pill {inset-block-start: 22px; inset-inline-end: 22px; }
+.cake-studio .hrow {padding: 20px 30px 14px; }
+.cake-studio .rail {padding: 0 30px 18px; }
+.cake-studio .shead h2 {font-size: 27px; }
+}
+@media (min-width: 1180px) {
+.cake-studio .cz-frame {max-width: 1180px; }
+.cake-studio .scene {transform: scale(1.32); }
+}
