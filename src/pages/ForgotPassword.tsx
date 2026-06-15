@@ -136,7 +136,7 @@ export default function ForgotPassword() {
             )}
 
             <div className="mt-6 pt-4 border-t text-center">
-              <Link to="/auth">
+              <Link to="/login">
                 <Button variant="ghost" className="text-sm">
                   <ArrowRight className="w-4 h-4 me-1" />
                   العودة لتسجيل الدخول

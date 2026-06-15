@@ -9,11 +9,12 @@ interface StoreFooterProps {
   onShop: () => void;
 }
 
+// Social profiles — placeholder hrefs; the owner swaps these for real handles.
 const SOCIAL = [
-  { icon: Camera, label: 'إنستغرام' },
-  { icon: Music, label: 'تيك توك' },
-  { icon: MessageCircle, label: 'واتساب' },
-  { icon: Send, label: 'بريد' },
+  { icon: Camera, label: 'إنستغرام', href: 'https://instagram.com' },
+  { icon: Music, label: 'تيك توك', href: 'https://tiktok.com' },
+  { icon: MessageCircle, label: 'واتساب', href: 'https://wa.me/966112345678' },
+  { icon: Send, label: 'بريد', href: 'mailto:hello@pinkcake.sa' },
 ];
 
 export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps) {
@@ -26,9 +27,10 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
   ];
   const helpLinks = [
     { label: 'تتبّعي طلبك', action: () => onNavigate('/track') },
-    { label: 'سياسة التوصيل', action: () => {} },
-    { label: 'الأسئلة الشائعة', action: () => {} },
-    { label: 'تواصلي معنا', action: () => {} },
+    { label: 'سياسة التوصيل', action: () => onNavigate('/faq') },
+    { label: 'الأسئلة الشائعة', action: () => onNavigate('/faq') },
+    { label: 'تواصلي معنا', action: () => onNavigate('/contact') },
+    { label: 'من نحن', action: () => onNavigate('/about') },
   ];
 
   return (
@@ -50,14 +52,17 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
               كيكات وحلويات مصممة يدوياً بأجود المكونات، نصنعها بحب لنُحضر لكِ لحظات لا تُنسى.
             </p>
             <div className="flex items-center gap-2 mt-5">
-              {SOCIAL.map(({ icon: Icon, label }) => (
-                <button
+              {SOCIAL.map(({ icon: Icon, label, href }) => (
+                <a
                   key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="w-9 h-9 rounded-full border border-border flex items-center justify-center press hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
                 >
                   <Icon className="w-4 h-4" />
-                </button>
+                </a>
               ))}
             </div>
           </div>
@@ -114,8 +119,8 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
         <div className="mt-10 pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">© 2026 {storeName} Patisserie. جميع الحقوق محفوظة.</p>
           <div className="flex items-center gap-4">
-            <button className="text-xs text-muted-foreground hover:text-primary transition-colors">الشروط والأحكام</button>
-            <button className="text-xs text-muted-foreground hover:text-primary transition-colors">الخصوصية</button>
+            <button onClick={() => onNavigate('/terms')} className="text-xs text-muted-foreground hover:text-primary transition-colors">الشروط والأحكام</button>
+            <button onClick={() => onNavigate('/privacy')} className="text-xs text-muted-foreground hover:text-primary transition-colors">الخصوصية</button>
             <div className="flex items-center gap-1.5 ms-2 text-muted-foreground">
               <CreditCard className="w-5 h-5" />
               <Smartphone className="w-5 h-5" />

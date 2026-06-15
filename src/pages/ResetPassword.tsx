@@ -79,7 +79,7 @@ export default function ResetPassword() {
       
       // Redirect to login after 2 seconds
       setTimeout(() => {
-        navigate('/auth');
+        navigate('/login');
       }, 2000);
     }
   };

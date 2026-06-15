@@ -21,7 +21,7 @@ interface CustomerProfile {
 }
 
 export default function CustomerProfile() {
-  const { user, signOut } = useAuth();
+  const { user, isLoading: authLoading, signOut } = useAuth();
   const { settings } = useSettings();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -99,6 +99,14 @@ export default function CustomerProfile() {
     updateProfile.mutate();
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -111,7 +119,7 @@ export default function CustomerProfile() {
             <CardDescription>سجل دخولك للوصول إلى ملفك الشخصي</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" onClick={() => navigate('/customer-auth')}>
+            <Button className="w-full" onClick={() => navigate('/login')}>
               تسجيل الدخول
             </Button>
           </CardContent>

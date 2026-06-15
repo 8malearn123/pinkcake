@@ -21,7 +21,12 @@ const READ: Record<string, (args: Args) => unknown> = {
   // identity / role
   get_my_roles: () => currentRoles(),
   get_my_branch: () => [{ branch_id: 'b1', branch_name: 'فرع العليا' }],
-  get_my_customer_profile: () => d.PROFILES[0],
+  get_my_customer_profile: () => [{
+    id: d.PROFILES[0].id,
+    name: d.PROFILES[0].full_name,
+    phone: d.PROFILES[0].phone,
+    address: 'حي الورود، شارع الأمير سلطان، الرياض',
+  }],
   get_all_profiles_for_admin: () => d.PROFILES,
   get_employees_secure: () => d.PROFILES.filter((p) => !(p.roles as string[]).includes('customer')),
   get_admin_access_logs: () => [],

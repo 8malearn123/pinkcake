@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useMyOrders } from '@/hooks/useCustomerStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -19,18 +19,23 @@ import {
   MapPin,
   LogOut,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
 
 export default function MyOrders() {
-  const { user, signOut } = useAuth();
+  const { user, isLoading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const { data: orders, isLoading } = useMyOrders();
 
-  if (!user) {
-    navigate('/customer-auth');
-    return null;
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
+  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <div className="min-h-screen bg-background">

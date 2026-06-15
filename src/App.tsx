@@ -43,6 +43,11 @@ const BranchLive = lazy(() => import("./pages/BranchLive"));
 const Driver = lazy(() => import("./pages/Driver"));
 const CustomOrders = lazy(() => import("./pages/CustomOrders"));
 const CakeCustomizer = lazy(() => import("./pages/CakeCustomizer"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Contact = lazy(() => import("./pages/Contact"));
+const About = lazy(() => import("./pages/About"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const DesignSystem = lazy(() => import("./pages/DesignSystem"));
 const LozaHome = lazy(() => import("./pages/loza/LozaHome"));
 const LozaCustomizer = lazy(() => import("./pages/loza/LozaCustomizer"));
@@ -98,13 +103,20 @@ const App = () => (
             <BrowserRouter>
             <Suspense fallback={<RouteFallback />}>
             <Routes>
-              {/* Public storefront — shares a cart context across landing + details */}
+              {/* Public storefront — shares a cart context across landing, details + customizer */}
               <Route element={<StorefrontLayout />}>
                 <Route path="/" element={<Store />} />
                 <Route path="/store" element={<Store />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path="/customize" element={<CakeCustomizer />} />
               </Route>
-              <Route path="/customize" element={<CakeCustomizer />} />
+
+              {/* Customer info pages */}
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
 
               {/* Loza — Dessert Marketplace (flag-gated; off in prod by default) */}
               {LOZA_ENABLED && (
