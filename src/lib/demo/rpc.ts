@@ -11,8 +11,8 @@ const READ: Record<string, (args: Args) => unknown> = {
   // catalogue
   get_products_for_public_store: () => d.PRODUCTS,
   get_products_for_authenticated_store: () => d.PRODUCTS,
-  get_product_with_options: (a) => ({ ...(d.PRODUCTS.find((p) => p.id === a?.['_product_id']) ?? d.PRODUCTS[0]), options: [] }),
-  get_product_rating: () => ({ average_rating: 4.6, review_count: d.REVIEWS.length }),
+  get_product_with_options: (a) => [{ ...(d.PRODUCTS.find((p) => p.id === a?.['_product_id']) ?? d.PRODUCTS[0]), options: [] }],
+  get_product_rating: () => [{ average_rating: 4.6, review_count: d.REVIEWS.length }],
   get_product_reviews: () => d.REVIEWS,
   get_my_product_review: () => null,
   get_branches_for_public_store: () => d.BRANCHES,
@@ -52,8 +52,8 @@ const READ: Record<string, (args: Args) => unknown> = {
 
   // customer self-service
   get_my_orders: () => d.MY_ORDERS,
-  get_my_order_details: (a) => d.MY_ORDERS.find((o) => o.id === a?.['_order_id']) ?? d.MY_ORDERS[0],
-  get_my_pickup_code: () => ({ pickup_code: 'PICK-4821', order_number: 'ORD-1005' }),
+  get_my_order_details: (a) => [d.MY_ORDERS.find((o) => o.id === a?.['_order_id']) ?? d.MY_ORDERS[0]],
+  get_my_pickup_code: () => 'PICK-4821',
   get_my_pricing_requests: () => d.CUSTOM_ORDERS,
 
   // support / submissions
