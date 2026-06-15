@@ -3,10 +3,11 @@ import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ImpersonationProvider } from "./contexts/ImpersonationContext";
+import { StoreCartProvider } from "./contexts/StoreCartContext";
 import { ImpersonationBanner } from "./components/admin/ImpersonationBanner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DemoModeBadge } from "./components/demo/DemoModeBadge";
@@ -30,6 +31,7 @@ const Branches = lazy(() => import("./pages/Branches"));
 const Users = lazy(() => import("./pages/Users"));
 const Login = lazy(() => import("./pages/Login"));
 const Store = lazy(() => import("./pages/Store"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
 const MyOrderDetails = lazy(() => import("./pages/MyOrderDetails"));
 const CustomerProfile = lazy(() => import("./pages/CustomerProfile"));
@@ -74,6 +76,16 @@ function RouteFallback() {
   );
 }
 
+// Public storefront layout — provides the shared cart to the landing page and the
+// product details route so "add to cart" stays in sync across them.
+function StorefrontLayout() {
+  return (
+    <StoreCartProvider>
+      <Outlet />
+    </StoreCartProvider>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <SettingsProvider>
@@ -86,9 +98,12 @@ const App = () => (
             <BrowserRouter>
             <Suspense fallback={<RouteFallback />}>
             <Routes>
-              {/* Public Store - Landing Page */}
-              <Route path="/" element={<Store />} />
-              <Route path="/store" element={<Store />} />
+              {/* Public storefront — shares a cart context across landing + details */}
+              <Route element={<StorefrontLayout />}>
+                <Route path="/" element={<Store />} />
+                <Route path="/store" element={<Store />} />
+                <Route path="/product/:id" element={<ProductDetails />} />
+              </Route>
               <Route path="/customize" element={<CakeCustomizer />} />
 
               {/* Loza — Dessert Marketplace (flag-gated; off in prod by default) */}
