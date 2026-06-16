@@ -40,7 +40,7 @@ export default function Shop() {
   const occasion = params.get('occasion') ?? '';
 
   const { data: products, isLoading } = usePublicStoreProducts();
-  const { addToCart, count: cartCount } = useStoreCart();
+  const { addToCart, count: cartCount, open: openCart } = useStoreCart();
   const wishlist = useStoreWishlist();
 
   const productIds = useMemo(() => products?.map((p) => p.id) ?? [], [products]);
@@ -117,7 +117,7 @@ export default function Shop() {
           <div className="flex items-center gap-1.5 shrink-0">
             <AccountMenu />
             <button
-              onClick={() => navigate('/store', { state: { openCart: true } })}
+              onClick={openCart}
               aria-label="عربة التسوق"
               className="press relative rounded-full border border-border bg-card h-10 w-10 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors"
             >

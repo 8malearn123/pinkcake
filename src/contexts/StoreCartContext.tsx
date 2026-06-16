@@ -31,12 +31,20 @@ interface StoreCartContextValue {
   clear: () => void;
   count: number;
   total: number;
+  /** Cart sheet open state — the sheet is rendered once globally (CartSheet). */
+  isOpen: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  open: () => void;
+  close: () => void;
 }
 
 const StoreCartContext = createContext<StoreCartContextValue | null>(null);
 
 export function StoreCartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isOpen, setOpen] = useState(false);
+  const open = useCallback(() => setOpen(true), []);
+  const close = useCallback(() => setOpen(false), []);
 
   const addToCart = useCallback((product: StoreProduct, quantity = 1) => {
     setCart((prev) => {
@@ -78,8 +86,8 @@ export function StoreCartProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ cart, addToCart, updateQuantity, removeFromCart, setCart, clear, count, total }),
-    [cart, addToCart, updateQuantity, removeFromCart, clear, count, total],
+    () => ({ cart, addToCart, updateQuantity, removeFromCart, setCart, clear, count, total, isOpen, setOpen, open, close }),
+    [cart, addToCart, updateQuantity, removeFromCart, clear, count, total, isOpen, open, close],
   );
 
   return <StoreCartContext.Provider value={value}>{children}</StoreCartContext.Provider>;
