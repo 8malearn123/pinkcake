@@ -4,6 +4,7 @@ import { usePublicStoreProducts, usePublicStoreBranches } from '@/hooks/usePubli
 import { useCreateCustomerOrder, StoreProduct } from '@/hooks/useCustomerStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
 import { useStoreCart } from '@/contexts/StoreCartContext';
+import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,7 @@ import { StoreFooter } from '@/components/store/StoreFooter';
 import { BackToTop } from '@/components/store/BackToTop';
 import {
   ShoppingCart,
+  Heart,
   Plus,
   Minus,
   Trash2,
@@ -93,6 +95,7 @@ export default function Store() {
     count: cartCount,
     total: cartTotal,
   } = useStoreCart();
+  const wishlist = useStoreWishlist();
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -289,6 +292,24 @@ export default function Store() {
               </Button>
             )}
 
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="المفضلة"
+              onClick={() => navigate('/wishlist')}
+              className="relative rounded-full border-border h-10 w-10 press hover:border-primary/50 hover:bg-primary/5"
+            >
+              <Heart className="w-5 h-5" />
+              {wishlist.count > 0 && (
+                <span
+                  key={wishlist.count}
+                  className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow"
+                >
+                  {wishlist.count}
+                </span>
+              )}
+            </Button>
+
             <Sheet open={cartOpen} onOpenChange={setCartOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="عربة التسوق" className="relative rounded-full border-border h-10 w-10 press hover:border-primary/50 hover:bg-primary/5">
@@ -454,6 +475,8 @@ export default function Store() {
                   product={product}
                   rating={ratingsMap?.[product.id]}
                   onAddToCart={() => addToCart(product)}
+                  isFav={wishlist.has(product.id)}
+                  onToggleFav={() => wishlist.toggle(product)}
                   onViewDetails={() => navigate(`/product/${product.id}`)}
                   onOpenReviews={() => {
                     setSelectedProductForReview(product);

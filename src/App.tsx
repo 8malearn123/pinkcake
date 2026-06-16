@@ -8,6 +8,7 @@ import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ImpersonationProvider } from "./contexts/ImpersonationContext";
 import { StoreCartProvider } from "./contexts/StoreCartContext";
+import { StoreWishlistProvider } from "./contexts/StoreWishlistContext";
 import { ImpersonationBanner } from "./components/admin/ImpersonationBanner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DemoModeBadge } from "./components/demo/DemoModeBadge";
@@ -32,6 +33,7 @@ const Users = lazy(() => import("./pages/Users"));
 const Login = lazy(() => import("./pages/Login"));
 const Store = lazy(() => import("./pages/Store"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
 const MyOrderDetails = lazy(() => import("./pages/MyOrderDetails"));
 const CustomerProfile = lazy(() => import("./pages/CustomerProfile"));
@@ -86,7 +88,9 @@ function RouteFallback() {
 function StorefrontLayout() {
   return (
     <StoreCartProvider>
-      <Outlet />
+      <StoreWishlistProvider>
+        <Outlet />
+      </StoreWishlistProvider>
     </StoreCartProvider>
   );
 }
@@ -108,6 +112,7 @@ const App = () => (
                 <Route path="/" element={<Store />} />
                 <Route path="/store" element={<Store />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/customize" element={<CakeCustomizer />} />
               </Route>
 

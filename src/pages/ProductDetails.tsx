@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { usePublicStoreProducts } from '@/hooks/usePublicStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
 import { useStoreCart } from '@/contexts/StoreCartContext';
+import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
@@ -36,6 +37,7 @@ export default function ProductDetails() {
 
   const { data: products, isLoading } = usePublicStoreProducts();
   const { addToCart, count: cartCount } = useStoreCart();
+  const wishlist = useStoreWishlist();
 
   const product = useMemo(() => products?.find((p) => p.id === id), [products, id]);
   const { data: ratingsMap } = useProductRatings(product ? [product.id] : []);
@@ -50,7 +52,6 @@ export default function ProductDetails() {
   );
 
   const [qty, setQty] = useState(1);
-  const [fav, setFav] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -92,9 +93,22 @@ export default function ProductDetails() {
         </button>
 
         <button
+          onClick={() => navigate('/wishlist')}
+          aria-label="المفضلة"
+          className="press relative ms-auto rounded-full border border-border bg-card h-10 w-10 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors"
+        >
+          <Heart className="w-5 h-5" />
+          {wishlist.count > 0 && (
+            <span className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow">
+              {wishlist.count}
+            </span>
+          )}
+        </button>
+
+        <button
           onClick={goToCart}
           aria-label="عربة التسوق"
-          className="press relative ms-auto rounded-full border border-border bg-card h-10 w-10 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors"
+          className="press relative rounded-full border border-border bg-card h-10 w-10 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors"
         >
           <ShoppingCart className="w-5 h-5" />
           {cartCount > 0 && (
@@ -210,15 +224,15 @@ export default function ProductDetails() {
                 )}
 
                 <button
-                  onClick={() => setFav((f) => !f)}
-                  aria-label="أضيفي للمفضلة"
-                  aria-pressed={fav}
+                  onClick={() => wishlist.toggle(product)}
+                  aria-label={wishlist.has(product.id) ? 'إزالة من المفضلة' : 'أضيفي للمفضلة'}
+                  aria-pressed={wishlist.has(product.id)}
                   className={cn(
                     'press absolute top-4 end-4 w-10 h-10 rounded-full bg-background/85 backdrop-blur flex items-center justify-center transition-colors',
-                    fav && 'text-primary',
+                    wishlist.has(product.id) && 'text-primary',
                   )}
                 >
-                  <Heart className={cn('w-5 h-5', fav ? 'fill-primary text-primary' : 'text-foreground/70')} />
+                  <Heart className={cn('w-5 h-5', wishlist.has(product.id) ? 'fill-primary text-primary' : 'text-foreground/70')} />
                 </button>
               </div>
             </div>
@@ -374,6 +388,8 @@ export default function ProductDetails() {
                   product={p}
                   rating={ratingsMap?.[p.id]}
                   onAddToCart={() => addToCart(p)}
+                  isFav={wishlist.has(p.id)}
+                  onToggleFav={() => wishlist.toggle(p)}
                   onViewDetails={() => {
                     navigate(`/product/${p.id}`);
                     window.scrollTo({ top: 0 });

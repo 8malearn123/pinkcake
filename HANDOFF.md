@@ -81,6 +81,13 @@ No backend is involved until checkout, which still calls the existing
 from the same `get_products_for_public_store` / `get_product_rating` RPCs the store
 already uses.
 
+The **wishlist** (`StoreWishlistProvider`, `src/contexts/StoreWishlistContext.tsx`,
+page `/wishlist`) is likewise frontend-only — saved items persist to
+`localStorage` (key `pinkcake:wishlist:v1`). To make it account-bound, swap the
+localStorage read/write for a server-side list keyed by `product_id` (e.g.
+`get_my_wishlist` / `toggle_my_wishlist` RPCs); the UI contract (`items`, `has`,
+`toggle`, `remove`, `count`) stays the same.
+
 ## Quick checklist
 
 - [ ] Add real Supabase env, set `VITE_DEMO_MODE="false"`

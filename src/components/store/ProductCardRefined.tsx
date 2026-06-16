@@ -9,6 +9,9 @@ interface ProductCardRefinedProps {
   onAddToCart: () => void;
   onViewDetails?: () => void;
   onOpenReviews?: () => void;
+  /** Controlled wishlist state. When omitted the heart falls back to local state. */
+  isFav?: boolean;
+  onToggleFav?: () => void;
 }
 
 export function ProductCardRefined({
@@ -17,8 +20,12 @@ export function ProductCardRefined({
   onAddToCart,
   onViewDetails,
   onOpenReviews,
+  isFav,
+  onToggleFav,
 }: ProductCardRefinedProps) {
-  const [fav, setFav] = useState(false);
+  const [favLocal, setFavLocal] = useState(false);
+  const fav = isFav ?? favLocal;
+  const toggleFav = onToggleFav ?? (() => setFavLocal((f) => !f));
   const [added, setAdded] = useState(false);
 
   const handleAdd = () => {
@@ -54,15 +61,15 @@ export function ProductCardRefined({
         )}
 
         <button
-          onClick={() => setFav((f) => !f)}
-          aria-label="أضيفي للمفضلة"
+          onClick={toggleFav}
+          aria-label={fav ? 'إزالة من المفضلة' : 'أضيفي للمفضلة'}
           aria-pressed={fav}
           className={cn(
             'fav-btn press absolute top-3 end-3 z-[2] w-9 h-9 rounded-full bg-background/85 backdrop-blur flex items-center justify-center',
             fav && 'is-fav'
           )}
         >
-          <Heart className="w-4 h-4 text-foreground/70" />
+          <Heart className={cn('w-4 h-4 transition-colors', fav ? 'fill-primary text-primary' : 'text-foreground/70')} />
         </button>
 
         <div
