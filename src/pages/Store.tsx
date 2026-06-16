@@ -9,7 +9,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Sheet,
@@ -52,6 +51,7 @@ import { AnnouncementBar } from '@/components/store/AnnouncementBar';
 import { HeroCarousel } from '@/components/store/HeroCarousel';
 import { PromoStrip } from '@/components/store/PromoStrip';
 import { CategoryChips } from '@/components/store/CategoryChips';
+import { StoreSearch } from '@/components/store/StoreSearch';
 import { ProductCardRefined } from '@/components/store/ProductCardRefined';
 import { DesignYourCake } from '@/components/store/DesignYourCake';
 import { type CakeConfig } from '@/lib/cakeBuilder';
@@ -259,15 +259,13 @@ export default function Store() {
           </button>
 
           {/* Search */}
-          <div className="flex-1 max-w-md mx-auto relative hidden md:block">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ابحثي عن كيكة أو نكهة..."
-              className="ps-10 h-10 rounded-full bg-secondary/60 border-transparent focus-visible:bg-card"
-            />
-          </div>
+          <StoreSearch
+            products={products || []}
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onSubmit={scrollToProducts}
+            className="flex-1 max-w-md mx-auto hidden md:block"
+          />
 
           {/* Actions */}
           <div className="flex items-center gap-1.5 ms-auto">
@@ -416,15 +414,13 @@ export default function Store() {
 
         {/* Mobile search */}
         <div className="md:hidden px-4 pb-3">
-          <div className="relative">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ابحثي عن كيكة..."
-              className="ps-10 h-10 rounded-full bg-secondary/60 border-transparent"
-            />
-          </div>
+          <StoreSearch
+            products={products || []}
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onSubmit={scrollToProducts}
+            placeholder="ابحثي عن كيكة..."
+          />
         </div>
       </header>
 
