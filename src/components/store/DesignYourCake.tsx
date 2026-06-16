@@ -46,7 +46,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
   return (
     <section id="design" className="scroll-mt-24">
       <div
-        className="relative overflow-hidden rounded-[2rem] border border-border/60 shadow-soft-lift"
+        className="relative md:overflow-hidden rounded-[2rem] border border-border/60 shadow-soft-lift"
         style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--card)))' }}
       >
         <div className="grid md:grid-cols-2">
@@ -151,9 +151,10 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
             </div>
           </div>
 
-          {/* Live premium preview (shared with /customize) */}
+          {/* Live premium preview (shared with /customize). On mobile it sticks
+              below the header so the cake stays in view while choosing. */}
           <div
-            className="relative order-1 md:order-2 min-h-[360px] sm:min-h-[420px] md:min-h-[480px] flex items-center justify-center overflow-hidden"
+            className="relative order-1 md:order-2 sticky top-16 z-10 md:static rounded-t-[2rem] md:rounded-none h-[340px] md:h-auto md:min-h-[480px] flex items-center justify-center overflow-hidden"
             style={{ background: STAGE_BG }}
           >
             <div className="absolute inset-0 noise-overlay opacity-30" />
