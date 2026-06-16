@@ -34,6 +34,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Store = lazy(() => import("./pages/Store"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Shop = lazy(() => import("./pages/Shop"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
 const MyOrderDetails = lazy(() => import("./pages/MyOrderDetails"));
 const CustomerProfile = lazy(() => import("./pages/CustomerProfile"));
@@ -111,6 +112,7 @@ const App = () => (
               <Route element={<StorefrontLayout />}>
                 <Route path="/" element={<Store />} />
                 <Route path="/store" element={<Store />} />
+                <Route path="/shop" element={<Shop />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/customize" element={<CakeCustomizer />} />

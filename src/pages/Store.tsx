@@ -35,14 +35,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
 import { Reveal } from '@/components/Reveal';
 import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
@@ -52,6 +44,7 @@ import { HeroCarousel } from '@/components/store/HeroCarousel';
 import { PromoStrip } from '@/components/store/PromoStrip';
 import { CategoryChips } from '@/components/store/CategoryChips';
 import { StoreSearch } from '@/components/store/StoreSearch';
+import { AccountMenu } from '@/components/store/AccountMenu';
 import { ProductCardRefined } from '@/components/store/ProductCardRefined';
 import { DesignYourCake } from '@/components/store/DesignYourCake';
 import { type CakeConfig } from '@/lib/cakeBuilder';
@@ -62,19 +55,14 @@ import { StoreFooter } from '@/components/store/StoreFooter';
 import { BackToTop } from '@/components/store/BackToTop';
 import {
   ShoppingCart,
-  Heart,
   Plus,
   Minus,
   Trash2,
   Cake,
-  User,
-  Package,
-  LogOut,
   Loader2,
   Calendar,
   Clock,
   MapPin,
-  LogIn,
   Search,
   Sparkles,
   ArrowLeft,
@@ -85,7 +73,7 @@ import { format, addDays } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
 export default function Store() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { settings } = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
@@ -163,6 +151,9 @@ export default function Store() {
   const scrollToProducts = () => {
     productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  const goToShop = (q?: string) =>
+    navigate(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop');
 
   const scrollToDesign = () => {
     const el = document.getElementById('design');
@@ -263,7 +254,7 @@ export default function Store() {
             products={products || []}
             value={searchQuery}
             onChange={setSearchQuery}
-            onSubmit={scrollToProducts}
+            onSubmit={() => goToShop(searchQuery)}
             className="flex-1 max-w-md mx-auto hidden md:block"
           />
 
@@ -279,44 +270,7 @@ export default function Store() {
               صمّمي كيكتك
             </Button>
 
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="حسابي" className="rounded-full border-border h-10 w-10 press hover:border-primary/50 hover:bg-primary/5">
-                    <User className="w-5 h-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="flex flex-col gap-0.5">
-                    <span className="font-semibold">حسابي</span>
-                    <span className="text-xs text-muted-foreground font-normal truncate" dir="ltr">{user.email}</span>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/my-profile')} className="gap-2 cursor-pointer">
-                    <User className="w-4 h-4 text-muted-foreground" /> ملفي الشخصي
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/my-orders')} className="gap-2 cursor-pointer">
-                    <Package className="w-4 h-4 text-muted-foreground" /> طلباتي
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/wishlist')} className="gap-2 cursor-pointer">
-                    <Heart className="w-4 h-4 text-muted-foreground" /> المفضلة
-                    {wishlist.count > 0 && <span className="ms-auto text-xs font-semibold text-primary">{wishlist.count}</span>}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/track')} className="gap-2 cursor-pointer">
-                    <Truck className="w-4 h-4 text-muted-foreground" /> تتبّع الطلب
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => signOut()} className="gap-2 cursor-pointer text-destructive focus:text-destructive">
-                    <LogOut className="w-4 h-4" /> تسجيل الخروج
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/login')} className="gap-2 rounded-full press">
-                <LogIn className="w-4 h-4" />
-                <span className="hidden sm:inline">دخول</span>
-              </Button>
-            )}
+            <AccountMenu />
 
             <Sheet open={cartOpen} onOpenChange={setCartOpen}>
               <SheetTrigger asChild>
@@ -418,7 +372,7 @@ export default function Store() {
             products={products || []}
             value={searchQuery}
             onChange={setSearchQuery}
-            onSubmit={scrollToProducts}
+            onSubmit={() => goToShop(searchQuery)}
             placeholder="ابحثي عن كيكة..."
           />
         </div>
@@ -427,7 +381,7 @@ export default function Store() {
       {/* ── Main ── */}
       <main className="container mx-auto px-4 lg:px-6 py-6 lg:py-10 space-y-8 lg:space-y-12">
         <Reveal>
-          <HeroCarousel onShopClick={scrollToProducts} onCustomizeClick={() => navigate('/customize')} />
+          <HeroCarousel onShopClick={() => goToShop()} onCustomizeClick={() => navigate('/customize')} />
         </Reveal>
 
         <Reveal>
@@ -442,9 +396,14 @@ export default function Store() {
                 <div className="text-xs text-primary tracking-widest uppercase font-medium">مجموعتنا</div>
                 <h2 className="font-display text-4xl md:text-5xl mt-1 leading-none">كيكات مختارة بعناية</h2>
               </div>
-              <p className="text-sm text-muted-foreground max-w-xs">
-                تشكيلة محدثة من أكثر من {products?.length || 0} منتج فاخر، اختاري ما يناسب لحظتك.
-              </p>
+              <div className="flex items-center gap-4">
+                <p className="hidden sm:block text-sm text-muted-foreground max-w-[16rem]">
+                  تشكيلة محدثة من أكثر من {products?.length || 0} منتج فاخر.
+                </p>
+                <button onClick={() => goToShop()} className="group shrink-0 text-sm text-primary font-medium inline-flex items-center gap-1.5 press">
+                  تسوّقي الكل <ArrowLeft className="cta-arrow w-4 h-4" />
+                </button>
+              </div>
             </div>
           </Reveal>
 
@@ -528,7 +487,7 @@ export default function Store() {
                 من أعياد الميلاد إلى المناسبات الخاصة، نحضّر لكِ كل طلب بحبٍّ وعناية.
               </p>
               <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-                <button onClick={scrollToProducts} className="group press sheen rounded-full ps-8 pe-6 h-[52px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors flex items-center gap-2">
+                <button onClick={() => goToShop()} className="group press sheen rounded-full ps-8 pe-6 h-[52px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors flex items-center gap-2">
                   تسوّقي الآن <ArrowLeft className="cta-arrow w-4 h-4" />
                 </button>
                 <button onClick={scrollToDesign} className="press rounded-full px-8 h-[52px] bg-white/10 border border-white/30 text-white hover:bg-white/20 font-medium transition-colors">
