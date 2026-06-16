@@ -37,6 +37,7 @@ export default function Shop() {
   const q = params.get('q') ?? '';
   const category = params.get('category') ?? 'all';
   const sort = params.get('sort') ?? 'featured';
+  const occasion = params.get('occasion') ?? '';
 
   const { data: products, isLoading } = usePublicStoreProducts();
   const { addToCart, count: cartCount } = useStoreCart();
@@ -87,7 +88,8 @@ export default function Shop() {
     return list;
   }, [products, q, category, sort, ratingsMap]);
 
-  const isFiltered = !!q || category !== 'all';
+  const isNarrowed = !!q || category !== 'all';
+  const isFiltered = isNarrowed || !!occasion;
 
   return (
     <div className="min-h-screen bg-background">
@@ -133,10 +135,17 @@ export default function Shop() {
       <main className="container mx-auto px-4 lg:px-6 py-6 lg:py-8">
         {/* Title */}
         <div className="mb-5">
-          <div className="text-xs text-primary tracking-widest uppercase font-medium">المتجر</div>
+          <div className="text-xs text-primary tracking-widest uppercase font-medium">
+            {occasion ? 'تسوّقي حسب المناسبة' : 'المتجر'}
+          </div>
           <h1 className="font-display text-4xl md:text-5xl mt-1 leading-none">
-            {q ? <>نتائج البحث عن «{q}»</> : 'كل المنتجات'}
+            {q ? <>نتائج البحث عن «{q}»</> : occasion || 'كل المنتجات'}
           </h1>
+          {occasion && !q && (
+            <p className="text-sm text-muted-foreground mt-2 max-w-xl">
+              اخترنا لكِ تشكيلتنا المثالية لـ«{occasion}» — صفّي حسب الفئة أو رتّبي كما تحبّين.
+            </p>
+          )}
         </div>
 
         {/* Toolbar — category filter + sort */}
@@ -165,7 +174,7 @@ export default function Shop() {
           </div>
           {!isLoading && (
             <div className="text-sm text-muted-foreground">
-              {results.length} منتج{isFiltered ? ' مطابق' : ''}
+              {results.length} منتج{isNarrowed ? ' مطابق' : ''}
             </div>
           )}
         </div>

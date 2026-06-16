@@ -8,7 +8,12 @@ const OCCASIONS = [
   { title: 'شكراً وامتنان', img: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80' },
 ];
 
-export function ShopByOccasion({ onShop }: { onShop: () => void }) {
+interface ShopByOccasionProps {
+  onShop: () => void;
+  onOccasion: (occasion: string) => void;
+}
+
+export function ShopByOccasion({ onShop, onOccasion }: ShopByOccasionProps) {
   return (
     <section className="space-y-5">
       <div className="flex items-end justify-between flex-wrap gap-3">
@@ -24,7 +29,7 @@ export function ShopByOccasion({ onShop }: { onShop: () => void }) {
         {OCCASIONS.map((o) => (
           <button
             key={o.title}
-            onClick={onShop}
+            onClick={() => onOccasion(o.title)}
             className="occasion group relative block rounded-3xl overflow-hidden shadow-soft-lift aspect-[3/4] text-start"
           >
             <img src={o.img} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
