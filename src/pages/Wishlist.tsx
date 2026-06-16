@@ -13,7 +13,7 @@ export default function Wishlist() {
   const navigate = useNavigate();
   const { settings } = useSettings();
   const { items, count, clear, has, toggle } = useStoreWishlist();
-  const { addToCart, count: cartCount } = useStoreCart();
+  const { addToCart, count: cartCount, open: openCart } = useStoreCart();
 
   const ids = useMemo(() => items.map((p) => p.id), [items]);
   const { data: ratingsMap } = useProductRatings(ids);
@@ -44,7 +44,7 @@ export default function Wishlist() {
           </button>
 
           <button
-            onClick={() => navigate('/store', { state: { openCart: true } })}
+            onClick={openCart}
             aria-label="عربة التسوق"
             className="press relative ms-auto rounded-full border border-border bg-card h-10 w-10 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors"
           >

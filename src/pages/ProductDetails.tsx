@@ -36,7 +36,7 @@ export default function ProductDetails() {
   const { settings } = useSettings();
 
   const { data: products, isLoading } = usePublicStoreProducts();
-  const { addToCart, count: cartCount } = useStoreCart();
+  const { addToCart, count: cartCount, open: openCart } = useStoreCart();
   const wishlist = useStoreWishlist();
 
   const product = useMemo(() => products?.find((p) => p.id === id), [products, id]);
@@ -55,7 +55,7 @@ export default function ProductDetails() {
   const [reviewsOpen, setReviewsOpen] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const goToCart = () => navigate('/store', { state: { openCart: true } });
+  const goToCart = openCart;
 
   const handleAdd = () => {
     if (!product) return;

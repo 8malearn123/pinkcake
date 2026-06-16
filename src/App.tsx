@@ -9,6 +9,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ImpersonationProvider } from "./contexts/ImpersonationContext";
 import { StoreCartProvider } from "./contexts/StoreCartContext";
 import { StoreWishlistProvider } from "./contexts/StoreWishlistContext";
+import { CartSheet } from "./components/store/CartSheet";
 import { ImpersonationBanner } from "./components/admin/ImpersonationBanner";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DemoModeBadge } from "./components/demo/DemoModeBadge";
@@ -91,6 +92,7 @@ function StorefrontLayout() {
     <StoreCartProvider>
       <StoreWishlistProvider>
         <Outlet />
+        <CartSheet />
       </StoreWishlistProvider>
     </StoreCartProvider>
   );
