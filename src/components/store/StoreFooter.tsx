@@ -24,6 +24,7 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
     { label: 'كب كيك', action: onShop },
     { label: 'حلويات فرنسية', action: onShop },
     { label: 'صمّمي كيكتك', action: () => onNavigate('/customize') },
+    { label: 'قائمة المفضلة', action: () => onNavigate('/wishlist') },
   ];
   const helpLinks = [
     { label: 'تتبّعي طلبك', action: () => onNavigate('/track') },
