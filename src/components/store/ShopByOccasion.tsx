@@ -25,12 +25,12 @@ export function ShopByOccasion({ onShop, onOccasion }: ShopByOccasionProps) {
           كل المناسبات <ArrowLeft className="cta-arrow w-4 h-4" />
         </button>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {OCCASIONS.map((o) => (
           <button
             key={o.title}
             onClick={() => onOccasion(o.title)}
-            className="occasion group relative block rounded-3xl overflow-hidden shadow-soft-lift aspect-[3/4] text-start"
+            className="occasion group relative block rounded-3xl overflow-hidden shadow-soft-lift aspect-[3/2] sm:aspect-[3/4] text-start"
           >
             <img src={o.img} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
             <div

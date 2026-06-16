@@ -205,7 +205,7 @@ export default function Store() {
           <CategoryChips categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
 
           {productsLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="rounded-3xl overflow-hidden border border-border/60 bg-card">
                   <Skeleton className="aspect-[4/5]" />
@@ -228,7 +228,7 @@ export default function Store() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
               {filteredProducts.map((product) => (
                 <ProductCardRefined
                   key={product.id}
