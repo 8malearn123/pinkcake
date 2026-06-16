@@ -11,7 +11,7 @@ export function HowItWorks() {
     <section className="rounded-[2rem] bg-card border border-border/60 p-7 md:p-10 shadow-soft-lift">
       <div className="text-center max-w-xl mx-auto">
         <div className="text-xs text-primary tracking-widest uppercase font-medium">بكلِّ بساطة</div>
-        <h2 className="font-display text-3xl md:text-4xl mt-1 leading-tight">من الفكرة إلى بابكِ في ٣ خطوات</h2>
+        <h2 className="font-display text-2xl sm:text-3xl md:text-4xl mt-1 leading-tight">من الفكرة إلى بابكِ في ٣ خطوات</h2>
       </div>
       <div className="grid md:grid-cols-3 gap-8 md:gap-6 mt-9">
         {STEPS.map(({ icon: Icon, num, title, desc }) => (

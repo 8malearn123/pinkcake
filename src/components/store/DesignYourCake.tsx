@@ -51,11 +51,11 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
       >
         <div className="grid md:grid-cols-2">
           {/* Controls */}
-          <div className="p-7 md:p-10 lg:p-12 order-2 md:order-1">
+          <div className="p-5 sm:p-7 md:p-10 lg:p-12 order-2 md:order-1">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs tracking-widest uppercase font-medium">
               <Wand2 className="w-3.5 h-3.5" /> صمّمي بنفسكِ
             </div>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّمي كيكتكِ المثالية</h2>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّمي كيكتكِ المثالية</h2>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-md">
               اختاري الشكل والنكهة واللون، وشاهدي كيكتكِ تتشكّل أمامكِ — ثم خصّصيها أكثر بكل التفاصيل.
             </p>
@@ -153,7 +153,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
 
           {/* Live premium preview (shared with /customize) */}
           <div
-            className="relative order-1 md:order-2 min-h-[420px] md:min-h-[480px] flex items-center justify-center overflow-hidden"
+            className="relative order-1 md:order-2 min-h-[360px] sm:min-h-[420px] md:min-h-[480px] flex items-center justify-center overflow-hidden"
             style={{ background: STAGE_BG }}
           >
             <div className="absolute inset-0 noise-overlay opacity-30" />

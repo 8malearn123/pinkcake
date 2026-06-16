@@ -19,7 +19,7 @@ export function ShopByOccasion({ onShop, onOccasion }: ShopByOccasionProps) {
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div className="text-xs text-primary tracking-widest uppercase font-medium">تسوّقي حسب المناسبة</div>
-          <h2 className="font-display text-3xl md:text-4xl mt-1 leading-none">لكلِّ لحظة كيكتها</h2>
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl mt-1 leading-none">لكلِّ لحظة كيكتها</h2>
         </div>
         <button onClick={onShop} className="group text-sm text-primary font-medium inline-flex items-center gap-1.5">
           كل المناسبات <ArrowLeft className="cta-arrow w-4 h-4" />

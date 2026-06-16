@@ -189,7 +189,7 @@ export default function Store() {
             <div className="flex items-end justify-between flex-wrap gap-3">
               <div>
                 <div className="text-xs text-primary tracking-widest uppercase font-medium">مجموعتنا</div>
-                <h2 className="font-display text-4xl md:text-5xl mt-1 leading-none">كيكات مختارة بعناية</h2>
+                <h2 className="font-display text-3xl md:text-5xl mt-1 leading-none">كيكات مختارة بعناية</h2>
               </div>
               <div className="flex items-center gap-4">
                 <p className="hidden sm:block text-sm text-muted-foreground max-w-[16rem]">
@@ -280,7 +280,7 @@ export default function Store() {
                 <Sparkles className="w-3.5 h-3.5 text-primary" />
                 تجربة استثنائية
               </div>
-              <h3 className="font-display text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تبدأ بقطعة كيك</h3>
+              <h3 className="font-display text-2xl sm:text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تبدأ بقطعة كيك</h3>
               <p className="mt-3 text-white/75 leading-relaxed max-w-lg mx-auto">
                 من أعياد الميلاد إلى المناسبات الخاصة، نحضّر لكِ كل طلب بحبٍّ وعناية.
               </p>

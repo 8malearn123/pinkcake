@@ -20,7 +20,7 @@ export function Testimonials() {
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div className="text-xs text-primary tracking-widest uppercase font-medium">آراء عميلاتنا</div>
-          <h2 className="font-display text-3xl md:text-4xl mt-1 leading-none">ثقةٌ تُحلّي كلَّ مناسبة</h2>
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl mt-1 leading-none">ثقةٌ تُحلّي كلَّ مناسبة</h2>
         </div>
         <div className="flex items-center gap-2 rounded-full bg-card border border-border/60 px-4 py-2 shadow-soft-lift">
           <Stars size="w-4 h-4" />
