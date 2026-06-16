@@ -154,7 +154,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
           {/* Live premium preview (shared with /customize). On mobile it sticks
               below the header so the cake stays in view while choosing. */}
           <div
-            className="relative order-1 md:order-2 sticky top-16 z-10 md:static rounded-t-[2rem] md:rounded-none h-[340px] md:h-auto md:min-h-[480px] flex items-center justify-center overflow-hidden"
+            className="relative order-1 md:order-2 sticky top-16 z-10 md:static rounded-t-[2rem] md:rounded-none h-[440px] md:h-auto md:min-h-[480px] flex items-center justify-center overflow-hidden"
             style={{ background: STAGE_BG }}
           >
             <div className="absolute inset-0 noise-overlay opacity-30" />
@@ -162,7 +162,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
               <span className="w-1.5 h-1.5 rounded-full bg-accent" /> معاينة حيّة
             </div>
 
-            <div className="cake-studio cz-embed relative z-[5] w-full pb-10">
+            <div className="cake-studio cz-embed relative z-[5] w-full pb-4 md:pb-10">
               <div className="cz-scene">
                 <div className="cake-wrap" ref={wrapRef}>
                   <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />
