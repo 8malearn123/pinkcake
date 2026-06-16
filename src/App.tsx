@@ -1,9 +1,9 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ImpersonationProvider } from "./contexts/ImpersonationContext";
@@ -96,6 +96,17 @@ function StorefrontLayout() {
   );
 }
 
+// Reset scroll to the top on every route change — React Router preserves the
+// previous scroll position otherwise (e.g. clicking an occasion near the bottom
+// of the home page would land you near the bottom of /shop).
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <SettingsProvider>
@@ -106,6 +117,7 @@ const App = () => (
             <DemoModeBadge />
             <ImpersonationBanner />
             <BrowserRouter>
+            <ScrollToTop />
             <Suspense fallback={<RouteFallback />}>
             <Routes>
               {/* Public storefront — shares a cart context across landing, details + customizer */}

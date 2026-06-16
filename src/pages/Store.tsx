@@ -460,7 +460,10 @@ export default function Store() {
 
         {/* Shop by occasion */}
         <Reveal>
-          <ShopByOccasion onShop={scrollToProducts} />
+          <ShopByOccasion
+            onShop={() => goToShop()}
+            onOccasion={(occ) => navigate(`/shop?occasion=${encodeURIComponent(occ)}`)}
+          />
         </Reveal>
 
         {/* How it works */}

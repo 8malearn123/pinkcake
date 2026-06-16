@@ -88,6 +88,13 @@ localStorage read/write for a server-side list keyed by `product_id` (e.g.
 `get_my_wishlist` / `toggle_my_wishlist` RPCs); the UI contract (`items`, `has`,
 `toggle`, `remove`, `count`) stays the same.
 
+The **catalog** (`/shop`, page `src/pages/Shop.tsx`) filters/sorts the products
+query client-side via URL params (`?q`, `?category`, `?sort`, `?occasion`). The
+`occasion` param currently only *frames* the page (heading) and shows the full
+range, since products carry no occasion metadata yet. When the catalogue gains
+occasion tags, filter `results` by `occasion` in `Shop.tsx` — the URL contract
+stays the same.
+
 ## Quick checklist
 
 - [ ] Add real Supabase env, set `VITE_DEMO_MODE="false"`
