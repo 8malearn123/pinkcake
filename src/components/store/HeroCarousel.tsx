@@ -61,7 +61,7 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
                       onClick={onCustomizeClick}
                       className="press rounded-full px-7 h-12 bg-transparent border border-white/40 text-white hover:bg-white/10 font-medium transition-colors"
                     >
-                      استكشفي الكتالوج
+                      صمّمي كيكتك
                     </button>
                   </div>
                   <div className="mt-4 flex items-center gap-2 text-white/75 text-xs">
