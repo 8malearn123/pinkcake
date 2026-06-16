@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { useStoreCart } from '@/contexts/StoreCartContext';
 import { cn } from '@/lib/utils';
 import '@/components/cake/cakeStudio.css';
 import {
@@ -26,6 +27,7 @@ const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 export default function CakeCustomizer() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToCart } = useStoreCart();
   // Continue a design started in the home "design your cake" section.
   const incoming = (location.state as { initial?: CakeConfig } | null)?.initial;
   const [step, setStep] = useState(incoming?.shape ? 3 : 0);
@@ -55,7 +57,7 @@ export default function CakeCustomizer() {
   }, [art]);
 
   const go = (n: number) => setStep(Math.max(0, Math.min(STEPS.length - 1, n)));
-  const back = () => (step > 0 ? go(step - 1) : navigate('/'));
+  const back = () => (step > 0 ? go(step - 1) : navigate('/store'));
   const set = (patch: Partial<CakeConfig>) => setCfg((c) => ({ ...c, ...patch }));
 
   const runConfetti = useCallback(() => {
@@ -97,9 +99,19 @@ export default function CakeCustomizer() {
       return;
     }
     if (last) {
+      const summary = [cfg.shape?.name, cfg.flavor?.name, cfg.color.name, cfg.design.name]
+        .filter(Boolean)
+        .join(' · ');
+      addToCart({
+        id: `custom-${Date.now()}`,
+        name: `كيكة مخصّصة${cfg.shape ? ` — ${cfg.shape.name}` : ''}`,
+        description: summary + (cfg.text.trim() ? ` · «${cfg.text.trim()}»` : ''),
+        price: total,
+        category: 'تصميم خاص',
+        image_url: null,
+      });
       runConfetti();
       setDone(true);
-      toast({ title: 'أُضيفت كيكتكِ إلى العربة', description: `الإجمالي ${total} ر.س — سنتواصل معكِ لتأكيد التوصيل` });
     } else {
       go(step + 1);
     }
@@ -304,7 +316,16 @@ export default function CakeCustomizer() {
               <br /><b style={{ color: 'hsl(var(--foreground))' }}>الإجمالي {total} ر.س</b>
               {cfg.shape ? ` — تكفي ${cfg.shape.serves}، جاهزة خلال ${cfg.shape.lead}.` : ''}
             </p>
-            <button className="again" onClick={reset}>صمّمي كيكة أخرى</button>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                className="again"
+                style={{ background: 'hsl(var(--foreground))', color: 'hsl(var(--background))', border: 'none' }}
+                onClick={() => navigate('/store', { state: { openCart: true } })}
+              >
+                إتمام الطلب
+              </button>
+              <button className="again" onClick={reset}>صمّمي كيكة أخرى</button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useMyOrderDetails, useMyOrderRealtime } from '@/hooks/useCustomerStore';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -24,22 +24,27 @@ import {
   AlertCircle,
   Store,
   LogOut,
+  Loader2,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
 
 export default function MyOrderDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, isLoading: authLoading, signOut } = useAuth();
   const { data: order, isLoading, error } = useMyOrderDetails(id);
-  
+
   // Enable realtime updates
   useMyOrderRealtime(id);
 
-  if (!user) {
-    navigate('/customer-auth');
-    return null;
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
+  if (!user) return <Navigate to="/login" replace />;
 
   if (isLoading) {
     return (
