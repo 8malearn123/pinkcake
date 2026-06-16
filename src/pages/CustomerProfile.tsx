@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
-import { ArrowRight, User, Phone, MapPin, Loader2, Cake, Save } from 'lucide-react';
+import { ArrowRight, User, Phone, MapPin, Loader2, Cake, Save, Package, Heart, Truck, ChevronLeft, LogOut } from 'lucide-react';
 
 interface CustomerProfile {
   id: string;
@@ -99,6 +99,12 @@ export default function CustomerProfile() {
     updateProfile.mutate();
   };
 
+  const quickLinks = [
+    { icon: Package, title: 'طلباتي', desc: 'تتبّعي طلباتك السابقة', to: '/my-orders' },
+    { icon: Heart, title: 'المفضلة', desc: 'منتجاتك المحفوظة', to: '/wishlist' },
+    { icon: Truck, title: 'تتبّع طلب', desc: 'عبر رمز التتبّع', to: '/track' },
+  ];
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -142,7 +148,7 @@ export default function CustomerProfile() {
                 <User className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="font-bold">الملف الشخصي</h1>
+                <h1 className="font-bold">حسابي</h1>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
             </div>
@@ -150,7 +156,28 @@ export default function CustomerProfile() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-lg">
+      <main className="container mx-auto px-4 py-6 max-w-2xl space-y-5">
+        {/* Quick access — the items that moved out of the top nav */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {quickLinks.map((l) => (
+            <button
+              key={l.to}
+              onClick={() => navigate(l.to)}
+              className="press group text-start rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 hover:shadow-soft-lift transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <span className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <l.icon className="w-5 h-5" />
+                </span>
+                <ChevronLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+              <div className="font-semibold mt-3">{l.title}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{l.desc}</div>
+            </button>
+          ))}
+        </div>
+
+        {/* Profile details */}
         {isLoading ? (
           <Card>
             <CardHeader>
@@ -171,11 +198,6 @@ export default function CustomerProfile() {
                 يبدو أن حسابك غير مرتبط بملف عميل
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Button className="w-full" onClick={() => signOut()}>
-                تسجيل الخروج
-              </Button>
-            </CardContent>
           </Card>
         ) : (
           <Card>
@@ -259,28 +281,15 @@ export default function CustomerProfile() {
           </Card>
         )}
 
-        {/* Account Actions */}
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle className="text-base">إعدادات الحساب</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => navigate('/my-orders')}
-            >
-              طلباتي
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start text-destructive hover:text-destructive"
-              onClick={() => signOut()}
-            >
-              تسجيل الخروج
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Logout */}
+        <Button
+          variant="outline"
+          className="w-full justify-center gap-2 text-destructive hover:text-destructive hover:border-destructive/40"
+          onClick={() => signOut()}
+        >
+          <LogOut className="w-4 h-4" />
+          تسجيل الخروج
+        </Button>
       </main>
     </div>
   );

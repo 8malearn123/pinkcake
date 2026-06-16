@@ -36,6 +36,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { toast } from '@/hooks/use-toast';
 import { Reveal } from '@/components/Reveal';
 import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
@@ -274,17 +282,33 @@ export default function Store() {
             </Button>
 
             {user ? (
-              <>
-                <Button variant="ghost" size="icon" onClick={() => navigate('/my-profile')} aria-label="حسابي" className="press">
-                  <User className="w-5 h-5" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => navigate('/my-orders')} aria-label="طلباتي" className="press">
-                  <Package className="w-5 h-5" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => signOut()} aria-label="خروج" className="hidden sm:inline-flex press">
-                  <LogOut className="w-5 h-5" />
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="حسابي" className="rounded-full border-border h-10 w-10 press hover:border-primary/50 hover:bg-primary/5">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="flex flex-col gap-0.5">
+                    <span className="font-semibold">حسابي</span>
+                    <span className="text-xs text-muted-foreground font-normal truncate" dir="ltr">{user.email}</span>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/my-profile')} className="gap-2 cursor-pointer">
+                    <User className="w-4 h-4 text-muted-foreground" /> ملفي الشخصي
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/my-orders')} className="gap-2 cursor-pointer">
+                    <Package className="w-4 h-4 text-muted-foreground" /> طلباتي
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/track')} className="gap-2 cursor-pointer">
+                    <Truck className="w-4 h-4 text-muted-foreground" /> تتبّع الطلب
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()} className="gap-2 cursor-pointer text-destructive focus:text-destructive">
+                    <LogOut className="w-4 h-4" /> تسجيل الخروج
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button variant="ghost" size="sm" onClick={() => navigate('/login')} className="gap-2 rounded-full press">
                 <LogIn className="w-4 h-4" />
