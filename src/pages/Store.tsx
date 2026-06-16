@@ -300,6 +300,10 @@ export default function Store() {
                   <DropdownMenuItem onClick={() => navigate('/my-orders')} className="gap-2 cursor-pointer">
                     <Package className="w-4 h-4 text-muted-foreground" /> طلباتي
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/wishlist')} className="gap-2 cursor-pointer">
+                    <Heart className="w-4 h-4 text-muted-foreground" /> المفضلة
+                    {wishlist.count > 0 && <span className="ms-auto text-xs font-semibold text-primary">{wishlist.count}</span>}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/track')} className="gap-2 cursor-pointer">
                     <Truck className="w-4 h-4 text-muted-foreground" /> تتبّع الطلب
                   </DropdownMenuItem>
@@ -315,24 +319,6 @@ export default function Store() {
                 <span className="hidden sm:inline">دخول</span>
               </Button>
             )}
-
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="المفضلة"
-              onClick={() => navigate('/wishlist')}
-              className="relative rounded-full border-border h-10 w-10 press hover:border-primary/50 hover:bg-primary/5"
-            >
-              <Heart className="w-5 h-5" />
-              {wishlist.count > 0 && (
-                <span
-                  key={wishlist.count}
-                  className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow"
-                >
-                  {wishlist.count}
-                </span>
-              )}
-            </Button>
 
             <Sheet open={cartOpen} onOpenChange={setCartOpen}>
               <SheetTrigger asChild>
