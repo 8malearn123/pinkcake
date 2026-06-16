@@ -112,9 +112,9 @@ export default function Store() {
             <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105">
               <Cake className="w-5 h-5 text-primary-foreground" />
             </div>
-            <div className="hidden sm:block text-start leading-tight">
-              <div className="font-display text-lg">{settings.storeName}</div>
-              <div className="text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
+            <div className="text-start leading-tight">
+              <div className="font-display text-base sm:text-lg">{settings.storeName}</div>
+              <div className="hidden sm:block text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
             </div>
           </button>
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import hero1 from '@/assets/hero-cake-1.jpg';
@@ -28,9 +28,21 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
 
   const go = (dir: number) => setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
 
+  // Touch swipe (the arrows are hidden on mobile).
+  const touchX = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX.current = null;
+  };
+
   return (
     <section className="relative overflow-hidden rounded-[2rem] bg-foreground shadow-rose-glow">
-      <div className="relative h-[460px] md:h-[520px]">
+      <div className="relative h-[440px] sm:h-[480px] md:h-[520px]" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {SLIDES.map((s, i) => (
           <div key={i} className={cn('hero-slide', i === index && 'hero-active')}>
             <img
@@ -48,9 +60,9 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
                     <Sparkles className="w-3.5 h-3.5 text-primary" />
                     <span>{s.badge}</span>
                   </div>
-                  <h2 className="font-display text-5xl md:text-7xl leading-[1.05] mt-5 tracking-tight">{s.title}</h2>
-                  <p className="mt-5 text-base md:text-lg text-white/80 leading-relaxed max-w-md">{s.text}</p>
-                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <h2 className="font-display text-[2.6rem] leading-[1.08] sm:text-6xl md:text-7xl md:leading-[1.05] mt-4 md:mt-5 tracking-tight">{s.title}</h2>
+                  <p className="mt-3 md:mt-5 text-[15px] md:text-lg text-white/80 leading-relaxed max-w-md">{s.text}</p>
+                  <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-3">
                     <button
                       onClick={onShopClick}
                       className="group press sheen rounded-full ps-7 pe-5 h-12 bg-white text-foreground hover:bg-white/90 shadow-lg font-semibold transition-colors flex items-center gap-2"
@@ -78,14 +90,14 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
         <button
           onClick={() => go(-1)}
           aria-label="السابق"
-          className="absolute start-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur border border-white/20 flex items-center justify-center text-white press transition-colors"
+          className="absolute start-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur border border-white/20 hidden md:flex items-center justify-center text-white press transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
         <button
           onClick={() => go(1)}
           aria-label="التالي"
-          className="absolute end-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur border border-white/20 flex items-center justify-center text-white press transition-colors"
+          className="absolute end-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur border border-white/20 hidden md:flex items-center justify-center text-white press transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
