@@ -283,6 +283,44 @@
 .cake-studio .success p {font-size: 13.5px; color: hsl(var(--muted-foreground)); margin: 0 0 24px; max-width: 290px; line-height: 1.6; }
 .cake-studio .success .again {cursor: pointer; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); color: hsl(var(--foreground));
       border-radius: 999px; padding: 13px 26px; font-family: 'Cairo'; font-weight: 800; font-size: 14px; }
+
+/* "Most popular" social-proof badge — highlights a recommended option per step. */
+.cake-studio .pop {position: absolute; inset-block-start: 10px; inset-inline-start: 10px; z-index: 3;
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 999px;
+      background: hsl(var(--blush)); color: hsl(var(--primary)); border: 1px solid hsl(var(--primary) / .22);
+      font-family: 'Cairo'; font-size: 9.5px; font-weight: 800; white-space: nowrap;
+      box-shadow: 0 4px 10px -6px hsl(var(--primary) / .45); }
+.cake-studio .pop svg {width: 11px; height: 11px; }
+.cake-studio .pop.inline {position: static; margin-top: 6px; box-shadow: none; }
+.cake-studio .design .pop {inset-inline-start: 8px; inset-block-start: 8px; padding: 3px; gap: 0; }
+
+/* Custom-colour swatch (eyedropper) — lets the customer pick any cream shade. */
+.cake-studio .sw.custom .dot {display: grid; place-items: center; color: hsl(var(--primary));
+      background: conic-gradient(from 210deg, #f4c4d0, #f6e0b6, #cfe6c4, #c4dcea, #ddc8e8, #f4c4d0); }
+.cake-studio .sw.custom .dot svg {width: 18px; height: 18px; filter: drop-shadow(0 1px 1px hsl(0 0% 100% / .7)); }
+.cake-studio .sw.custom input {position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+/* PhotoCake — edible photo-print upload (Lola's signature add-on). */
+.cake-studio .photo-drop {display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+      width: 100%; min-height: 134px; border: 1.5px dashed hsl(var(--primary) / .4); border-radius: 16px;
+      background: hsl(var(--blush) / .32); cursor: pointer; padding: 18px; text-align: center;
+      transition: border-color .2s, background .2s; }
+.cake-studio .photo-drop:hover {border-color: hsl(var(--primary)); background: hsl(var(--blush) / .5); }
+.cake-studio .photo-drop .pic {width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+      background: hsl(var(--card)); color: hsl(var(--primary)); box-shadow: 0 6px 16px -10px hsl(var(--primary) / .6); }
+.cake-studio .photo-drop .pic svg {width: 20px; height: 20px; }
+.cake-studio .photo-drop .t {font-family: 'Cairo'; font-weight: 800; font-size: 13.5px; color: hsl(var(--foreground)); }
+.cake-studio .photo-drop .h {font-size: 11.5px; color: hsl(var(--muted-foreground)); }
+.cake-studio .photo-prev {position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid hsl(var(--line)); }
+.cake-studio .photo-prev img {display: block; width: 100%; max-height: 210px; object-fit: cover; }
+.cake-studio .photo-prev .rm {position: absolute; inset-block-start: 8px; inset-inline-end: 8px; width: 30px; height: 30px;
+      border-radius: 999px; border: none; background: hsl(var(--foreground) / .6); color: #fff; display: grid;
+      place-items: center; cursor: pointer; backdrop-filter: blur(4px); }
+.cake-studio .photo-prev .rm svg {width: 15px; height: 15px; }
+.cake-studio .photo-note {display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: hsl(var(--muted-foreground)); margin-top: 9px; }
+.cake-studio .photo-note svg {width: 14px; height: 14px; color: hsl(140 30% 45%); flex: none; }
+.cake-studio .photo-note .add {color: hsl(var(--primary)); font-weight: 700; }
+
 @media (prefers-reduced-motion: reduce) {
 .cake-studio * {animation-duration: .001s !important; }
 }

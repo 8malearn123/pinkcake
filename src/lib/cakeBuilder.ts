@@ -7,11 +7,11 @@
 
 export interface Shape {
   id: string; name: string; serves: string; lead: string; price: number;
-  form: 'tiers' | 'cupcake' | 'number'; tiers?: { w: number; h: number }[];
+  form: 'tiers' | 'cupcake' | 'number'; tiers?: { w: number; h: number }[]; popular?: boolean;
 }
-export interface Flavor { id: string; name: string; ds: string; add: number; dot: string; g: string }
-export interface ColorOpt { id: string; name: string; c: string }
-export interface Design { id: string; name: string; add: number; icon: string }
+export interface Flavor { id: string; name: string; ds: string; add: number; dot: string; g: string; popular?: boolean }
+export interface ColorOpt { id: string; name: string; c: string; custom?: boolean }
+export interface Design { id: string; name: string; add: number; icon: string; popular?: boolean }
 export interface Addon { id: string; name: string; ds: string; add: number; icon: string }
 
 export interface CakeConfig {
@@ -33,7 +33,7 @@ export const STEPS = [
 
 export const SHAPES: Shape[] = [
   { id: 'bento',   name: 'بينتو ميني', serves: '2–3',   lead: '24 ساعة', price: 60,  form: 'tiers', tiers: [{ w: 128, h: 66 }] },
-  { id: 'classic', name: 'كلاسيكية',   serves: '6–8',   lead: '24 ساعة', price: 85,  form: 'tiers', tiers: [{ w: 182, h: 70 }] },
+  { id: 'classic', name: 'كلاسيكية',   serves: '6–8',   lead: '24 ساعة', price: 85,  form: 'tiers', tiers: [{ w: 182, h: 70 }], popular: true },
   { id: 'tier2',   name: 'طابقين',     serves: '10–14', lead: '48 ساعة', price: 180, form: 'tiers', tiers: [{ w: 120, h: 52 }, { w: 184, h: 64 }] },
   { id: 'tier3',   name: 'ثلاث طوابق', serves: '20–25', lead: '48 ساعة', price: 320, form: 'tiers', tiers: [{ w: 90, h: 44 }, { w: 142, h: 54 }, { w: 196, h: 62 }] },
   { id: 'cupcake', name: 'كب كيك',     serves: '12 قطعة', lead: '24 ساعة', price: 95, form: 'cupcake' },
@@ -42,7 +42,7 @@ export const SHAPES: Shape[] = [
 
 export const FLAVORS: Flavor[] = [
   { id: 'vanilla',   name: 'فانيليا بوربون',  ds: 'كلاسيكية ناعمة',    add: 0,  dot: 'linear-gradient(135deg,#fbf1da,#e7d0a0)', g: 'pearl' },
-  { id: 'chocolate', name: 'شوكولاتة بلجيكية', ds: 'غنية ومركّزة',      add: 15, dot: 'linear-gradient(135deg,#6b4326,#3a2414)', g: 'choco' },
+  { id: 'chocolate', name: 'شوكولاتة بلجيكية', ds: 'غنية ومركّزة',      add: 15, dot: 'linear-gradient(135deg,#6b4326,#3a2414)', g: 'choco', popular: true },
   { id: 'saffron',   name: 'زعفران وهيل',      ds: 'نكهة سعودية فاخرة', add: 30, dot: 'linear-gradient(135deg,#e7b54e,#bd7e1e)', g: 'saffron' },
   { id: 'lotus',     name: 'لوتس بسكوف',       ds: 'كراميل وبسكويت',    add: 22, dot: 'linear-gradient(135deg,#d39a5e,#9c6328)', g: 'crumble' },
   { id: 'pistachio', name: 'فستق حلبي',        ds: 'مكسّرات فاخرة',     add: 25, dot: 'linear-gradient(135deg,#a9c47a,#6f9243)', g: 'pistachio' },
@@ -62,7 +62,7 @@ export const COLORS: ColorOpt[] = [
 
 export const DESIGNS: Design[] = [
   { id: 'minimal', name: 'مينيمال',  add: 0,  icon: 'minus' },
-  { id: 'drip',    name: 'دريب',     add: 25, icon: 'droplet' },
+  { id: 'drip',    name: 'دريب',     add: 25, icon: 'droplet', popular: true },
   { id: 'pearls',  name: 'لؤلؤ',     add: 30, icon: 'sparkle2' },
   { id: 'berries', name: 'توت طازج', add: 28, icon: 'leaf2' },
   { id: 'floral',  name: 'ورد سكّري', add: 50, icon: 'flower' },
@@ -75,6 +75,15 @@ export const ADDONS: Addon[] = [
 ];
 
 export const QUICK_MESSAGES = ['كل عام وأنتِ بخير', 'مبروك', 'عيد ميلاد سعيد', 'بالتوفيق', 'ألف مبروك', 'أحبك'];
+
+// Edible photo print add-on ("PhotoCake"), charged when the customer attaches an image.
+export const PHOTO_PRINT_PRICE = 45;
+
+// Build a custom-colour swatch from a hex the customer picks. Any valid CSS colour
+// works in the live preview since the cake reads `color.c` directly.
+export function makeCustomColor(hex: string): ColorOpt {
+  return { id: 'custom', name: 'لونكِ', c: hex, custom: true };
+}
 
 export function price(cfg: CakeConfig): number {
   let p = 0;

@@ -5,13 +5,13 @@ import { useStoreCart } from '@/contexts/StoreCartContext';
 import { cn } from '@/lib/utils';
 import '@/components/cake/cakeStudio.css';
 import {
-  STEPS, SHAPES, FLAVORS, COLORS, DESIGNS, ADDONS, QUICK_MESSAGES,
-  buildCake, miniCakeHTML, price, type CakeConfig,
+  STEPS, SHAPES, FLAVORS, COLORS, DESIGNS, ADDONS, QUICK_MESSAGES, PHOTO_PRINT_PRICE,
+  buildCake, miniCakeHTML, price, makeCustomColor, type CakeConfig,
 } from '@/lib/cakeBuilder';
 import {
   ArrowRight, ChevronLeft, ChevronRight, Users, Clock, Wand2, Minus, Droplet,
   Sparkles, Leaf, Flower2, Flame, PenLine, Cake, Paintbrush, Check, BadgeCheck,
-  ShieldCheck, ShoppingBag, PartyPopper, type LucideIcon,
+  ShieldCheck, ShoppingBag, PartyPopper, Star, Pipette, ImagePlus, X, type LucideIcon,
 } from 'lucide-react';
 
 const DESIGN_ICON: Record<string, LucideIcon> = {
@@ -37,11 +37,14 @@ export default function CakeCustomizer() {
       : initial,
   );
   const [done, setDone] = useState(false);
+  // Edible photo print. Held client-side for live preview + pricing only; the actual
+  // file upload/storage is wired on the backend later (kept out of the cart type).
+  const [photo, setPhoto] = useState<string | null>(null);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const confettiRef = useRef<HTMLCanvasElement>(null);
 
-  const total = price(cfg);
+  const total = price(cfg) + (photo ? PHOTO_PRINT_PRICE : 0);
   const art = useMemo(() => buildCake(cfg), [cfg]);
   const s = STEPS[step];
   const last = step === STEPS.length - 1;
@@ -59,6 +62,15 @@ export default function CakeCustomizer() {
   const go = (n: number) => setStep(Math.max(0, Math.min(STEPS.length - 1, n)));
   const back = () => (step > 0 ? go(step - 1) : navigate('/store'));
   const set = (patch: Partial<CakeConfig>) => setCfg((c) => ({ ...c, ...patch }));
+
+  const onPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPhoto(typeof reader.result === 'string' ? reader.result : null);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const runConfetti = useCallback(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
@@ -105,7 +117,7 @@ export default function CakeCustomizer() {
       addToCart({
         id: `custom-${Date.now()}`,
         name: `كيكة مخصّصة${cfg.shape ? ` — ${cfg.shape.name}` : ''}`,
-        description: summary + (cfg.text.trim() ? ` · «${cfg.text.trim()}»` : ''),
+        description: summary + (cfg.text.trim() ? ` · «${cfg.text.trim()}»` : '') + (photo ? ' · مع صورة مطبوعة' : ''),
         price: total,
         category: 'تصميم خاص',
         image_url: null,
@@ -117,7 +129,7 @@ export default function CakeCustomizer() {
     }
   };
 
-  const reset = () => { setDone(false); setCfg(initial); setStep(0); };
+  const reset = () => { setDone(false); setCfg(initial); setStep(0); setPhoto(null); };
 
   const addonNames = ADDONS.filter((a) => cfg.addons[a.id as 'candle' | 'topper']).map((a) => a.name).join(' • ');
 
@@ -195,6 +207,7 @@ export default function CakeCustomizer() {
                 {SHAPES.map((sh) => (
                   <button key={sh.id} className={cn('card', cfg.shape?.id === sh.id && 'sel')} onClick={() => set({ shape: sh })}>
                     <div className="tick"><Check size={12} /></div>
+                    {sh.popular && <div className="pop"><Star size={11} /> الأكثر طلباً</div>}
                     <div className="thumb" dangerouslySetInnerHTML={{ __html: miniCakeHTML(sh) }} />
                     <div className="nm">{sh.name}</div>
                     <div className="meta"><Users size={13} /><bdi dir="ltr">{sh.serves}</bdi><span className="d" /><span>{sh.lead}</span></div>
@@ -209,7 +222,11 @@ export default function CakeCustomizer() {
                 {FLAVORS.map((f) => (
                   <button key={f.id} className={cn('frow', cfg.flavor?.id === f.id && 'sel')} onClick={() => set({ flavor: f })}>
                     <div className="fdot" style={{ background: f.dot }} />
-                    <div className="fmeta"><div className="nm">{f.name}</div><div className="ds">{f.ds}</div></div>
+                    <div className="fmeta">
+                      <div className="nm">{f.name}</div>
+                      <div className="ds">{f.ds}</div>
+                      {f.popular && <div className="pop inline"><Star size={11} /> الأكثر طلباً</div>}
+                    </div>
                     <div className="pr">{f.add ? `+${f.add} ر.س` : 'مشمولة'}</div>
                     <div className="fradio"><i /></div>
                   </button>
@@ -220,11 +237,23 @@ export default function CakeCustomizer() {
             {s.key === 'color' && (
               <div className="swatches sect">
                 {COLORS.map((col) => (
-                  <button key={col.id} className={cn('sw', cfg.color.id === col.id && 'sel')} onClick={() => set({ color: col })}>
+                  <button key={col.id} className={cn('sw', cfg.color.id === col.id && !cfg.color.custom && 'sel')} onClick={() => set({ color: col })}>
                     <div className="dot" style={{ background: col.c }} />
                     <div className="nm">{col.name}</div>
                   </button>
                 ))}
+                <label className={cn('sw', 'custom', cfg.color.custom && 'sel')}>
+                  <div className="dot" style={cfg.color.custom ? { background: cfg.color.c } : undefined}>
+                    {!cfg.color.custom && <Pipette size={18} />}
+                  </div>
+                  <div className="nm">مخصّص</div>
+                  <input
+                    type="color"
+                    value={cfg.color.custom ? cfg.color.c : '#eccfd6'}
+                    onChange={(e) => set({ color: makeCustomColor(e.target.value) })}
+                    aria-label="لون مخصّص"
+                  />
+                </label>
               </div>
             )}
 
@@ -235,6 +264,7 @@ export default function CakeCustomizer() {
                   return (
                     <button key={d.id} className={cn('design', cfg.design.id === d.id && 'sel')} onClick={() => set({ design: d })}>
                       <div className="tick"><Check size={12} /></div>
+                      {d.popular && <div className="pop"><Star size={11} /></div>}
                       <div className="ic"><Ic size={22} /></div>
                       <div className="nm">{d.name}</div>
                       <div className="pr">{d.add ? `+${d.add}` : 'مشمول'}</div>
@@ -257,6 +287,22 @@ export default function CakeCustomizer() {
                     <button key={m} className={cn('chip', cfg.text === m && 'sel')} onClick={() => set({ text: m })}>{m}</button>
                   ))}
                 </div>
+
+                <div className="flabel"><ImagePlus size={16} /> اطبعي صورتكِ على الكيكة <span className="opt">— اختياري</span></div>
+                {photo ? (
+                  <div className="photo-prev">
+                    <img src={photo} alt="الصورة المرفقة" />
+                    <button className="rm" onClick={() => setPhoto(null)} aria-label="إزالة الصورة"><X size={15} /></button>
+                  </div>
+                ) : (
+                  <label className="photo-drop">
+                    <div className="pic"><ImagePlus size={20} /></div>
+                    <div className="t">أرفقي صورة للطباعة</div>
+                    <div className="h">صورة بصيغة JPG أو PNG — نضعها على كيكتك بأفضل شكل</div>
+                    <input type="file" accept="image/*" hidden onChange={onPhoto} />
+                  </label>
+                )}
+                <div className="photo-note"><BadgeCheck size={14} /> طباعة صالحة للأكل <span className="add">+{PHOTO_PRINT_PRICE} ر.س</span></div>
 
                 <div className="flabel"><Flame size={16} /> إضافات الاحتفال <span className="opt">— اختياري</span></div>
                 <div className="addons">
@@ -283,6 +329,7 @@ export default function CakeCustomizer() {
                   <div className="srow"><div className="k"><Paintbrush size={15} /> التزيين</div><div className="v">{cfg.design.name}</div></div>
                   {cfg.text.trim() && <div className="srow"><div className="k"><PenLine size={15} /> الرسالة</div><div className="v">«{cfg.text.trim()}»</div></div>}
                   {addonNames && <div className="srow"><div className="k"><Flame size={15} /> إضافات</div><div className="v">{addonNames}</div></div>}
+                  {photo && <div className="srow"><div className="k"><ImagePlus size={15} /> صورة</div><div className="v">مطبوعة على الكيكة</div></div>}
                   {cfg.shape && <div className="srow"><div className="k"><Clock size={15} /> الجاهزية</div><div className="v muted">خلال {cfg.shape.lead}</div></div>}
                   <div className="stotal"><div className="k">الإجمالي</div><div className="v"><span className="big num">{total}</span><span className="cur">ر.س</span></div></div>
                 </div>
