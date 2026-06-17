@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import '@/components/cake/cakeStudio.css';
 import {
-  SHAPES, FLAVORS, COLORS, DESIGNS, buildCake, price, makeCustomColor, type CakeConfig,
+  SHAPES, FLAVORS, COLORS, DESIGNS, buildCake, miniCakeHTML, price, makeCustomColor, type CakeConfig,
 } from '@/lib/cakeBuilder';
 import { Wand2, ShoppingBag, SlidersHorizontal, Users, Star, Pipette } from 'lucide-react';
 
@@ -19,6 +19,7 @@ const initial: CakeConfig = {
 
 const STAGE_BG =
   'radial-gradient(70% 56% at 50% 30%, hsl(28 44% 97.5%), transparent 72%), linear-gradient(180deg, hsl(28 30% 97%), hsl(20 18% 93.5%))';
+const THUMB_BG = 'radial-gradient(80% 70% at 50% 40%, hsl(28 38% 97%), hsl(28 22% 92%))';
 
 interface DesignYourCakeProps {
   onAddCustom: (total: number, summary: string) => void;
@@ -46,70 +47,142 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
   return (
     <section id="design" className="scroll-mt-24">
       <div
-        className="relative md:overflow-hidden rounded-[2rem] border border-border/60 shadow-soft-lift"
+        className="relative rounded-[2rem] border border-border/60 shadow-soft-lift"
         style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--card)))' }}
       >
         <div className="grid md:grid-cols-2">
+          {/* Live premium preview (shared with /customize). Sticky on mobile AND
+              desktop so the cake stays in view while choosing. */}
+          <div
+            className="order-1 md:order-2 self-start sticky top-16 md:top-5 z-10 md:m-3
+                       h-[440px] md:h-[600px] flex items-center justify-center overflow-hidden
+                       rounded-t-[2rem] md:rounded-[1.6rem]"
+            style={{ background: STAGE_BG }}
+          >
+            <div className="absolute inset-0 noise-overlay opacity-30" />
+            <div className="absolute top-5 end-5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-card/85 backdrop-blur border border-border/60 text-[11px] text-muted-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent" /> معاينة حيّة
+            </div>
+
+            <div className="cake-studio cz-embed relative z-[5] w-full pb-4 md:pb-6">
+              <div className="cz-scene">
+                <div className="cake-wrap" ref={wrapRef}>
+                  <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />
+                  <div className="stand" dangerouslySetInnerHTML={{ __html: art.stand }} />
+                </div>
+              </div>
+            </div>
+
+            {cfg.shape && (
+              <div className="absolute bottom-5 inset-x-0 z-10 flex justify-center px-4">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card/90 backdrop-blur border border-border/60 text-[11.5px] shadow-soft-lift">
+                  <Users className="w-3.5 h-3.5 text-primary" />
+                  <span>تكفي <b className="font-bold text-foreground"><bdi dir="ltr">{cfg.shape.serves}</bdi></b></span>
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
+                  <span>جاهزة خلال <b className="font-bold text-foreground">{cfg.shape.lead}</b></span>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Controls */}
-          <div className="p-5 sm:p-7 md:p-10 lg:p-12 order-2 md:order-1">
+          <div className="order-2 md:order-1 p-5 sm:p-7 md:p-9 lg:p-11">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs tracking-widest uppercase font-medium">
               <Wand2 className="w-3.5 h-3.5" /> صمّمي بنفسكِ
             </div>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّمي كيكتكِ المثالية</h2>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-md">
-              اختاري الشكل والنكهة واللون، وشاهدي كيكتكِ تتشكّل أمامكِ — ثم خصّصيها أكثر بكل التفاصيل.
+              اختاري الشكل والنكهة واللون، وشاهدي كيكتكِ تتشكّل أمامكِ لحظة بلحظة — ثم خصّصيها أكثر بكل التفاصيل.
             </p>
 
             {/* Shape */}
             <div className="mt-7">
-              <div className="text-sm font-semibold mb-2">الشكل</div>
-              <div className="grid grid-cols-3 gap-2">
-                {SHAPES.map((sh) => (
-                  <button
-                    key={sh.id}
-                    onClick={() => set({ shape: sh })}
-                    className={cn(
-                      'press relative rounded-xl border px-2 py-2.5 text-center transition-colors',
-                      cfg.shape?.id === sh.id ? 'border-primary bg-primary/[0.08]' : 'border-border bg-card',
-                    )}
-                  >
-                    {sh.popular && (
-                      <span className="absolute top-1 start-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary/15 text-primary" title="الأكثر طلباً">
-                        <Star className="w-2.5 h-2.5 fill-current" />
-                      </span>
-                    )}
-                    <div className="text-[13px] font-bold leading-tight">{sh.name}</div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5"><bdi dir="ltr">{sh.serves}</bdi></div>
-                  </button>
-                ))}
+              <div className="flex items-baseline justify-between mb-2.5">
+                <div className="text-sm font-bold">الشكل</div>
+                <div className="text-[11px] text-muted-foreground">القاعدة والحجم</div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {SHAPES.map((sh) => {
+                  const sel = cfg.shape?.id === sh.id;
+                  return (
+                    <button
+                      key={sh.id}
+                      onClick={() => set({ shape: sh })}
+                      className={cn(
+                        'press relative rounded-2xl border p-2.5 text-center transition-all',
+                        sel
+                          ? 'border-primary ring-1 ring-primary bg-primary/[0.06] shadow-soft-lift'
+                          : 'border-border bg-card hover:border-primary/40',
+                      )}
+                    >
+                      {sh.popular && (
+                        <span className="absolute top-1.5 end-1.5 z-10 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[8.5px] font-bold leading-none border border-primary/20">
+                          <Star className="w-2.5 h-2.5 fill-current" /> الأكثر طلباً
+                        </span>
+                      )}
+                      <div
+                        className="h-[76px] rounded-xl mb-1.5 flex items-center justify-center overflow-hidden"
+                        style={{ background: THUMB_BG }}
+                      >
+                        <div className="cake-studio cz-embed" dangerouslySetInnerHTML={{ __html: miniCakeHTML(sh) }} />
+                      </div>
+                      <div className="font-bold text-[12.5px] leading-tight">{sh.name}</div>
+                      <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground mt-0.5">
+                        <Users className="w-3 h-3 text-primary" /><bdi dir="ltr">{sh.serves}</bdi>
+                      </div>
+                      <div className="text-[11px] text-muted-foreground mt-1">
+                        من <span className="font-display text-foreground text-[14px]">{sh.price}</span> ر.س
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Flavour */}
-            <div className="mt-5">
-              <div className="text-sm font-semibold mb-2">النكهة</div>
-              <div className="flex flex-wrap gap-2">
-                {FLAVORS.map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => set({ flavor: f })}
-                    className={cn(
-                      'press inline-flex items-center gap-2 rounded-full border ps-2 pe-3 py-1.5 text-[13px] transition-colors',
-                      cfg.flavor?.id === f.id ? 'border-primary bg-primary/[0.08] font-semibold' : 'border-border bg-card',
-                    )}
-                  >
-                    <span className="w-4 h-4 rounded-full shrink-0 ring-1 ring-border/60" style={{ background: f.dot }} />
-                    {f.name}
-                    {f.popular && <Star className="w-3 h-3 text-primary fill-current shrink-0" />}
-                  </button>
-                ))}
+            <div className="mt-6">
+              <div className="flex items-baseline justify-between mb-2.5">
+                <div className="text-sm font-bold">النكهة</div>
+                <div className="text-[11px] text-muted-foreground">قلب الكيكة اللذيذ</div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {FLAVORS.map((f) => {
+                  const sel = cfg.flavor?.id === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => set({ flavor: f })}
+                      className={cn(
+                        'press relative rounded-2xl border p-2.5 text-center transition-all',
+                        sel
+                          ? 'border-primary ring-1 ring-primary bg-primary/[0.06]'
+                          : 'border-border bg-card hover:border-primary/40',
+                      )}
+                    >
+                      {f.popular && (
+                        <span className="absolute top-1.5 end-1.5 z-10 inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary/10 text-primary border border-primary/20" title="الأكثر طلباً">
+                          <Star className="w-2.5 h-2.5 fill-current" />
+                        </span>
+                      )}
+                      <span
+                        className="block w-11 h-11 mx-auto rounded-2xl ring-1 ring-border/50 shadow-inner mb-2"
+                        style={{ background: f.dot }}
+                      />
+                      <div className="font-bold text-[12px] leading-tight">{f.name}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">{f.add ? `+${f.add} ر.س` : 'مشمولة'}</div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Colour */}
-            <div className="mt-5">
-              <div className="text-sm font-semibold mb-2">لون الكريمة</div>
-              <div className="flex flex-wrap gap-x-3 gap-y-2">
+            <div className="mt-6">
+              <div className="flex items-baseline justify-between mb-2.5">
+                <div className="text-sm font-bold">لون الكريمة</div>
+                <div className="text-[11px] text-muted-foreground">لمسة الأناقة</div>
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-2.5">
                 {COLORS.map((col) => (
                   <button
                     key={col.id}
@@ -119,7 +192,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                   >
                     <span
                       className={cn(
-                        'w-9 h-9 rounded-full border-2 border-card shadow-inner transition-transform',
+                        'w-10 h-10 rounded-full border-2 border-card shadow-inner transition-transform',
                         cfg.color.id === col.id ? 'outline outline-2 outline-primary outline-offset-2 scale-105' : 'ring-1 ring-border/60',
                       )}
                       style={{ background: col.c }}
@@ -130,7 +203,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                 <label className="press flex flex-col items-center gap-1 w-12 cursor-pointer" title="لون مخصّص">
                   <span
                     className={cn(
-                      'w-9 h-9 rounded-full border-2 border-card shadow-inner grid place-items-center transition-transform',
+                      'w-10 h-10 rounded-full border-2 border-card shadow-inner grid place-items-center transition-transform',
                       cfg.color.custom ? 'outline outline-2 outline-primary outline-offset-2 scale-105' : 'ring-1 ring-border/60',
                     )}
                     style={cfg.color.custom
@@ -174,40 +247,8 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
               </button>
             </div>
             <div className="mt-3 text-xs text-muted-foreground">
-              «خصّصيها أكثر» تنقلكِ إلى الاستوديو الكامل مع تصميمكِ الحالي — لإضافة الزينة والرسالة والمزيد.
+              «خصّصيها أكثر» تنقلكِ إلى الاستوديو الكامل مع تصميمكِ الحالي — لإضافة الزينة والرسالة والصورة المطبوعة والمزيد.
             </div>
-          </div>
-
-          {/* Live premium preview (shared with /customize). On mobile it sticks
-              below the header so the cake stays in view while choosing. */}
-          <div
-            className="relative order-1 md:order-2 sticky top-16 z-10 md:static rounded-t-[2rem] md:rounded-none h-[440px] md:h-auto md:min-h-[480px] flex items-center justify-center overflow-hidden"
-            style={{ background: STAGE_BG }}
-          >
-            <div className="absolute inset-0 noise-overlay opacity-30" />
-            <div className="absolute top-5 end-5 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-card/85 backdrop-blur border border-border/60 text-[11px] text-muted-foreground">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent" /> معاينة حيّة
-            </div>
-
-            <div className="cake-studio cz-embed relative z-[5] w-full pb-4 md:pb-10">
-              <div className="cz-scene">
-                <div className="cake-wrap" ref={wrapRef}>
-                  <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />
-                  <div className="stand" dangerouslySetInnerHTML={{ __html: art.stand }} />
-                </div>
-              </div>
-            </div>
-
-            {cfg.shape && (
-              <div className="absolute bottom-5 inset-x-0 z-10 flex justify-center px-4">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card/90 backdrop-blur border border-border/60 text-[11.5px] shadow-soft-lift">
-                  <Users className="w-3.5 h-3.5 text-primary" />
-                  <span>تكفي <b className="font-bold text-foreground"><bdi dir="ltr">{cfg.shape.serves}</bdi></b></span>
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
-                  <span>جاهزة خلال <b className="font-bold text-foreground">{cfg.shape.lead}</b></span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
