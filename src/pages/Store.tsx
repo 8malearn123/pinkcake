@@ -34,6 +34,7 @@ import {
   ArrowLeft,
   Truck,
   ShieldCheck,
+  PartyPopper,
 } from 'lucide-react';
 
 export default function Store() {
@@ -129,6 +130,15 @@ export default function Store() {
 
           {/* Actions */}
           <div className="flex items-center gap-1.5 ms-auto">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/events')}
+              className="hidden lg:inline-flex gap-1.5 text-foreground/80 hover:text-primary hover:bg-primary/10 rounded-full press"
+            >
+              <PartyPopper className="w-4 h-4 text-primary" />
+              جهّزي مناسبتك
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -287,6 +297,9 @@ export default function Store() {
               <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
                 <button onClick={() => goToShop()} className="group press sheen rounded-full ps-8 pe-6 h-[52px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors flex items-center gap-2">
                   تسوّقي الآن <ArrowLeft className="cta-arrow w-4 h-4" />
+                </button>
+                <button onClick={() => navigate('/events')} className="press rounded-full ps-7 pe-8 h-[52px] bg-white/10 border border-white/30 text-white hover:bg-white/20 font-medium transition-colors inline-flex items-center gap-2">
+                  <PartyPopper className="w-4 h-4 text-primary" /> جهّزي مناسبتك
                 </button>
                 <button onClick={scrollToDesign} className="press rounded-full px-8 h-[52px] bg-white/10 border border-white/30 text-white hover:bg-white/20 font-medium transition-colors">
                   صمّمي كيكتكِ

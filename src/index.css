@@ -364,6 +364,11 @@
   .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }
 
+  /* Event builder step transition */
+  .cz-step { animation: czStepIn 0.4s var(--ease-out-soft); }
+  @keyframes czStepIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .cz-step { animation-duration: 0.001s; } }
+
   /* Hero carousel */
   .hero-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 1s var(--ease-out-soft), visibility 1s; }
   .hero-slide.hero-active { opacity: 1; visibility: visible; }
