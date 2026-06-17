@@ -360,6 +360,10 @@
   .press { transition: transform 0.12s var(--ease-out-soft); }
   .press:active { transform: scale(0.94); }
 
+  /* Hide scrollbar (horizontal chip rows etc.) */
+  .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+
   /* Hero carousel */
   .hero-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 1s var(--ease-out-soft), visibility 1s; }
   .hero-slide.hero-active { opacity: 1; visibility: visible; }

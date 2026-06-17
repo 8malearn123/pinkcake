@@ -19,18 +19,18 @@ export function ShopByOccasion({ onShop, onOccasion }: ShopByOccasionProps) {
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <div className="text-xs text-primary tracking-widest uppercase font-medium">تسوّقي حسب المناسبة</div>
-          <h2 className="font-display text-3xl md:text-4xl mt-1 leading-none">لكلِّ لحظة كيكتها</h2>
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl mt-1 leading-none">لكلِّ لحظة كيكتها</h2>
         </div>
         <button onClick={onShop} className="group text-sm text-primary font-medium inline-flex items-center gap-1.5">
           كل المناسبات <ArrowLeft className="cta-arrow w-4 h-4" />
         </button>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {OCCASIONS.map((o) => (
           <button
             key={o.title}
             onClick={() => onOccasion(o.title)}
-            className="occasion group relative block rounded-3xl overflow-hidden shadow-soft-lift aspect-[3/4] text-start"
+            className="occasion group relative block rounded-3xl overflow-hidden shadow-soft-lift aspect-[3/2] sm:aspect-[3/4] text-start"
           >
             <img src={o.img} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
             <div

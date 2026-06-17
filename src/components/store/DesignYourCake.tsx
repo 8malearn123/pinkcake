@@ -46,16 +46,16 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
   return (
     <section id="design" className="scroll-mt-24">
       <div
-        className="relative overflow-hidden rounded-[2rem] border border-border/60 shadow-soft-lift"
+        className="relative md:overflow-hidden rounded-[2rem] border border-border/60 shadow-soft-lift"
         style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--card)))' }}
       >
         <div className="grid md:grid-cols-2">
           {/* Controls */}
-          <div className="p-7 md:p-10 lg:p-12 order-2 md:order-1">
+          <div className="p-5 sm:p-7 md:p-10 lg:p-12 order-2 md:order-1">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs tracking-widest uppercase font-medium">
               <Wand2 className="w-3.5 h-3.5" /> صمّمي بنفسكِ
             </div>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّمي كيكتكِ المثالية</h2>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّمي كيكتكِ المثالية</h2>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-md">
               اختاري الشكل والنكهة واللون، وشاهدي كيكتكِ تتشكّل أمامكِ — ثم خصّصيها أكثر بكل التفاصيل.
             </p>
@@ -151,9 +151,10 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
             </div>
           </div>
 
-          {/* Live premium preview (shared with /customize) */}
+          {/* Live premium preview (shared with /customize). On mobile it sticks
+              below the header so the cake stays in view while choosing. */}
           <div
-            className="relative order-1 md:order-2 min-h-[420px] md:min-h-[480px] flex items-center justify-center overflow-hidden"
+            className="relative order-1 md:order-2 sticky top-16 z-10 md:static rounded-t-[2rem] md:rounded-none h-[440px] md:h-auto md:min-h-[480px] flex items-center justify-center overflow-hidden"
             style={{ background: STAGE_BG }}
           >
             <div className="absolute inset-0 noise-overlay opacity-30" />
@@ -161,7 +162,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
               <span className="w-1.5 h-1.5 rounded-full bg-accent" /> معاينة حيّة
             </div>
 
-            <div className="cake-studio cz-embed relative z-[5] w-full pb-10">
+            <div className="cake-studio cz-embed relative z-[5] w-full pb-4 md:pb-10">
               <div className="cz-scene">
                 <div className="cake-wrap" ref={wrapRef}>
                   <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />

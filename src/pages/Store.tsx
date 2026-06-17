@@ -112,9 +112,9 @@ export default function Store() {
             <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105">
               <Cake className="w-5 h-5 text-primary-foreground" />
             </div>
-            <div className="hidden sm:block text-start leading-tight">
-              <div className="font-display text-lg">{settings.storeName}</div>
-              <div className="text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
+            <div className="text-start leading-tight">
+              <div className="font-display text-base sm:text-lg">{settings.storeName}</div>
+              <div className="hidden sm:block text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
             </div>
           </button>
 
@@ -189,7 +189,7 @@ export default function Store() {
             <div className="flex items-end justify-between flex-wrap gap-3">
               <div>
                 <div className="text-xs text-primary tracking-widest uppercase font-medium">مجموعتنا</div>
-                <h2 className="font-display text-4xl md:text-5xl mt-1 leading-none">كيكات مختارة بعناية</h2>
+                <h2 className="font-display text-3xl md:text-5xl mt-1 leading-none">كيكات مختارة بعناية</h2>
               </div>
               <div className="flex items-center gap-4">
                 <p className="hidden sm:block text-sm text-muted-foreground max-w-[16rem]">
@@ -205,7 +205,7 @@ export default function Store() {
           <CategoryChips categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
 
           {productsLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="rounded-3xl overflow-hidden border border-border/60 bg-card">
                   <Skeleton className="aspect-[4/5]" />
@@ -228,7 +228,7 @@ export default function Store() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
               {filteredProducts.map((product) => (
                 <ProductCardRefined
                   key={product.id}
@@ -280,7 +280,7 @@ export default function Store() {
                 <Sparkles className="w-3.5 h-3.5 text-primary" />
                 تجربة استثنائية
               </div>
-              <h3 className="font-display text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تبدأ بقطعة كيك</h3>
+              <h3 className="font-display text-2xl sm:text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تبدأ بقطعة كيك</h3>
               <p className="mt-3 text-white/75 leading-relaxed max-w-lg mx-auto">
                 من أعياد الميلاد إلى المناسبات الخاصة، نحضّر لكِ كل طلب بحبٍّ وعناية.
               </p>
