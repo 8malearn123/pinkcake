@@ -2,9 +2,9 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import '@/components/cake/cakeStudio.css';
 import {
-  SHAPES, FLAVORS, COLORS, DESIGNS, buildCake, price, type CakeConfig,
+  SHAPES, FLAVORS, COLORS, DESIGNS, buildCake, price, makeCustomColor, type CakeConfig,
 } from '@/lib/cakeBuilder';
-import { Wand2, ShoppingBag, SlidersHorizontal, Users } from 'lucide-react';
+import { Wand2, ShoppingBag, SlidersHorizontal, Users, Star, Pipette } from 'lucide-react';
 
 // A complete (compatible) config so the live cake renders immediately and the
 // selections carry straight into /customize.
@@ -69,10 +69,15 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                     key={sh.id}
                     onClick={() => set({ shape: sh })}
                     className={cn(
-                      'press rounded-xl border px-2 py-2.5 text-center transition-colors',
+                      'press relative rounded-xl border px-2 py-2.5 text-center transition-colors',
                       cfg.shape?.id === sh.id ? 'border-primary bg-primary/[0.08]' : 'border-border bg-card',
                     )}
                   >
+                    {sh.popular && (
+                      <span className="absolute top-1 start-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary/15 text-primary" title="الأكثر طلباً">
+                        <Star className="w-2.5 h-2.5 fill-current" />
+                      </span>
+                    )}
                     <div className="text-[13px] font-bold leading-tight">{sh.name}</div>
                     <div className="text-[10px] text-muted-foreground mt-0.5"><bdi dir="ltr">{sh.serves}</bdi></div>
                   </button>
@@ -95,6 +100,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                   >
                     <span className="w-4 h-4 rounded-full shrink-0 ring-1 ring-border/60" style={{ background: f.dot }} />
                     {f.name}
+                    {f.popular && <Star className="w-3 h-3 text-primary fill-current shrink-0" />}
                   </button>
                 ))}
               </div>
@@ -121,6 +127,27 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                     <span className={cn('text-[10px]', cfg.color.id === col.id ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{col.name}</span>
                   </button>
                 ))}
+                <label className="press flex flex-col items-center gap-1 w-12 cursor-pointer" title="لون مخصّص">
+                  <span
+                    className={cn(
+                      'w-9 h-9 rounded-full border-2 border-card shadow-inner grid place-items-center transition-transform',
+                      cfg.color.custom ? 'outline outline-2 outline-primary outline-offset-2 scale-105' : 'ring-1 ring-border/60',
+                    )}
+                    style={cfg.color.custom
+                      ? { background: cfg.color.c }
+                      : { background: 'conic-gradient(from 210deg,#f4c4d0,#f6e0b6,#cfe6c4,#c4dcea,#ddc8e8,#f4c4d0)' }}
+                  >
+                    {!cfg.color.custom && <Pipette className="w-4 h-4 text-foreground/70" />}
+                  </span>
+                  <span className={cn('text-[10px]', cfg.color.custom ? 'text-foreground font-semibold' : 'text-muted-foreground')}>مخصّص</span>
+                  <input
+                    type="color"
+                    value={cfg.color.custom ? cfg.color.c : '#eccfd6'}
+                    onChange={(e) => set({ color: makeCustomColor(e.target.value) })}
+                    aria-label="لون مخصّص"
+                    className="sr-only"
+                  />
+                </label>
               </div>
             </div>
 
