@@ -7,9 +7,23 @@ import type { StoreBranch } from '@/hooks/usePublicStore';
 import { OCCASIONS, GUEST_BANDS, SERVE_STYLES } from './eventOptions';
 
 const cardBase =
-  'press relative rounded-2xl border p-4 text-center transition-all flex flex-col items-center justify-center gap-2 min-h-[104px]';
+  'press relative rounded-2xl border p-4 text-center transition-all flex flex-col items-center justify-center gap-2.5 min-h-[112px]';
 const cardSel = 'border-primary ring-1 ring-primary bg-primary/[0.06] shadow-soft-lift';
 const cardIdle = 'border-border bg-card hover:border-primary/40';
+
+function EmojiTile({ children, lg }: { children: React.ReactNode; lg?: boolean }) {
+  return (
+    <span
+      className={cn(
+        'grid place-items-center rounded-2xl bg-gradient-to-br from-blush to-card border border-border/40 shadow-inner',
+        lg ? 'w-14 h-14 text-3xl' : 'w-11 h-11 text-2xl',
+      )}
+      aria-hidden
+    >
+      {children}
+    </span>
+  );
+}
 
 export function StepHeading({ title, sub }: { title: string; sub?: string }) {
   return (
@@ -58,7 +72,7 @@ export function OccasionStep({ value, onChange }: { value: Occasion | null; onCh
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {OCCASIONS.map((o) => (
           <button key={o.id} onClick={() => onChange(o.id)} className={cn(cardBase, value === o.id ? cardSel : cardIdle)}>
-            <span className="text-3xl" aria-hidden>{o.emoji}</span>
+            <EmojiTile lg>{o.emoji}</EmojiTile>
             <span className="font-bold text-sm">{o.label}</span>
           </button>
         ))}
@@ -122,7 +136,7 @@ export function ServeStylesStep({ value, onChange }: { value: ServeStyle[]; onCh
                   <Check className="w-3 h-3" />
                 </span>
               )}
-              <span className="text-3xl" aria-hidden>{s.emoji}</span>
+              <EmojiTile lg>{s.emoji}</EmojiTile>
               <span className="font-bold text-sm leading-tight">{s.label}</span>
               <span className="text-[11px] text-muted-foreground">{s.hint}</span>
             </button>
@@ -152,7 +166,7 @@ export function StationStep({ stationType, liveStationId, onChange }: {
             onClick={() => onChange({ stationType: o.id, liveStationId: o.id === 'live' ? (liveStationId ?? LIVE_STATIONS[0].id) : null })}
             className={cn(cardBase, stationType === o.id ? cardSel : cardIdle)}
           >
-            <span className="text-3xl" aria-hidden>{o.emoji}</span>
+            <EmojiTile lg>{o.emoji}</EmojiTile>
             <span className="font-bold text-sm">{o.label}</span>
             <span className="text-[11px] text-muted-foreground">{o.hint}</span>
           </button>
@@ -195,14 +209,14 @@ export function ServersStep({ guests, serversNeeded, serversCount, serviceHours,
           onClick={() => onChange({ serversNeeded: false })}
           className={cn(cardBase, !serversNeeded ? cardSel : cardIdle)}
         >
-          <span className="text-3xl" aria-hidden>🙅‍♀️</span>
+          <EmojiTile lg>🙅‍♀️</EmojiTile>
           <span className="font-bold text-sm">لا، شكراً</span>
         </button>
         <button
           onClick={() => onChange({ serversNeeded: true, serversCount: serversCount || suggested, serviceHours: serviceHours || 3 })}
           className={cn(cardBase, serversNeeded ? cardSel : cardIdle)}
         >
-          <span className="text-3xl" aria-hidden>🤵</span>
+          <EmojiTile lg>🤵</EmojiTile>
           <span className="font-bold text-sm">نعم، أحتاج</span>
         </button>
       </div>

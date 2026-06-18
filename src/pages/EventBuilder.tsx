@@ -14,12 +14,14 @@ import {
 } from '@/components/events/EventSteps';
 import { OCCASIONS, SERVE_STYLES } from '@/components/events/eventOptions';
 import { EventReadyCart } from '@/components/events/EventReadyCart';
+import { EventIntro } from '@/components/events/EventIntro';
+import { EventStepper } from '@/components/events/EventStepper';
 import {
   Cake, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Users, CalendarCheck,
   PartyPopper, Check, Send,
 } from 'lucide-react';
 
-type Phase = 'wizard' | 'cart' | 'done';
+type Phase = 'intro' | 'wizard' | 'cart' | 'done';
 
 interface WizardState {
   occasion: Occasion | null;
@@ -75,7 +77,7 @@ export default function EventBuilder() {
   const { data: branches } = usePublicStoreBranches();
   const createOrder = useCreateEventOrder();
 
-  const [phase, setPhase] = useState<Phase>('wizard');
+  const [phase, setPhase] = useState<Phase>('intro');
   const [step, setStep] = useState(0);
   const [cfg, setCfg] = useState<WizardState>(initial);
   const [items, setItems] = useState<EventLineItem[]>([]);
@@ -86,6 +88,14 @@ export default function EventBuilder() {
 
   const pickOccasion = (o: Occasion) =>
     setCfg((c) => ({ ...c, occasion: o, serveStyles: c.serveStyles.length ? c.serveStyles : STYLE_DEFAULTS[o] }));
+
+  // From the intro: jump straight in with the occasion preselected.
+  const quickStart = (o: Occasion) => {
+    pickOccasion(o);
+    setStep(1);
+    setPhase('wizard');
+    window.scrollTo({ top: 0 });
+  };
 
   const canProceed = (s: number): boolean => {
     switch (s) {
@@ -104,8 +114,9 @@ export default function EventBuilder() {
     }
     if (step < STEPS.length - 1) {
       setStep((s) => s + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      setItems(planEvent(cfg).items);
+      setItems(livePlan.items);
       setPhase('cart');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -113,8 +124,12 @@ export default function EventBuilder() {
 
   const back = () => {
     if (phase === 'cart') { setPhase('wizard'); return; }
-    if (step > 0) setStep((s) => s - 1);
-    else navigate('/');
+    if (phase === 'wizard') {
+      if (step > 0) { setStep((s) => s - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+      else setPhase('intro');
+      return;
+    }
+    navigate('/');
   };
 
   const setQty = (id: string, qty: number) =>
@@ -133,8 +148,12 @@ export default function EventBuilder() {
     });
   };
 
-  const plan = phase === 'cart' ? planEvent(cfg) : null;
-  const progress = phase === 'done' ? 100 : phase === 'cart' ? 100 : ((step + 1) / STEPS.length) * 100;
+  // Live recommendation drives the running estimate shown while building.
+  const livePlan = useMemo(() => planEvent(cfg), [cfg]);
+  const liveEstimate = planSubtotal(livePlan.items);
+  const showEstimate = cfg.guestCount > 0 && cfg.serveStyles.length > 0;
+  const summarySubtotal = phase === 'cart' ? planSubtotal(items) : showEstimate ? liveEstimate : null;
+  const progress = phase === 'intro' ? 0 : phase === 'wizard' ? ((step + 1) / STEPS.length) * 100 : 100;
 
   return (
     <div className="min-h-screen bg-background">
@@ -168,16 +187,26 @@ export default function EventBuilder() {
       </header>
 
       <main className="container mx-auto px-4 lg:px-6 py-7 lg:py-10">
-        {phase === 'done' ? (
+        {phase === 'intro' && (
+          <EventIntro
+            onStart={() => { setPhase('wizard'); setStep(0); window.scrollTo({ top: 0 }); }}
+            onQuickStart={quickStart}
+          />
+        )}
+
+        {phase === 'done' && (
           <SuccessView tracking={tracking} onTrack={() => navigate('/track')} onHome={() => navigate('/')} />
-        ) : (
+        )}
+
+        {(phase === 'wizard' || phase === 'cart') && (
           <div className="grid lg:grid-cols-[1fr_320px] gap-8">
             {/* Main column */}
             <div className="min-w-0">
               {phase === 'wizard' && (
                 <>
-                  <div className="text-xs text-primary tracking-widest uppercase font-medium mb-1">
-                    الخطوة <bdi dir="ltr">{step + 1}</bdi> من <bdi dir="ltr">{STEPS.length}</bdi>
+                  <EventStepper steps={STEPS} current={step} onStepClick={(i) => { setStep(i); window.scrollTo({ top: 0 }); }} />
+                  <div className="text-xs text-primary tracking-widest uppercase font-medium mb-2 md:hidden">
+                    الخطوة <bdi dir="ltr">{step + 1}</bdi> من <bdi dir="ltr">{STEPS.length}</bdi> — {STEPS[step].label}
                   </div>
                   <div key={step} className="cz-step">
                     {step === 0 && <OccasionStep value={cfg.occasion} onChange={pickOccasion} />}
@@ -188,8 +217,8 @@ export default function EventBuilder() {
                     {step === 5 && <WhenWhereStep eventDate={cfg.eventDate} branchId={cfg.branchId} fulfillmentMode={cfg.fulfillmentMode} branches={branches ?? []} minDate={minDate} onChange={set} />}
                   </div>
 
-                  {/* Nav */}
-                  <div className="mt-8 flex items-center gap-3">
+                  {/* Desktop nav */}
+                  <div className="mt-8 hidden lg:flex items-center gap-3">
                     <button
                       onClick={back}
                       className="press rounded-full h-[52px] px-5 border border-border bg-card font-semibold hover:border-primary/50 transition-colors flex items-center justify-center gap-2"
@@ -206,11 +235,11 @@ export default function EventBuilder() {
                 </>
               )}
 
-              {phase === 'cart' && plan && (
+              {phase === 'cart' && (
                 <EventReadyCart
                   guestCount={cfg.guestCount}
                   items={items}
-                  notes={plan.notes}
+                  notes={livePlan.notes}
                   onQty={setQty}
                   onRemove={removeItem}
                   onSubmit={submit}
@@ -222,8 +251,36 @@ export default function EventBuilder() {
 
             {/* Live summary (desktop) */}
             <aside className="hidden lg:block">
-              <LiveSummary cfg={cfg} branchName={branches?.find((b) => b.id === cfg.branchId)?.name} subtotal={phase === 'cart' ? planSubtotal(items) : null} />
+              <LiveSummary cfg={cfg} branchName={branches?.find((b) => b.id === cfg.branchId)?.name} subtotal={summarySubtotal} live={phase !== 'cart'} />
             </aside>
+          </div>
+        )}
+
+        {/* Mobile sticky action bar */}
+        {phase === 'wizard' && (
+          <div className="lg:hidden sticky bottom-0 z-30 -mx-4 px-4 py-3 mt-4 bg-background/95 backdrop-blur border-t border-border/60 flex items-center gap-3">
+            <button
+              onClick={back}
+              aria-label={step === 0 ? 'الرئيسية' : 'السابق'}
+              className="press w-12 h-12 rounded-full border border-border bg-card grid place-items-center hover:border-primary/50 transition-colors shrink-0"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            {showEstimate && (
+              <div className="flex-1 min-w-0 text-center leading-tight">
+                <div className="text-[10px] text-muted-foreground">تقديري مبدئي</div>
+                <div className="font-display text-lg text-primary"><bdi dir="ltr">{liveEstimate}</bdi> <span className="text-[11px] text-muted-foreground">ر.س</span></div>
+              </div>
+            )}
+            <button
+              onClick={next}
+              className={cn(
+                'press sheen rounded-full h-12 px-6 bg-foreground text-background font-semibold shadow-rose-glow transition-colors flex items-center justify-center gap-2',
+                showEstimate ? 'shrink-0' : 'flex-1',
+              )}
+            >
+              {step === STEPS.length - 1 ? <>الضيافة المقترحة <Sparkles className="w-5 h-5" /></> : <>التالي <ChevronLeft className="w-5 h-5" /></>}
+            </button>
           </div>
         )}
       </main>
@@ -240,7 +297,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function LiveSummary({ cfg, branchName, subtotal }: { cfg: WizardState; branchName?: string; subtotal: number | null }) {
+function LiveSummary({ cfg, branchName, subtotal, live }: { cfg: WizardState; branchName?: string; subtotal: number | null; live?: boolean }) {
   const occ = OCCASIONS.find((o) => o.id === cfg.occasion);
   const styles = cfg.serveStyles.map((s) => SERVE_STYLES.find((x) => x.id === s)?.label).filter(Boolean);
   const stationLabel = cfg.stationType === 'none' ? null : cfg.stationType === 'ready_corner' ? 'ركن حلا جاهز' : 'محطة حية';
@@ -266,7 +323,7 @@ function LiveSummary({ cfg, branchName, subtotal }: { cfg: WizardState; branchNa
           {branchName && <Row label="الفرع" value={branchName} />}
           {subtotal !== null && (
             <div className="mt-3 pt-3 border-t border-border flex items-end justify-between">
-              <span className="text-xs text-muted-foreground">تقديري</span>
+              <span className="text-xs text-muted-foreground">{live ? 'تقديري مبدئي' : 'تقديري'}</span>
               <span className="font-display text-2xl text-primary"><bdi dir="ltr">{subtotal}</bdi> <span className="text-xs text-muted-foreground">ر.س</span></span>
             </div>
           )}
