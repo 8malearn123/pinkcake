@@ -28,13 +28,13 @@ import { BackToTop } from '@/components/store/BackToTop';
 import {
   ShoppingCart,
   Cake,
-  Clock,
   Search,
   Sparkles,
   ArrowLeft,
-  Truck,
-  ShieldCheck,
   PartyPopper,
+  Wand2,
+  Flame,
+  BadgeCheck,
 } from 'lucide-react';
 
 export default function Store() {
@@ -80,11 +80,6 @@ export default function Store() {
 
   const goToShop = (q?: string) =>
     navigate(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop');
-
-  const scrollToDesign = () => {
-    const el = document.getElementById('design');
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
-  };
 
   // Quick-add the on-page design as a custom cake line.
   const handleDesignAdd = (total: number, summary: string) => {
@@ -272,34 +267,31 @@ export default function Store() {
           <Testimonials />
         </Reveal>
 
-        {/* Final CTA */}
+        {/* Occasions & hospitality builder — dedicated CTA */}
         <Reveal>
           <section className="rounded-[2rem] gradient-cocoa text-white p-8 md:p-14 text-center shadow-soft-lift relative overflow-hidden">
             <div className="absolute inset-0 noise-overlay opacity-30" />
             <div className="relative z-10 max-w-2xl mx-auto">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-xs tracking-widest uppercase">
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
-                تجربة استثنائية
+                <PartyPopper className="w-3.5 h-3.5 text-primary" />
+                ضيافة المناسبات والأعراس
               </div>
-              <h3 className="font-display text-2xl sm:text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تبدأ بقطعة كيك</h3>
+              <h3 className="font-display text-2xl sm:text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تستحق ضيافة تليق بها</h3>
               <p className="mt-3 text-white/75 leading-relaxed max-w-lg mx-auto">
-                من أعياد الميلاد إلى المناسبات الخاصة، نحضّر لكِ كل طلب بحبٍّ وعناية.
+                أعراس، فعاليات الشركات، والمناسبات الكبيرة — أجيبي على بضعة أسئلة، ونجهّز لكِ ضيافة متكاملة من الكيكة إلى المحطات الحية ومقدّمي الخدمة.
               </p>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-                <button onClick={() => goToShop()} className="group press sheen rounded-full ps-8 pe-6 h-[52px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors flex items-center gap-2">
-                  تسوّقي الآن <ArrowLeft className="cta-arrow w-4 h-4" />
-                </button>
-                <button onClick={() => navigate('/events')} className="press rounded-full ps-7 pe-8 h-[52px] bg-white/10 border border-white/30 text-white hover:bg-white/20 font-medium transition-colors inline-flex items-center gap-2">
-                  <PartyPopper className="w-4 h-4 text-primary" /> جهّزي مناسبتك
-                </button>
-                <button onClick={scrollToDesign} className="press rounded-full px-8 h-[52px] bg-white/10 border border-white/30 text-white hover:bg-white/20 font-medium transition-colors">
-                  صمّمي كيكتكِ
+              <div className="mt-7 flex justify-center">
+                <button
+                  onClick={() => navigate('/events')}
+                  className="group press sheen rounded-full ps-9 pe-7 h-[56px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors inline-flex items-center gap-2.5 text-base sm:text-lg"
+                >
+                  <PartyPopper className="w-5 h-5 text-primary" /> جهّزي مناسبتك <ArrowLeft className="cta-arrow w-4 h-4" />
                 </button>
               </div>
               <div className="mt-7 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-white/70 text-xs">
-                <span className="inline-flex items-center gap-1.5"><Truck className="w-4 h-4 text-primary" /> توصيل مجاني فوق ٢٠٠ ر.س</span>
-                <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" /> تحضير خلال ٢٤ ساعة</span>
-                <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> دفع آمن ١٠٠٪</span>
+                <span className="inline-flex items-center gap-1.5"><Wand2 className="w-4 h-4 text-primary" /> ضيافة مقترحة حسب عدد ضيوفك</span>
+                <span className="inline-flex items-center gap-1.5"><Flame className="w-4 h-4 text-primary" /> محطات حية ومقدّمو ضيافة</span>
+                <span className="inline-flex items-center gap-1.5"><BadgeCheck className="w-4 h-4 text-primary" /> فريق المناسبات يؤكّد التفاصيل</span>
               </div>
             </div>
           </section>
