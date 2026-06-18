@@ -14,14 +14,13 @@ import {
 } from '@/components/events/EventSteps';
 import { OCCASIONS, SERVE_STYLES } from '@/components/events/eventOptions';
 import { EventReadyCart } from '@/components/events/EventReadyCart';
-import { EventIntro } from '@/components/events/EventIntro';
 import { EventStepper } from '@/components/events/EventStepper';
 import {
   Cake, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Users, CalendarCheck,
   PartyPopper, Check, Send,
 } from 'lucide-react';
 
-type Phase = 'intro' | 'wizard' | 'cart' | 'done';
+type Phase = 'wizard' | 'cart' | 'done';
 
 interface WizardState {
   occasion: Occasion | null;
@@ -77,7 +76,7 @@ export default function EventBuilder() {
   const { data: branches } = usePublicStoreBranches();
   const createOrder = useCreateEventOrder();
 
-  const [phase, setPhase] = useState<Phase>('intro');
+  const [phase, setPhase] = useState<Phase>('wizard');
   const [step, setStep] = useState(0);
   const [cfg, setCfg] = useState<WizardState>(initial);
   const [items, setItems] = useState<EventLineItem[]>([]);
@@ -88,14 +87,6 @@ export default function EventBuilder() {
 
   const pickOccasion = (o: Occasion) =>
     setCfg((c) => ({ ...c, occasion: o, serveStyles: c.serveStyles.length ? c.serveStyles : STYLE_DEFAULTS[o] }));
-
-  // From the intro: jump straight in with the occasion preselected.
-  const quickStart = (o: Occasion) => {
-    pickOccasion(o);
-    setStep(1);
-    setPhase('wizard');
-    window.scrollTo({ top: 0 });
-  };
 
   const canProceed = (s: number): boolean => {
     switch (s) {
@@ -124,12 +115,8 @@ export default function EventBuilder() {
 
   const back = () => {
     if (phase === 'cart') { setPhase('wizard'); return; }
-    if (phase === 'wizard') {
-      if (step > 0) { setStep((s) => s - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-      else setPhase('intro');
-      return;
-    }
-    navigate('/');
+    if (step > 0) { setStep((s) => s - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else navigate('/');
   };
 
   const setQty = (id: string, qty: number) =>
@@ -153,7 +140,7 @@ export default function EventBuilder() {
   const liveEstimate = planSubtotal(livePlan.items);
   const showEstimate = cfg.guestCount > 0 && cfg.serveStyles.length > 0;
   const summarySubtotal = phase === 'cart' ? planSubtotal(items) : showEstimate ? liveEstimate : null;
-  const progress = phase === 'intro' ? 0 : phase === 'wizard' ? ((step + 1) / STEPS.length) * 100 : 100;
+  const progress = phase === 'wizard' ? ((step + 1) / STEPS.length) * 100 : 100;
 
   return (
     <div className="min-h-screen bg-background">
@@ -187,13 +174,6 @@ export default function EventBuilder() {
       </header>
 
       <main className="container mx-auto px-4 lg:px-6 py-7 lg:py-10">
-        {phase === 'intro' && (
-          <EventIntro
-            onStart={() => { setPhase('wizard'); setStep(0); window.scrollTo({ top: 0 }); }}
-            onQuickStart={quickStart}
-          />
-        )}
-
         {phase === 'done' && (
           <SuccessView tracking={tracking} onTrack={() => navigate('/track')} onHome={() => navigate('/')} />
         )}
