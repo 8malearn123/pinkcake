@@ -69,14 +69,14 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
           </div>
           <h3 className="font-display text-3xl sm:text-4xl md:text-5xl mt-4 leading-tight">لحظات الفرح تستحق ضيافة تليق بها</h3>
           <p className="mt-3 text-white/75 leading-relaxed max-w-md mx-auto lg:mx-0">
-            أعراس، فعاليات الشركات، والمناسبات الكبيرة — أجيبي على بضعة أسئلة، ونجهّز لكِ ضيافة متكاملة من الكيكة إلى المحطات الحية ومقدّمي الخدمة.
+            أعراس، فعاليات الشركات، والمناسبات الكبيرة — أجب على بضعة أسئلة، ونجهّز لك ضيافة متكاملة من الكيكة إلى المحطات الحية ومقدّمي الخدمة.
           </p>
           <div className="mt-7 flex justify-center lg:justify-start">
             <button
               onClick={onStart}
               className="group press sheen rounded-full ps-9 pe-7 h-[56px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors inline-flex items-center gap-2.5 text-base sm:text-lg"
             >
-              <PartyPopper className="w-5 h-5 text-primary" /> جهّزي مناسبتك <ArrowLeft className="cta-arrow w-4 h-4" />
+              <PartyPopper className="w-5 h-5 text-primary" /> جهّز مناسبتك <ArrowLeft className="cta-arrow w-4 h-4" />
             </button>
           </div>
           <div className="mt-7 flex flex-wrap lg:flex-col items-center lg:items-start justify-center lg:justify-start gap-x-6 gap-y-2 lg:gap-y-2.5 text-white/75 text-xs">

@@ -52,7 +52,7 @@ export function InfoPageLayout({ eyebrow, title, subtitle, icon: Icon, children 
             onClick={() => navigate('/store')}
             className="press ms-auto inline-flex items-center gap-2 rounded-full h-10 px-5 bg-foreground text-background text-sm font-semibold hover:bg-foreground/90 transition-colors"
           >
-            <Store className="w-4 h-4" /> تسوّقي
+            <Store className="w-4 h-4" /> تسوّق
           </button>
         </div>
       </header>

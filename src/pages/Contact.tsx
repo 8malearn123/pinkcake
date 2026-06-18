@@ -50,8 +50,8 @@ export default function Contact() {
   return (
     <InfoPageLayout
       eyebrow="نحن هنا لمساعدتك"
-      title="تواصلي معنا"
-      subtitle="هل لديكِ سؤال أو طلب خاص أو ترغبين بمعرفة المزيد؟ يسعدنا أن نسمع منكِ، اختاري الطريقة الأنسب لكِ للتواصل."
+      title="تواصل معنا"
+      subtitle="هل لديك سؤال أو طلب خاص أو ترغبين بمعرفة المزيد؟ يسعدنا أن نسمع منك، اختر الطريقة الأنسب لك للتواصل."
       icon={MessageCircle}
     >
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -80,7 +80,7 @@ export default function Contact() {
           {/* Social buttons */}
           <div className="rounded-3xl border border-border/60 bg-card p-5">
             <div className="text-xs text-muted-foreground tracking-widest uppercase font-medium mb-3">
-              تابعينا
+              تابعنا
             </div>
             <div className="flex items-center gap-3">
               {SOCIALS.map((social) => {
@@ -104,9 +104,9 @@ export default function Contact() {
 
         {/* Contact form */}
         <div className="rounded-3xl border border-border/60 bg-card p-6">
-          <h2 className="font-display text-2xl">أرسلي لنا رسالة</h2>
+          <h2 className="font-display text-2xl">أرسل لنا رسالة</h2>
           <p className="text-muted-foreground leading-relaxed mt-1">
-            املئي النموذج التالي وسنعاود التواصل معكِ في أقرب وقت ممكن.
+            املئي النموذج التالي وسنعاود التواصل معك في أقرب وقت ممكن.
           </p>
           <ContactForm submissionType="contact" />
         </div>

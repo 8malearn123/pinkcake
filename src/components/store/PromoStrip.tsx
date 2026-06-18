@@ -4,7 +4,7 @@ const ITEMS = [
   { icon: Cake, title: 'خبزٌ طازج يومياً', sub: 'دفعات محدودة كل صباح' },
   { icon: Truck, title: 'توصيل سريع', sub: 'لجميع فروعنا في المدينة' },
   { icon: ShieldCheck, title: 'مكونات فاخرة', sub: 'منتقاة بعناية موثوقة' },
-  { icon: Clock, title: 'حجز مسبق', sub: 'احجزي موعدك بضغطة' },
+  { icon: Clock, title: 'حجز مسبق', sub: 'احجز موعدك بضغطة' },
 ];
 
 export function PromoStrip() {

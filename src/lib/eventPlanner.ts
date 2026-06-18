@@ -183,7 +183,7 @@ export function planEvent(cfg: EventConfig, rules: Rules = DEFAULT_RULES): Event
 
   // 9) Occasion bias — sets a helpful note only; the customer can override everything.
   if (cfg.occasion === 'corporate') {
-    notes.push('للفعاليات المؤسسية ننصح بتغليف وبطاقة بهوية شركتك — أضيفيها في خانة الملاحظات.');
+    notes.push('للفعاليات المؤسسية ننصح بتغليف وبطاقة بهوية شركتك — أضِفها في خانة الملاحظات.');
   }
   if (cfg.occasion === 'wedding') {
     notes.push('نقدّم الحلا على دفعات أثناء الحفل لإبقاء الطاولة ممتلئة ومرتّبة.');

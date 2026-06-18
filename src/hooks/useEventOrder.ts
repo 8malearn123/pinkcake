@@ -42,7 +42,7 @@ export function useCreateEventOrder() {
       return { trackingCode: trackingFrom(data) };
     },
     onError: () =>
-      toast({ title: 'تعذّر إرسال الطلب', description: 'حاولي مرة ثانية.', variant: 'destructive' }),
+      toast({ title: 'تعذّر إرسال الطلب', description: 'حاول مرة ثانية.', variant: 'destructive' }),
   });
 }
 

@@ -25,7 +25,7 @@ const VALUES: Value[] = [
     icon: Gift,
     title: 'لكل مناسبة',
     description:
-      'من أعياد الميلاد إلى حفلات الزفاف والتخرّج، نصمّم لكِ الكيكة التي تليق بلحظاتكِ المميزة وتجعلها لا تُنسى.',
+      'من أعياد الميلاد إلى حفلات الزفاف والتخرّج، نصمّم لك الكيكة التي تليق بلحظاتك المميزة وتجعلها لا تُنسى.',
   },
 ];
 
@@ -40,7 +40,7 @@ export default function About() {
     <InfoPageLayout
       eyebrow="قصتنا"
       title="من نحن"
-      subtitle="كيكات وحلويات مصنوعة يدوياً بحب، نُحضّرها بأجود المكونات لنُحوّل مناسباتكِ إلى ذكريات حلوة لا تُنسى."
+      subtitle="كيكات وحلويات مصنوعة يدوياً بحب، نُحضّرها بأجود المكونات لنُحوّل مناسباتك إلى ذكريات حلوة لا تُنسى."
       icon={Cake}
     >
       <div className="space-y-12">
@@ -58,7 +58,7 @@ export default function About() {
           </p>
           <p className="text-muted-foreground leading-relaxed">
             رحلتنا مستمرة في الابتكار وتقديم نكهات جديدة وتصاميم مبهرة، لكن يبقى هدفنا واحداً منذ اليوم
-            الأول: أن نرسم البسمة على وجهكِ ووجوه من تحبّين في كل مناسبة.
+            الأول: أن نرسم البسمة على وجهك ووجوه من تحبّ في كل مناسبة.
           </p>
         </section>
 
@@ -96,22 +96,22 @@ export default function About() {
           className="rounded-3xl p-8 text-center"
           style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--card)))' }}
         >
-          <h2 className="font-display text-3xl">جاهزة لتذوّقي الفرق؟</h2>
+          <h2 className="font-display text-3xl">جاهز لتذوّق الفرق؟</h2>
           <p className="text-muted-foreground leading-relaxed mt-3 max-w-xl mx-auto">
-            تصفّحي تشكيلتنا من الكيكات والحلويات، أو صمّمي كيكتكِ الخاصة بنفسكِ لتناسب مناسبتكِ تماماً.
+            تصفّح تشكيلتنا من الكيكات والحلويات، أو صمّم كيكتك الخاصة بنفسك لتناسب مناسبتك تماماً.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
             <Link
               to="/store"
               className="inline-flex items-center justify-center rounded-full h-11 px-6 bg-foreground text-background text-sm font-semibold hover:bg-foreground/90 transition-colors"
             >
-              تسوّقي الآن
+              تسوّق الآن
             </Link>
             <Link
               to="/customize"
               className="inline-flex items-center justify-center rounded-full h-11 px-6 border border-border bg-card text-sm font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors"
             >
-              صمّمي كيكتك
+              صمّم كيكتك
             </Link>
           </div>
         </section>

@@ -229,7 +229,7 @@ export function CartSheet() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl">إتمام الطلب</DialogTitle>
-            <DialogDescription>أدخلي تفاصيل الاستلام لإكمال طلبك</DialogDescription>
+            <DialogDescription>أدخل تفاصيل الاستلام لإكمال طلبك</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -255,7 +255,7 @@ export function CartSheet() {
                 الفرع
               </Label>
               <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-                <SelectTrigger><SelectValue placeholder="اختاري الفرع" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="اختر الفرع" /></SelectTrigger>
                 <SelectContent>
                   {branches?.map((branch) => (
                     <SelectItem key={branch.id} value={branch.id}>
@@ -273,7 +273,7 @@ export function CartSheet() {
                   التاريخ
                 </Label>
                 <Select value={deliveryDate} onValueChange={setDeliveryDate}>
-                  <SelectTrigger><SelectValue placeholder="اختاري" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="اختر" /></SelectTrigger>
                   <SelectContent>
                     {availableDates.map((date) => (
                       <SelectItem key={date.value} value={date.value}>{date.label}</SelectItem>
@@ -287,7 +287,7 @@ export function CartSheet() {
                   الوقت
                 </Label>
                 <Select value={deliveryTime} onValueChange={setDeliveryTime}>
-                  <SelectTrigger><SelectValue placeholder="اختاري" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="اختر" /></SelectTrigger>
                   <SelectContent>
                     {timeSlots.map((slot) => (
                       <SelectItem key={slot.value} value={slot.value}>{slot.label}</SelectItem>

@@ -22,15 +22,15 @@ export function EventReadyCart({ guestCount, items, notes, onQty, onRemove, onSu
         <Sparkles className="w-3.5 h-3.5" /> ضيافة مقترحة
       </div>
       <h2 className="font-display text-2xl md:text-3xl mt-3 leading-tight">
-        جهّزنا لكِ ضيافة مقترحة لـ <bdi dir="ltr">{guestCount}</bdi> ضيف
+        جهّزنا لك ضيافة مقترحة لـ <bdi dir="ltr">{guestCount}</bdi> ضيف
       </h2>
-      <p className="text-sm text-muted-foreground mt-2">تقدرين تعدّلين الكميات أو تحذفين أي صنف قبل الإرسال.</p>
+      <p className="text-sm text-muted-foreground mt-2">تقدر تعدّل الكميات أو تحذف أي صنف قبل الإرسال.</p>
 
       {/* Line items */}
       <div className="mt-6 space-y-2.5">
         {items.length === 0 && (
           <div className="text-center py-12 rounded-2xl border border-dashed border-border/70 bg-secondary/30">
-            <p className="text-sm text-muted-foreground">حذفتِ كل الأصناف — ارجعي وعدّلي اختياراتك.</p>
+            <p className="text-sm text-muted-foreground">حذفتِ كل الأصناف — ارجع وعدّلي اختياراتك.</p>
           </div>
         )}
         {items.map((it) => (
@@ -95,7 +95,7 @@ export function EventReadyCart({ guestCount, items, notes, onQty, onRemove, onSu
           disabled={submitting || items.length === 0}
           className="press sheen flex-1 rounded-full h-[52px] px-6 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          <Send className="w-5 h-5" /> {submitting ? 'جارٍ الإرسال…' : 'أرسلي الطلب لفريق المناسبات'}
+          <Send className="w-5 h-5" /> {submitting ? 'جارٍ الإرسال…' : 'أرسل الطلب لفريق المناسبات'}
         </button>
       </div>
     </div>

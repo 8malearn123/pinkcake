@@ -100,7 +100,7 @@ export default function EventBuilder() {
 
   const next = () => {
     if (!canProceed(step)) {
-      toast({ title: 'الرجاء الإكمال', description: 'أكملي هذه الخطوة للمتابعة.', variant: 'destructive' });
+      toast({ title: 'الرجاء الإكمال', description: 'أكمل هذه الخطوة للمتابعة.', variant: 'destructive' });
       return;
     }
     if (step < STEPS.length - 1) {
@@ -164,7 +164,7 @@ export default function EventBuilder() {
             </div>
           </button>
           <div className="ms-auto inline-flex items-center gap-2 text-xs text-primary font-medium">
-            <PartyPopper className="w-4 h-4" /> جهّزي مناسبتك
+            <PartyPopper className="w-4 h-4" /> جهّز مناسبتك
           </div>
         </div>
         {/* Progress */}
@@ -290,7 +290,7 @@ function LiveSummary({ cfg, branchName, subtotal, live }: { cfg: WizardState; br
       </div>
       {!any ? (
         <p className="text-sm text-muted-foreground mt-4 leading-relaxed">
-          راح يظهر هنا ملخّص اختياراتك خطوة بخطوة وأنتِ تجهّزين ضيافتك.
+          راح يظهر هنا ملخّص اختياراتك خطوة بخطوة وأنت تجهّز ضيافتك.
         </p>
       ) : (
         <div className="mt-3">
@@ -331,7 +331,7 @@ function SuccessView({ tracking, onTrack, onHome }: { tracking: string | null; o
       )}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <button onClick={onTrack} className="press rounded-full h-[52px] px-7 bg-foreground text-background font-semibold hover:bg-foreground/90 transition-colors flex items-center gap-2">
-          <Send className="w-4 h-4" /> تتبّعي الطلب
+          <Send className="w-4 h-4" /> تتبّع الطلب
         </button>
         <button onClick={onHome} className="press rounded-full h-[52px] px-7 border border-border bg-card font-semibold hover:border-primary/50 transition-colors">
           العودة للرئيسية

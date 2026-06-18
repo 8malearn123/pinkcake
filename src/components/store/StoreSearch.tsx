@@ -29,7 +29,7 @@ export function StoreSearch({
   value,
   onChange,
   onSubmit,
-  placeholder = 'ابحثي عن كيكة أو نكهة...',
+  placeholder = 'ابحث عن كيكة أو نكهة...',
   className,
 }: StoreSearchProps) {
   const navigate = useNavigate();
@@ -174,16 +174,16 @@ export function StoreSearch({
                   <Search className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <p className="text-sm font-medium">لا توجد نتائج لـ «{value.trim()}»</p>
-                <p className="text-xs text-muted-foreground mt-1">جرّبي كلمة أخرى مثل: شوكولاتة، تشيز كيك…</p>
+                <p className="text-xs text-muted-foreground mt-1">جرّب كلمة أخرى مثل: شوكولاتة، تشيز كيك…</p>
               </div>
             )
           ) : suggestions.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-muted-foreground">ابدئي بالكتابة للبحث…</div>
+            <div className="px-4 py-6 text-center text-sm text-muted-foreground">ابدأ بالكتابة للبحث…</div>
           ) : (
             <div className="p-3">
               {categories.length > 0 && (
                 <>
-                  <div className="text-[11px] text-muted-foreground px-1 mb-2 tracking-widest uppercase">تصفّحي حسب الفئة</div>
+                  <div className="text-[11px] text-muted-foreground px-1 mb-2 tracking-widest uppercase">تصفّح حسب الفئة</div>
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {categories.map((c) => (
                       <button

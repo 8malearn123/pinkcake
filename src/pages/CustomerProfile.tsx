@@ -100,7 +100,7 @@ export default function CustomerProfile() {
   };
 
   const quickLinks = [
-    { icon: Package, title: 'طلباتي', desc: 'تتبّعي طلباتك السابقة', to: '/my-orders' },
+    { icon: Package, title: 'طلباتي', desc: 'تتبّع طلباتك السابقة', to: '/my-orders' },
     { icon: Heart, title: 'المفضلة', desc: 'منتجاتك المحفوظة', to: '/wishlist' },
     { icon: Truck, title: 'تتبّع طلب', desc: 'عبر رمز التتبّع', to: '/track' },
   ];

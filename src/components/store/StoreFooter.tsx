@@ -23,14 +23,14 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
     { label: 'تشيز كيك', action: onShop },
     { label: 'كب كيك', action: onShop },
     { label: 'حلويات فرنسية', action: onShop },
-    { label: 'صمّمي كيكتك', action: () => onNavigate('/customize') },
+    { label: 'صمّم كيكتك', action: () => onNavigate('/customize') },
     { label: 'قائمة المفضلة', action: () => onNavigate('/wishlist') },
   ];
   const helpLinks = [
-    { label: 'تتبّعي طلبك', action: () => onNavigate('/track') },
+    { label: 'تتبّع طلبك', action: () => onNavigate('/track') },
     { label: 'سياسة التوصيل', action: () => onNavigate('/faq') },
     { label: 'الأسئلة الشائعة', action: () => onNavigate('/faq') },
-    { label: 'تواصلي معنا', action: () => onNavigate('/contact') },
+    { label: 'تواصل معنا', action: () => onNavigate('/contact') },
     { label: 'من نحن', action: () => onNavigate('/about') },
   ];
 
@@ -50,7 +50,7 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
               </div>
             </button>
             <p className="text-sm text-muted-foreground leading-relaxed mt-4 max-w-xs">
-              كيكات وحلويات مصممة يدوياً بأجود المكونات، نصنعها بحب لنُحضر لكِ لحظات لا تُنسى.
+              كيكات وحلويات مصممة يدوياً بأجود المكونات، نصنعها بحب لنُحضر لك لحظات لا تُنسى.
             </p>
             <div className="flex items-center gap-2 mt-5">
               {SOCIAL.map(({ icon: Icon, label, href }) => (
@@ -70,7 +70,7 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
 
           {/* Shop */}
           <nav className="md:col-span-2">
-            <div className="text-xs tracking-widest uppercase text-muted-foreground font-medium mb-4">تسوّقي</div>
+            <div className="text-xs tracking-widest uppercase text-muted-foreground font-medium mb-4">تسوّق</div>
             <ul className="space-y-2.5 text-sm">
               {shopLinks.map((l) => (
                 <li key={l.label}>
@@ -98,7 +98,7 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
 
           {/* Contact */}
           <div className="md:col-span-4">
-            <div className="text-xs tracking-widest uppercase text-muted-foreground font-medium mb-4">زورينا</div>
+            <div className="text-xs tracking-widest uppercase text-muted-foreground font-medium mb-4">زرنا</div>
             <ul className="space-y-3 text-sm text-foreground/80">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />

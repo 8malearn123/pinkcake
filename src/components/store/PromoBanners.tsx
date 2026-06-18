@@ -23,10 +23,10 @@ export function PromoBanners({ onCustomize, onShop }: PromoBannersProps) {
             <span>استوديو التصميم</span>
           </div>
           <h3 className="font-display text-3xl md:text-4xl mt-3 leading-tight">
-            صمّمي كيكتك خطوة بخطوة
+            صمّم كيكتك خطوة بخطوة
           </h3>
           <p className="mt-2 text-sm md:text-base opacity-90 leading-relaxed">
-            اختاري الشكل والنكهات والألوان، وشاهدي معاينة ثلاثية الأبعاد قبل الطلب.
+            اختر الشكل والنكهات والألوان، وشاهد معاينة ثلاثية الأبعاد قبل الطلب.
           </p>
           <div className="mt-5 inline-flex items-center gap-2 font-medium text-sm group-hover:gap-3 transition-all">
             ابدأي التصميم

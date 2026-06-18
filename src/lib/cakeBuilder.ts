@@ -24,10 +24,10 @@ export interface CakeConfig {
 }
 
 export const STEPS = [
-  { key: 'shape',  cap: 'الشكل',   kick: 'القاعدة',        title: 'اختاري شكل كيكتك',   sub: 'كل قاعدة بحجم وعدد أشخاص يناسب مناسبتك.' },
-  { key: 'flavor', cap: 'النكهة',  kick: 'القلب اللذيذ',   title: 'اختاري نكهة الإسفنج', sub: 'النكهة التي تنتظرها أول قطعة.' },
-  { key: 'color',  cap: 'اللون',   kick: 'التغليف',        title: 'اختاري لون الكريمة',  sub: 'لمسة اللون التي تطبع الأناقة.' },
-  { key: 'design', cap: 'التزيين', kick: 'اللمسة',         title: 'أضيفي لمسة التزيين',  sub: 'تفصيل أنيق يجعلها تحفة.' },
+  { key: 'shape',  cap: 'الشكل',   kick: 'القاعدة',        title: 'اختر شكل كيكتك',   sub: 'كل قاعدة بحجم وعدد أشخاص يناسب مناسبتك.' },
+  { key: 'flavor', cap: 'النكهة',  kick: 'القلب اللذيذ',   title: 'اختر نكهة الإسفنج', sub: 'النكهة التي تنتظرها أول قطعة.' },
+  { key: 'color',  cap: 'اللون',   kick: 'التغليف',        title: 'اختر لون الكريمة',  sub: 'لمسة اللون التي تطبع الأناقة.' },
+  { key: 'design', cap: 'التزيين', kick: 'اللمسة',         title: 'أضِف لمسة التزيين',  sub: 'تفصيل أنيق يجعلها تحفة.' },
   { key: 'finish', cap: 'الإهداء', kick: 'اللمسة الأخيرة', title: 'رسالتك وإضافاتك',     sub: 'كلمة من القلب وإضافات الاحتفال.' },
 ] as const;
 
@@ -74,7 +74,7 @@ export const ADDONS: Addon[] = [
   { id: 'topper', name: 'توبر مناسبة', ds: 'توبر أكريليك مذهّب', add: 20, icon: 'topper' },
 ];
 
-export const QUICK_MESSAGES = ['كل عام وأنتِ بخير', 'مبروك', 'عيد ميلاد سعيد', 'بالتوفيق', 'ألف مبروك', 'أحبك'];
+export const QUICK_MESSAGES = ['كل عام وأنت بخير', 'مبروك', 'عيد ميلاد سعيد', 'بالتوفيق', 'ألف مبروك', 'أحبك'];
 
 // Edible photo print add-on ("PhotoCake"), charged when the customer attaches an image.
 export const PHOTO_PRINT_PRICE = 45;
@@ -82,7 +82,7 @@ export const PHOTO_PRINT_PRICE = 45;
 // Build a custom-colour swatch from a hex the customer picks. Any valid CSS colour
 // works in the live preview since the cake reads `color.c` directly.
 export function makeCustomColor(hex: string): ColorOpt {
-  return { id: 'custom', name: 'لونكِ', c: hex, custom: true };
+  return { id: 'custom', name: 'لونك', c: hex, custom: true };
 }
 
 export function price(cfg: CakeConfig): number {

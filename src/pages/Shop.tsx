@@ -136,14 +136,14 @@ export default function Shop() {
         {/* Title */}
         <div className="mb-5">
           <div className="text-xs text-primary tracking-widest uppercase font-medium">
-            {occasion ? 'تسوّقي حسب المناسبة' : 'المتجر'}
+            {occasion ? 'تسوّق حسب المناسبة' : 'المتجر'}
           </div>
           <h1 className="font-display text-4xl md:text-5xl mt-1 leading-none">
             {q ? <>نتائج البحث عن «{q}»</> : occasion || 'كل المنتجات'}
           </h1>
           {occasion && !q && (
             <p className="text-sm text-muted-foreground mt-2 max-w-xl">
-              اخترنا لكِ تشكيلتنا المثالية لـ«{occasion}» — صفّي حسب الفئة أو رتّبي كما تحبّين.
+              اخترنا لك تشكيلتنا المثالية لـ«{occasion}» — صفّ حسب الفئة أو رتّب كما تحبّ.
             </p>
           )}
         </div>

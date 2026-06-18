@@ -74,7 +74,7 @@ export default function Wishlist() {
                 onClick={addAll}
                 className="press inline-flex items-center gap-2 rounded-full h-11 px-5 bg-foreground text-background text-sm font-semibold hover:bg-foreground/90 transition-colors"
               >
-                <ShoppingBag className="w-4 h-4" /> أضيفي الكل للعربة
+                <ShoppingBag className="w-4 h-4" /> أضِف الكل للعربة
               </button>
               <button
                 onClick={clear}
@@ -94,13 +94,13 @@ export default function Wishlist() {
             </div>
             <h3 className="font-display text-3xl mb-2">لا توجد مفضلات بعد</h3>
             <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
-              اضغطي على القلب في أي منتج لحفظه هنا والعودة إليه لاحقاً.
+              اضغط على القلب في أي منتج لحفظه هنا والعودة إليه لاحقاً.
             </p>
             <button
               onClick={() => navigate('/store')}
               className="press inline-flex items-center gap-2 rounded-full h-12 px-7 bg-foreground text-background font-semibold hover:bg-foreground/90 transition-colors"
             >
-              تصفّحي المنتجات
+              تصفّح المنتجات
             </button>
           </div>
         ) : (

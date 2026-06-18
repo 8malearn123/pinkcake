@@ -68,7 +68,7 @@ export function Stepper({ value, onChange, min = 0, max = 99, suffix }: {
 export function OccasionStep({ value, onChange }: { value: Occasion | null; onChange: (o: Occasion) => void }) {
   return (
     <div>
-      <StepHeading title="وش نوع مناسبتك؟" sub="نضبط لكِ الاقتراح حسب المناسبة." />
+      <StepHeading title="وش نوع مناسبتك؟" sub="نضبط لك الاقتراح حسب المناسبة." />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {OCCASIONS.map((o) => (
           <button key={o.id} onClick={() => onChange(o.id)} className={cn(cardBase, value === o.id ? cardSel : cardIdle)}>
@@ -100,7 +100,7 @@ export function GuestCountStep({ value, onChange }: { value: number; onChange: (
         ))}
       </div>
       <div className="mt-5 max-w-xs">
-        <label className="text-sm font-semibold mb-2 block">أو اكتبي العدد بالضبط</label>
+        <label className="text-sm font-semibold mb-2 block">أو اكتب العدد بالضبط</label>
         <div className="flex items-center gap-2 rounded-2xl border border-border bg-card px-4 h-14 focus-within:border-primary transition-colors">
           <Users className="w-5 h-5 text-primary shrink-0" />
           <input
@@ -125,7 +125,7 @@ export function ServeStylesStep({ value, onChange }: { value: ServeStyle[]; onCh
     onChange(value.includes(id) ? value.filter((x) => x !== id) : [...value, id]);
   return (
     <div>
-      <StepHeading title="وش تحبّين نقدّمين لضيوفك؟" sub="تقدرين تختارين أكثر من خيار." />
+      <StepHeading title="وش تحبّ نقدّم لضيوفك؟" sub="تقدر تختار أكثر من خيار." />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {SERVE_STYLES.map((s) => {
           const on = value.includes(s.id);
@@ -158,7 +158,7 @@ export function StationStep({ stationType, liveStationId, onChange }: {
   ];
   return (
     <div>
-      <StepHeading title="تبغين ركن ضيافة في موقع المناسبة؟" sub="اختياري — يضيف لمسة مميزة لضيوفك." />
+      <StepHeading title="تبغى ركن ضيافة في موقع المناسبة؟" sub="اختياري — يضيف لمسة مميزة لضيوفك." />
       <div className="grid sm:grid-cols-3 gap-3">
         {opts.map((o) => (
           <button
@@ -174,7 +174,7 @@ export function StationStep({ stationType, liveStationId, onChange }: {
       </div>
       {stationType === 'live' && (
         <div className="mt-5">
-          <div className="text-sm font-semibold mb-2.5">اختاري نوع المحطة الحية</div>
+          <div className="text-sm font-semibold mb-2.5">اختر نوع المحطة الحية</div>
           <div className="flex flex-wrap gap-2.5">
             {LIVE_STATIONS.map((s) => (
               <button
@@ -203,7 +203,7 @@ export function ServersStep({ guests, serversNeeded, serversCount, serviceHours,
   const suggested = suggestServers(guests);
   return (
     <div>
-      <StepHeading title="تحتاجين مقدّمي ضيافة في الموقع؟" sub="فريق يخدم الضيوف ويرتّب الطاولة طوال المناسبة." />
+      <StepHeading title="تحتاج مقدّمي ضيافة في الموقع؟" sub="فريق يخدم الضيوف ويرتّب الطاولة طوال المناسبة." />
       <div className="grid grid-cols-2 gap-3 max-w-sm">
         <button
           onClick={() => onChange({ serversNeeded: false })}

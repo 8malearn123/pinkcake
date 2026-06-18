@@ -62,7 +62,7 @@ export function ProductCardRefined({
 
         <button
           onClick={toggleFav}
-          aria-label={fav ? 'إزالة من المفضلة' : 'أضيفي للمفضلة'}
+          aria-label={fav ? 'إزالة من المفضلة' : 'أضِف للمفضلة'}
           aria-pressed={fav}
           className={cn(
             'fav-btn press absolute top-3 end-3 z-[2] w-9 h-9 rounded-full bg-background/85 backdrop-blur flex items-center justify-center',

@@ -107,7 +107,7 @@ export default function CakeCustomizer() {
 
   const onNext = () => {
     if (!canProceed) {
-      toast({ title: 'الرجاء الإكمال', description: 'اختاري خياراً للمتابعة', variant: 'destructive' });
+      toast({ title: 'الرجاء الإكمال', description: 'اختر خياراً للمتابعة', variant: 'destructive' });
       return;
     }
     if (last) {
@@ -142,7 +142,7 @@ export default function CakeCustomizer() {
             <button className="ghost-btn" onClick={back} aria-label="رجوع"><ArrowRight size={18} /></button>
             <div className="hmid">
               <div className="wm serif">Pink Cake</div>
-              <div className="ttl">صمّمي كيكتك</div>
+              <div className="ttl">صمّم كيكتك</div>
             </div>
             <div className="htotal">
               <div className="lbl">الإجمالي</div>
@@ -187,7 +187,7 @@ export default function CakeCustomizer() {
             <div className="ph-hint">
               <div>
                 <div className="serif" style={{ fontSize: 34, color: 'hsl(var(--primary)/.5)', marginBottom: 6 }}>✲</div>
-                <div style={{ fontSize: 13, fontWeight: 500 }}>اختاري شكل البداية لتظهر كيكتك هنا</div>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>اختر شكل البداية لتظهر كيكتك هنا</div>
               </div>
             </div>
           )}
@@ -278,7 +278,7 @@ export default function CakeCustomizer() {
               <div className="sect">
                 <div className="flabel" style={{ marginTop: 2 }}><PenLine size={16} /> الرسالة على الكيكة <span className="opt">— اختياري</span></div>
                 <input
-                  className="msg-input" maxLength={28} placeholder="اكتبي رسالتك هنا…"
+                  className="msg-input" maxLength={28} placeholder="اكتب رسالتك هنا…"
                   value={cfg.text} onChange={(e) => set({ text: e.target.value })}
                 />
                 <div className="cc"><span>{cfg.text.length}</span>/28</div>
@@ -288,7 +288,7 @@ export default function CakeCustomizer() {
                   ))}
                 </div>
 
-                <div className="flabel"><ImagePlus size={16} /> اطبعي صورتكِ على الكيكة <span className="opt">— اختياري</span></div>
+                <div className="flabel"><ImagePlus size={16} /> اطبع صورتك على الكيكة <span className="opt">— اختياري</span></div>
                 {photo ? (
                   <div className="photo-prev">
                     <img src={photo} alt="الصورة المرفقة" />
@@ -334,7 +334,7 @@ export default function CakeCustomizer() {
                   <div className="stotal"><div className="k">الإجمالي</div><div className="v"><span className="big num">{total}</span><span className="cur">ر.س</span></div></div>
                 </div>
                 <div className="assure"><BadgeCheck size={14} /> تعديلات مجانية غير محدودة قبل التأكيد.</div>
-                <div className="assure"><ShieldCheck size={14} /> تُحضّر طازجة في فرعكِ الأقرب — تفاصيل التوصيل في الخطوة التالية.</div>
+                <div className="assure"><ShieldCheck size={14} /> تُحضّر طازجة في فرعك الأقرب — تفاصيل التوصيل في الخطوة التالية.</div>
               </div>
             )}
           </div>
@@ -345,7 +345,7 @@ export default function CakeCustomizer() {
           <button className={cn('btn', 'btn-prev', step === 0 && 'hide')} onClick={back} aria-label="السابق"><ChevronRight size={18} /></button>
           <button className={cn('btn', 'btn-next', last && 'commit')} disabled={!canProceed} onClick={onNext}>
             {last ? (
-              <><ShoppingBag size={18} /> <span>أضيفي تصميمكِ إلى العربة</span></>
+              <><ShoppingBag size={18} /> <span>أضِف تصميمك إلى العربة</span></>
             ) : (
               <><span>التالي <span className="pp"><span className="num">{total}</span> <span className="cur">ر.س</span></span></span> <ChevronLeft size={18} /></>
             )}
@@ -357,7 +357,7 @@ export default function CakeCustomizer() {
         <div className={cn('success', done && 'show')}>
           <div>
             <div className="badge"><Check size={42} /></div>
-            <h3>أُضيفت كيكتكِ إلى العربة</h3>
+            <h3>أُضيفت كيكتك إلى العربة</h3>
             <p>
               {cfg.shape?.name} · {cfg.flavor?.name} · {cfg.color.name}{cfg.text.trim() ? ` · «${cfg.text.trim()}»` : ''}
               <br /><b style={{ color: 'hsl(var(--foreground))' }}>الإجمالي {total} ر.س</b>
@@ -371,7 +371,7 @@ export default function CakeCustomizer() {
               >
                 إتمام الطلب
               </button>
-              <button className="again" onClick={reset}>صمّمي كيكة أخرى</button>
+              <button className="again" onClick={reset}>صمّم كيكة أخرى</button>
             </div>
           </div>
         </div>

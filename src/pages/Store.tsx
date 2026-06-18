@@ -90,7 +90,7 @@ export default function Store() {
     });
   };
 
-  // "خصّصيها أكثر" — carry the current design into the full studio.
+  // "خصّصها أكثر" — carry the current design into the full studio.
   const handleCustomizeMore = (cfg: CakeConfig) => navigate('/customize', { state: { initial: cfg } });
 
   return (
@@ -129,7 +129,7 @@ export default function Store() {
               className="hidden sm:inline-flex gap-1.5 text-primary hover:text-primary hover:bg-primary/10 rounded-full press"
             >
               <Sparkles className="w-4 h-4" />
-              صمّمي كيكتك
+              صمّم كيكتك
             </Button>
 
             <AccountMenu />
@@ -161,7 +161,7 @@ export default function Store() {
             value={searchQuery}
             onChange={setSearchQuery}
             onSubmit={() => goToShop(searchQuery)}
-            placeholder="ابحثي عن كيكة..."
+            placeholder="ابحث عن كيكة..."
           />
         </div>
       </header>
@@ -189,7 +189,7 @@ export default function Store() {
                   تشكيلة محدثة من أكثر من {products?.length || 0} منتج فاخر.
                 </p>
                 <button onClick={() => goToShop()} className="group shrink-0 text-sm text-primary font-medium inline-flex items-center gap-1.5 press">
-                  تسوّقي الكل <ArrowLeft className="cta-arrow w-4 h-4" />
+                  تسوّق الكل <ArrowLeft className="cta-arrow w-4 h-4" />
                 </button>
               </div>
             </div>

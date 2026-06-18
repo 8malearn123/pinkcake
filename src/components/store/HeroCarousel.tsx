@@ -8,7 +8,7 @@ import hero3 from '@/assets/hero-cake-3.jpg';
 const SLIDES = [
   { image: hero1, badge: 'مجموعة الموسم', title: 'حلاوة بلمسة من الذهب', text: 'كيكات مصممة يدوياً بأجود المكونات، تُقدّم لحظاتك الخاصة بأناقة لا تُنسى.' },
   { image: hero3, badge: 'الأكثر طلباً', title: 'ريد فيلفت الكلاسيكية', text: 'طبقات حمراء مخمليّة بكريمة الجبن الطازجة — قطعة من الفرح في كل لقمة.' },
-  { image: hero2, badge: 'وصل حديثاً', title: 'ماكرون فرنسي ملوّن', text: 'تشكيلة ماكرون بألوان الموسم ونكهات منتقاة، مثالية لإهداء من تحبّين.' },
+  { image: hero2, badge: 'وصل حديثاً', title: 'ماكرون فرنسي ملوّن', text: 'تشكيلة ماكرون بألوان الموسم ونكهات منتقاة، مثالية لإهداء من تحبّ.' },
 ];
 
 interface HeroCarouselProps {
@@ -67,13 +67,13 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
                       onClick={onShopClick}
                       className="group press sheen rounded-full ps-7 pe-5 h-12 bg-white text-foreground hover:bg-white/90 shadow-lg font-semibold transition-colors flex items-center gap-2"
                     >
-                      تسوّقي الآن <ArrowLeft className="cta-arrow w-4 h-4" />
+                      تسوّق الآن <ArrowLeft className="cta-arrow w-4 h-4" />
                     </button>
                     <button
                       onClick={onCustomizeClick}
                       className="press rounded-full px-7 h-12 bg-transparent border border-white/40 text-white hover:bg-white/10 font-medium transition-colors"
                     >
-                      صمّمي كيكتك
+                      صمّم كيكتك
                     </button>
                   </div>
                   <div className="mt-4 flex items-center gap-2 text-white/75 text-xs">

@@ -88,11 +88,11 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
           {/* Controls */}
           <div className="order-2 md:order-1 p-5 sm:p-7 md:p-9 lg:p-11">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs tracking-widest uppercase font-medium">
-              <Wand2 className="w-3.5 h-3.5" /> صمّمي بنفسكِ
+              <Wand2 className="w-3.5 h-3.5" /> صمّم بنفسك
             </div>
-            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّمي كيكتكِ المثالية</h2>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّم كيكتك المثالية</h2>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-md">
-              اختاري الشكل والنكهة واللون، وشاهدي كيكتكِ تتشكّل أمامكِ لحظة بلحظة — ثم خصّصيها أكثر بكل التفاصيل.
+              اختر الشكل والنكهة واللون، وشاهد كيكتك تتشكّل أمامك لحظة بلحظة — ثم خصّصها أكثر بكل التفاصيل.
             </p>
 
             {/* Shape */}
@@ -237,17 +237,17 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                 onClick={() => onAddCustom(total, summary)}
                 className="group press sheen flex-1 min-w-[170px] rounded-full h-[52px] px-6 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2"
               >
-                <ShoppingBag className="w-5 h-5" /> أضيفي إلى العربة
+                <ShoppingBag className="w-5 h-5" /> أضِف إلى العربة
               </button>
               <button
                 onClick={() => onCustomizeMore(cfg)}
                 className="press rounded-full h-[52px] px-5 border border-border bg-card text-foreground font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
               >
-                <SlidersHorizontal className="w-4 h-4 text-primary" /> خصّصيها أكثر
+                <SlidersHorizontal className="w-4 h-4 text-primary" /> خصّصها أكثر
               </button>
             </div>
             <div className="mt-3 text-xs text-muted-foreground">
-              «خصّصيها أكثر» تنقلكِ إلى الاستوديو الكامل مع تصميمكِ الحالي — لإضافة الزينة والرسالة والصورة المطبوعة والمزيد.
+              «خصّصها أكثر» تنقلك إلى الاستوديو الكامل مع تصميمك الحالي — لإضافة الزينة والرسالة والصورة المطبوعة والمزيد.
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@ export function ShopByOccasion({ onShop, onOccasion }: ShopByOccasionProps) {
     <section className="space-y-5">
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
-          <div className="text-xs text-primary tracking-widest uppercase font-medium">تسوّقي حسب المناسبة</div>
+          <div className="text-xs text-primary tracking-widest uppercase font-medium">تسوّق حسب المناسبة</div>
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl mt-1 leading-none">لكلِّ لحظة كيكتها</h2>
         </div>
         <button onClick={onShop} className="group text-sm text-primary font-medium inline-flex items-center gap-1.5">
@@ -40,7 +40,7 @@ export function ShopByOccasion({ onShop, onOccasion }: ShopByOccasionProps) {
             <div className="absolute inset-x-0 bottom-0 p-4 text-white">
               <div className="font-display text-lg md:text-xl leading-tight">{o.title}</div>
               <div className="go mt-1 text-xs inline-flex items-center gap-1 text-white/90">
-                تسوّقي <ArrowLeft className="w-3.5 h-3.5" />
+                تسوّق <ArrowLeft className="w-3.5 h-3.5" />
               </div>
             </div>
           </button>

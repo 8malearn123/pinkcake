@@ -225,7 +225,7 @@ export default function ProductDetails() {
 
                 <button
                   onClick={() => wishlist.toggle(product)}
-                  aria-label={wishlist.has(product.id) ? 'إزالة من المفضلة' : 'أضيفي للمفضلة'}
+                  aria-label={wishlist.has(product.id) ? 'إزالة من المفضلة' : 'أضِف للمفضلة'}
                   aria-pressed={wishlist.has(product.id)}
                   className={cn(
                     'press absolute top-4 end-4 w-10 h-10 rounded-full bg-background/85 backdrop-blur flex items-center justify-center transition-colors',
@@ -327,7 +327,7 @@ export default function ProductDetails() {
                   {added ? (
                     <><Check className="w-5 h-5" /> تمت الإضافة</>
                   ) : (
-                    <><ShoppingBag className="w-5 h-5" /> أضيفي إلى العربة</>
+                    <><ShoppingBag className="w-5 h-5" /> أضِف إلى العربة</>
                   )}
                 </button>
               </div>
@@ -364,7 +364,7 @@ export default function ProductDetails() {
                 </span>
                 <span className="flex-1">
                   <span className="block text-sm font-semibold">تريدين تصميماً خاصاً؟</span>
-                  <span className="block text-xs text-muted-foreground">صمّمي كيكتكِ من الصفر بالشكل والنكهة التي تحبّينها.</span>
+                  <span className="block text-xs text-muted-foreground">صمّم كيكتك من الصفر بالشكل والنكهة التي تحبّها.</span>
                 </span>
                 <ChevronLeft className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -376,7 +376,7 @@ export default function ProductDetails() {
         {related.length > 0 && (
           <section className="mt-16 lg:mt-24">
             <div className="flex items-end justify-between gap-3 mb-5">
-              <h2 className="font-display text-2xl md:text-3xl">قد يعجبكِ أيضاً</h2>
+              <h2 className="font-display text-2xl md:text-3xl">قد يعجبك أيضاً</h2>
               <button onClick={() => navigate('/store')} className="text-sm text-primary press inline-flex items-center gap-1">
                 كل المنتجات <ChevronLeft className="w-4 h-4" />
               </button>
@@ -417,7 +417,7 @@ export default function ProductDetails() {
             added && 'bg-success',
           )}
         >
-          {added ? <><Check className="w-5 h-5" /> تمت الإضافة</> : <><ShoppingBag className="w-5 h-5" /> أضيفي إلى العربة</>}
+          {added ? <><Check className="w-5 h-5" /> تمت الإضافة</> : <><ShoppingBag className="w-5 h-5" /> أضِف إلى العربة</>}
         </button>
       </div>
 
