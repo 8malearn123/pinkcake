@@ -21,6 +21,7 @@ import { ProductCardRefined } from '@/components/store/ProductCardRefined';
 import { DesignYourCake } from '@/components/store/DesignYourCake';
 import { type CakeConfig } from '@/lib/cakeBuilder';
 import { ShopByOccasion } from '@/components/store/ShopByOccasion';
+import { OccasionsCallout } from '@/components/store/OccasionsCallout';
 import { HowItWorks } from '@/components/store/HowItWorks';
 import { Testimonials } from '@/components/store/Testimonials';
 import { StoreFooter } from '@/components/store/StoreFooter';
@@ -28,12 +29,9 @@ import { BackToTop } from '@/components/store/BackToTop';
 import {
   ShoppingCart,
   Cake,
-  Clock,
   Search,
   Sparkles,
   ArrowLeft,
-  Truck,
-  ShieldCheck,
 } from 'lucide-react';
 
 export default function Store() {
@@ -79,11 +77,6 @@ export default function Store() {
 
   const goToShop = (q?: string) =>
     navigate(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop');
-
-  const scrollToDesign = () => {
-    const el = document.getElementById('design');
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
-  };
 
   // Quick-add the on-page design as a custom cake line.
   const handleDesignAdd = (total: number, summary: string) => {
@@ -271,34 +264,9 @@ export default function Store() {
           <Testimonials />
         </Reveal>
 
-        {/* Final CTA */}
+        {/* Occasions & hospitality builder — dedicated, creative callout */}
         <Reveal>
-          <section className="rounded-[2rem] gradient-cocoa text-white p-8 md:p-14 text-center shadow-soft-lift relative overflow-hidden">
-            <div className="absolute inset-0 noise-overlay opacity-30" />
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur text-xs tracking-widest uppercase">
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
-                تجربة استثنائية
-              </div>
-              <h3 className="font-display text-2xl sm:text-3xl md:text-5xl mt-4 leading-tight">لحظات الفرح تبدأ بقطعة كيك</h3>
-              <p className="mt-3 text-white/75 leading-relaxed max-w-lg mx-auto">
-                من أعياد الميلاد إلى المناسبات الخاصة، نحضّر لكِ كل طلب بحبٍّ وعناية.
-              </p>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-                <button onClick={() => goToShop()} className="group press sheen rounded-full ps-8 pe-6 h-[52px] bg-white text-foreground hover:bg-white/90 font-semibold transition-colors flex items-center gap-2">
-                  تسوّقي الآن <ArrowLeft className="cta-arrow w-4 h-4" />
-                </button>
-                <button onClick={scrollToDesign} className="press rounded-full px-8 h-[52px] bg-white/10 border border-white/30 text-white hover:bg-white/20 font-medium transition-colors">
-                  صمّمي كيكتكِ
-                </button>
-              </div>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-white/70 text-xs">
-                <span className="inline-flex items-center gap-1.5"><Truck className="w-4 h-4 text-primary" /> توصيل مجاني فوق ٢٠٠ ر.س</span>
-                <span className="inline-flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" /> تحضير خلال ٢٤ ساعة</span>
-                <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-primary" /> دفع آمن ١٠٠٪</span>
-              </div>
-            </div>
-          </section>
+          <OccasionsCallout onStart={() => navigate('/events')} />
         </Reveal>
       </main>
 
