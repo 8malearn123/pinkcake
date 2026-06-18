@@ -133,15 +133,6 @@ export default function Store() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate('/events')}
-              className="hidden lg:inline-flex gap-1.5 text-foreground/80 hover:text-primary hover:bg-primary/10 rounded-full press"
-            >
-              <PartyPopper className="w-4 h-4 text-primary" />
-              جهّزي مناسبتك
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
               onClick={() => navigate('/customize')}
               className="hidden sm:inline-flex gap-1.5 text-primary hover:text-primary hover:bg-primary/10 rounded-full press"
             >
