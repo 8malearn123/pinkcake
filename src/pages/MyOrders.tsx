@@ -90,7 +90,7 @@ export default function MyOrders() {
               <ShoppingCart className="w-9 h-9 text-primary" />
             </div>
             <h3 className="font-display text-3xl mb-2">لا توجد طلبات بعد</h3>
-            <p className="text-muted-foreground mb-6 text-sm">ابدأي رحلتك الحلوة معنا الآن</p>
+            <p className="text-muted-foreground mb-6 text-sm">ابدأ رحلتك الحلوة معنا الآن</p>
             <Button onClick={() => navigate('/store')} className="rounded-full px-6 h-11 bg-foreground text-background hover:bg-foreground/90">
               <Store className="w-4 h-4 me-2" />
               تصفّح المنتجات

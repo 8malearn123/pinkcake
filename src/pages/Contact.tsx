@@ -51,7 +51,7 @@ export default function Contact() {
     <InfoPageLayout
       eyebrow="نحن هنا لمساعدتك"
       title="تواصل معنا"
-      subtitle="هل لديك سؤال أو طلب خاص أو ترغبين بمعرفة المزيد؟ يسعدنا أن نسمع منك، اختر الطريقة الأنسب لك للتواصل."
+      subtitle="هل لديك سؤال أو طلب خاص أو ترغب بمعرفة المزيد؟ يسعدنا أن نسمع منك، اختر الطريقة الأنسب لك للتواصل."
       icon={MessageCircle}
     >
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -106,7 +106,7 @@ export default function Contact() {
         <div className="rounded-3xl border border-border/60 bg-card p-6">
           <h2 className="font-display text-2xl">أرسل لنا رسالة</h2>
           <p className="text-muted-foreground leading-relaxed mt-1">
-            املئي النموذج التالي وسنعاود التواصل معك في أقرب وقت ممكن.
+            املأ النموذج التالي وسنعاود التواصل معك في أقرب وقت ممكن.
           </p>
           <ContactForm submissionType="contact" />
         </div>

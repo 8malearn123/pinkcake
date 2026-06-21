@@ -363,7 +363,7 @@ export default function ProductDetails() {
                   <Sparkles className="w-5 h-5" />
                 </span>
                 <span className="flex-1">
-                  <span className="block text-sm font-semibold">تريدين تصميماً خاصاً؟</span>
+                  <span className="block text-sm font-semibold">تريد تصميماً خاصاً؟</span>
                   <span className="block text-xs text-muted-foreground">صمّم كيكتك من الصفر بالشكل والنكهة التي تحبّها.</span>
                 </span>
                 <ChevronLeft className="w-5 h-5 text-muted-foreground" />

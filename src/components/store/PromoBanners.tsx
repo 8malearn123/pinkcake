@@ -29,7 +29,7 @@ export function PromoBanners({ onCustomize, onShop }: PromoBannersProps) {
             اختر الشكل والنكهات والألوان، وشاهد معاينة ثلاثية الأبعاد قبل الطلب.
           </p>
           <div className="mt-5 inline-flex items-center gap-2 font-medium text-sm group-hover:gap-3 transition-all">
-            ابدأي التصميم
+            ابدأ التصميم
             <ArrowLeft className="w-4 h-4" />
           </div>
         </div>
