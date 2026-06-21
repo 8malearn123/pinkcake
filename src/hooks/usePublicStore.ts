@@ -8,6 +8,7 @@ export interface StoreProduct {
   price: number;
   category: string | null;
   image_url: string | null;
+  occasions?: string[] | null;
 }
 
 export interface StoreBranch {

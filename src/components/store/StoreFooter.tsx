@@ -11,8 +11,8 @@ interface StoreFooterProps {
 
 // Social profiles — placeholder hrefs; the owner swaps these for real handles.
 const SOCIAL = [
-  { icon: Camera, label: 'إنستغرام', href: 'https://instagram.com' },
-  { icon: Music, label: 'تيك توك', href: 'https://tiktok.com' },
+  { icon: Camera, label: 'إنستغرام', href: 'https://instagram.com/pinkcake.sa' },
+  { icon: Music, label: 'تيك توك', href: 'https://tiktok.com/@pinkcake.sa' },
   { icon: MessageCircle, label: 'واتساب', href: 'https://wa.me/966112345678' },
   { icon: Send, label: 'بريد', href: 'mailto:hello@pinkcake.sa' },
 ];

@@ -34,12 +34,12 @@ export const demoSession = {
 const img = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=700&q=80`;
 
 export const PRODUCTS = [
-  { id: 'p1', name: 'كيكة الشوكولاتة الفاخرة', description: 'طبقات شوكولاتة بلجيكية مع كريمة الغاناش', price: 145, category: 'كيكات', image_url: img('1563729784474-d77dbb933a9e'), is_available: true, display_order: 1, stock: 12 },
-  { id: 'p2', name: 'تشيز كيك التوت', description: 'تشيز كيك كريمي بصوص التوت الطازج', price: 120, category: 'تشيز كيك', image_url: img('1533134242443-d4fd215305ad'), is_available: true, display_order: 2, stock: 8 },
-  { id: 'p3', name: 'كيكة الريد فيلفت', description: 'الكلاسيكية الحمراء بكريمة الجبن', price: 135, category: 'كيكات', image_url: img('1586788680434-30d324b2d46f'), is_available: true, display_order: 3, stock: 5 },
-  { id: 'p4', name: 'كب كيك الفانيلا', description: 'علبة 6 قطع بنكهات متنوعة', price: 75, category: 'كب كيك', image_url: img('1426869981800-95ebf51ce900'), is_available: true, display_order: 4, stock: 20 },
-  { id: 'p5', name: 'كيكة اللوتس', description: 'بسكويت اللوتس مع كريمة الكراميل', price: 160, category: 'كيكات', image_url: img('1535141192574-5d4897c12636'), is_available: true, display_order: 5, stock: 0 },
-  { id: 'p6', name: 'ماكرون فرنسي', description: 'تشكيلة 12 قطعة ماكرون', price: 95, category: 'حلويات', image_url: img('1569864358642-9d1684040f43'), is_available: true, display_order: 6, stock: 15 },
+  { id: 'p1', name: 'كيكة الشوكولاتة الفاخرة', description: 'طبقات شوكولاتة بلجيكية مع كريمة الغاناش', price: 145, category: 'كيكات', image_url: img('1563729784474-d77dbb933a9e'), is_available: true, display_order: 1, stock: 12, occasions: ['أعياد الميلاد', 'أعراس وخطوبة', 'شكراً وامتنان'] },
+  { id: 'p2', name: 'تشيز كيك التوت', description: 'تشيز كيك كريمي بصوص التوت الطازج', price: 120, category: 'تشيز كيك', image_url: img('1533134242443-d4fd215305ad'), is_available: true, display_order: 2, stock: 8, occasions: ['أعياد الميلاد', 'شكراً وامتنان'] },
+  { id: 'p3', name: 'كيكة الريد فيلفت', description: 'الكلاسيكية الحمراء بكريمة الجبن', price: 135, category: 'كيكات', image_url: img('1586788680434-30d324b2d46f'), is_available: true, display_order: 3, stock: 5, occasions: ['أعراس وخطوبة', 'أعياد الميلاد'] },
+  { id: 'p4', name: 'كب كيك الفانيلا', description: 'علبة 6 قطع بنكهات متنوعة', price: 75, category: 'كب كيك', image_url: img('1426869981800-95ebf51ce900'), is_available: true, display_order: 4, stock: 20, occasions: ['أعياد الميلاد', 'تخرّج ونجاح'] },
+  { id: 'p5', name: 'كيكة اللوتس', description: 'بسكويت اللوتس مع كريمة الكراميل', price: 160, category: 'كيكات', image_url: img('1535141192574-5d4897c12636'), is_available: true, display_order: 5, stock: 0, occasions: ['أعياد الميلاد', 'شكراً وامتنان'] },
+  { id: 'p6', name: 'ماكرون فرنسي', description: 'تشكيلة 12 قطعة ماكرون', price: 95, category: 'حلويات', image_url: img('1569864358642-9d1684040f43'), is_available: true, display_order: 6, stock: 15, occasions: ['تخرّج ونجاح', 'شكراً وامتنان', 'أعراس وخطوبة'] },
 ];
 
 export const BRANCHES = [

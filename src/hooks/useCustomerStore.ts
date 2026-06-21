@@ -118,15 +118,20 @@ export function useCreateCustomerOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      branchId,
-      deliveryDate,
-      deliveryTime,
-      items,
-    }: {
-      branchId: string;
+    mutationFn: async (payload: {
+      branchId?: string | null;
+      fulfillmentMode: 'delivery' | 'pickup';
+      recipientName: string;
+      recipientPhone: string;
+      address?: string | null;
       deliveryDate: string;
       deliveryTime: string;
+      isGift?: boolean;
+      cardMessage?: string | null;
+      giftRecipientName?: string | null;
+      giftRecipientPhone?: string | null;
+      notes?: string | null;
+      deliveryFee?: number;
       items: {
         product_id: string;
         product_name: string;
@@ -134,28 +139,46 @@ export function useCreateCustomerOrder() {
         unit_price: number;
       }[];
     }) => {
-      const { data, error } = await supabase.rpc('create_customer_order', {
-        _branch_id: branchId,
-        _delivery_date: deliveryDate,
-        _delivery_time: deliveryTime,
-        _items: items,
+      // The order RPC gains the richer checkout fields on the backend (recipient,
+      // fulfilment mode, address, gift + card message…); call it through an
+      // untyped view until the generated types are regenerated. In demo mode the
+      // mock returns an order id so the confirmation screen has one.
+      const client = supabase as unknown as {
+        rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+      };
+      const { data, error } = await client.rpc('create_customer_order', {
+        _branch_id: payload.branchId ?? null,
+        _fulfillment_mode: payload.fulfillmentMode,
+        _recipient_name: payload.recipientName,
+        _recipient_phone: payload.recipientPhone,
+        _address: payload.address ?? null,
+        _delivery_date: payload.deliveryDate,
+        _delivery_time: payload.deliveryTime,
+        _is_gift: payload.isGift ?? false,
+        _card_message: payload.cardMessage ?? null,
+        _gift_recipient_name: payload.giftRecipientName ?? null,
+        _gift_recipient_phone: payload.giftRecipientPhone ?? null,
+        _notes: payload.notes ?? null,
+        _delivery_fee: payload.deliveryFee ?? 0,
+        _items: payload.items,
       });
 
       if (error) throw error;
-      return data as string;
+      const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | string | null;
+      if (typeof row === 'string') return { orderId: row, orderNumber: row };
+      return {
+        orderId: String((row as Record<string, unknown>)?.order_id ?? (row as Record<string, unknown>)?.id ?? ''),
+        orderNumber: String((row as Record<string, unknown>)?.order_number ?? ''),
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-orders'] });
-      toast({
-        title: 'تم إرسال الطلب',
-        description: 'سيتم التواصل معك لتأكيد الطلب',
-      });
     },
     onError: (error) => {
       console.error('Create order error:', error);
       toast({
-        title: 'خطأ',
-        description: 'فشل في إرسال الطلب. يرجى المحاولة مرة أخرى.',
+        title: 'تعذّر إرسال الطلب',
+        description: 'حدث خطأ، يرجى المحاولة مرة أخرى.',
         variant: 'destructive',
       });
     },

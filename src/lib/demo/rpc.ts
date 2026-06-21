@@ -64,6 +64,9 @@ const READ: Record<string, (args: Args) => unknown> = {
 
   // event/ضيافة builder — returns a tracking code so the success screen has one
   create_event_order: () => ({ tracking_code: `EVT-${2000 + Math.floor(Math.random() * 900)}`, order_id: 'evt-demo' }),
+
+  // storefront checkout — returns an order id + number for the confirmation screen
+  create_customer_order: () => ({ order_id: 'o1', order_number: `PC-${3000 + Math.floor(Math.random() * 900)}` }),
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {

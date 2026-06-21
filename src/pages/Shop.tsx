@@ -57,16 +57,24 @@ export default function Shop() {
     setParams(next, { replace: true });
   };
 
+  // Only filter by occasion once at least one product carries occasion tags
+  // (so a not-yet-tagged real catalogue still shows everything under the banner).
+  const occasionTagged = useMemo(
+    () => !!occasion && (products ?? []).some((p) => p.occasions?.includes(occasion)),
+    [products, occasion],
+  );
+
   const results = useMemo(() => {
     const ql = q.trim().toLowerCase();
     let list = (products ?? []).filter((p) => {
       const matchCat = category === 'all' || p.category === category;
+      const matchOcc = !occasionTagged || !!p.occasions?.includes(occasion);
       const matchQ =
         !ql ||
         p.name.toLowerCase().includes(ql) ||
         !!p.description?.toLowerCase().includes(ql) ||
         !!p.category?.toLowerCase().includes(ql);
-      return matchCat && matchQ;
+      return matchCat && matchOcc && matchQ;
     });
     const rate = (id: string) => ratingsMap?.[id]?.average_rating ?? 0;
     switch (sort) {
@@ -86,7 +94,7 @@ export default function Shop() {
         break;
     }
     return list;
-  }, [products, q, category, sort, ratingsMap]);
+  }, [products, q, category, sort, ratingsMap, occasion, occasionTagged]);
 
   const isNarrowed = !!q || category !== 'all';
   const isFiltered = isNarrowed || !!occasion;
