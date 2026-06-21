@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { usePublicStoreProducts } from '@/hooks/usePublicStore';
+import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
@@ -57,15 +57,17 @@ export default function ProductDetails() {
 
   const goToCart = openCart;
 
+  const soldOut = product ? isSoldOut(product) : false;
+
   const handleAdd = () => {
-    if (!product) return;
+    if (!product || soldOut) return;
     addToCart(product, qty);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1300);
   };
 
   const handleBuyNow = () => {
-    if (!product) return;
+    if (!product || soldOut) return;
     addToCart(product, qty);
     goToCart();
   };
@@ -264,7 +266,7 @@ export default function ProductDetails() {
                     <b className="text-foreground font-semibold">{rating.average_rating}</b> · {rating.review_count} تقييم
                   </span>
                 ) : (
-                  <span className="text-muted-foreground">كوني أول من يقيّم</span>
+                  <span className="text-muted-foreground">كن أول من يقيّم</span>
                 )}
               </button>
 
@@ -279,9 +281,15 @@ export default function ProductDetails() {
                 <div className="font-display text-4xl text-primary leading-none">
                   {product.price} <span className="text-base text-muted-foreground font-sans">ر.س</span>
                 </div>
-                <span className="mb-1 inline-flex items-center gap-1.5 text-xs text-success">
-                  <span className="w-1.5 h-1.5 rounded-full bg-success" /> متوفّرة الآن
-                </span>
+                {soldOut ? (
+                  <span className="mb-1 inline-flex items-center gap-1.5 text-xs text-destructive font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-destructive" /> نفد المخزون
+                  </span>
+                ) : (
+                  <span className="mb-1 inline-flex items-center gap-1.5 text-xs text-success">
+                    <span className="w-1.5 h-1.5 rounded-full bg-success" /> متوفّرة الآن
+                  </span>
+                )}
               </div>
 
               {/* Features */}
@@ -319,12 +327,16 @@ export default function ProductDetails() {
 
                 <button
                   onClick={handleAdd}
+                  disabled={soldOut}
                   className={cn(
                     'group press sheen flex-1 min-w-[200px] rounded-full h-[52px] px-7 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2',
                     added && 'bg-success hover:bg-success',
+                    soldOut && 'opacity-50 cursor-not-allowed hover:bg-foreground',
                   )}
                 >
-                  {added ? (
+                  {soldOut ? (
+                    'نفد المخزون'
+                  ) : added ? (
                     <><Check className="w-5 h-5" /> تمت الإضافة</>
                   ) : (
                     <><ShoppingBag className="w-5 h-5" /> أضِف إلى العربة</>
@@ -332,13 +344,15 @@ export default function ProductDetails() {
                 </button>
               </div>
 
-              <button
-                onClick={handleBuyNow}
-                className="press mt-3 w-full rounded-full h-[52px] px-7 border border-border bg-card text-foreground font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
-              >
-                اشترِ الآن
-                {qty > 1 && <span className="text-muted-foreground font-normal">· {lineTotal} ر.س</span>}
-              </button>
+              {!soldOut && (
+                <button
+                  onClick={handleBuyNow}
+                  className="press mt-3 w-full rounded-full h-[52px] px-7 border border-border bg-card text-foreground font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
+                >
+                  اشترِ الآن
+                  {qty > 1 && <span className="text-muted-foreground font-normal">· {lineTotal} ر.س</span>}
+                </button>
+              )}
 
               {/* Trust */}
               <div className="mt-7 grid grid-cols-3 gap-3 border-t border-border/60 pt-6">
@@ -412,12 +426,14 @@ export default function ProductDetails() {
         </div>
         <button
           onClick={handleAdd}
+          disabled={soldOut}
           className={cn(
             'press flex-1 rounded-full h-12 bg-foreground text-background font-semibold flex items-center justify-center gap-2 transition-colors',
             added && 'bg-success',
+            soldOut && 'opacity-50 cursor-not-allowed',
           )}
         >
-          {added ? <><Check className="w-5 h-5" /> تمت الإضافة</> : <><ShoppingBag className="w-5 h-5" /> أضِف إلى العربة</>}
+          {soldOut ? 'نفد المخزون' : added ? <><Check className="w-5 h-5" /> تمت الإضافة</> : <><ShoppingBag className="w-5 h-5" /> أضِف إلى العربة</>}
         </button>
       </div>
 

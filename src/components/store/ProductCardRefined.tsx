@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Cake, Plus, Check, Star, Heart } from 'lucide-react';
 import { StoreProduct } from '@/hooks/useCustomerStore';
+import { isSoldOut } from '@/hooks/usePublicStore';
 import { cn } from '@/lib/utils';
 
 interface ProductCardRefinedProps {
@@ -27,8 +28,10 @@ export function ProductCardRefined({
   const fav = isFav ?? favLocal;
   const toggleFav = onToggleFav ?? (() => setFavLocal((f) => !f));
   const [added, setAdded] = useState(false);
+  const soldOut = isSoldOut(product);
 
   const handleAdd = () => {
+    if (soldOut) return;
     onAddToCart();
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1300);
@@ -58,6 +61,12 @@ export function ProductCardRefined({
           <span className="absolute top-3 start-3 px-2.5 py-1 rounded-full bg-background/85 backdrop-blur text-[10px] font-medium text-foreground tracking-wide">
             {product.category}
           </span>
+        )}
+
+        {soldOut && (
+          <div className="absolute inset-0 z-[2] bg-background/45 flex items-center justify-center pointer-events-none">
+            <span className="px-3 py-1.5 rounded-full bg-foreground/85 text-background text-xs font-bold backdrop-blur">نفد المخزون</span>
+          </div>
         )}
 
         <button
@@ -116,11 +125,13 @@ export function ProductCardRefined({
           </div>
           <button
             onClick={handleAdd}
-            aria-label="أضف إلى العربة"
+            disabled={soldOut}
+            aria-label={soldOut ? 'نفد المخزون' : 'أضف إلى العربة'}
             className={cn(
               'add-btn press relative rounded-full h-11 w-11 shrink-0 shadow-rose-glow bg-foreground text-background',
               'hover:bg-foreground/90 hover:scale-105 transition-transform flex items-center justify-center overflow-hidden',
-              added && 'added'
+              added && 'added',
+              soldOut && 'opacity-40 cursor-not-allowed hover:scale-100 shadow-none'
             )}
           >
             <Plus className="icon-plus w-5 h-5" />

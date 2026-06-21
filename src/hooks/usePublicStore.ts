@@ -9,6 +9,8 @@ export interface StoreProduct {
   category: string | null;
   image_url: string | null;
   occasions?: string[] | null;
+  is_available?: boolean | null;
+  stock?: number | null;
 }
 
 export interface StoreBranch {
@@ -16,6 +18,10 @@ export interface StoreBranch {
   name: string;
   address: string | null;
 }
+
+/** A product is unavailable when explicitly flagged out, or its stock hits zero. */
+export const isSoldOut = (p: { is_available?: boolean | null; stock?: number | null }) =>
+  p.is_available === false || p.stock === 0;
 
 // Get products for public store display (no auth required)
 export function usePublicStoreProducts() {
