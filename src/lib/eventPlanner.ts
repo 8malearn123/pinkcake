@@ -5,6 +5,7 @@
  * editable package. No I/O. Every constant is sourced to the portion/staffing
  * research in §1.2/§1.3 so the events team can reason about (and later tune) it.
  */
+import type { LucideIcon } from 'lucide-react';
 import {
   CAKES, MINIS, OTHER_DESSERTS, STATIONS, SERVER_SKU, catalogItem,
   type ServeStyle, type CatalogItem,
@@ -28,7 +29,7 @@ export interface EventConfig {
 export interface EventLineItem {
   catalogId: string;
   name: string;
-  emoji: string;
+  icon: LucideIcon;
   kind: string;
   unitPrice: number;
   unitLabel: string;
@@ -67,7 +68,7 @@ function fromCatalog(item: CatalogItem, qty: number, extra: Partial<EventLineIte
   return {
     catalogId: item.id,
     name: item.name,
-    emoji: item.emoji,
+    icon: item.icon,
     kind: item.kind,
     unitPrice: item.unitPrice,
     unitLabel: item.unitLabel,

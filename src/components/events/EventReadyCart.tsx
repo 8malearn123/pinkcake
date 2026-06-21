@@ -35,7 +35,9 @@ export function EventReadyCart({ guestCount, items, notes, onQty, onRemove, onSu
         )}
         {items.map((it) => (
           <div key={it.catalogId} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
-            <div className="w-12 h-12 rounded-xl grid place-items-center text-2xl shrink-0 bg-gradient-to-br from-blush to-card border border-border/40" aria-hidden>{it.emoji}</div>
+            <div className="w-12 h-12 rounded-xl grid place-items-center shrink-0 bg-primary/[0.08] text-primary ring-1 ring-inset ring-primary/15">
+              <it.icon className="w-5 h-5" strokeWidth={1.75} />
+            </div>
             <div className="min-w-0 flex-1">
               <div className="font-bold text-sm leading-tight">{it.name}</div>
               <div className="text-[11px] text-muted-foreground mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">

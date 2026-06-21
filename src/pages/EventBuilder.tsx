@@ -294,7 +294,7 @@ function LiveSummary({ cfg, branchName, subtotal, live }: { cfg: WizardState; br
         </p>
       ) : (
         <div className="mt-3">
-          {occ && <Row label="المناسبة" value={<span>{occ.emoji} {occ.label}</span>} />}
+          {occ && <Row label="المناسبة" value={<span className="inline-flex items-center gap-1.5"><occ.icon className="w-3.5 h-3.5 text-primary" /> {occ.label}</span>} />}
           {cfg.guestCount > 0 && <Row label="عدد الضيوف" value={<span><bdi dir="ltr">{cfg.guestCount}</bdi> ضيف</span>} />}
           {styles.length > 0 && <Row label="الأصناف" value={<span className="leading-relaxed">{styles.join(' · ')}</span>} />}
           {stationLabel && <Row label="ركن الضيافة" value={stationLabel} />}
