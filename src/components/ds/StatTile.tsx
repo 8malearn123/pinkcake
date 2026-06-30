@@ -12,8 +12,6 @@ interface StatTileProps {
     value: number;
     isPositive: boolean;
   };
-  /** 'compact' for dense control-room boards (اللوحة المباشرة)؛ الافتراضي للملخصات. */
-  size?: 'default' | 'compact';
   className?: string;
 }
 
@@ -30,31 +28,8 @@ const TONE_STYLES: Record<StatTone, { iconBox: string; value: string }> = {
 /**
  * بطاقة الإحصائيات الموحّدة لكل لوحات النظام (المطبخ، الفرع، السائق، التحكم...).
  */
-export function StatTile({ label, value, icon: Icon, tone = 'neutral', trend, size = 'default', className }: StatTileProps) {
+export function StatTile({ label, value, icon: Icon, tone = 'neutral', trend, className }: StatTileProps) {
   const styles = TONE_STYLES[tone];
-
-  // Compact: a denser, lighter tile (icon beside the value) for boards that
-  // show many metrics at once. No heavy shadow — keeps the screen airy.
-  if (size === 'compact') {
-    return (
-      <div
-        className={cn(
-          'rounded-2xl border border-border/60 bg-card p-4 flex items-center gap-3 hover:border-primary/30 transition-colors duration-300',
-          className
-        )}
-      >
-        {Icon && (
-          <div className={cn('w-11 h-11 rounded-xl flex items-center justify-center shrink-0', styles.iconBox)}>
-            <Icon className="w-5 h-5" />
-          </div>
-        )}
-        <div className="min-w-0">
-          <p className={cn('text-2xl font-bold leading-none', styles.value)}>{value}</p>
-          <p className="text-muted-foreground text-xs font-medium mt-1.5 truncate">{label}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={cn('glass-card rounded-2xl p-6 hover:shadow-xl transition-all duration-300', className)}>

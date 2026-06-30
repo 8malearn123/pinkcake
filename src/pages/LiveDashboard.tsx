@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader, StatTile, SectionCard, EmptyState, LoadingState } from '@/components/ds';
+import { PageHeader, SectionCard, EmptyState, LoadingState } from '@/components/ds';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,6 +24,7 @@ import {
   ArrowUp,
   ArrowDown,
   Minus,
+  ChevronLeft,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -104,6 +105,14 @@ export default function LiveDashboard() {
   // Get orders needing attention (pending approval)
   const urgentOrders = orders?.filter((o) => o.status === 'pending_approval').slice(0, 5) || [];
 
+  // The order pipeline — the stages a cake moves through, in flow order.
+  const pipeline = [
+    { key: 'pending', label: 'بانتظار الموافقة', value: stats.pendingApproval, icon: Clock, box: 'bg-warning/10 text-warning', text: 'text-warning' },
+    { key: 'prep', label: 'قيد التجهيز', value: stats.paid + stats.preparing, icon: ChefHat, box: 'bg-info/10 text-info', text: 'text-info' },
+    { key: 'delivery', label: 'في التوصيل', value: stats.readyToShip + stats.inTransit, icon: Truck, box: 'bg-primary/10 text-primary', text: 'text-primary' },
+    { key: 'done', label: 'مكتمل', value: stats.completed, icon: CheckCircle2, box: 'bg-success/10 text-success', text: 'text-success' },
+  ];
+
   return (
     <MainLayout>
       <div className="space-y-5">
@@ -134,14 +143,45 @@ export default function LiveDashboard() {
           <LoadingState label="جاري تحميل اللوحة المباشرة..." />
         ) : (
           <>
-            {/* Live Stats — compact strip; revenue leads, then the pipeline */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
-              <StatTile size="compact" label="إيرادات اليوم" value={formatCurrency(stats.todayRevenue)} icon={TrendingUp} tone="primary" />
-              <StatTile size="compact" label="إجمالي الطلبات" value={stats.totalOrders} icon={Package} tone="neutral" />
-              <StatTile size="compact" label="بانتظار الموافقة" value={stats.pendingApproval} icon={Clock} tone="warning" />
-              <StatTile size="compact" label="قيد التجهيز" value={stats.paid + stats.preparing} icon={ChefHat} tone="info" />
-              <StatTile size="compact" label="في التوصيل" value={stats.readyToShip + stats.inTransit} icon={Truck} tone="info" />
-              <StatTile size="compact" label="مكتمل" value={stats.completed} icon={CheckCircle2} tone="success" />
+            {/* Ops command bar — revenue + total summary, then the live order pipeline */}
+            <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-sm">
+              <div className="flex flex-col lg:flex-row">
+                {/* Summary: today's revenue (hero) + total orders */}
+                <div className="flex items-center gap-5 p-5 bg-primary/[0.04] border-b lg:border-b-0 lg:border-e border-border/60 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl gradient-pink shadow-warm flex items-center justify-center shrink-0">
+                      <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold leading-none">{formatCurrency(stats.todayRevenue)}</p>
+                      <p className="text-xs text-muted-foreground mt-1.5">إيرادات اليوم</p>
+                    </div>
+                  </div>
+                  <div className="w-px self-stretch bg-border/60" />
+                  <div>
+                    <p className="text-2xl font-bold leading-none">{stats.totalOrders}</p>
+                    <p className="text-xs text-muted-foreground mt-1.5">إجمالي الطلبات</p>
+                  </div>
+                </div>
+
+                {/* Pipeline: where the day's orders currently sit */}
+                <div className="flex items-center justify-between gap-1 p-4 flex-1 overflow-x-auto scrollbar-none">
+                  {pipeline.map((stage, i) => (
+                    <Fragment key={stage.key}>
+                      <div className="flex flex-col items-center gap-1.5 px-2 shrink-0">
+                        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stage.box)}>
+                          <stage.icon className="w-5 h-5" />
+                        </div>
+                        <p className={cn('text-xl font-bold leading-none', stage.text)}>{stage.value}</p>
+                        <p className="text-xs text-muted-foreground text-center leading-tight whitespace-nowrap">{stage.label}</p>
+                      </div>
+                      {i < pipeline.length - 1 && (
+                        <ChevronLeft className="w-4 h-4 text-muted-foreground/30 shrink-0" />
+                      )}
+                    </Fragment>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Panels — what needs action first, then the live feeds */}
