@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { LoadingState, ErrorState } from '@/components/ds';
-import { useKitchenOrders, useUpdateKitchenOrderStatus, useMarkOrderReady, useSendToBranch } from '@/hooks/useKitchenOrders';
+import { PageHeader, EmptyState, LoadingState, ErrorState } from '@/components/ds';
+import { useKitchenOrders, useUpdateKitchenOrderStatus, useMarkOrderReady, useSendToBranch, type KitchenOrder } from '@/hooks/useKitchenOrders';
 import { useCustomOrdersForReview, type CustomOrderForReview } from '@/hooks/useCustomOrders';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { OrderTransferDialog } from '@/components/orders/OrderTransferDialog';
@@ -14,10 +14,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHandoverBarcode } from '@/hooks/useHandoverBarcodes';
 import { OrderStatus } from '@/types/order';
-import { 
-  ChefHat, 
-  Clock, 
-  MapPin, 
+import { cn } from '@/lib/utils';
+import {
+  ChefHat,
+  Clock,
+  MapPin,
   CheckCircle2,
   ArrowLeft,
   Package,
@@ -29,72 +30,243 @@ import {
   Users,
   Image,
   PartyPopper,
+  RefreshCw,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
+const formatTime = (time: string | null) => (time ? time.substring(0, 5) : '-');
+const formatDate = (date: string | null) => (date ? new Date(date).toLocaleDateString('ar-SA') : '-');
+
+/* ── Prep-board lanes ─────────────────────────────────────────────────────
+   The kitchen is a ticket rail: paid orders wait, get prepared, then ship.
+   Each workflow stage is a lane whose header carries its own live count, so
+   no separate stats row is needed. */
+type LaneTone = 'warning' | 'info' | 'primary';
+
+const LANE_TONE: Record<LaneTone, { iconBox: string; count: string; accent: string }> = {
+  warning: { iconBox: 'bg-warning/10 text-warning', count: 'bg-warning/15 text-warning', accent: 'bg-warning' },
+  info: { iconBox: 'bg-info/10 text-info', count: 'bg-info/15 text-info', accent: 'bg-info' },
+  primary: { iconBox: 'gradient-pink text-white', count: 'bg-primary/15 text-primary', accent: 'gradient-pink' },
+};
+
+const LANES: { status: OrderStatus; label: string; icon: typeof Clock; tone: LaneTone }[] = [
+  { status: 'paid', label: 'بانتظار البدء', icon: Clock, tone: 'warning' },
+  { status: 'preparing', label: 'قيد التجهيز', icon: ChefHat, tone: 'info' },
+  { status: 'ready_to_ship', label: 'جاهز للإرسال', icon: Package, tone: 'primary' },
+];
+
 function OrderBarcodeStatus({ orderId }: { orderId: string }) {
   const { data: barcode } = useHandoverBarcode(orderId, 'kitchen_handover');
   const hasBarcode = !!barcode;
-  
+
   return (
-    <div className="flex items-center gap-2 text-xs">
-      {hasBarcode ? (
-        <span className="bg-primary/10 text-primary px-2 py-1 rounded flex items-center gap-1">
-          <QrCode className="w-3 h-3" />
-          باركود جاهز
-        </span>
-      ) : (
-        <span className="bg-muted text-muted-foreground px-2 py-1 rounded flex items-center gap-1">
-          <QrCode className="w-3 h-3" />
-          بدون باركود
-        </span>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium',
+        hasBarcode ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
       )}
-    </div>
+    >
+      <QrCode className="w-3 h-3" />
+      {hasBarcode ? 'باركود جاهز' : 'بدون باركود'}
+    </span>
+  );
+}
+
+interface PrepCardProps {
+  order: KitchenOrder;
+  tone: LaneTone;
+  barcodeOpen: boolean;
+  onToggleBarcode: () => void;
+  onStart: () => void;
+  onReady: () => void;
+  onSend: () => void;
+  busy: boolean;
+  starting: boolean;
+  readying: boolean;
+  sending: boolean;
+}
+
+function PrepCard({
+  order, tone, barcodeOpen, onToggleBarcode, onStart, onReady, onSend, busy, starting, readying, sending,
+}: PrepCardProps) {
+  return (
+    <Card className="overflow-hidden bg-card border-border/60 shadow-sm hover:shadow-soft-lift hover:-translate-y-0.5 transition-all duration-200">
+      <div className={cn('h-1.5', LANE_TONE[tone].accent)} />
+      <div className="p-4 space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-mono font-bold text-primary text-sm">{order.order_number}</span>
+          <StatusBadge status={order.status as OrderStatus} showIcon={false} className="text-xs px-2 py-0.5" />
+        </div>
+
+        <div className="space-y-1.5 text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{order.branch_name || 'غير محدد'}</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Clock className="w-3.5 h-3.5 shrink-0" />
+            <span>الاستلام {formatTime(order.delivery_time)} · {formatDate(order.delivery_date)}</span>
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-muted/40 p-3 space-y-1">
+          {order.items?.map((item, index) => (
+            <div key={index} className="flex items-center justify-between text-sm">
+              <span className="truncate">{item.product_name}</span>
+              <span className="font-semibold text-muted-foreground shrink-0 ms-2">×{item.quantity}</span>
+            </div>
+          ))}
+          {order.notes && (
+            <p className="text-xs text-muted-foreground pt-1.5 mt-1 border-t border-border/50">
+              <span className="font-medium">ملاحظات:</span> {order.notes}
+            </p>
+          )}
+        </div>
+
+        {order.status === 'paid' && (
+          <Button onClick={onStart} className="w-full gradient-pink text-white shadow-warm hover:opacity-90" disabled={busy}>
+            {starting ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <ChefHat className="w-4 h-4 me-1.5" />}
+            بدء التجهيز
+          </Button>
+        )}
+
+        {order.status === 'preparing' && (
+          <Button onClick={onReady} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={busy}>
+            {readying ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <CheckCircle2 className="w-4 h-4 me-1.5" />}
+            تم التجهيز (إنشاء باركود)
+          </Button>
+        )}
+
+        {order.status === 'ready_to_ship' && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <OrderBarcodeStatus orderId={order.id} />
+              <Button onClick={onToggleBarcode} variant="ghost" size="sm" className="h-7 text-xs text-primary hover:bg-primary/5">
+                <QrCode className="w-3.5 h-3.5 me-1" />
+                {barcodeOpen ? 'إخفاء' : 'عرض الباركود'}
+              </Button>
+            </div>
+            <Button onClick={onSend} variant="outline" className="w-full text-primary border-primary/30 hover:bg-primary/5" disabled={busy}>
+              {sending ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <ArrowLeft className="w-4 h-4 me-1.5" />}
+              إرسال للفرع
+            </Button>
+            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              يجب مسح الباركود من السائق أولاً
+            </p>
+            {barcodeOpen && (
+              <div className="pt-2 border-t border-border/50">
+                <HandoverBarcodeDisplay
+                  orderId={order.id}
+                  barcodeType="kitchen_handover"
+                  title="باركود تسليم المطبخ"
+                  description="يجب على السائق مسح هذا الباركود لاستلام الطلب"
+                  canGenerate={false}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function CustomCard({ order, onReview }: { order: CustomOrderForReview; onReview: () => void }) {
+  const isEvent = order.order_kind === 'event';
+  const chips = [order.flavor, order.filling, order.sugar_level].filter(Boolean) as string[];
+
+  return (
+    <Card className="overflow-hidden bg-card border-border/60 shadow-sm hover:shadow-soft-lift hover:-translate-y-0.5 transition-all duration-200">
+      <div className={cn('h-1.5', isEvent ? 'gradient-pink' : 'bg-primary/40')} />
+      <div className="p-4 space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-mono font-bold text-primary text-sm">{order.order_number}</span>
+          {isEvent ? (
+            <Badge className="bg-primary text-primary-foreground gap-1">
+              <PartyPopper className="w-3 h-3" /> ضيافة
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">بانتظار المراجعة</Badge>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            {isEvent ? <PartyPopper className="w-5 h-5" /> : <Cake className="w-5 h-5" />}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold truncate leading-tight">{order.product_type}</p>
+            {order.occasion && <p className="text-xs text-muted-foreground truncate">{order.occasion}</p>}
+          </div>
+        </div>
+
+        <div className="space-y-1.5 text-sm text-muted-foreground">
+          {order.number_of_people && (
+            <div className="flex items-center gap-2">
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span>{order.number_of_people} شخص</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{order.branch_name}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="w-3.5 h-3.5 shrink-0" />
+            <span>{format(new Date(order.pickup_date), 'PPP', { locale: ar })} · {order.pickup_time}</span>
+          </div>
+        </div>
+
+        {chips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {chips.map((chip, i) => (
+              <Badge key={i} variant="secondary" className="text-xs font-normal">{chip}</Badge>
+            ))}
+          </div>
+        )}
+
+        {order.writing_text && (
+          <div className="rounded-xl bg-muted/40 p-2.5 text-sm">
+            <span className="text-muted-foreground text-xs">الكتابة: </span>
+            <span className="font-medium">"{order.writing_text}"</span>
+          </div>
+        )}
+
+        {order.reference_image_url && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Image className="w-3.5 h-3.5" /> صورة مرجعية مرفقة
+          </div>
+        )}
+
+        <Button onClick={onReview} className="w-full gradient-pink text-white shadow-warm hover:opacity-90">
+          {isEvent ? <PartyPopper className="w-4 h-4 me-1.5" /> : <Cake className="w-4 h-4 me-1.5" />}
+          مراجعة الطلب
+        </Button>
+      </div>
+    </Card>
   );
 }
 
 export default function Kitchen() {
   const [transferOrderId, setTransferOrderId] = useState<string | null>(null);
-  const [transferBranchId, setTransferBranchId] = useState<string | null>(null);
+  const [transferBranchId] = useState<string | null>(null);
   const [showBarcodeOrderId, setShowBarcodeOrderId] = useState<string | null>(null);
   const [reviewOrder, setReviewOrder] = useState<CustomOrderForReview | null>(null);
 
   const { data: kitchenOrders = [], isLoading, error, refetch } = useKitchenOrders();
   const { data: customOrders = [], isLoading: customLoading, error: customError, refetch: refetchCustom } = useCustomOrdersForReview();
 
-  // Most urgent first: in-progress, then awaiting start, then outbound; oldest first within each.
-  const STATUS_ORDER: Record<string, number> = { preparing: 0, paid: 1, ready_to_ship: 2 };
-  const sortedKitchenOrders = [...kitchenOrders].sort((a, b) => {
-    const s = (STATUS_ORDER[a.status as string] ?? 9) - (STATUS_ORDER[b.status as string] ?? 9);
-    if (s !== 0) return s;
-    return new Date(a.created_at as string).getTime() - new Date(b.created_at as string).getTime();
-  });
   const updateStatus = useUpdateKitchenOrderStatus();
   const markReady = useMarkOrderReady();
   const sendToBranch = useSendToBranch();
 
-  const handleStartPreparing = (orderId: string) => {
-    updateStatus.mutate({ orderId, status: 'preparing' });
-  };
-
-  const handleMarkReady = (orderId: string) => {
-    markReady.mutate(orderId);
-  };
-
-  const handleSendToBranch = (orderId: string) => {
-    sendToBranch.mutate(orderId);
-  };
-
-  const formatTime = (time: string | null) => {
-    if (!time) return '-';
-    return time.substring(0, 5);
-  };
-
-  const formatDate = (date: string | null) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('ar-SA');
-  };
+  // Oldest first within each lane so the chef works the queue in order.
+  const byLane = (status: OrderStatus) =>
+    [...kitchenOrders]
+      .filter((o) => o.status === status)
+      .sort((a, b) => new Date(a.created_at as string).getTime() - new Date(b.created_at as string).getTime());
 
   if (isLoading) {
     return (
@@ -107,224 +279,112 @@ export default function Kitchen() {
   if (error) {
     return (
       <MainLayout>
-        <ErrorState
-          title="حدث خطأ في تحميل الطلبات"
-          onRetry={() => refetch()}
-        />
+        <ErrorState title="حدث خطأ في تحميل الطلبات" onRetry={() => refetch()} />
       </MainLayout>
     );
   }
 
-  const isLoaderActive = updateStatus.isPending || markReady.isPending || sendToBranch.isPending;
+  const busy = updateStatus.isPending || markReady.isPending || sendToBranch.isPending;
 
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl gradient-pink flex items-center justify-center">
-            <ChefHat className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold">المطبخ المركزي</h1>
-            <p className="text-muted-foreground">إدارة تجهيز الطلبات</p>
-          </div>
-        </div>
+        <PageHeader
+          title="المطبخ المركزي"
+          description="إدارة تجهيز الطلبات"
+          icon={ChefHat}
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => { refetch(); refetchCustom(); }}
+            >
+              <RefreshCw className="w-4 h-4" />
+              تحديث
+            </Button>
+          }
+        />
 
         <Tabs defaultValue="regular" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="regular" className="flex items-center gap-2">
               <ChefHat className="w-4 h-4" />
               الطلبات العادية
-              {kitchenOrders.length > 0 && (
-                <Badge variant="secondary" className="ms-1">{kitchenOrders.length}</Badge>
-              )}
+              {kitchenOrders.length > 0 && <Badge variant="secondary" className="ms-1">{kitchenOrders.length}</Badge>}
             </TabsTrigger>
             <TabsTrigger value="custom" className="flex items-center gap-2">
               <Cake className="w-4 h-4" />
               طلبات مخصصة
-              {customOrders.length > 0 && (
-                <Badge variant="destructive" className="ms-1">{customOrders.length}</Badge>
-              )}
+              {customOrders.length > 0 && <Badge variant="destructive" className="ms-1">{customOrders.length}</Badge>}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="regular" className="space-y-6 mt-6">
-            {/* Barcode Workflow Notice */}
-            <Alert className="border-primary/30 bg-primary/5">
+          {/* ── Regular orders: kanban prep board ── */}
+          <TabsContent value="regular" className="space-y-5 mt-6">
+            <Alert className="border-primary/20 bg-primary/5">
               <ScanLine className="h-4 w-4" />
               <AlertDescription>
                 <strong>نظام التسليم بالباركود:</strong> يجب على السائق مسح الباركود من الطلب الجاهز قبل إرساله للفرع.
               </AlertDescription>
             </Alert>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Card className="p-4 bg-secondary/50 border-secondary">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-secondary-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">بانتظار البدء</p>
-                    <p className="text-2xl font-bold">
-                      {kitchenOrders.filter(o => o.status === 'paid').length}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4 bg-accent/50 border-accent">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
-                    <ChefHat className="w-5 h-5 text-accent-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">قيد التجهيز</p>
-                    <p className="text-2xl font-bold">
-                      {kitchenOrders.filter(o => o.status === 'preparing').length}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4 bg-primary/10 border-primary/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                    <Package className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">جاهز للإرسال</p>
-                    <p className="text-2xl font-bold text-primary">
-                      {kitchenOrders.filter(o => o.status === 'ready_to_ship').length}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Orders Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedKitchenOrders.map((order) => (
-                <Card key={order.id} className="p-5 glass-card hover:shadow-lg transition-shadow">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-mono font-bold text-primary">{order.order_number}</span>
-                    <StatusBadge status={order.status as OrderStatus} showIcon={false} />
-                  </div>
-
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span>{order.branch_name || 'غير محدد'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span>الاستلام: {formatTime(order.delivery_time)} - {formatDate(order.delivery_date)}</span>
-                    </div>
-                    {order.status === 'ready_to_ship' && (
-                      <OrderBarcodeStatus orderId={order.id} />
-                    )}
-                  </div>
-
-                  <div className="border-t border-border pt-4 mb-4">
-                    <p className="text-sm font-medium mb-2">المنتجات:</p>
-                    <div className="space-y-1">
-                      {order.items?.map((item, index) => (
-                        <div key={index} className="flex justify-between text-sm">
-                          <span>{item.product_name}</span>
-                          <span className="font-medium">×{item.quantity}</span>
+            {kitchenOrders.length === 0 ? (
+              <EmptyState
+                icon={ChefHat}
+                title="لا توجد طلبات للتجهيز حالياً"
+                description="عندما يُدفع طلب جديد سيظهر هنا في مسار التجهيز مباشرة."
+              />
+            ) : (
+              <div className="grid gap-4 md:grid-cols-3">
+                {LANES.map((lane) => {
+                  const orders = byLane(lane.status);
+                  const tone = LANE_TONE[lane.tone];
+                  const Icon = lane.icon;
+                  return (
+                    <div key={lane.status} className="rounded-2xl bg-muted/30 border border-border/40 p-3">
+                      <div className="flex items-center gap-2 px-1 pb-3">
+                        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', tone.iconBox)}>
+                          <Icon className="w-4 h-4" />
                         </div>
-                      ))}
-                    </div>
-                    {order.notes && (
-                      <p className="text-sm text-muted-foreground mt-2 bg-muted p-2 rounded">
-                        ملاحظات: {order.notes}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    {order.status === 'paid' && (
-                      <Button 
-                        onClick={() => handleStartPreparing(order.id)}
-                        className="w-full gradient-pink text-white"
-                        disabled={isLoaderActive}
-                      >
-                        {updateStatus.isPending ? (
-                          <Loader2 className="w-4 h-4 me-1 animate-spin" />
+                        <span className="font-semibold">{lane.label}</span>
+                        <span className={cn('ms-auto text-xs font-bold px-2 py-0.5 rounded-full', tone.count)}>
+                          {orders.length}
+                        </span>
+                      </div>
+                      <div className="space-y-3">
+                        {orders.length === 0 ? (
+                          <p className="text-xs text-muted-foreground/70 text-center py-8 border border-dashed border-border/50 rounded-xl">
+                            لا طلبات في هذه المرحلة
+                          </p>
                         ) : (
-                          <ChefHat className="w-4 h-4 me-1" />
+                          orders.map((order) => (
+                            <PrepCard
+                              key={order.id}
+                              order={order}
+                              tone={lane.tone}
+                              barcodeOpen={showBarcodeOrderId === order.id}
+                              onToggleBarcode={() => setShowBarcodeOrderId(showBarcodeOrderId === order.id ? null : order.id)}
+                              onStart={() => updateStatus.mutate({ orderId: order.id, status: 'preparing' })}
+                              onReady={() => markReady.mutate(order.id)}
+                              onSend={() => sendToBranch.mutate(order.id)}
+                              busy={busy}
+                              starting={updateStatus.isPending}
+                              readying={markReady.isPending}
+                              sending={sendToBranch.isPending}
+                            />
+                          ))
                         )}
-                        بدء التجهيز
-                      </Button>
-                    )}
-                    {order.status === 'preparing' && (
-                      <Button 
-                        onClick={() => handleMarkReady(order.id)}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                        disabled={isLoaderActive}
-                      >
-                        {markReady.isPending ? (
-                          <Loader2 className="w-4 h-4 me-1 animate-spin" />
-                        ) : (
-                          <CheckCircle2 className="w-4 h-4 me-1" />
-                        )}
-                        تم التجهيز (إنشاء باركود)
-                      </Button>
-                    )}
-                    {order.status === 'ready_to_ship' && (
-                      <>
-                        <Button 
-                          onClick={() => setShowBarcodeOrderId(showBarcodeOrderId === order.id ? null : order.id)}
-                          variant="outline" 
-                          className="w-full"
-                        >
-                          <QrCode className="w-4 h-4 me-1" />
-                          {showBarcodeOrderId === order.id ? 'إخفاء الباركود' : 'عرض الباركود للسائق'}
-                        </Button>
-                        <Button 
-                          onClick={() => handleSendToBranch(order.id)}
-                          variant="outline" 
-                          className="w-full text-primary border-primary/30"
-                          disabled={isLoaderActive}
-                        >
-                          {sendToBranch.isPending ? (
-                            <Loader2 className="w-4 h-4 me-1 animate-spin" />
-                          ) : (
-                            <ArrowLeft className="w-4 h-4 me-1" />
-                          )}
-                          إرسال للفرع
-                        </Button>
-                        <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
-                          <AlertTriangle className="w-3 h-3" />
-                          يجب مسح الباركود من السائق أولاً
-                        </p>
-                      </>
-                    )}
-                  </div>
-                  
-                  {showBarcodeOrderId === order.id && order.status === 'ready_to_ship' && (
-                    <div className="mt-4 pt-4 border-t">
-                      <HandoverBarcodeDisplay
-                        orderId={order.id}
-                        barcodeType="kitchen_handover"
-                        title="باركود تسليم المطبخ"
-                        description="يجب على السائق مسح هذا الباركود لاستلام الطلب"
-                        canGenerate={false}
-                      />
+                      </div>
                     </div>
-                  )}
-                </Card>
-              ))}
-            </div>
-
-            {kitchenOrders.length === 0 && (
-              <div className="text-center py-16">
-                <ChefHat className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-xl font-medium text-muted-foreground">لا توجد طلبات للتجهيز حالياً</p>
+                  );
+                })}
               </div>
             )}
           </TabsContent>
 
-          <TabsContent value="custom" className="space-y-6 mt-6">
+          {/* ── Custom / hospitality review queue ── */}
+          <TabsContent value="custom" className="space-y-5 mt-6">
             <Alert className="border-primary/30 bg-primary/10">
               <Cake className="h-4 w-4 text-primary" />
               <AlertDescription className="text-primary">
@@ -335,108 +395,23 @@ export default function Kitchen() {
             {customError ? (
               <ErrorState title="تعذّر تحميل الطلبات المخصصة" onRetry={() => refetchCustom()} />
             ) : customLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
+              <LoadingState label="جاري تحميل الطلبات المخصصة..." />
             ) : customOrders.length === 0 ? (
-              <div className="text-center py-16">
-                <Cake className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-xl font-medium text-muted-foreground">لا توجد طلبات مخصصة للمراجعة</p>
-              </div>
+              <EmptyState
+                icon={Cake}
+                title="لا توجد طلبات مخصصة للمراجعة"
+                description="ستظهر هنا طلبات الكيك المخصص والضيافة بانتظار التسعير."
+              />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {customOrders.map((order) => (
-                  <Card key={order.id} className="p-5 border-primary/30 bg-card hover:shadow-lg transition-shadow">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="font-mono font-bold text-primary">{order.order_number}</span>
-                      {order.order_kind === 'event' ? (
-                        <Badge className="bg-primary text-primary-foreground gap-1">
-                          <PartyPopper className="w-3 h-3" /> ضيافة
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                          بانتظار المراجعة
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Cake className="w-4 h-4 text-primary" />
-                        <span className="font-medium">{order.product_type}</span>
-                      </div>
-                      {order.occasion && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>المناسبة: {order.occasion}</span>
-                        </div>
-                      )}
-                      {order.number_of_people && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Users className="w-4 h-4" />
-                          <span>{order.number_of_people} شخص</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
-                        <span>{order.branch_name}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span>
-                          {format(new Date(order.pickup_date), 'PPP', { locale: ar })} - {order.pickup_time}
-                        </span>
-                      </div>
-                    </div>
-
-                    {(order.flavor || order.filling) && (
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {order.flavor && (
-                          <Badge variant="secondary" className="text-xs">
-                            {order.flavor}
-                          </Badge>
-                        )}
-                        {order.filling && (
-                          <Badge variant="secondary" className="text-xs">
-                            {order.filling}
-                          </Badge>
-                        )}
-                        {order.sugar_level && (
-                          <Badge variant="secondary" className="text-xs">
-                            {order.sugar_level}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-
-                    {order.writing_text && (
-                      <div className="mb-3 p-2 bg-muted rounded text-sm">
-                        <span className="text-muted-foreground">الكتابة: </span>
-                        <span className="font-medium">"{order.writing_text}"</span>
-                      </div>
-                    )}
-
-                    {order.reference_image_url && (
-                      <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                        <Image className="w-4 h-4" />
-                        <span>يوجد صورة مرجعية</span>
-                      </div>
-                    )}
-
-                    <Button 
-                      onClick={() => setReviewOrder(order)}
-                      className="w-full bg-primary hover:bg-primary text-white"
-                    >
-                      <Cake className="w-4 h-4 me-1" />
-                      مراجعة الطلب
-                    </Button>
-                  </Card>
+                  <CustomCard key={order.id} order={order} onReview={() => setReviewOrder(order)} />
                 ))}
               </div>
             )}
           </TabsContent>
         </Tabs>
 
-        {/* Transfer Dialog */}
         <OrderTransferDialog
           open={!!transferOrderId}
           onOpenChange={(open) => !open && setTransferOrderId(null)}
@@ -444,7 +419,6 @@ export default function Kitchen() {
           currentBranchId={transferBranchId}
         />
 
-        {/* Chef Review Dialog */}
         <ChefReviewDialog
           order={reviewOrder}
           open={!!reviewOrder}
