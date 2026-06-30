@@ -38,7 +38,14 @@ const READ: Record<string, (args: Args) => unknown> = {
   get_kitchen_orders_secure: () => d.ORDERS.filter((o) => ['paid', 'preparing', 'ready_to_ship'].includes(o.status as string)),
   get_driver_orders: () => d.ORDERS.filter((o) => ['ready_to_ship', 'in_transit'].includes(o.status as string)),
   get_priced_orders_for_support: () => d.CUSTOM_ORDERS,
-  get_custom_orders_for_review: () => d.CUSTOM_ORDERS,
+  // Chef's review queue: only orders still awaiting a price.
+  get_custom_orders_for_review: () =>
+    d.CUSTOM_ORDERS.filter((o) => ['custom_pending_review', 'sent_to_chef'].includes(o.status as string)),
+  // Chef sets feasibility + price; echo the submitted price so the toast is accurate.
+  chef_review_custom_order: (a) => ({
+    new_status: a?.['_feasibility'] === 'not_feasible' ? 'custom_rejected' : 'chef_priced',
+    price: a?.['_proposed_price'] ?? 0,
+  }),
   get_order_details_secure: (a) => d.ORDERS.find((o) => o.id === a?.['_order_id']) ?? d.ORDERS[0],
   get_order_by_tracking_code: (a) => {
     const code = a?.['_tracking_code'];

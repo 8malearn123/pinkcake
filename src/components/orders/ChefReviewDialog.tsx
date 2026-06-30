@@ -31,9 +31,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useChefReviewOrder, CustomOrderForReview } from '@/hooks/useCustomOrders';
-import { Loader2, Check, X, Clock, Users, Cake, Image } from 'lucide-react';
+import { Loader2, Check, X, Clock, Users, Cake, Image, PartyPopper } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+
+const SERVE_LABELS: Record<string, string> = {
+  centerpiece_cake: 'كيكة المناسبة', assorted_mini: 'حلا ميني متنوّع', chocolate: 'شوكولاتة ضيافة',
+  cupcake: 'كب كيك', maamoul: 'معمول وبيتفور', trays: 'صواني حلا',
+};
+const STATION_LABELS: Record<string, string> = { ready_corner: 'ركن حلا جاهز', live: 'محطة حية', none: 'بدون' };
+const FULFILL_LABELS: Record<string, string> = { delivery: 'توصيل', onsite_setup: 'تجهيز في الموقع' };
+
+function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex justify-between gap-3">
+      <span className="text-muted-foreground">{label}:</span>
+      <span className="font-medium text-end">{value}</span>
+    </div>
+  );
+}
 
 const reviewSchema = z.object({
   feasibility: z.enum(['feasible', 'not_feasible', 'needs_modification']),
@@ -50,6 +66,14 @@ const reviewSchema = z.object({
 }, {
   message: 'سبب الرفض مطلوب',
   path: ['rejectionReason'],
+}).refine((data) => {
+  if (data.feasibility === 'needs_modification' && !data.customerNotes?.trim()) {
+    return false;
+  }
+  return true;
+}, {
+  message: 'يرجى ذكر التعديلات المطلوبة',
+  path: ['customerNotes'],
 });
 
 type ReviewFormData = z.infer<typeof reviewSchema>;
@@ -86,6 +110,14 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
   });
 
   const feasibility = form.watch('feasibility');
+  const isEvent = order?.order_kind === 'event';
+
+  // Reset the form whenever the dialog closes so stale values never bleed into
+  // the next order's review.
+  const handleClose = (next: boolean) => {
+    if (!next) form.reset();
+    onOpenChange(next);
+  };
 
   const onSubmit = async (data: ReviewFormData) => {
     if (!order) return;
@@ -107,12 +139,12 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
   if (!order) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Cake className="h-5 w-5" />
-            مراجعة الطلب المخصص - {order.order_number}
+            {isEvent ? <PartyPopper className="h-5 w-5 text-primary" /> : <Cake className="h-5 w-5" />}
+            {isEvent ? 'مراجعة طلب الضيافة' : 'مراجعة الطلب المخصص'} - {order.order_number}
           </DialogTitle>
         </DialogHeader>
 
@@ -152,52 +184,54 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                متطلبات المنتج
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">نوع المنتج:</span>
-                <Badge variant="secondary">{order.product_type}</Badge>
-              </div>
-              {order.occasion && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">المناسبة:</span>
-                  <span>{order.occasion}</span>
-                </div>
-              )}
-              {order.number_of_people && (
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">عدد الأشخاص:</span>
-                  <span className="flex items-center gap-1">
-                    <Users className="h-3 w-3" />
-                    {order.number_of_people}
-                  </span>
-                </div>
-              )}
-              {order.flavor && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">النكهة:</span>
-                  <span>{order.flavor}</span>
-                </div>
-              )}
-              {order.filling && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">الحشوة:</span>
-                  <span>{order.filling}</span>
-                </div>
-              )}
-              {order.sugar_level && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">السكر:</span>
-                  <span>{order.sugar_level}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {isEvent ? (
+            <Card className="border-primary/30 bg-primary/[0.03]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-primary flex items-center gap-1.5">
+                  <PartyPopper className="h-4 w-4" /> متطلبات الضيافة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {order.occasion && <DetailRow label="المناسبة" value={order.occasion} />}
+                {order.guest_count != null && (
+                  <DetailRow label="عدد الضيوف" value={<span className="flex items-center gap-1"><Users className="h-3 w-3" />{order.guest_count} ضيف</span>} />
+                )}
+                {order.serve_styles && order.serve_styles.length > 0 && (
+                  <DetailRow label="الأصناف" value={order.serve_styles.map((s) => SERVE_LABELS[s] ?? s).join(' · ')} />
+                )}
+                {order.station_type && order.station_type !== 'none' && (
+                  <DetailRow label="ركن الضيافة" value={STATION_LABELS[order.station_type] ?? order.station_type} />
+                )}
+                {order.servers_needed && (
+                  <DetailRow label="طاقم الخدمة" value={`${order.servers_count ?? '—'} مقدّم × ${order.service_hours ?? '—'} ساعات`} />
+                )}
+                {order.event_date && (
+                  <DetailRow label="تاريخ المناسبة" value={format(new Date(order.event_date), 'PPP', { locale: ar })} />
+                )}
+                {order.fulfillment_mode && (
+                  <DetailRow label="طريقة التقديم" value={FULFILL_LABELS[order.fulfillment_mode] ?? order.fulfillment_mode} />
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  متطلبات المنتج
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <DetailRow label="نوع المنتج" value={<Badge variant="secondary">{order.product_type}</Badge>} />
+                {order.occasion && <DetailRow label="المناسبة" value={order.occasion} />}
+                {order.number_of_people && (
+                  <DetailRow label="عدد الأشخاص" value={<span className="flex items-center gap-1"><Users className="h-3 w-3" />{order.number_of_people}</span>} />
+                )}
+                {order.flavor && <DetailRow label="النكهة" value={order.flavor} />}
+                {order.filling && <DetailRow label="الحشوة" value={order.filling} />}
+                {order.sugar_level && <DetailRow label="السكر" value={order.sugar_level} />}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Design Details */}
@@ -375,11 +409,15 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
                       name="customerNotes"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>ملاحظات للعميل</FormLabel>
+                          <FormLabel>
+                            {feasibility === 'needs_modification' ? 'التعديلات المطلوبة (تظهر للعميل) *' : 'ملاحظات للعميل'}
+                          </FormLabel>
                           <FormControl>
                             <Textarea
                               {...field}
-                              placeholder="ملاحظات ستظهر للعميل مع عرض السعر..."
+                              placeholder={feasibility === 'needs_modification'
+                                ? 'اذكر التعديلات التي يحتاجها الطلب ليصبح قابلاً للتنفيذ…'
+                                : 'ملاحظات ستظهر للعميل مع عرض السعر…'}
                               rows={2}
                             />
                           </FormControl>
@@ -416,7 +454,7 @@ export function ChefReviewDialog({ order, open, onOpenChange }: ChefReviewDialog
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
+                onClick={() => handleClose(false)}
               >
                 إلغاء
               </Button>

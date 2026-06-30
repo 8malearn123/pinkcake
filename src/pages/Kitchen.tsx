@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { LoadingState, ErrorState } from '@/components/ds';
 import { useKitchenOrders, useUpdateKitchenOrderStatus, useMarkOrderReady, useSendToBranch } from '@/hooks/useKitchenOrders';
-import { useCustomOrdersForReview } from '@/hooks/useCustomOrders';
+import { useCustomOrdersForReview, type CustomOrderForReview } from '@/hooks/useCustomOrders';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { OrderTransferDialog } from '@/components/orders/OrderTransferDialog';
 import { HandoverBarcodeDisplay } from '@/components/orders/HandoverBarcodeDisplay';
@@ -28,6 +28,7 @@ import {
   Cake,
   Users,
   Image,
+  PartyPopper,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -57,10 +58,18 @@ export default function Kitchen() {
   const [transferOrderId, setTransferOrderId] = useState<string | null>(null);
   const [transferBranchId, setTransferBranchId] = useState<string | null>(null);
   const [showBarcodeOrderId, setShowBarcodeOrderId] = useState<string | null>(null);
-  const [reviewOrder, setReviewOrder] = useState<any>(null);
-  
+  const [reviewOrder, setReviewOrder] = useState<CustomOrderForReview | null>(null);
+
   const { data: kitchenOrders = [], isLoading, error, refetch } = useKitchenOrders();
-  const { data: customOrders = [], isLoading: customLoading } = useCustomOrdersForReview();
+  const { data: customOrders = [], isLoading: customLoading, error: customError, refetch: refetchCustom } = useCustomOrdersForReview();
+
+  // Most urgent first: in-progress, then awaiting start, then outbound; oldest first within each.
+  const STATUS_ORDER: Record<string, number> = { preparing: 0, paid: 1, ready_to_ship: 2 };
+  const sortedKitchenOrders = [...kitchenOrders].sort((a, b) => {
+    const s = (STATUS_ORDER[a.status as string] ?? 9) - (STATUS_ORDER[b.status as string] ?? 9);
+    if (s !== 0) return s;
+    return new Date(a.created_at as string).getTime() - new Date(b.created_at as string).getTime();
+  });
   const updateStatus = useUpdateKitchenOrderStatus();
   const markReady = useMarkOrderReady();
   const sendToBranch = useSendToBranch();
@@ -193,8 +202,8 @@ export default function Kitchen() {
             </div>
 
             {/* Orders Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {kitchenOrders.map((order) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {sortedKitchenOrders.map((order) => (
                 <Card key={order.id} className="p-5 glass-card hover:shadow-lg transition-shadow">
                   <div className="flex items-center justify-between mb-4">
                     <span className="font-mono font-bold text-primary">{order.order_number}</span>
@@ -323,7 +332,9 @@ export default function Kitchen() {
               </AlertDescription>
             </Alert>
 
-            {customLoading ? (
+            {customError ? (
+              <ErrorState title="تعذّر تحميل الطلبات المخصصة" onRetry={() => refetchCustom()} />
+            ) : customLoading ? (
               <div className="flex items-center justify-center py-10">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
@@ -333,14 +344,20 @@ export default function Kitchen() {
                 <p className="text-xl font-medium text-muted-foreground">لا توجد طلبات مخصصة للمراجعة</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {customOrders.map((order) => (
-                  <Card key={order.id} className="p-5 border-primary/30 bg-gradient-to-br from-pink-50 to-white hover:shadow-lg transition-shadow">
+                  <Card key={order.id} className="p-5 border-primary/30 bg-card hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                       <span className="font-mono font-bold text-primary">{order.order_number}</span>
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                        بانتظار المراجعة
-                      </Badge>
+                      {order.order_kind === 'event' ? (
+                        <Badge className="bg-primary text-primary-foreground gap-1">
+                          <PartyPopper className="w-3 h-3" /> ضيافة
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                          بانتظار المراجعة
+                        </Badge>
+                      )}
                     </div>
 
                     <div className="space-y-3 mb-4">

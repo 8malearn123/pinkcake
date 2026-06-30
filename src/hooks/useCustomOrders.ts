@@ -41,6 +41,17 @@ export interface CustomOrderForReview {
   notes: string | null;
   created_at: string;
   status: string;
+  // Event/ضيافة orders (order_kind='event') carry hospitality metadata so the
+  // chef can price the full package, not just a single cake.
+  order_kind?: string | null;
+  guest_count?: number | null;
+  serve_styles?: string[] | null;
+  station_type?: string | null;
+  servers_needed?: boolean | null;
+  servers_count?: number | null;
+  service_hours?: number | null;
+  event_date?: string | null;
+  fulfillment_mode?: string | null;
 }
 
 export interface ChefReviewData {
@@ -108,6 +119,7 @@ export function useCustomOrdersForReview() {
       if (error) throw error;
       return (data || []) as CustomOrderForReview[];
     },
+    refetchInterval: 30000, // keep the chef's review queue fresh, like kitchen orders
   });
 }
 
@@ -129,12 +141,12 @@ export function useChefReviewOrder() {
       if (error) throw error;
       return result;
     },
-    onSuccess: (result: any) => {
+    onSuccess: (result: { new_status?: string; price?: number } | null) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['custom-orders-review'] });
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['priced-orders-support'] });
-      
+
       const isRejected = result?.new_status === 'custom_rejected';
       toast({
         title: isRejected ? 'تم رفض الطلب' : 'تم تسعير الطلب',
