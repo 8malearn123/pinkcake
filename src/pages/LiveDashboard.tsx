@@ -51,6 +51,17 @@ const STATUS_CONFIG: Record<OrderStatus, { label: string; icon: React.ReactNode;
   customer_rejected: { label: 'رُفض السعر', icon: <Clock className="w-4 h-4" />, color: 'text-destructive', bgColor: 'bg-destructive/10' },
 };
 
+/** Lighter empty state for the compact side rail — keeps the board airy. */
+function MiniEmpty({ icon: Icon, title, hint }: { icon: React.ComponentType<{ className?: string }>; title: string; hint?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-7 px-3">
+      <Icon className="w-7 h-7 text-muted-foreground/40 mb-2" />
+      <p className="text-sm font-medium text-muted-foreground">{title}</p>
+      {hint && <p className="text-xs text-muted-foreground/70 mt-0.5">{hint}</p>}
+    </div>
+  );
+}
+
 export default function LiveDashboard() {
   const navigate = useNavigate();
   const { orders, stats, recentEvents, isLoading, isConnected, clearEvents } = useRealtimeOrders();
@@ -95,7 +106,7 @@ export default function LiveDashboard() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-5">
         <PageHeader
           title="لوحة التحكم المباشرة"
           description="متابعة الطلبات في الوقت الفعلي"
@@ -123,61 +134,25 @@ export default function LiveDashboard() {
           <LoadingState label="جاري تحميل اللوحة المباشرة..." />
         ) : (
           <>
-            {/* Live Stats — revenue leads, then the order pipeline */}
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-              <StatTile label="إيرادات اليوم" value={formatCurrency(stats.todayRevenue)} icon={TrendingUp} tone="primary" />
-              <StatTile label="إجمالي الطلبات" value={stats.totalOrders} icon={Package} tone="neutral" />
-              <StatTile label="بانتظار الموافقة" value={stats.pendingApproval} icon={Clock} tone="warning" />
-              <StatTile label="قيد التجهيز" value={stats.paid + stats.preparing} icon={ChefHat} tone="info" />
-              <StatTile label="في التوصيل" value={stats.readyToShip + stats.inTransit} icon={Truck} tone="info" />
-              <StatTile label="مكتمل" value={stats.completed} icon={CheckCircle2} tone="success" />
+            {/* Live Stats — compact strip; revenue leads, then the pipeline */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+              <StatTile size="compact" label="إيرادات اليوم" value={formatCurrency(stats.todayRevenue)} icon={TrendingUp} tone="primary" />
+              <StatTile size="compact" label="إجمالي الطلبات" value={stats.totalOrders} icon={Package} tone="neutral" />
+              <StatTile size="compact" label="بانتظار الموافقة" value={stats.pendingApproval} icon={Clock} tone="warning" />
+              <StatTile size="compact" label="قيد التجهيز" value={stats.paid + stats.preparing} icon={ChefHat} tone="info" />
+              <StatTile size="compact" label="في التوصيل" value={stats.readyToShip + stats.inTransit} icon={Truck} tone="info" />
+              <StatTile size="compact" label="مكتمل" value={stats.completed} icon={CheckCircle2} tone="success" />
             </div>
 
             {/* Panels — what needs action first, then the live feeds */}
-            <div className="grid lg:grid-cols-3 gap-6">
-              {/* Orders Needing Attention */}
-              <SectionCard
-                title="تتطلب انتباهك"
-                icon={Bell}
-                action={urgentOrders.length > 0 ? <Badge variant="destructive">{urgentOrders.length}</Badge> : undefined}
-                contentClassName="pt-0"
-              >
-                <ScrollArea className="h-[400px] pe-2">
-                  {urgentOrders.length === 0 ? (
-                    <EmptyState icon={CheckCircle2} title="لا توجد طلبات معلقة" description="جميع الطلبات تمت معالجتها" />
-                  ) : (
-                    <div className="space-y-3">
-                      {urgentOrders.map((order) => (
-                        <button
-                          key={order.id}
-                          type="button"
-                          onClick={() => navigate(`/orders/${order.id}`)}
-                          className="w-full text-start p-4 rounded-xl border border-warning/30 bg-warning/5 hover:bg-warning/10 transition-colors"
-                        >
-                          <div className="flex items-center justify-between mb-2 gap-2">
-                            <span className="font-mono font-bold text-sm">{order.order_number}</span>
-                            <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
-                              {STATUS_CONFIG[order.status as OrderStatus]?.label}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground truncate">{order.customer?.name || 'عميل غير محدد'}</span>
-                            <span className="text-sm font-semibold shrink-0 ms-2">{formatCurrency(order.total_amount)}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </SectionCard>
-
-              {/* Recent Orders */}
-              <SectionCard title="آخر الطلبات" icon={Package} contentClassName="pt-0">
-                <ScrollArea className="h-[400px] pe-2">
+            <div className="grid lg:grid-cols-3 gap-4 items-start">
+              {/* Recent Orders — the main feed carries the screen */}
+              <SectionCard title="آخر الطلبات" icon={Package} className="lg:col-span-2" contentClassName="pt-0">
+                <ScrollArea className="h-[440px] pe-2">
                   {recentOrders.length === 0 ? (
                     <EmptyState icon={Package} title="لا توجد طلبات" description="عندما يصل طلب جديد سيظهر هنا مباشرة." />
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {recentOrders.map((order) => {
                         const statusConfig = STATUS_CONFIG[order.status as OrderStatus];
                         return (
@@ -217,18 +192,51 @@ export default function LiveDashboard() {
                 </ScrollArea>
               </SectionCard>
 
-              {/* Recent Activity Feed */}
-              <SectionCard
-                title="النشاط المباشر"
-                icon={Activity}
-                action={recentEvents.length > 0 ? <Button variant="ghost" size="sm" onClick={clearEvents}>مسح</Button> : undefined}
-                contentClassName="pt-0"
-              >
-                <ScrollArea className="h-[400px] pe-2">
-                  {recentEvents.length === 0 ? (
-                    <EmptyState icon={Radio} title="في انتظار الأحداث" description="ستظهر هنا أي تغييرات على الطلبات لحظة حدوثها." />
+              {/* Side rail — alerts + live activity, height hugs content */}
+              <div className="space-y-4">
+                <SectionCard
+                  title="تتطلب انتباهك"
+                  icon={Bell}
+                  action={urgentOrders.length > 0 ? <Badge variant="destructive">{urgentOrders.length}</Badge> : undefined}
+                  contentClassName="pt-0"
+                >
+                  {urgentOrders.length === 0 ? (
+                    <MiniEmpty icon={CheckCircle2} title="لا توجد طلبات معلقة" hint="كل شيء تمت معالجته" />
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2.5 max-h-[280px] overflow-y-auto pe-1">
+                      {urgentOrders.map((order) => (
+                        <button
+                          key={order.id}
+                          type="button"
+                          onClick={() => navigate(`/orders/${order.id}`)}
+                          className="w-full text-start p-3 rounded-xl border border-warning/30 bg-warning/5 hover:bg-warning/10 transition-colors"
+                        >
+                          <div className="flex items-center justify-between mb-2 gap-2">
+                            <span className="font-mono font-bold text-sm">{order.order_number}</span>
+                            <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
+                              {STATUS_CONFIG[order.status as OrderStatus]?.label}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground truncate">{order.customer?.name || 'عميل غير محدد'}</span>
+                            <span className="text-sm font-semibold shrink-0 ms-2">{formatCurrency(order.total_amount)}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </SectionCard>
+
+                <SectionCard
+                  title="النشاط المباشر"
+                  icon={Activity}
+                  action={recentEvents.length > 0 ? <Button variant="ghost" size="sm" onClick={clearEvents}>مسح</Button> : undefined}
+                  contentClassName="pt-0"
+                >
+                  {recentEvents.length === 0 ? (
+                    <MiniEmpty icon={Radio} title="في انتظار الأحداث" hint="تظهر التغييرات لحظة حدوثها" />
+                  ) : (
+                    <div className="space-y-2.5 max-h-[280px] overflow-y-auto pe-1">
                       {recentEvents.map((event, index) => (
                         <button
                           key={`${event.id}-${index}`}
@@ -248,8 +256,8 @@ export default function LiveDashboard() {
                       ))}
                     </div>
                   )}
-                </ScrollArea>
-              </SectionCard>
+                </SectionCard>
+              </div>
             </div>
 
             {/* Status Distribution Bar */}
