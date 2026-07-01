@@ -46,7 +46,8 @@ const READ: Record<string, (args: Args) => unknown> = {
     new_status: a?.['_feasibility'] === 'not_feasible' ? 'custom_rejected' : 'chef_priced',
     price: a?.['_proposed_price'] ?? 0,
   }),
-  get_order_details_secure: (a) => d.ORDERS.find((o) => o.id === a?.['_order_id']) ?? d.ORDERS[0],
+  // Real RPC returns rows — wrap in an array so useOrder's data[0] resolves (else "not found").
+  get_order_details_secure: (a) => [d.ORDERS.find((o) => o.id === a?.['_order_id']) ?? d.ORDERS[0]],
   get_order_by_tracking_code: (a) => {
     const code = a?.['_tracking_code'];
     return [d.ORDERS.find((o) => o.tracking_code === code) ?? d.ORDERS[0]];
