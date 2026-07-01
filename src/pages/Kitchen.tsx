@@ -3,7 +3,6 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader, EmptyState, LoadingState, ErrorState } from '@/components/ds';
 import { useKitchenOrders, useUpdateKitchenOrderStatus, useMarkOrderReady, useSendToBranch, type KitchenOrder } from '@/hooks/useKitchenOrders';
 import { useCustomOrdersForReview, type CustomOrderForReview } from '@/hooks/useCustomOrders';
-import { StatusBadge } from '@/components/ui/StatusBadge';
 import { OrderTransferDialog } from '@/components/orders/OrderTransferDialog';
 import { HandoverBarcodeDisplay } from '@/components/orders/HandoverBarcodeDisplay';
 import { OrderBriefDialog } from '@/components/orders/OrderBriefDialog';
@@ -27,7 +26,6 @@ import {
   AlertTriangle,
   ScanLine,
   Cake,
-  Users,
   ClipboardList,
   PartyPopper,
   RefreshCw,
@@ -36,7 +34,6 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
 const formatTime = (time: string | null) => (time ? time.substring(0, 5) : '-');
-const formatDate = (date: string | null) => (date ? new Date(date).toLocaleDateString('ar-SA') : '-');
 const sortByCreated = (a: { created_at: string }, b: { created_at: string }) =>
   new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
 
@@ -168,38 +165,42 @@ function PrepActions({ order, barcodeOpen, onToggleBarcode, onStart, onReady, on
 
 type CardActionProps = Omit<PrepActionsProps, 'order'>;
 
+/* Light, scan-in-a-glance card. Product + time lead; the lane already conveys
+   status, so no redundant status badge. */
 function PrepCard({ order, tone, ...actions }: { order: KitchenOrder; tone: LaneTone } & CardActionProps) {
   return (
-    <Card className="overflow-hidden bg-card border-border/60 shadow-sm hover:shadow-soft-lift hover:-translate-y-0.5 transition-all duration-200">
-      <div className={cn('h-1.5', LANE_TONE[tone].accent)} />
-      <div className="p-4 space-y-3">
+    <Card className="overflow-hidden bg-card border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+      <div className={cn('h-1', LANE_TONE[tone].accent)} />
+      <div className="p-3.5 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-mono font-bold text-primary text-sm">{order.order_number}</span>
-          <StatusBadge status={order.status as OrderStatus} showIcon={false} className="text-xs px-2 py-0.5" />
+          <span className="font-mono text-xs text-muted-foreground">{order.order_number}</span>
+          <span className="inline-flex items-center gap-1 text-sm font-bold">
+            <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+            {formatTime(order.delivery_time)}
+          </span>
         </div>
-        <div className="space-y-1.5 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{order.branch_name || 'غير محدد'}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Clock className="w-3.5 h-3.5 shrink-0" />
-            <span>الاستلام {formatTime(order.delivery_time)} · {formatDate(order.delivery_date)}</span>
-          </div>
-        </div>
-        <div className="rounded-xl bg-muted/40 p-3 space-y-1">
+
+        <div className="space-y-0.5">
           {order.items?.map((item, index) => (
-            <div key={index} className="flex items-center justify-between text-sm">
-              <span className="truncate">{item.product_name}</span>
-              <span className="font-semibold text-muted-foreground shrink-0 ms-2">×{item.quantity}</span>
+            <div key={index} className="flex items-baseline justify-between gap-2">
+              <span className="font-semibold text-sm leading-snug">{item.product_name}</span>
+              <span className="text-sm font-bold text-primary shrink-0">×{item.quantity}</span>
             </div>
           ))}
-          {order.notes && (
-            <p className="text-xs text-muted-foreground pt-1.5 mt-1 border-t border-border/50">
-              <span className="font-medium">ملاحظات:</span> {order.notes}
-            </p>
-          )}
         </div>
+
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <MapPin className="w-3 h-3 shrink-0" />
+          <span className="truncate">{order.branch_name || 'غير محدد'}</span>
+        </div>
+
+        {order.notes && (
+          <div className="flex items-center gap-1.5 text-xs text-warning bg-warning/10 rounded-md px-2 py-1">
+            <AlertTriangle className="w-3 h-3 shrink-0" />
+            <span>{order.notes}</span>
+          </div>
+        )}
+
         <PrepActions order={order} {...actions} />
       </div>
     </Card>
@@ -210,57 +211,51 @@ function CustomPrepCard({ order, tone, onBrief, ...actions }: {
   order: CustomOrderForReview; tone: LaneTone; onBrief: () => void;
 } & CardActionProps) {
   const isEvent = order.order_kind === 'event';
+  const peopleValue = isEvent ? order.guest_count : order.number_of_people;
   const chips = [order.flavor, order.filling, order.sugar_level].filter(Boolean) as string[];
+  const subline = [order.occasion, peopleValue != null ? `${peopleValue} ${isEvent ? 'ضيف' : 'شخص'}` : null]
+    .filter(Boolean).join(' · ');
 
   return (
-    <Card className="overflow-hidden bg-card border-border/60 shadow-sm hover:shadow-soft-lift hover:-translate-y-0.5 transition-all duration-200">
-      <div className={cn('h-1.5', isEvent ? 'gradient-pink' : 'bg-primary/40')} />
-      <div className="p-4 space-y-3">
+    <Card className="overflow-hidden bg-card border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+      <div className={cn('h-1', isEvent ? 'gradient-pink' : 'bg-primary/40')} />
+      <div className="p-3.5 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-mono font-bold text-primary text-sm">{order.order_number}</span>
-          {isEvent ? (
-            <Badge className="bg-primary text-primary-foreground gap-1"><PartyPopper className="w-3 h-3" /> ضيافة</Badge>
-          ) : (
-            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 gap-1"><Cake className="w-3 h-3" /> مخصص</Badge>
-          )}
+          <span className="font-mono text-xs text-muted-foreground">{order.order_number}</span>
+          <Badge className="bg-primary/10 text-primary border-0 gap-1 text-[11px] px-2 py-0.5 font-medium">
+            {isEvent ? <PartyPopper className="w-3 h-3" /> : <Cake className="w-3 h-3" />}
+            {isEvent ? 'ضيافة' : 'مخصص'}
+          </Badge>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            {isEvent ? <PartyPopper className="w-5 h-5" /> : <Cake className="w-5 h-5" />}
-          </div>
-          <div className="min-w-0">
-            <p className="font-semibold truncate leading-tight">{order.product_type}</p>
-            {order.occasion && <p className="text-xs text-muted-foreground truncate">{order.occasion}</p>}
-          </div>
+        <div>
+          <p className="font-semibold text-sm leading-snug">{order.product_type}</p>
+          {subline && <p className="text-xs text-muted-foreground mt-0.5">{subline}</p>}
         </div>
 
-        <div className="space-y-1.5 text-sm text-muted-foreground">
-          {isEvent && order.guest_count != null && (
-            <div className="flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span>{order.guest_count} ضيف</span></div>
-          )}
-          {!isEvent && order.number_of_people && (
-            <div className="flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span>{order.number_of_people} شخص</span></div>
-          )}
-          <div className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5 shrink-0" /><span className="truncate">{order.branch_name}</span></div>
-          <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 shrink-0" /><span>{format(new Date(order.pickup_date), 'PPP', { locale: ar })} · {order.pickup_time}</span></div>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Clock className="w-3 h-3 shrink-0" />
+          <span className="truncate">{format(new Date(order.pickup_date), 'd MMM', { locale: ar })} · {order.pickup_time} · {order.branch_name}</span>
         </div>
 
         {chips.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {chips.map((chip, i) => <Badge key={i} variant="secondary" className="text-xs font-normal">{chip}</Badge>)}
+          <div className="flex flex-wrap gap-1">
+            {chips.map((chip, i) => (
+              <span key={i} className="text-[11px] text-muted-foreground bg-muted/60 rounded px-1.5 py-0.5">{chip}</span>
+            ))}
           </div>
         )}
 
-        {order.total_amount != null && (
-          <div className="flex items-center gap-1.5 text-xs text-success font-medium">
-            <CheckCircle2 className="w-3.5 h-3.5" /> مدفوع • {order.total_amount} ر.س
-          </div>
-        )}
-
-        <Button onClick={onBrief} variant="outline" className="w-full border-primary/30 text-primary hover:bg-primary/5">
-          <ClipboardList className="w-4 h-4 me-1.5" /> عرض التفاصيل الكاملة
-        </Button>
+        <div className="flex items-center justify-between gap-2">
+          {order.total_amount != null && (
+            <span className="inline-flex items-center gap-1 text-xs text-success font-medium">
+              <CheckCircle2 className="w-3.5 h-3.5" /> مدفوع · {order.total_amount} ر.س
+            </span>
+          )}
+          <button onClick={onBrief} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+            <ClipboardList className="w-3.5 h-3.5" /> التفاصيل الكاملة
+          </button>
+        </div>
 
         <PrepActions order={order} {...actions} />
       </div>
