@@ -73,7 +73,10 @@ const READ: Record<string, (args: Args) => unknown> = {
   get_contact_submissions_secure: () => d.SUBMISSIONS,
 
   // barcodes
-  get_handover_barcode: () => ({ barcode_code: 'HB-77213', barcode_type: 'kitchen_handover', is_scanned: false }),
+  // Real RPC returns the barcode CODE (a string) — the display renders it directly
+  // (QR + <code>), so returning an object here crashes React (#31).
+  get_handover_barcode: () => 'HB-77213',
+  generate_handover_barcode: () => 'HB-77213',
 
   // event/ضيافة builder — returns a tracking code so the success screen has one
   create_event_order: () => ({ tracking_code: `EVT-${2000 + Math.floor(Math.random() * 900)}`, order_id: 'evt-demo' }),
