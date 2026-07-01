@@ -25,6 +25,7 @@ import {
   ArrowDown,
   Minus,
   ChevronLeft,
+  AlertTriangle,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -102,13 +103,19 @@ export default function LiveDashboard() {
   // Get recent orders (last 10)
   const recentOrders = orders?.slice(0, 10) || [];
 
-  // Get orders needing attention (pending approval)
-  const urgentOrders = orders?.filter((o) => o.status === 'pending_approval').slice(0, 5) || [];
+  // Needs attention = orders past their delivery time that aren't done yet.
+  // (Pay-upfront means there's no "awaiting approval" — the real risk is running late.)
+  const nowMs = Date.now();
+  const urgentOrders = orders?.filter((o) =>
+    !!o.delivery_date && !!o.delivery_time &&
+    new Date(`${o.delivery_date}T${o.delivery_time}`).getTime() < nowMs &&
+    !['completed', 'ready_for_pickup'].includes(o.status)
+  ).slice(0, 5) || [];
 
-  // The order pipeline — the stages a cake moves through, in flow order.
+  // The order pipeline — pay-upfront: paid → preparing → delivery → done.
   const pipeline = [
-    { key: 'pending', label: 'بانتظار الموافقة', value: stats.pendingApproval, icon: Clock, box: 'bg-warning/10 text-warning', text: 'text-warning' },
-    { key: 'prep', label: 'قيد التجهيز', value: stats.paid + stats.preparing, icon: ChefHat, box: 'bg-info/10 text-info', text: 'text-info' },
+    { key: 'new', label: 'بانتظار التجهيز', value: stats.paid, icon: Clock, box: 'bg-warning/10 text-warning', text: 'text-warning' },
+    { key: 'prep', label: 'قيد التجهيز', value: stats.preparing, icon: ChefHat, box: 'bg-info/10 text-info', text: 'text-info' },
     { key: 'delivery', label: 'في التوصيل', value: stats.readyToShip + stats.inTransit, icon: Truck, box: 'bg-primary/10 text-primary', text: 'text-primary' },
     { key: 'done', label: 'مكتمل', value: stats.completed, icon: CheckCircle2, box: 'bg-success/10 text-success', text: 'text-success' },
   ];
@@ -241,7 +248,7 @@ export default function LiveDashboard() {
                   contentClassName="pt-0"
                 >
                   {urgentOrders.length === 0 ? (
-                    <MiniEmpty icon={CheckCircle2} title="لا توجد طلبات معلقة" hint="كل شيء تمت معالجته" />
+                    <MiniEmpty icon={CheckCircle2} title="لا طلبات متأخرة" hint="كل الطلبات ضمن وقتها" />
                   ) : (
                     <div className="space-y-2.5 max-h-[280px] overflow-y-auto pe-1">
                       {urgentOrders.map((order) => (
@@ -249,17 +256,18 @@ export default function LiveDashboard() {
                           key={order.id}
                           type="button"
                           onClick={() => navigate(`/orders/${order.id}`)}
-                          className="w-full text-start p-3 rounded-xl border border-warning/30 bg-warning/5 hover:bg-warning/10 transition-colors"
+                          className="w-full text-start p-3 rounded-xl border border-destructive/30 bg-destructive/5 hover:bg-destructive/10 transition-colors"
                         >
                           <div className="flex items-center justify-between mb-2 gap-2">
                             <span className="font-mono font-bold text-sm">{order.order_number}</span>
-                            <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
-                              {STATUS_CONFIG[order.status as OrderStatus]?.label}
-                            </Badge>
+                            <Badge variant="destructive" className="gap-1"><AlertTriangle className="w-3 h-3" /> متأخر</Badge>
                           </div>
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between gap-2">
                             <span className="text-sm text-muted-foreground truncate">{order.customer?.name || 'عميل غير محدد'}</span>
-                            <span className="text-sm font-semibold shrink-0 ms-2">{formatCurrency(order.total_amount)}</span>
+                            <span className="text-xs font-medium shrink-0 flex items-center gap-1 text-muted-foreground">
+                              {STATUS_CONFIG[order.status as OrderStatus]?.icon}
+                              {STATUS_CONFIG[order.status as OrderStatus]?.label}
+                            </span>
                           </div>
                         </button>
                       ))}

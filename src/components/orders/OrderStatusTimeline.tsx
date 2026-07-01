@@ -7,9 +7,10 @@ interface OrderStatusTimelineProps {
   className?: string;
 }
 
+// Pay-upfront: the customer pays at checkout, so every order that reaches the
+// fulfillment journey is already paid. The timeline starts at "تم الدفع" — no
+// customer-approval or payment-wait stages.
 const statusOrder: OrderStatus[] = [
-  'pending_approval',
-  'awaiting_payment',
   'paid',
   'preparing',
   'ready_to_ship',
