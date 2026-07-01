@@ -5,11 +5,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CustomOrderForReview } from '@/hooks/useCustomOrders';
-import { Users, Cake, PartyPopper, CheckCircle2 } from 'lucide-react';
+import {
+  Users, Cake, PartyPopper, CheckCircle2, User, MapPin, Calendar,
+  Sparkles, Image as ImageIcon, StickyNote, ChefHat, Grid2x2, ConciergeBell, MapPinned,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
@@ -20,11 +21,53 @@ const SERVE_LABELS: Record<string, string> = {
 const STATION_LABELS: Record<string, string> = { ready_corner: 'ركن حلا جاهز', live: 'محطة حية', none: 'بدون' };
 const FULFILL_LABELS: Record<string, string> = { delivery: 'توصيل', onsite_setup: 'تجهيز في الموقع' };
 
-function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+type IconType = React.ComponentType<{ className?: string }>;
+
+/* A key fact — icon tile + label + value. */
+function Fact({ icon: Icon, label, value }: { icon: IconType; label: string; value: React.ReactNode }) {
   return (
-    <div className="flex justify-between gap-3">
-      <span className="text-muted-foreground">{label}:</span>
-      <span className="font-medium text-end">{value}</span>
+    <div className="flex items-center gap-2.5 rounded-xl border border-border/50 bg-card p-3">
+      <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground leading-tight">{label}</p>
+        <p className="font-semibold text-sm truncate leading-tight mt-0.5">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+/* A cake-spec tile (flavor / filling / sugar). */
+function SpecTile({ label, value }: { label: string; value?: string | null }) {
+  if (!value) return null;
+  return (
+    <div className="rounded-xl bg-muted/40 p-3 text-center">
+      <p className="text-[11px] text-muted-foreground mb-1">{label}</p>
+      <p className="font-semibold text-sm">{value}</p>
+    </div>
+  );
+}
+
+function SectionHead({ icon: Icon, title }: { icon: IconType; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+        <Icon className="w-4 h-4" />
+      </div>
+      <h3 className="font-bold">{title}</h3>
+    </div>
+  );
+}
+
+function DetailRow({ icon: Icon, label, value }: { icon: IconType; label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-2 border-b border-border/40 last:border-0">
+      <span className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Icon className="w-3.5 h-3.5" />
+        {label}
+      </span>
+      <span className="text-sm font-medium text-end">{value}</span>
     </div>
   );
 }
@@ -37,138 +80,142 @@ interface OrderBriefDialogProps {
 
 /**
  * Read-only brief for a paid custom/occasion order. Pay-upfront model: the price
- * is already settled at checkout, so the chef just reads what to make. No pricing
- * or feasibility form — prep actions live on the order card.
+ * is already settled at checkout, so the chef just reads what to make.
  */
 export function OrderBriefDialog({ order, open, onOpenChange }: OrderBriefDialogProps) {
   if (!order) return null;
   const isEvent = order.order_kind === 'event';
+  const peopleValue = isEvent ? order.guest_count : order.number_of_people;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {isEvent ? <PartyPopper className="h-5 w-5 text-primary" /> : <Cake className="h-5 w-5 text-primary" />}
-            {isEvent ? 'تفاصيل طلب الضيافة' : 'تفاصيل الطلب المخصص'} - {order.order_number}
-          </DialogTitle>
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto p-0 gap-0" dir="rtl">
+        {/* Header */}
+        <DialogHeader className="p-6 pb-4 space-y-0">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl gradient-pink shadow-warm flex items-center justify-center shrink-0">
+              {isEvent ? <PartyPopper className="w-6 h-6 text-white" /> : <Cake className="w-6 h-6 text-white" />}
+            </div>
+            <div className="min-w-0">
+              <DialogTitle className="text-lg leading-tight">
+                {isEvent ? 'تفاصيل طلب الضيافة' : 'تفاصيل الطلب المخصص'}
+              </DialogTitle>
+              <p className="font-mono text-sm text-primary font-bold mt-0.5">{order.order_number}</p>
+            </div>
+          </div>
         </DialogHeader>
 
-        {/* Paid confirmation — no pricing needed, just prepare */}
-        <div className="flex items-center justify-between rounded-lg bg-success/10 text-success px-4 py-2.5 text-sm">
-          <span className="flex items-center gap-2 font-semibold">
-            <CheckCircle2 className="h-4 w-4" /> مدفوع مسبقاً — جاهز للتجهيز
-          </span>
-          {order.total_amount != null && <span className="font-bold">{order.total_amount} ر.س</span>}
-        </div>
+        <div className="px-6 pb-6 space-y-5">
+          {/* Paid banner */}
+          <div className="flex items-center justify-between rounded-xl bg-success/10 border border-success/20 px-4 py-3">
+            <span className="flex items-center gap-2.5 font-semibold text-success">
+              <div className="w-7 h-7 rounded-full bg-success/15 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              مدفوع مسبقاً — جاهز للتجهيز
+            </span>
+            {order.total_amount != null && (
+              <span className="font-bold text-success text-lg">
+                {order.total_amount} <span className="text-sm font-medium">ر.س</span>
+              </span>
+            )}
+          </div>
 
-        {/* Order details + requirements */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">تفاصيل الطلب</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <DetailRow label="العميل" value={order.customer_name} />
-              <DetailRow label="الفرع" value={order.branch_name} />
-              <DetailRow label="تاريخ الاستلام" value={format(new Date(order.pickup_date), 'PPP', { locale: ar })} />
-              <DetailRow label="وقت الاستلام" value={order.pickup_time} />
-              <DetailRow label="تاريخ الطلب" value={format(new Date(order.created_at), 'PPP', { locale: ar })} />
-            </CardContent>
-          </Card>
+          {/* Key facts */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Fact icon={User} label="العميل" value={order.customer_name} />
+            <Fact icon={MapPin} label="الفرع" value={order.branch_name} />
+            <Fact
+              icon={Calendar}
+              label="الاستلام"
+              value={`${format(new Date(order.pickup_date), 'd MMM', { locale: ar })} · ${order.pickup_time}`}
+            />
+            {peopleValue != null && (
+              <Fact icon={Users} label={isEvent ? 'الضيوف' : 'الأشخاص'} value={`${peopleValue} ${isEvent ? 'ضيف' : 'شخص'}`} />
+            )}
+          </div>
 
+          {/* Spec card */}
           {isEvent ? (
-            <Card className="border-primary/30 bg-primary/[0.03]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-primary flex items-center gap-1.5">
-                  <PartyPopper className="h-4 w-4" /> متطلبات الضيافة
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                {order.occasion && <DetailRow label="المناسبة" value={order.occasion} />}
-                {order.guest_count != null && (
-                  <DetailRow label="عدد الضيوف" value={<span className="flex items-center gap-1"><Users className="h-3 w-3" />{order.guest_count} ضيف</span>} />
-                )}
+            <div className="rounded-2xl border border-primary/20 bg-primary/[0.03] p-5">
+              <SectionHead icon={PartyPopper} title="متطلبات الضيافة" />
+              <div className="space-y-0.5">
+                {order.occasion && <DetailRow icon={Sparkles} label="المناسبة" value={order.occasion} />}
                 {order.serve_styles && order.serve_styles.length > 0 && (
-                  <DetailRow label="الأصناف" value={order.serve_styles.map((s) => SERVE_LABELS[s] ?? s).join(' · ')} />
+                  <DetailRow icon={Cake} label="الأصناف" value={order.serve_styles.map((s) => SERVE_LABELS[s] ?? s).join(' · ')} />
                 )}
                 {order.station_type && order.station_type !== 'none' && (
-                  <DetailRow label="ركن الضيافة" value={STATION_LABELS[order.station_type] ?? order.station_type} />
+                  <DetailRow icon={Grid2x2} label="ركن الضيافة" value={STATION_LABELS[order.station_type] ?? order.station_type} />
                 )}
                 {order.servers_needed && (
-                  <DetailRow label="طاقم الخدمة" value={`${order.servers_count ?? '—'} مقدّم × ${order.service_hours ?? '—'} ساعات`} />
+                  <DetailRow icon={ConciergeBell} label="طاقم الخدمة" value={`${order.servers_count ?? '—'} مقدّم × ${order.service_hours ?? '—'} ساعات`} />
                 )}
                 {order.event_date && (
-                  <DetailRow label="تاريخ المناسبة" value={format(new Date(order.event_date), 'PPP', { locale: ar })} />
+                  <DetailRow icon={Calendar} label="تاريخ المناسبة" value={format(new Date(order.event_date), 'PPP', { locale: ar })} />
                 )}
                 {order.fulfillment_mode && (
-                  <DetailRow label="طريقة التقديم" value={FULFILL_LABELS[order.fulfillment_mode] ?? order.fulfillment_mode} />
+                  <DetailRow icon={MapPinned} label="طريقة التقديم" value={FULFILL_LABELS[order.fulfillment_mode] ?? order.fulfillment_mode} />
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ) : (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">متطلبات المنتج</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <DetailRow label="نوع المنتج" value={<Badge variant="secondary">{order.product_type}</Badge>} />
-                {order.occasion && <DetailRow label="المناسبة" value={order.occasion} />}
-                {order.number_of_people && (
-                  <DetailRow label="عدد الأشخاص" value={<span className="flex items-center gap-1"><Users className="h-3 w-3" />{order.number_of_people}</span>} />
-                )}
-                {order.flavor && <DetailRow label="النكهة" value={order.flavor} />}
-                {order.filling && <DetailRow label="الحشوة" value={order.filling} />}
-                {order.sugar_level && <DetailRow label="السكر" value={order.sugar_level} />}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Design brief */}
-        {(order.design_description || order.writing_text || order.reference_image_url) && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">تفاصيل التصميم</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {order.writing_text && (
-                <div>
-                  <Label className="text-xs text-muted-foreground">نص الكتابة:</Label>
-                  <p className="mt-1 rounded-md bg-muted p-2 text-lg font-medium">"{order.writing_text}"</p>
+            <div className="rounded-2xl border border-border/60 bg-card p-5">
+              <SectionHead icon={ChefHat} title="مواصفات الكيكة" />
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">{order.product_type}</Badge>
+                {order.occasion && <span className="text-sm text-muted-foreground">مناسبة: {order.occasion}</span>}
+              </div>
+              {(order.flavor || order.filling || order.sugar_level) && (
+                <div className="grid grid-cols-3 gap-2">
+                  <SpecTile label="النكهة" value={order.flavor} />
+                  <SpecTile label="الحشوة" value={order.filling} />
+                  <SpecTile label="مستوى السكر" value={order.sugar_level} />
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Design brief (custom cakes) */}
+          {(order.design_description || order.writing_text || order.reference_image_url) && (
+            <div className="rounded-2xl border border-border/60 bg-card p-5 space-y-4">
+              <SectionHead icon={Sparkles} title="التصميم" />
+
+              {order.writing_text && (
+                <div className="rounded-2xl bg-gradient-to-br from-primary/[0.08] to-primary/[0.02] border border-primary/15 px-5 py-6 text-center">
+                  <p className="text-xs text-muted-foreground mb-2">نص الكتابة على الكيكة</p>
+                  <p className="font-display text-2xl text-primary leading-snug">"{order.writing_text}"</p>
+                </div>
+              )}
+
               {order.design_description && (
                 <div>
-                  <Label className="text-xs text-muted-foreground">وصف التصميم:</Label>
-                  <p className="mt-1 rounded-md bg-muted p-2">{order.design_description}</p>
+                  <p className="text-xs text-muted-foreground mb-1.5">وصف التصميم</p>
+                  <p className="rounded-xl bg-muted/40 p-3.5 text-sm leading-relaxed">{order.design_description}</p>
                 </div>
               )}
+
               {order.reference_image_url && (
                 <div>
-                  <Label className="text-xs text-muted-foreground">صورة مرجعية:</Label>
-                  <div className="mt-1">
-                    <img src={order.reference_image_url} alt="Reference" className="max-h-48 rounded-md object-contain" />
-                  </div>
+                  <p className="text-xs text-muted-foreground mb-1.5 flex items-center gap-1.5"><ImageIcon className="w-3.5 h-3.5" /> صورة مرجعية</p>
+                  <img src={order.reference_image_url} alt="Reference" className="max-h-56 rounded-xl object-contain border border-border/50" />
                 </div>
               )}
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          )}
 
-        {order.notes && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">ملاحظات إضافية</CardTitle>
-            </CardHeader>
-            <CardContent>
+          {/* Notes — kept prominent (may carry allergy/special instructions) */}
+          {order.notes && (
+            <div className="rounded-2xl border border-warning/25 bg-warning/5 p-4">
+              <div className="flex items-center gap-2 mb-2 text-warning font-semibold text-sm">
+                <StickyNote className="w-4 h-4" /> ملاحظات مهمة
+              </div>
               <p className="text-sm">{order.notes}</p>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          )}
 
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>إغلاق</Button>
+          <div className="flex justify-end pt-1">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>إغلاق</Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
