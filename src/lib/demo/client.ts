@@ -4,16 +4,20 @@
  * to render every screen with sample data. Filters (.eq/.order/…) are accepted
  * but mostly no-ops — design mode wants populated screens, not query fidelity.
  */
-import { TABLES, demoUser, demoSession } from './data';
+import { TABLES, demoUser, demoSession, mutateOrderStatus } from './data';
 import { resolveRpc } from './rpc';
 
 type Result = { data: unknown; error: null };
 
 class DemoQuery implements PromiseLike<Result> {
+  private table: string;
   private rows: Record<string, unknown>[];
   private singleMode = false;
+  private eqFilters: [string, unknown][] = [];
+  private updatePayload: Record<string, unknown> | null = null;
 
   constructor(table: string) {
+    this.table = table;
     this.rows = TABLES[table] ? [...TABLES[table]] : [];
   }
 
@@ -22,7 +26,7 @@ class DemoQuery implements PromiseLike<Result> {
   order() { return this; }
   limit() { return this; }
   range() { return this; }
-  eq() { return this; }
+  eq(col: string, val: unknown) { this.eqFilters.push([col, val]); return this; }
   neq() { return this; }
   gt() { return this; }
   gte() { return this; }
@@ -46,14 +50,26 @@ class DemoQuery implements PromiseLike<Result> {
     this.rows = arr.map((r, i) => ({ id: `demo-${Date.now()}-${i}`, ...(r as object) }));
     return this;
   }
+  // Deferred so the .eq() filter (which chains AFTER .update()) is known at resolve time.
   update(payload: unknown) {
-    this.rows = this.rows.map((r) => ({ ...r, ...(payload as object) }));
+    this.updatePayload = payload as Record<string, unknown>;
     return this;
   }
   upsert(payload: unknown) { return this.insert(payload); }
   delete() { this.rows = []; return this; }
 
   then<T = Result>(onfulfilled?: ((value: Result) => T | PromiseLike<T>) | null): PromiseLike<T> {
+    if (this.updatePayload) {
+      const idFilter = this.eqFilters.find(([c]) => c === 'id');
+      // Order updates persist to the live demo data so kitchen/branch/driver
+      // cards actually move; everything else keeps the echo behaviour.
+      if (this.table === 'orders' && idFilter) {
+        const row = mutateOrderStatus(idFilter[1], this.updatePayload);
+        this.rows = row ? [row] : [{ ...this.updatePayload }];
+      } else {
+        this.rows = this.rows.map((r) => ({ ...r, ...this.updatePayload }));
+      }
+    }
     const data = this.singleMode ? (this.rows[0] ?? null) : this.rows;
     return Promise.resolve({ data, error: null } as Result).then(onfulfilled);
   }

@@ -137,6 +137,19 @@ export const TABLES: Record<string, Record<string, unknown>[]> = {
   notification_log: NOTIFICATION_LOG,
 };
 
+/**
+ * Demo state transition — mutate an order's status/fields in place so staff
+ * actions (start prep, mark ready, send to branch…) actually move cards when a
+ * query refetches. Covers both regular ORDERS and custom/occasion CUSTOM_ORDERS.
+ */
+export function mutateOrderStatus(id: unknown, patch: Record<string, unknown>): Record<string, unknown> | undefined {
+  const row =
+    (ORDERS as Record<string, unknown>[]).find((o) => o.id === id) ??
+    (CUSTOM_ORDERS as Record<string, unknown>[]).find((o) => o.id === id);
+  if (row) Object.assign(row, patch);
+  return row;
+}
+
 /** Roles for the current demo session (drives ProtectedRoute / dashboards). */
 export function currentRoles(): string[] {
   return [getDemoRole()];

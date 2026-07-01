@@ -42,6 +42,15 @@ const READ: Record<string, (args: Args) => unknown> = {
   // already paid, so the chef just prepares them (paid → preparing → ready_to_ship).
   get_custom_orders_for_review: () =>
     d.CUSTOM_ORDERS.filter((o) => ['paid', 'preparing', 'ready_to_ship'].includes(o.status as string)),
+  // Kitchen prep actions — mutate demo state so the card actually moves across the board.
+  kitchen_mark_order_ready: (a) => {
+    d.mutateOrderStatus(a?.['_order_id'], { status: 'ready_to_ship' });
+    return { success: true, barcode_code: 'HB-77213', message: 'تم تجهيز الطلب وإنشاء باركود التسليم' };
+  },
+  kitchen_send_to_branch: (a) => {
+    d.mutateOrderStatus(a?.['_order_id'], { status: 'in_transit' });
+    return { success: true, message: 'تم إرسال الطلب للفرع بنجاح' };
+  },
   // Real RPC returns rows — wrap in an array so useOrder's data[0] resolves (else "not found").
   get_order_details_secure: (a) => [d.ORDERS.find((o) => o.id === a?.['_order_id']) ?? d.ORDERS[0]],
   get_order_by_tracking_code: (a) => {
