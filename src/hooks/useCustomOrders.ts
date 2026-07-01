@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import type { CakeDesign } from '@/lib/cakeBuilder';
 
 export interface CustomOrderFormData {
   customerName: string;
@@ -41,6 +42,8 @@ export interface CustomOrderForReview {
   notes: string | null;
   created_at: string;
   status: string;
+  // The live cake design the customer built (option IDs) — rendered for the chef.
+  cake_design?: CakeDesign | null;
   // Pay-upfront: custom/occasion orders reach the kitchen already paid, so they
   // carry the amount the customer paid (shown for confirmation, not for pricing).
   total_amount?: number | null;

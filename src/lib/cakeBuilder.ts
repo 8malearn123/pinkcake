@@ -85,6 +85,30 @@ export function makeCustomColor(hex: string): ColorOpt {
   return { id: 'custom', name: 'لونك', c: hex, custom: true };
 }
 
+/**
+ * A cake design as stored on an order (option IDs, not the full objects). Lets a
+ * paid custom order carry the exact design the customer built so staff (kitchen)
+ * can re-render the same live cake via resolveCakeConfig → buildCake.
+ */
+export interface CakeDesign {
+  shape: string;
+  flavor: string | null;
+  color: string;
+  design: string;
+  text?: string;
+  addons?: { candle: boolean; topper: boolean };
+}
+
+/** Resolve stored design IDs back into a live CakeConfig. Null if the shape is unknown. */
+export function resolveCakeConfig(d: CakeDesign): CakeConfig | null {
+  const shape = SHAPES.find((s) => s.id === d.shape) ?? null;
+  if (!shape) return null;
+  const flavor = d.flavor ? FLAVORS.find((f) => f.id === d.flavor) ?? null : null;
+  const color = COLORS.find((c) => c.id === d.color) ?? makeCustomColor(d.color);
+  const design = DESIGNS.find((g) => g.id === d.design) ?? DESIGNS[0];
+  return { shape, flavor, color, design, text: d.text ?? '', addons: d.addons ?? { candle: false, topper: false } };
+}
+
 export function price(cfg: CakeConfig): number {
   let p = 0;
   if (cfg.shape) p += cfg.shape.price;
