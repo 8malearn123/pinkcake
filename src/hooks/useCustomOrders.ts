@@ -41,8 +41,12 @@ export interface CustomOrderForReview {
   notes: string | null;
   created_at: string;
   status: string;
+  // Pay-upfront: custom/occasion orders reach the kitchen already paid, so they
+  // carry the amount the customer paid (shown for confirmation, not for pricing).
+  total_amount?: number | null;
+  payment_status?: string | null;
   // Event/ضيافة orders (order_kind='event') carry hospitality metadata so the
-  // chef can price the full package, not just a single cake.
+  // chef can prepare the full package, not just a single cake.
   order_kind?: string | null;
   guest_count?: number | null;
   serve_styles?: string[] | null;

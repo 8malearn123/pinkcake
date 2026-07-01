@@ -38,14 +38,10 @@ const READ: Record<string, (args: Args) => unknown> = {
   get_kitchen_orders_secure: () => d.ORDERS.filter((o) => ['paid', 'preparing', 'ready_to_ship'].includes(o.status as string)),
   get_driver_orders: () => d.ORDERS.filter((o) => ['ready_to_ship', 'in_transit'].includes(o.status as string)),
   get_priced_orders_for_support: () => d.CUSTOM_ORDERS,
-  // Chef's review queue: only orders still awaiting a price.
+  // Kitchen's custom/occasion prep queue. Pay-upfront model: these orders are
+  // already paid, so the chef just prepares them (paid → preparing → ready_to_ship).
   get_custom_orders_for_review: () =>
-    d.CUSTOM_ORDERS.filter((o) => ['custom_pending_review', 'sent_to_chef'].includes(o.status as string)),
-  // Chef sets feasibility + price; echo the submitted price so the toast is accurate.
-  chef_review_custom_order: (a) => ({
-    new_status: a?.['_feasibility'] === 'not_feasible' ? 'custom_rejected' : 'chef_priced',
-    price: a?.['_proposed_price'] ?? 0,
-  }),
+    d.CUSTOM_ORDERS.filter((o) => ['paid', 'preparing', 'ready_to_ship'].includes(o.status as string)),
   // Real RPC returns rows — wrap in an array so useOrder's data[0] resolves (else "not found").
   get_order_details_secure: (a) => [d.ORDERS.find((o) => o.id === a?.['_order_id']) ?? d.ORDERS[0]],
   get_order_by_tracking_code: (a) => {

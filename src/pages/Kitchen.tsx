@@ -6,7 +6,7 @@ import { useCustomOrdersForReview, type CustomOrderForReview } from '@/hooks/use
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { OrderTransferDialog } from '@/components/orders/OrderTransferDialog';
 import { HandoverBarcodeDisplay } from '@/components/orders/HandoverBarcodeDisplay';
-import { ChefReviewDialog } from '@/components/orders/ChefReviewDialog';
+import { OrderBriefDialog } from '@/components/orders/OrderBriefDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -28,7 +28,7 @@ import {
   ScanLine,
   Cake,
   Users,
-  Image,
+  ClipboardList,
   PartyPopper,
   RefreshCw,
 } from 'lucide-react';
@@ -37,11 +37,13 @@ import { ar } from 'date-fns/locale';
 
 const formatTime = (time: string | null) => (time ? time.substring(0, 5) : '-');
 const formatDate = (date: string | null) => (date ? new Date(date).toLocaleDateString('ar-SA') : '-');
+const sortByCreated = (a: { created_at: string }, b: { created_at: string }) =>
+  new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
 
 /* ── Prep-board lanes ─────────────────────────────────────────────────────
-   The kitchen is a ticket rail: paid orders wait, get prepared, then ship.
-   Each workflow stage is a lane whose header carries its own live count, so
-   no separate stats row is needed. */
+   Both regular and custom/occasion orders arrive paid and move through the
+   same rail: paid → preparing → ready_to_ship. Each stage is a lane whose
+   header carries its own live count. */
 type LaneTone = 'warning' | 'info' | 'primary';
 
 const LANE_TONE: Record<LaneTone, { iconBox: string; count: string; accent: string }> = {
@@ -59,7 +61,6 @@ const LANES: { status: OrderStatus; label: string; icon: typeof Clock; tone: Lan
 function OrderBarcodeStatus({ orderId }: { orderId: string }) {
   const { data: barcode } = useHandoverBarcode(orderId, 'kitchen_handover');
   const hasBarcode = !!barcode;
-
   return (
     <span
       className={cn(
@@ -73,9 +74,35 @@ function OrderBarcodeStatus({ orderId }: { orderId: string }) {
   );
 }
 
-interface PrepCardProps {
-  order: KitchenOrder;
-  tone: LaneTone;
+function LaneEmpty() {
+  return (
+    <p className="text-xs text-muted-foreground/70 text-center py-8 border border-dashed border-border/50 rounded-xl">
+      لا طلبات في هذه المرحلة
+    </p>
+  );
+}
+
+function Lane({ label, icon: Icon, tone, count, children }: {
+  label: string; icon: typeof Clock; tone: LaneTone; count: number; children: React.ReactNode;
+}) {
+  const t = LANE_TONE[tone];
+  return (
+    <div className="rounded-2xl bg-muted/30 border border-border/40 p-3">
+      <div className="flex items-center gap-2 px-1 pb-3">
+        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', t.iconBox)}>
+          <Icon className="w-4 h-4" />
+        </div>
+        <span className="font-semibold">{label}</span>
+        <span className={cn('ms-auto text-xs font-bold px-2 py-0.5 rounded-full', t.count)}>{count}</span>
+      </div>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+/* Status-appropriate prep buttons — shared by regular and custom/occasion cards. */
+interface PrepActionsProps {
+  order: { id: string; status: string };
   barcodeOpen: boolean;
   onToggleBarcode: () => void;
   onStart: () => void;
@@ -87,9 +114,61 @@ interface PrepCardProps {
   sending: boolean;
 }
 
-function PrepCard({
-  order, tone, barcodeOpen, onToggleBarcode, onStart, onReady, onSend, busy, starting, readying, sending,
-}: PrepCardProps) {
+function PrepActions({ order, barcodeOpen, onToggleBarcode, onStart, onReady, onSend, busy, starting, readying, sending }: PrepActionsProps) {
+  if (order.status === 'paid') {
+    return (
+      <Button onClick={onStart} className="w-full gradient-pink text-white shadow-warm hover:opacity-90" disabled={busy}>
+        {starting ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <ChefHat className="w-4 h-4 me-1.5" />}
+        بدء التجهيز
+      </Button>
+    );
+  }
+  if (order.status === 'preparing') {
+    return (
+      <Button onClick={onReady} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={busy}>
+        {readying ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <CheckCircle2 className="w-4 h-4 me-1.5" />}
+        تم التجهيز (إنشاء باركود)
+      </Button>
+    );
+  }
+  if (order.status === 'ready_to_ship') {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <OrderBarcodeStatus orderId={order.id} />
+          <Button onClick={onToggleBarcode} variant="ghost" size="sm" className="h-7 text-xs text-primary hover:bg-primary/5">
+            <QrCode className="w-3.5 h-3.5 me-1" />
+            {barcodeOpen ? 'إخفاء' : 'عرض الباركود'}
+          </Button>
+        </div>
+        <Button onClick={onSend} variant="outline" className="w-full text-primary border-primary/30 hover:bg-primary/5" disabled={busy}>
+          {sending ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <ArrowLeft className="w-4 h-4 me-1.5" />}
+          إرسال للفرع
+        </Button>
+        <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+          <AlertTriangle className="w-3 h-3" />
+          يجب مسح الباركود من السائق أولاً
+        </p>
+        {barcodeOpen && (
+          <div className="pt-2 border-t border-border/50">
+            <HandoverBarcodeDisplay
+              orderId={order.id}
+              barcodeType="kitchen_handover"
+              title="باركود تسليم المطبخ"
+              description="يجب على السائق مسح هذا الباركود لاستلام الطلب"
+              canGenerate={false}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+  return null;
+}
+
+type CardActionProps = Omit<PrepActionsProps, 'order'>;
+
+function PrepCard({ order, tone, ...actions }: { order: KitchenOrder; tone: LaneTone } & CardActionProps) {
   return (
     <Card className="overflow-hidden bg-card border-border/60 shadow-sm hover:shadow-soft-lift hover:-translate-y-0.5 transition-all duration-200">
       <div className={cn('h-1.5', LANE_TONE[tone].accent)} />
@@ -98,7 +177,6 @@ function PrepCard({
           <span className="font-mono font-bold text-primary text-sm">{order.order_number}</span>
           <StatusBadge status={order.status as OrderStatus} showIcon={false} className="text-xs px-2 py-0.5" />
         </div>
-
         <div className="space-y-1.5 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <MapPin className="w-3.5 h-3.5 shrink-0" />
@@ -109,7 +187,6 @@ function PrepCard({
             <span>الاستلام {formatTime(order.delivery_time)} · {formatDate(order.delivery_date)}</span>
           </div>
         </div>
-
         <div className="rounded-xl bg-muted/40 p-3 space-y-1">
           {order.items?.map((item, index) => (
             <div key={index} className="flex items-center justify-between text-sm">
@@ -123,57 +200,15 @@ function PrepCard({
             </p>
           )}
         </div>
-
-        {order.status === 'paid' && (
-          <Button onClick={onStart} className="w-full gradient-pink text-white shadow-warm hover:opacity-90" disabled={busy}>
-            {starting ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <ChefHat className="w-4 h-4 me-1.5" />}
-            بدء التجهيز
-          </Button>
-        )}
-
-        {order.status === 'preparing' && (
-          <Button onClick={onReady} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={busy}>
-            {readying ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <CheckCircle2 className="w-4 h-4 me-1.5" />}
-            تم التجهيز (إنشاء باركود)
-          </Button>
-        )}
-
-        {order.status === 'ready_to_ship' && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <OrderBarcodeStatus orderId={order.id} />
-              <Button onClick={onToggleBarcode} variant="ghost" size="sm" className="h-7 text-xs text-primary hover:bg-primary/5">
-                <QrCode className="w-3.5 h-3.5 me-1" />
-                {barcodeOpen ? 'إخفاء' : 'عرض الباركود'}
-              </Button>
-            </div>
-            <Button onClick={onSend} variant="outline" className="w-full text-primary border-primary/30 hover:bg-primary/5" disabled={busy}>
-              {sending ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <ArrowLeft className="w-4 h-4 me-1.5" />}
-              إرسال للفرع
-            </Button>
-            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
-              <AlertTriangle className="w-3 h-3" />
-              يجب مسح الباركود من السائق أولاً
-            </p>
-            {barcodeOpen && (
-              <div className="pt-2 border-t border-border/50">
-                <HandoverBarcodeDisplay
-                  orderId={order.id}
-                  barcodeType="kitchen_handover"
-                  title="باركود تسليم المطبخ"
-                  description="يجب على السائق مسح هذا الباركود لاستلام الطلب"
-                  canGenerate={false}
-                />
-              </div>
-            )}
-          </div>
-        )}
+        <PrepActions order={order} {...actions} />
       </div>
     </Card>
   );
 }
 
-function CustomCard({ order, onReview }: { order: CustomOrderForReview; onReview: () => void }) {
+function CustomPrepCard({ order, tone, onBrief, ...actions }: {
+  order: CustomOrderForReview; tone: LaneTone; onBrief: () => void;
+} & CardActionProps) {
   const isEvent = order.order_kind === 'event';
   const chips = [order.flavor, order.filling, order.sugar_level].filter(Boolean) as string[];
 
@@ -184,11 +219,9 @@ function CustomCard({ order, onReview }: { order: CustomOrderForReview; onReview
         <div className="flex items-center justify-between gap-2">
           <span className="font-mono font-bold text-primary text-sm">{order.order_number}</span>
           {isEvent ? (
-            <Badge className="bg-primary text-primary-foreground gap-1">
-              <PartyPopper className="w-3 h-3" /> ضيافة
-            </Badge>
+            <Badge className="bg-primary text-primary-foreground gap-1"><PartyPopper className="w-3 h-3" /> ضيافة</Badge>
           ) : (
-            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">بانتظار المراجعة</Badge>
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 gap-1"><Cake className="w-3 h-3" /> مخصص</Badge>
           )}
         </div>
 
@@ -203,47 +236,33 @@ function CustomCard({ order, onReview }: { order: CustomOrderForReview; onReview
         </div>
 
         <div className="space-y-1.5 text-sm text-muted-foreground">
-          {order.number_of_people && (
-            <div className="flex items-center gap-2">
-              <Users className="w-3.5 h-3.5 shrink-0" />
-              <span>{order.number_of_people} شخص</span>
-            </div>
+          {isEvent && order.guest_count != null && (
+            <div className="flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span>{order.guest_count} ضيف</span></div>
           )}
-          <div className="flex items-center gap-2">
-            <MapPin className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{order.branch_name}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5 shrink-0" />
-            <span>{format(new Date(order.pickup_date), 'PPP', { locale: ar })} · {order.pickup_time}</span>
-          </div>
+          {!isEvent && order.number_of_people && (
+            <div className="flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span>{order.number_of_people} شخص</span></div>
+          )}
+          <div className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5 shrink-0" /><span className="truncate">{order.branch_name}</span></div>
+          <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 shrink-0" /><span>{format(new Date(order.pickup_date), 'PPP', { locale: ar })} · {order.pickup_time}</span></div>
         </div>
 
         {chips.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {chips.map((chip, i) => (
-              <Badge key={i} variant="secondary" className="text-xs font-normal">{chip}</Badge>
-            ))}
+            {chips.map((chip, i) => <Badge key={i} variant="secondary" className="text-xs font-normal">{chip}</Badge>)}
           </div>
         )}
 
-        {order.writing_text && (
-          <div className="rounded-xl bg-muted/40 p-2.5 text-sm">
-            <span className="text-muted-foreground text-xs">الكتابة: </span>
-            <span className="font-medium">"{order.writing_text}"</span>
+        {order.total_amount != null && (
+          <div className="flex items-center gap-1.5 text-xs text-success font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5" /> مدفوع • {order.total_amount} ر.س
           </div>
         )}
 
-        {order.reference_image_url && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Image className="w-3.5 h-3.5" /> صورة مرجعية مرفقة
-          </div>
-        )}
-
-        <Button onClick={onReview} className="w-full gradient-pink text-white shadow-warm hover:opacity-90">
-          {isEvent ? <PartyPopper className="w-4 h-4 me-1.5" /> : <Cake className="w-4 h-4 me-1.5" />}
-          مراجعة الطلب
+        <Button onClick={onBrief} variant="outline" className="w-full border-primary/30 text-primary hover:bg-primary/5">
+          <ClipboardList className="w-4 h-4 me-1.5" /> عرض التفاصيل الكاملة
         </Button>
+
+        <PrepActions order={order} {...actions} />
       </div>
     </Card>
   );
@@ -253,7 +272,7 @@ export default function Kitchen() {
   const [transferOrderId, setTransferOrderId] = useState<string | null>(null);
   const [transferBranchId] = useState<string | null>(null);
   const [showBarcodeOrderId, setShowBarcodeOrderId] = useState<string | null>(null);
-  const [reviewOrder, setReviewOrder] = useState<CustomOrderForReview | null>(null);
+  const [briefOrder, setBriefOrder] = useState<CustomOrderForReview | null>(null);
 
   const { data: kitchenOrders = [], isLoading, error, refetch } = useKitchenOrders();
   const { data: customOrders = [], isLoading: customLoading, error: customError, refetch: refetchCustom } = useCustomOrdersForReview();
@@ -262,11 +281,8 @@ export default function Kitchen() {
   const markReady = useMarkOrderReady();
   const sendToBranch = useSendToBranch();
 
-  // Oldest first within each lane so the chef works the queue in order.
-  const byLane = (status: OrderStatus) =>
-    [...kitchenOrders]
-      .filter((o) => o.status === status)
-      .sort((a, b) => new Date(a.created_at as string).getTime() - new Date(b.created_at as string).getTime());
+  const regularByLane = (status: OrderStatus) => [...kitchenOrders].filter((o) => o.status === status).sort(sortByCreated);
+  const customByLane = (status: OrderStatus) => [...customOrders].filter((o) => o.status === status).sort(sortByCreated);
 
   if (isLoading) {
     return (
@@ -286,6 +302,19 @@ export default function Kitchen() {
 
   const busy = updateStatus.isPending || markReady.isPending || sendToBranch.isPending;
 
+  // Shared prep-action wiring for a given order id + status.
+  const actionProps = (o: { id: string; status: string }) => ({
+    barcodeOpen: showBarcodeOrderId === o.id,
+    onToggleBarcode: () => setShowBarcodeOrderId(showBarcodeOrderId === o.id ? null : o.id),
+    onStart: () => updateStatus.mutate({ orderId: o.id, status: 'preparing' }),
+    onReady: () => markReady.mutate(o.id),
+    onSend: () => sendToBranch.mutate(o.id),
+    busy,
+    starting: updateStatus.isPending,
+    readying: markReady.isPending,
+    sending: sendToBranch.isPending,
+  });
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -294,12 +323,7 @@ export default function Kitchen() {
           description="إدارة تجهيز الطلبات"
           icon={ChefHat}
           actions={
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => { refetch(); refetchCustom(); }}
-            >
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => { refetch(); refetchCustom(); }}>
               <RefreshCw className="w-4 h-4" />
               تحديث
             </Button>
@@ -315,8 +339,8 @@ export default function Kitchen() {
             </TabsTrigger>
             <TabsTrigger value="custom" className="flex items-center gap-2">
               <Cake className="w-4 h-4" />
-              طلبات مخصصة
-              {customOrders.length > 0 && <Badge variant="destructive" className="ms-1">{customOrders.length}</Badge>}
+              مخصص وضيافة
+              {customOrders.length > 0 && <Badge variant="secondary" className="ms-1">{customOrders.length}</Badge>}
             </TabsTrigger>
           </TabsList>
 
@@ -338,57 +362,25 @@ export default function Kitchen() {
             ) : (
               <div className="grid gap-4 md:grid-cols-3">
                 {LANES.map((lane) => {
-                  const orders = byLane(lane.status);
-                  const tone = LANE_TONE[lane.tone];
-                  const Icon = lane.icon;
+                  const orders = regularByLane(lane.status);
                   return (
-                    <div key={lane.status} className="rounded-2xl bg-muted/30 border border-border/40 p-3">
-                      <div className="flex items-center gap-2 px-1 pb-3">
-                        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', tone.iconBox)}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <span className="font-semibold">{lane.label}</span>
-                        <span className={cn('ms-auto text-xs font-bold px-2 py-0.5 rounded-full', tone.count)}>
-                          {orders.length}
-                        </span>
-                      </div>
-                      <div className="space-y-3">
-                        {orders.length === 0 ? (
-                          <p className="text-xs text-muted-foreground/70 text-center py-8 border border-dashed border-border/50 rounded-xl">
-                            لا طلبات في هذه المرحلة
-                          </p>
-                        ) : (
-                          orders.map((order) => (
-                            <PrepCard
-                              key={order.id}
-                              order={order}
-                              tone={lane.tone}
-                              barcodeOpen={showBarcodeOrderId === order.id}
-                              onToggleBarcode={() => setShowBarcodeOrderId(showBarcodeOrderId === order.id ? null : order.id)}
-                              onStart={() => updateStatus.mutate({ orderId: order.id, status: 'preparing' })}
-                              onReady={() => markReady.mutate(order.id)}
-                              onSend={() => sendToBranch.mutate(order.id)}
-                              busy={busy}
-                              starting={updateStatus.isPending}
-                              readying={markReady.isPending}
-                              sending={sendToBranch.isPending}
-                            />
-                          ))
-                        )}
-                      </div>
-                    </div>
+                    <Lane key={lane.status} label={lane.label} icon={lane.icon} tone={lane.tone} count={orders.length}>
+                      {orders.length === 0 ? <LaneEmpty /> : orders.map((order) => (
+                        <PrepCard key={order.id} order={order} tone={lane.tone} {...actionProps(order)} />
+                      ))}
+                    </Lane>
                   );
                 })}
               </div>
             )}
           </TabsContent>
 
-          {/* ── Custom / hospitality review queue ── */}
+          {/* ── Custom / occasion: paid, prepared from a brief ── */}
           <TabsContent value="custom" className="space-y-5 mt-6">
-            <Alert className="border-primary/30 bg-primary/10">
+            <Alert className="border-primary/20 bg-primary/5">
               <Cake className="h-4 w-4 text-primary" />
-              <AlertDescription className="text-primary">
-                <strong>طلبات مخصصة:</strong> هذه الطلبات تتطلب مراجعة وتحديد السعر ووقت التحضير قبل إرسالها للعميل للموافقة.
+              <AlertDescription>
+                <strong>طلبات مدفوعة:</strong> كيك مخصص وضيافة مناسبات — العميل دفع مسبقاً، جهّزها حسب التفاصيل المرفقة لكل طلب.
               </AlertDescription>
             </Alert>
 
@@ -399,14 +391,27 @@ export default function Kitchen() {
             ) : customOrders.length === 0 ? (
               <EmptyState
                 icon={Cake}
-                title="لا توجد طلبات مخصصة للمراجعة"
-                description="ستظهر هنا طلبات الكيك المخصص والضيافة بانتظار التسعير."
+                title="لا توجد طلبات مخصصة أو ضيافة"
+                description="ستظهر هنا طلبات الكيك المخصص والضيافة المدفوعة بانتظار التجهيز."
               />
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {customOrders.map((order) => (
-                  <CustomCard key={order.id} order={order} onReview={() => setReviewOrder(order)} />
-                ))}
+              <div className="grid gap-4 md:grid-cols-3">
+                {LANES.map((lane) => {
+                  const orders = customByLane(lane.status);
+                  return (
+                    <Lane key={lane.status} label={lane.label} icon={lane.icon} tone={lane.tone} count={orders.length}>
+                      {orders.length === 0 ? <LaneEmpty /> : orders.map((order) => (
+                        <CustomPrepCard
+                          key={order.id}
+                          order={order}
+                          tone={lane.tone}
+                          onBrief={() => setBriefOrder(order)}
+                          {...actionProps(order)}
+                        />
+                      ))}
+                    </Lane>
+                  );
+                })}
               </div>
             )}
           </TabsContent>
@@ -419,10 +424,10 @@ export default function Kitchen() {
           currentBranchId={transferBranchId}
         />
 
-        <ChefReviewDialog
-          order={reviewOrder}
-          open={!!reviewOrder}
-          onOpenChange={(open) => !open && setReviewOrder(null)}
+        <OrderBriefDialog
+          order={briefOrder}
+          open={!!briefOrder}
+          onOpenChange={(open) => !open && setBriefOrder(null)}
         />
       </div>
     </MainLayout>

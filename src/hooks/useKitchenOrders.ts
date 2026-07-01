@@ -34,17 +34,17 @@ export function useKitchenOrders() {
       if (error) throw error;
 
       // Parse items from JSON
-      return (data || []).map((order: any) => ({
-        id: order.id,
-        order_number: order.order_number,
-        status: order.status,
-        branch_id: order.branch_id,
-        branch_name: order.branch_name,
-        delivery_date: order.delivery_date,
-        delivery_time: order.delivery_time,
-        notes: order.notes,
-        created_at: order.created_at,
-        items: order.items ? (Array.isArray(order.items) ? order.items : JSON.parse(order.items)) : null,
+      return ((data || []) as Array<Record<string, unknown>>).map((order) => ({
+        id: order.id as string,
+        order_number: order.order_number as string,
+        status: order.status as OrderStatus,
+        branch_id: (order.branch_id ?? null) as string | null,
+        branch_name: (order.branch_name ?? null) as string | null,
+        delivery_date: (order.delivery_date ?? null) as string | null,
+        delivery_time: (order.delivery_time ?? null) as string | null,
+        notes: (order.notes ?? null) as string | null,
+        created_at: order.created_at as string,
+        items: order.items ? (Array.isArray(order.items) ? order.items : JSON.parse(order.items as string)) : null,
       })) as KitchenOrder[];
     },
     refetchInterval: 30000, // Refresh every 30 seconds
@@ -79,6 +79,7 @@ export function useUpdateKitchenOrderStatus() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['custom-orders-review'] });
       toast({
         title: 'تم التحديث',
         description: 'تم تحديث حالة الطلب بنجاح',
@@ -117,6 +118,7 @@ export function useMarkOrderReady() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['custom-orders-review'] });
       queryClient.invalidateQueries({ queryKey: ['handover-barcode'] });
       toast({
         title: 'تم التجهيز',
@@ -156,6 +158,7 @@ export function useSendToBranch() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kitchen-orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['custom-orders-review'] });
       queryClient.invalidateQueries({ queryKey: ['driver-orders'] });
       toast({
         title: 'تم الإرسال',
