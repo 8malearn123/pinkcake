@@ -141,7 +141,7 @@ function PrepActions({ order, barcodeOpen, onToggleBarcode, onStart, onReady, on
             {barcodeOpen ? 'إخفاء' : 'عرض الباركود'}
           </Button>
         </div>
-        <Button onClick={onSend} variant="outline" className="w-full text-primary border-primary/30 hover:bg-primary/5" disabled={busy}>
+        <Button onClick={onSend} className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={busy}>
           {sending ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <ArrowLeft className="w-4 h-4 me-1.5" />}
           إرسال للفرع
         </Button>
