@@ -306,7 +306,7 @@ export default function Kitchen() {
           }
         />
 
-        <Tabs defaultValue="regular" className="w-full">
+        <Tabs defaultValue="regular" dir="rtl" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="regular" className="flex items-center gap-2">
               <ChefHat className="w-4 h-4" />
