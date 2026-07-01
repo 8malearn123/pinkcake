@@ -43,10 +43,10 @@ const sortByCreated = (a: { created_at: string }, b: { created_at: string }) =>
    header carries its own live count. */
 type LaneTone = 'warning' | 'info' | 'primary';
 
-const LANE_TONE: Record<LaneTone, { iconBox: string; count: string; accent: string }> = {
-  warning: { iconBox: 'bg-warning/10 text-warning', count: 'bg-warning/15 text-warning', accent: 'bg-warning' },
-  info: { iconBox: 'bg-info/10 text-info', count: 'bg-info/15 text-info', accent: 'bg-info' },
-  primary: { iconBox: 'gradient-pink text-white', count: 'bg-primary/15 text-primary', accent: 'gradient-pink' },
+const LANE_TONE: Record<LaneTone, { iconBox: string; count: string; headerBg: string; timeBox: string }> = {
+  warning: { iconBox: 'bg-warning/10 text-warning', count: 'bg-warning/15 text-warning', headerBg: 'bg-warning/[0.06]', timeBox: 'bg-warning/15 text-warning' },
+  info: { iconBox: 'bg-info/10 text-info', count: 'bg-info/15 text-info', headerBg: 'bg-info/[0.06]', timeBox: 'bg-info/15 text-info' },
+  primary: { iconBox: 'gradient-pink text-white', count: 'bg-primary/15 text-primary', headerBg: 'bg-primary/[0.05]', timeBox: 'bg-primary/15 text-primary' },
 };
 
 const LANES: { status: OrderStatus; label: string; icon: typeof Clock; tone: LaneTone }[] = [
@@ -165,26 +165,40 @@ function PrepActions({ order, barcodeOpen, onToggleBarcode, onStart, onReady, on
 
 type CardActionProps = Omit<PrepActionsProps, 'order'>;
 
-/* Light, scan-in-a-glance card. Product + time lead; the lane already conveys
-   status, so no redundant status badge. */
+/* Kitchen "ticket": a tinted header carries the pickup time (the scan anchor)
+   and order no.; the body lists what to make. The lane conveys status, so no
+   redundant status badge. */
+function CardHeader({ tone, time, sub, children }: { tone: LaneTone; time: string; sub: string; children?: React.ReactNode }) {
+  const t = LANE_TONE[tone];
+  return (
+    <div className={cn('flex items-center justify-between gap-2 px-3.5 py-2.5 border-b border-border/40', t.headerBg)}>
+      <div className="flex items-center gap-2.5">
+        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', t.timeBox)}>
+          <Clock className="w-4 h-4" />
+        </div>
+        <div className="leading-none">
+          <p className="text-base font-bold tabular-nums">{time}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">{sub}</p>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function PrepCard({ order, tone, ...actions }: { order: KitchenOrder; tone: LaneTone } & CardActionProps) {
   return (
-    <Card className="overflow-hidden bg-card border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-      <div className={cn('h-1', LANE_TONE[tone].accent)} />
-      <div className="p-3.5 space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-mono text-xs text-muted-foreground">{order.order_number}</span>
-          <span className="inline-flex items-center gap-1 text-sm font-bold">
-            <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-            {formatTime(order.delivery_time)}
-          </span>
-        </div>
+    <Card className="overflow-hidden bg-card border border-border/50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+      <CardHeader tone={tone} time={formatTime(order.delivery_time)} sub="الاستلام">
+        <span className="font-mono text-xs text-muted-foreground">{order.order_number}</span>
+      </CardHeader>
 
-        <div className="space-y-0.5">
+      <div className="p-3.5 space-y-2.5">
+        <div className="space-y-1.5">
           {order.items?.map((item, index) => (
             <div key={index} className="flex items-baseline justify-between gap-2">
-              <span className="font-semibold text-sm leading-snug">{item.product_name}</span>
-              <span className="text-sm font-bold text-primary shrink-0">×{item.quantity}</span>
+              <span className="font-semibold text-[15px] leading-snug">{item.product_name}</span>
+              <span className="text-sm font-bold text-primary shrink-0 tabular-nums">×{item.quantity}</span>
             </div>
           ))}
         </div>
@@ -217,25 +231,27 @@ function CustomPrepCard({ order, tone, onBrief, ...actions }: {
     .filter(Boolean).join(' · ');
 
   return (
-    <Card className="overflow-hidden bg-card border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-      <div className={cn('h-1', isEvent ? 'gradient-pink' : 'bg-primary/40')} />
-      <div className="p-3.5 space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-mono text-xs text-muted-foreground">{order.order_number}</span>
-          <Badge className="bg-primary/10 text-primary border-0 gap-1 text-[11px] px-2 py-0.5 font-medium">
-            {isEvent ? <PartyPopper className="w-3 h-3" /> : <Cake className="w-3 h-3" />}
-            {isEvent ? 'ضيافة' : 'مخصص'}
-          </Badge>
-        </div>
+    <Card className="overflow-hidden bg-card border border-border/50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+      <CardHeader tone={tone} time={order.pickup_time} sub={format(new Date(order.pickup_date), 'd MMM', { locale: ar })}>
+        {isEvent ? (
+          <Badge className="bg-primary text-primary-foreground gap-1 text-[11px] px-2 py-0.5"><PartyPopper className="w-3 h-3" /> ضيافة</Badge>
+        ) : (
+          <Badge className="bg-primary/10 text-primary border-0 gap-1 text-[11px] px-2 py-0.5 font-medium"><Cake className="w-3 h-3" /> مخصص</Badge>
+        )}
+      </CardHeader>
 
-        <div>
-          <p className="font-semibold text-sm leading-snug">{order.product_type}</p>
-          {subline && <p className="text-xs text-muted-foreground mt-0.5">{subline}</p>}
+      <div className="p-3.5 space-y-2.5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="font-bold text-[15px] leading-snug">{order.product_type}</p>
+            {subline && <p className="text-xs text-muted-foreground mt-0.5">{subline}</p>}
+          </div>
+          <span className="font-mono text-[10px] text-muted-foreground shrink-0 mt-1">{order.order_number}</span>
         </div>
 
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Clock className="w-3 h-3 shrink-0" />
-          <span className="truncate">{format(new Date(order.pickup_date), 'd MMM', { locale: ar })} · {order.pickup_time} · {order.branch_name}</span>
+          <MapPin className="w-3 h-3 shrink-0" />
+          <span className="truncate">{order.branch_name}</span>
         </div>
 
         {chips.length > 0 && (
