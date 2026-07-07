@@ -29,8 +29,8 @@ const IMPERSONATION_KEY = 'admin_impersonation';
 
 // Get role-based landing page for redirect
 const getRoleLandingPage = (roles: AppRole[]): string => {
-  if (roles.includes('admin')) return '/dashboard';
-  if (roles.includes('call_center')) return '/dashboard';
+  if (roles.includes('admin')) return '/live';
+  if (roles.includes('call_center')) return '/live';
   if (roles.includes('customer_support')) return '/submissions';
   if (roles.includes('kitchen')) return '/kitchen';
   if (roles.includes('branch')) return '/branch-orders';
@@ -179,7 +179,7 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
       });
 
       // Force full page reload to reset to admin state
-      window.location.href = '/dashboard';
+      window.location.href = '/live';
     } catch (err) {
       console.error('End impersonation error:', err);
       // Still clear local state and reload even if server call fails

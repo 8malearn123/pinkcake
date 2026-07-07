@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import { useImpersonation } from '@/contexts/ImpersonationContext';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, LogOut } from 'lucide-react';
@@ -15,6 +16,29 @@ const roleLabels: Record<string, string> = {
 
 export function ImpersonationBanner() {
   const { isImpersonating, impersonatedUser, endImpersonation } = useImpersonation();
+  const bannerRef = useRef<HTMLDivElement>(null);
+
+  // The banner is fixed to the top, so reserve matching space on the page body
+  // while impersonating — otherwise it overlaps the page's own top bar. Measured
+  // (not hard-coded) so it stays correct as the banner wraps across breakpoints.
+  useLayoutEffect(() => {
+    if (!isImpersonating || !impersonatedUser) {
+      document.body.style.paddingTop = '';
+      return;
+    }
+    const el = bannerRef.current;
+    if (!el) return;
+    const apply = () => { document.body.style.paddingTop = `${el.offsetHeight}px`; };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    window.addEventListener('resize', apply);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', apply);
+      document.body.style.paddingTop = '';
+    };
+  }, [isImpersonating, impersonatedUser]);
 
   if (!isImpersonating || !impersonatedUser) {
     return null;
@@ -25,7 +49,7 @@ export function ImpersonationBanner() {
     .join(', ');
 
   return (
-    <div className="fixed top-0 end-0 start-0 z-[100] bg-destructive text-destructive-foreground px-4 py-2 shadow-lg">
+    <div ref={bannerRef} className="fixed top-0 end-0 start-0 z-[100] bg-destructive text-destructive-foreground px-4 py-2 shadow-lg">
       <div className="container mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 animate-pulse" />
