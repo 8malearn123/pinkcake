@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, MapPin, Phone, Calendar, Clock, Gift, Sparkles, Copy, MessageCircle, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LozaShell from './LozaShell';
 import { useLozaCart, LozaOrder } from '@/contexts/LozaCartContext';
 import { Button } from '@/components/ui/button';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { toast } from '@/hooks/use-toast';
 
 const STAGES: { key: LozaOrder['status']; label: string; emoji: string }[] = [
@@ -162,7 +163,7 @@ export default function LozaOrderDetails() {
                   <div className="font-bold text-sm line-clamp-1">{it.name}</div>
                   <div className="text-[11px] text-muted-foreground">× {it.quantity}</div>
                 </div>
-                <div className="font-bold text-sm">{it.unitPrice * it.quantity} ر.س</div>
+                <div className="font-bold text-sm">{it.unitPrice * it.quantity} <RiyalSymbol /></div>
               </div>
             ))}
           </div>
@@ -187,11 +188,11 @@ export default function LozaOrderDetails() {
         {/* Summary */}
         <section className="bg-card rounded-3xl shadow-loza border border-border/40 p-4 space-y-2 text-sm">
           <h3 className="text-sm font-bold font-loza-display mb-2">ملخص الفاتورة</h3>
-          <Row label="المجموع الفرعي" value={`${order.subtotal} ر.س`} />
-          <Row label="التوصيل" value={order.delivery === 0 ? 'مجاني' : `${order.delivery} ر.س`} />
+          <Row label="المجموع الفرعي" value={<>{order.subtotal} <RiyalSymbol /></>} />
+          <Row label="التوصيل" value={order.delivery === 0 ? 'مجاني' : <>{order.delivery} <RiyalSymbol /></>} />
           <div className="border-t border-border/60 pt-2 mt-1 flex justify-between font-extrabold text-base">
             <span>الإجمالي</span>
-            <span className="text-gradient-loza">{order.total} ر.س</span>
+            <span className="text-gradient-loza">{order.total} <RiyalSymbol /></span>
           </div>
           <div className="text-[11px] text-muted-foreground pt-1">
             طريقة الدفع: <b>{paymentLabel(order.paymentMethod)}</b>
@@ -228,7 +229,7 @@ function Info({ icon: Icon, label, value }: any) {
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>

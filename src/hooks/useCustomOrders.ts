@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { formatSARText } from '@/lib/currency';
 import type { CakeDesign } from '@/lib/cakeBuilder';
 
 export interface CustomOrderFormData {
@@ -159,7 +160,7 @@ export function useChefReviewOrder() {
         title: isRejected ? 'تم رفض الطلب' : 'تم تسعير الطلب',
         description: isRejected 
           ? 'تم إرسال الرفض لخدمة العملاء'
-          : `السعر: ${result?.price} ر.س - بانتظار إرسال العرض للعميل`,
+          : `السعر: ${formatSARText(result?.price)} - بانتظار إرسال العرض للعميل`,
       });
     },
     onError: (error) => {

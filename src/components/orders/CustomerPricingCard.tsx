@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Loader2, Check, X, DollarSign, Clock, MapPin, Cake } from 'lucide-react';
 import { CustomerPricingRequest, useRespondToPricing } from '@/hooks/useCustomOrderWorkflow';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import {
@@ -84,7 +85,7 @@ export function CustomerPricingCard({ order }: CustomerPricingCardProps) {
             <div className="flex items-center justify-center gap-2">
               <DollarSign className="w-6 h-6 text-primary" />
               <span className="text-3xl font-bold text-primary">{order.proposed_price}</span>
-              <span className="text-lg text-muted-foreground">ر.س</span>
+              <RiyalSymbol className="text-lg text-muted-foreground" />
             </div>
             <p className="text-sm text-muted-foreground mt-2">
               وقت التحضير: {order.preparation_time}

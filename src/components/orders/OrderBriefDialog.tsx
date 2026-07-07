@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 const SERVE_LABELS: Record<string, string> = {
   centerpiece_cake: 'كيكة المناسبة', assorted_mini: 'حلا ميني متنوّع', chocolate: 'شوكولاتة ضيافة',
@@ -119,7 +120,7 @@ export function OrderBriefDialog({ order, open, onOpenChange }: OrderBriefDialog
             </span>
             {order.total_amount != null && (
               <span className="font-bold text-success text-lg">
-                {order.total_amount} <span className="text-sm font-medium">ر.س</span>
+                {order.total_amount} <RiyalSymbol className="text-sm font-medium" />
               </span>
             )}
           </div>

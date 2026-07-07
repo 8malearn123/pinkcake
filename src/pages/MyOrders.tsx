@@ -22,6 +22,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 export default function MyOrders() {
   const { user, isLoading: authLoading, signOut } = useAuth();
@@ -151,7 +152,7 @@ export default function MyOrders() {
                     <div>
                       <div className="text-[10px] text-muted-foreground tracking-widest uppercase">المجموع</div>
                       <div className="font-display text-2xl text-primary leading-none mt-0.5">
-                        {order.total_amount} <span className="text-xs text-muted-foreground">ر.س</span>
+                        {order.total_amount} <RiyalSymbol className="text-xs text-muted-foreground" />
                       </div>
                     </div>
                     <Button variant="ghost" size="sm" className="rounded-full text-primary hover:text-primary hover:bg-primary/10">

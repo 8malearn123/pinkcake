@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Cake, Plus, Check, Star, Heart } from 'lucide-react';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { isSoldOut } from '@/hooks/usePublicStore';
 import { cn } from '@/lib/utils';
@@ -120,7 +121,7 @@ export function ProductCardRefined({
           <div className="min-w-0">
             <div className="text-[10px] text-muted-foreground uppercase tracking-widest">السعر</div>
             <div className="font-display text-2xl text-primary leading-none mt-1">
-              {product.price} <span className="text-xs text-muted-foreground font-sans">ر.س</span>
+              {product.price} <RiyalSymbol className="text-lg text-muted-foreground" />
             </div>
           </div>
           <button

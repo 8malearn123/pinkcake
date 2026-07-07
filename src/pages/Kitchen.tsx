@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHandoverBarcode } from '@/hooks/useHandoverBarcodes';
 import { OrderStatus } from '@/types/order';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import {
   ChefHat,
   Clock,
@@ -265,7 +266,7 @@ function CustomPrepCard({ order, tone, onBrief, ...actions }: {
         <div className="flex items-center justify-between gap-2">
           {order.total_amount != null && (
             <span className="inline-flex items-center gap-1 text-xs text-success font-medium">
-              <CheckCircle2 className="w-3.5 h-3.5" /> مدفوع · {order.total_amount} ر.س
+              <CheckCircle2 className="w-3.5 h-3.5" /> مدفوع · {order.total_amount} <RiyalSymbol />
             </span>
           )}
           <button onClick={onBrief} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">

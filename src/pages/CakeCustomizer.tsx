@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import '@/components/cake/cakeStudio.css';
 import {
   STEPS, SHAPES, FLAVORS, COLORS, DESIGNS, ADDONS, QUICK_MESSAGES, PHOTO_PRINT_PRICE,
@@ -146,7 +147,7 @@ export default function CakeCustomizer() {
             </div>
             <div className="htotal">
               <div className="lbl">الإجمالي</div>
-              <div className="val"><span className="num">{total}</span><span className="cur">ر.س</span></div>
+              <div className="val"><span className="num">{total}</span><RiyalSymbol className="cur" /></div>
             </div>
           </div>
           <div className="rail">
@@ -211,7 +212,7 @@ export default function CakeCustomizer() {
                     <div className="thumb" dangerouslySetInnerHTML={{ __html: miniCakeHTML(sh) }} />
                     <div className="nm">{sh.name}</div>
                     <div className="meta"><Users size={13} /><bdi dir="ltr">{sh.serves}</bdi><span className="d" /><span>{sh.lead}</span></div>
-                    <div className="pr">من <span className="v num">{sh.price}</span> ر.س</div>
+                    <div className="pr">من <span className="v num">{sh.price}</span> <RiyalSymbol /></div>
                   </button>
                 ))}
               </div>
@@ -227,7 +228,7 @@ export default function CakeCustomizer() {
                       <div className="ds">{f.ds}</div>
                       {f.popular && <div className="pop inline"><Star size={11} /> الأكثر طلباً</div>}
                     </div>
-                    <div className="pr">{f.add ? `+${f.add} ر.س` : 'مشمولة'}</div>
+                    <div className="pr">{f.add ? <>+{f.add} <RiyalSymbol /></> : 'مشمولة'}</div>
                     <div className="fradio"><i /></div>
                   </button>
                 ))}
@@ -302,7 +303,7 @@ export default function CakeCustomizer() {
                     <input type="file" accept="image/*" hidden onChange={onPhoto} />
                   </label>
                 )}
-                <div className="photo-note"><BadgeCheck size={14} /> طباعة صالحة للأكل <span className="add">+{PHOTO_PRINT_PRICE} ر.س</span></div>
+                <div className="photo-note"><BadgeCheck size={14} /> طباعة صالحة للأكل <span className="add">+{PHOTO_PRINT_PRICE} <RiyalSymbol /></span></div>
 
                 <div className="flabel"><Flame size={16} /> إضافات الاحتفال <span className="opt">— اختياري</span></div>
                 <div className="addons">
@@ -313,7 +314,7 @@ export default function CakeCustomizer() {
                       <button key={a.id} className={cn('addon', on && 'on')} onClick={() => set({ addons: { ...cfg.addons, [a.id]: !on } })}>
                         <div className="ac"><Ic size={19} /></div>
                         <div className="am"><div className="nm">{a.name}</div><div className="ds">{a.ds}</div></div>
-                        <div className="ap">+{a.add} ر.س</div>
+                        <div className="ap">+{a.add} <RiyalSymbol /></div>
                         <div className="check"><Check size={13} /></div>
                       </button>
                     );
@@ -331,7 +332,7 @@ export default function CakeCustomizer() {
                   {addonNames && <div className="srow"><div className="k"><Flame size={15} /> إضافات</div><div className="v">{addonNames}</div></div>}
                   {photo && <div className="srow"><div className="k"><ImagePlus size={15} /> صورة</div><div className="v">مطبوعة على الكيكة</div></div>}
                   {cfg.shape && <div className="srow"><div className="k"><Clock size={15} /> الجاهزية</div><div className="v muted">خلال {cfg.shape.lead}</div></div>}
-                  <div className="stotal"><div className="k">الإجمالي</div><div className="v"><span className="big num">{total}</span><span className="cur">ر.س</span></div></div>
+                  <div className="stotal"><div className="k">الإجمالي</div><div className="v"><span className="big num">{total}</span><RiyalSymbol className="cur" /></div></div>
                 </div>
                 <div className="assure"><BadgeCheck size={14} /> تعديلات مجانية غير محدودة قبل التأكيد.</div>
                 <div className="assure"><ShieldCheck size={14} /> تُحضّر طازجة في فرعك الأقرب — تفاصيل التوصيل في الخطوة التالية.</div>
@@ -347,7 +348,7 @@ export default function CakeCustomizer() {
             {last ? (
               <><ShoppingBag size={18} /> <span>أضِف تصميمك إلى العربة</span></>
             ) : (
-              <><span>التالي <span className="pp"><span className="num">{total}</span> <span className="cur">ر.س</span></span></span> <ChevronLeft size={18} /></>
+              <><span>التالي <span className="pp"><span className="num">{total}</span> <RiyalSymbol className="cur" /></span></span> <ChevronLeft size={18} /></>
             )}
           </button>
         </div>
@@ -360,7 +361,7 @@ export default function CakeCustomizer() {
             <h3>أُضيفت كيكتك إلى العربة</h3>
             <p>
               {cfg.shape?.name} · {cfg.flavor?.name} · {cfg.color.name}{cfg.text.trim() ? ` · «${cfg.text.trim()}»` : ''}
-              <br /><b style={{ color: 'hsl(var(--foreground))' }}>الإجمالي {total} ر.س</b>
+              <br /><b style={{ color: 'hsl(var(--foreground))' }}>الإجمالي {total} <RiyalSymbol /></b>
               {cfg.shape ? ` — تكفي ${cfg.shape.serves}، جاهزة خلال ${cfg.shape.lead}.` : ''}
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>

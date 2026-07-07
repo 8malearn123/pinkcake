@@ -17,7 +17,7 @@ export default function Privacy() {
         </p>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">١. البيانات التي نجمعها</h2>
+          <h2 className="font-display text-2xl mb-2">1. البيانات التي نجمعها</h2>
           <p className="text-muted-foreground leading-relaxed">
             نجمع البيانات اللازمة لتقديم خدماتنا وتحسين تجربتك، وتشمل:
           </p>
@@ -30,7 +30,7 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٢. كيف نستخدم بياناتك</h2>
+          <h2 className="font-display text-2xl mb-2">2. كيف نستخدم بياناتك</h2>
           <p className="text-muted-foreground leading-relaxed">
             نستخدم بياناتك لمعالجة طلباتك وتوصيلها، والتواصل معك بخصوص حالة الطلب، والرد على
             استفساراتك، وتحسين خدماتنا ومنتجاتنا. وقد نرسل لك تحديثات أو عروضاً ترويجية في حال
@@ -39,7 +39,7 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٣. ملفات تعريف الارتباط (الكوكيز)</h2>
+          <h2 className="font-display text-2xl mb-2">3. ملفات تعريف الارتباط (الكوكيز)</h2>
           <p className="text-muted-foreground leading-relaxed">
             يستخدم موقعنا ملفات تعريف الارتباط لتحسين تجربة التصفّح وتذكّر تفضيلاتك وتحليل أداء
             الموقع. يمكنك التحكّم في هذه الملفات أو تعطيلها من إعدادات متصفّحك، مع العلم أن تعطيل
@@ -48,7 +48,7 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٤. مشاركة البيانات مع أطراف ثالثة</h2>
+          <h2 className="font-display text-2xl mb-2">4. مشاركة البيانات مع أطراف ثالثة</h2>
           <p className="text-muted-foreground leading-relaxed">
             نحن لا نبيع بياناتك الشخصية لأي جهة. وقد نشاركها فقط مع شركاء موثوقين بالقدر اللازم
             لتقديم الخدمة، مثل:
@@ -61,7 +61,7 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٥. حماية البيانات</h2>
+          <h2 className="font-display text-2xl mb-2">5. حماية البيانات</h2>
           <p className="text-muted-foreground leading-relaxed">
             نطبّق إجراءات تقنية وتنظيمية مناسبة لحماية بياناتك من الوصول غير المصرّح به أو الفقدان أو
             إساءة الاستخدام، وتشمل تشفير الاتصالات وتقييد الوصول للبيانات. ومع حرصنا الدائم، لا يمكن
@@ -70,7 +70,7 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٦. حقوقك</h2>
+          <h2 className="font-display text-2xl mb-2">6. حقوقك</h2>
           <p className="text-muted-foreground leading-relaxed">
             يحق لك الاطلاع على بياناتك الشخصية التي نحتفظ بها، وطلب تصحيحها أو تحديثها أو حذفها،
             إضافة إلى سحب موافقتك على معالجتها لأغراض تسويقية في أي وقت. لممارسة أي من هذه الحقوق،
@@ -79,7 +79,7 @@ export default function Privacy() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٧. التواصل معنا بخصوص الخصوصية</h2>
+          <h2 className="font-display text-2xl mb-2">7. التواصل معنا بخصوص الخصوصية</h2>
           <p className="text-muted-foreground leading-relaxed">
             إذا كان لديك أي استفسار أو ملاحظة حول سياسة الخصوصية أو طريقة تعاملنا مع بياناتك، يسعدنا
             تواصلك معنا عبر البريد الإلكتروني hello@pinkcake.sa أو من خلال صفحة «تواصل معنا»، وسنردّ

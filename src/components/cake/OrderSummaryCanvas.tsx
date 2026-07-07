@@ -1,5 +1,6 @@
 import { Cake, Sparkles, Droplet, Layers, PenLine, Receipt } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 interface Props {
   state: {
@@ -200,7 +201,7 @@ export default function OrderSummaryCanvas({
         </div>
         <div className="text-2xl font-display font-bold text-primary tabular-nums">
           {totalPrice}
-          <span className="text-xs font-medium text-muted-foreground ms-1">ر.س</span>
+          <RiyalSymbol className="text-xs font-medium text-muted-foreground ms-1" />
         </div>
       </div>
     </div>

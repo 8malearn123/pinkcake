@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import LozaShell from './LozaShell';
 import { LOZA_CAKES, LOZA_VENDORS, LOZA_CATEGORIES } from '@/data/lozaCatalog';
 import { useLozaCart } from '@/contexts/LozaCartContext';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 const BANNERS = [
   {
@@ -174,7 +175,7 @@ export default function LozaHome() {
                       </span>
                     )}
                     <span className="absolute bottom-2 end-2 bg-[hsl(var(--loza-brown))]/90 text-white text-[11px] font-bold px-2 py-1 rounded-full">
-                      {cake.price} ر.س
+                      {cake.price} <RiyalSymbol />
                     </span>
                   </div>
                 </Link>

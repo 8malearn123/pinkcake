@@ -4,6 +4,7 @@ import { Search, ArrowRight, X, Star, TrendingUp } from 'lucide-react';
 import LozaShell from './LozaShell';
 import { LOZA_CAKES, LOZA_CATEGORIES } from '@/data/lozaCatalog';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 const TRENDING = ['زعفران', 'تشيز كيك', 'فستق', 'شوكولاتة', 'كاب كيك ورود'];
 
@@ -106,7 +107,7 @@ export default function LozaSearch() {
                 <div className="relative h-28 bg-gradient-to-br from-[hsl(var(--loza-gold-light))] to-[hsl(var(--loza-cream))] flex items-center justify-center">
                   <span className="text-5xl group-hover:scale-110 transition-transform">{c.emoji}</span>
                   <span className="absolute bottom-2 end-2 bg-[hsl(var(--loza-brown))]/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    {c.price} ر.س
+                    {c.price} <RiyalSymbol />
                   </span>
                 </div>
                 <div className="p-3">

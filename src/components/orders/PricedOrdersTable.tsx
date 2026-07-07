@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Send, Eye, DollarSign, Clock, MapPin } from 'lucide-react';
 import { usePricedOrdersForSupport, useSendPricingToCustomer } from '@/hooks/useCustomOrderWorkflow';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import {
@@ -81,7 +82,7 @@ export function PricedOrdersTable() {
               <div className="pt-3 border-t space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">السعر المقترح:</span>
-                  <span className="text-xl font-bold text-primary">{order.chef_proposed_price} ر.س</span>
+                  <span className="text-xl font-bold text-primary">{order.chef_proposed_price} <RiyalSymbol /></span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">وقت التحضير:</span>
@@ -189,7 +190,7 @@ export function PricedOrdersTable() {
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-lg font-medium">السعر المقترح:</span>
-                  <span className="text-2xl font-bold text-primary">{selectedOrder.chef_proposed_price} ر.س</span>
+                  <span className="text-2xl font-bold text-primary">{selectedOrder.chef_proposed_price} <RiyalSymbol /></span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">وقت التحضير:</span>

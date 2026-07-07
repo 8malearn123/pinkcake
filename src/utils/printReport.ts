@@ -20,7 +20,7 @@ export function printReport(
     return;
   }
 
-  const currentDate = new Date().toLocaleDateString('ar-EG', {
+  const currentDate = new Date().toLocaleDateString('ar-EG-u-nu-latn', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

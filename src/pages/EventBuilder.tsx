@@ -15,6 +15,7 @@ import {
 import { OCCASIONS, SERVE_STYLES } from '@/components/events/eventOptions';
 import { EventReadyCart } from '@/components/events/EventReadyCart';
 import { EventStepper } from '@/components/events/EventStepper';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import {
   Cake, ArrowRight, ChevronLeft, ChevronRight, Sparkles, Users, CalendarCheck,
   PartyPopper, Check, Send,
@@ -249,7 +250,7 @@ export default function EventBuilder() {
             {showEstimate && (
               <div className="flex-1 min-w-0 text-center leading-tight">
                 <div className="text-[10px] text-muted-foreground">تقديري مبدئي</div>
-                <div className="font-display text-lg text-primary"><bdi dir="ltr">{liveEstimate}</bdi> <span className="text-[11px] text-muted-foreground">ر.س</span></div>
+                <div className="font-display text-lg text-primary"><bdi dir="ltr">{liveEstimate}</bdi> <RiyalSymbol className="text-[11px] text-muted-foreground" /></div>
               </div>
             )}
             <button
@@ -304,7 +305,7 @@ function LiveSummary({ cfg, branchName, subtotal, live }: { cfg: WizardState; br
           {subtotal !== null && (
             <div className="mt-3 pt-3 border-t border-border flex items-end justify-between">
               <span className="text-xs text-muted-foreground">{live ? 'تقديري مبدئي' : 'تقديري'}</span>
-              <span className="font-display text-2xl text-primary"><bdi dir="ltr">{subtotal}</bdi> <span className="text-xs text-muted-foreground">ر.س</span></span>
+              <span className="font-display text-2xl text-primary"><bdi dir="ltr">{subtotal}</bdi> <RiyalSymbol className="text-xs text-muted-foreground" /></span>
             </div>
           )}
         </div>

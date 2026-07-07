@@ -16,7 +16,7 @@ export default function Terms() {
         </p>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">١. التعريفات</h2>
+          <h2 className="font-display text-2xl mb-2">1. التعريفات</h2>
           <p className="text-muted-foreground leading-relaxed">
             يُقصد بكلمة «الموقع» أو «المتجر» المنصة الإلكترونية الخاصة ببينك كيك. ويُقصد بكلمة «نحن»
             أو «المتجر» الجهة المالكة والمشغّلة للموقع، بينما يُقصد بكلمة «العميل» أو «المستخدم» كل من
@@ -25,7 +25,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٢. استخدام الموقع</h2>
+          <h2 className="font-display text-2xl mb-2">2. استخدام الموقع</h2>
           <p className="text-muted-foreground leading-relaxed">
             تلتزم العميلة باستخدام الموقع للأغراض المشروعة فقط، وبتقديم بيانات صحيحة ودقيقة عند
             الطلب. ويُحظر القيام بأي من الآتي:
@@ -38,7 +38,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٣. الطلبات والأسعار</h2>
+          <h2 className="font-display text-2xl mb-2">3. الطلبات والأسعار</h2>
           <p className="text-muted-foreground leading-relaxed">
             تُعرض أسعار المنتجات بالريال السعودي وهي شاملة لضريبة القيمة المضافة. نحرص على دقة الأسعار
             والأوصاف، إلا أننا نحتفظ بالحق في تصحيح أي خطأ غير مقصود في السعر أو الوصف. ويُعدّ الطلب
@@ -47,7 +47,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٤. الدفع</h2>
+          <h2 className="font-display text-2xl mb-2">4. الدفع</h2>
           <p className="text-muted-foreground leading-relaxed">
             يتم الدفع إلكترونياً عبر بوابة دفع آمنة باستخدام بطاقات مدى أو البطاقات الائتمانية أو
             المحافظ الرقمية. لا نحتفظ ببيانات بطاقتك البنكية على خوادمنا، وتُعالَج جميع المدفوعات لدى
@@ -56,7 +56,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٥. التوصيل والاستلام</h2>
+          <h2 className="font-display text-2xl mb-2">5. التوصيل والاستلام</h2>
           <p className="text-muted-foreground leading-relaxed">
             نوفّر خدمة التوصيل داخل الرياض والمناطق المجاورة ضمن نطاق محدّد، كما يمكن للعميلة اختيار
             الاستلام من الفرع. أوقات التوصيل تقديرية وقد تتأثر بظروف خارجة عن إرادتنا مثل حركة المرور
@@ -66,7 +66,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٦. الإلغاء والاسترجاع</h2>
+          <h2 className="font-display text-2xl mb-2">6. الإلغاء والاسترجاع</h2>
           <p className="text-muted-foreground leading-relaxed">
             نظراً لطبيعة منتجاتنا الغذائية القابلة للتلف، لا يمكن استرجاعها بعد التسليم إلا في حال وجود
             خطأ من جانبنا. يمكن إلغاء الطلب أو تعديله خلال ساعتين من تأكيده وما لم يكن قد دخل مرحلة
@@ -76,7 +76,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٧. الملكية الفكرية</h2>
+          <h2 className="font-display text-2xl mb-2">7. الملكية الفكرية</h2>
           <p className="text-muted-foreground leading-relaxed">
             جميع محتويات الموقع من شعارات وتصاميم وصور ونصوص هي ملك لبينك كيك ومحمية بموجب أنظمة
             الملكية الفكرية. لا يجوز نسخها أو إعادة نشرها أو استخدامها لأي غرض تجاري دون الحصول على إذن
@@ -85,7 +85,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٨. حدود المسؤولية</h2>
+          <h2 className="font-display text-2xl mb-2">8. حدود المسؤولية</h2>
           <p className="text-muted-foreground leading-relaxed">
             نبذل قصارى جهدنا لتقديم منتجات وخدمات بأعلى جودة، إلا أننا لا نتحمّل المسؤولية عن أي أضرار
             غير مباشرة قد تنشأ عن استخدام الموقع أو المنتجات. وتقع على العميلة مسؤولية إبلاغنا بأي حساسية
@@ -94,7 +94,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">٩. التعديلات على الشروط</h2>
+          <h2 className="font-display text-2xl mb-2">9. التعديلات على الشروط</h2>
           <p className="text-muted-foreground leading-relaxed">
             نحتفظ بالحق في تعديل هذه الشروط والأحكام في أي وقت، وتُنشَر النسخة المحدّثة على هذه الصفحة
             مع تحديث تاريخ آخر مراجعة. استمرارك في استخدام الموقع بعد التعديل يُعدّ موافقة منك على
@@ -103,7 +103,7 @@ export default function Terms() {
         </section>
 
         <section>
-          <h2 className="font-display text-2xl mb-2">١٠. القانون المعمول به</h2>
+          <h2 className="font-display text-2xl mb-2">10. القانون المعمول به</h2>
           <p className="text-muted-foreground leading-relaxed">
             تخضع هذه الشروط والأحكام وتُفسَّر وفقاً لأنظمة المملكة العربية السعودية، وتختص الجهات
             القضائية المختصة في المملكة بالنظر في أي نزاع قد ينشأ عن استخدام الموقع أو التعامل معنا.

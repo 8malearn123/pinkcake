@@ -25,7 +25,7 @@ export function Testimonials() {
         <div className="flex items-center gap-2 rounded-full bg-card border border-border/60 px-4 py-2 shadow-soft-lift">
           <Stars size="w-4 h-4" />
           <span className="text-sm font-semibold">4.9</span>
-          <span className="text-xs text-muted-foreground">· أكثر من ١٢٠٠ تقييم</span>
+          <span className="text-xs text-muted-foreground">· أكثر من 1200 تقييم</span>
         </div>
       </div>
       <div className="grid md:grid-cols-3 gap-4 lg:gap-5">

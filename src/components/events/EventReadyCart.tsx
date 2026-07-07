@@ -1,5 +1,6 @@
 import { Trash2, Send, Info, Sparkles, ArrowRight } from 'lucide-react';
 import { Stepper } from './EventSteps';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { lineTotal, planSubtotal, type EventLineItem } from '@/lib/eventPlanner';
 
 interface Props {
@@ -45,7 +46,7 @@ export function EventReadyCart({ guestCount, items, notes, onQty, onRemove, onSu
                 {it.meta && <><span className="w-1 h-1 rounded-full bg-muted-foreground/40" /><span>{it.meta}</span></>}
               </div>
               <div className="text-[11px] text-primary font-semibold mt-1">
-                <bdi dir="ltr">{lineTotal(it)}</bdi> ر.س
+                <bdi dir="ltr">{lineTotal(it)}</bdi> <RiyalSymbol />
               </div>
             </div>
             <Stepper value={it.qty} min={1} max={99} onChange={(n) => onQty(it.catalogId, n)} />
@@ -75,12 +76,12 @@ export function EventReadyCart({ guestCount, items, notes, onQty, onRemove, onSu
         <div className="flex items-end justify-between">
           <div className="text-sm font-semibold">الإجمالي التقديري</div>
           <div className="font-display text-3xl text-primary leading-none">
-            <bdi dir="ltr">{subtotal}</bdi> <span className="text-sm text-muted-foreground">ر.س</span>
+            <bdi dir="ltr">{subtotal}</bdi> <RiyalSymbol className="text-sm text-muted-foreground" />
           </div>
         </div>
         <div className="flex items-start gap-2 text-[12px] text-muted-foreground mt-3 border-t border-border/60 pt-3">
           <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-          <span>هذي أسعار تقديرية. فريق المناسبات بيأكّد التفاصيل والسعر النهائي خلال ٢٤ ساعة.</span>
+          <span>هذي أسعار تقديرية. فريق المناسبات بيأكّد التفاصيل والسعر النهائي خلال 24 ساعة.</span>
         </div>
       </div>
 

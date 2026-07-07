@@ -18,11 +18,11 @@ export const OCCASIONS: { id: Occasion; label: string; icon: LucideIcon }[] = [
 ];
 
 export const GUEST_BANDS = [
-  { label: '١٠–٢٥', value: 20 },
-  { label: '٢٦–٥٠', value: 40 },
-  { label: '٥١–١٠٠', value: 80 },
-  { label: '١٠١–٢٠٠', value: 150 },
-  { label: '+٢٠٠', value: 250 },
+  { label: '10–25', value: 20 },
+  { label: '26–50', value: 40 },
+  { label: '51–100', value: 80 },
+  { label: '101–200', value: 150 },
+  { label: '+200', value: 250 },
 ];
 
 export const SERVE_STYLES: { id: ServeStyle; label: string; icon: LucideIcon; hint: string }[] = [

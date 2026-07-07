@@ -8,6 +8,7 @@ import LozaShell from './LozaShell';
 import { findCake, findVendor } from '@/data/lozaCatalog';
 import { useLozaCart } from '@/contexts/LozaCartContext';
 import { Button } from '@/components/ui/button';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 export default function LozaCakeDetails() {
   const { id } = useParams();
@@ -79,7 +80,7 @@ export default function LozaCakeDetails() {
               </Link>
             </div>
             <div className="text-end">
-              <div className="text-2xl font-extrabold text-gradient-loza">{unitPrice} ر.س</div>
+              <div className="text-2xl font-extrabold text-gradient-loza">{unitPrice} <RiyalSymbol /></div>
               <div className="text-[10px] text-muted-foreground">للحبة</div>
             </div>
           </div>
@@ -138,7 +139,7 @@ export default function LozaCakeDetails() {
                     )}
                   >
                     <div className="text-xs font-bold">{s.name}</div>
-                    <div className="text-[11px] mt-0.5 opacity-90">{s.price} ر.س</div>
+                    <div className="text-[11px] mt-0.5 opacity-90">{s.price} <RiyalSymbol /></div>
                   </button>
                 );
               })}
@@ -209,7 +210,7 @@ export default function LozaCakeDetails() {
         <div className="container mx-auto max-w-2xl px-4 py-3 flex items-center gap-3">
           <div className="flex-1">
             <div className="text-[10px] text-muted-foreground">الإجمالي</div>
-            <div className="font-extrabold text-gradient-loza text-lg leading-tight">{total} ر.س</div>
+            <div className="font-extrabold text-gradient-loza text-lg leading-tight">{total} <RiyalSymbol /></div>
           </div>
           <Button
             onClick={() => {

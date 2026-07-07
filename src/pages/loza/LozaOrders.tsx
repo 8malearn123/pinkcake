@@ -3,6 +3,7 @@ import { Receipt, ChevronLeft, Package } from 'lucide-react';
 import LozaShell from './LozaShell';
 import { useLozaCart, LozaOrder } from '@/contexts/LozaCartContext';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 const STATUS_MAP: Record<LozaOrder['status'], { label: string; color: string; emoji: string }> = {
   placed: { label: 'تم الاستلام', color: 'bg-amber-100 text-amber-800', emoji: '📝' },
@@ -63,7 +64,7 @@ export default function LozaOrders() {
                       </p>
                     </div>
                     <div className="text-end">
-                      <div className="font-extrabold text-gradient-loza">{o.total} ر.س</div>
+                      <div className="font-extrabold text-gradient-loza">{o.total} <RiyalSymbol /></div>
                       <span className={cn('inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-bold', s.color)}>
                         {s.emoji} {s.label}
                       </span>

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Search, Cake, ArrowLeft, TrendingUp, X } from 'lucide-react';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 interface StoreSearchProps {
   products: StoreProduct[];
@@ -157,7 +158,7 @@ export function StoreSearch({
                       {p.category && <span className="block text-[11px] text-muted-foreground">{p.category}</span>}
                     </span>
                     <span className="font-display text-base text-primary whitespace-nowrap">
-                      {p.price} <span className="text-[10px] text-muted-foreground font-sans">ر.س</span>
+                      {p.price} <RiyalSymbol className="text-[10px] text-muted-foreground font-sans" />
                     </span>
                   </button>
                 ))}
@@ -217,7 +218,7 @@ export function StoreSearch({
                     )}
                   </span>
                   <span className="flex-1 min-w-0 text-sm line-clamp-1">{p.name}</span>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">{p.price} ر.س</span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">{p.price} <RiyalSymbol /></span>
                 </button>
               ))}
             </div>

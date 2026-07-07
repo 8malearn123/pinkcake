@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Cake, Plus, Star, Eye } from 'lucide-react';
+import { Price } from '@/components/ui/riyal';
 import { StoreProduct } from '@/hooks/usePublicStore';
 
 interface ProductCardProps {
@@ -56,7 +57,7 @@ export function ProductCard({ product, rating, onAddToCart, onViewDetails }: Pro
           </p>
         )}
         <div className="flex items-center justify-between mt-2">
-          <span className="text-primary font-bold">{product.price} ر.س</span>
+          <Price amount={product.price} className="text-primary font-bold" />
           {rating && rating.review_count > 0 && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Star className="w-3 h-3 fill-warning text-warning" />

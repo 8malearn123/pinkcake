@@ -6,6 +6,8 @@ import LozaShell from './LozaShell';
 import { useLozaCart } from '@/contexts/LozaCartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { RiyalSymbol } from '@/components/ui/riyal';
+import { formatSARText } from '@/lib/currency';
 
 const CITIES = ['جازان', 'صبيا', 'أبو عريش', 'صامطة', 'بيش'];
 const TIMES = ['10:00 ص', '12:00 م', '2:00 م', '4:00 م', '6:00 م', '8:00 م'];
@@ -162,12 +164,12 @@ export default function LozaCheckout() {
 
         {/* Summary */}
         <Section title="ملخص الطلب">
-          <Row label="المجموع الفرعي" value={`${subtotal} ر.س`} />
-          {discount > 0 && <Row label="الخصم" value={`- ${discount} ر.س`} accent />}
-          <Row label="التوصيل" value={delivery === 0 ? 'مجاني 🎉' : `${delivery} ر.س`} />
+          <Row label="المجموع الفرعي" value={formatSARText(subtotal)} />
+          {discount > 0 && <Row label="الخصم" value={`- ${formatSARText(discount)}`} accent />}
+          <Row label="التوصيل" value={delivery === 0 ? 'مجاني 🎉' : formatSARText(delivery)} />
           <div className="border-t border-border/60 pt-2 mt-1 flex justify-between font-extrabold">
             <span>الإجمالي</span>
-            <span className="text-gradient-loza text-lg">{total} ر.س</span>
+            <span className="text-gradient-loza text-lg">{total} <RiyalSymbol /></span>
           </div>
         </Section>
       </main>
@@ -179,7 +181,7 @@ export default function LozaCheckout() {
             disabled={!canSubmit || submitting}
             className="w-full rounded-full gradient-loza-gold text-[hsl(var(--loza-brown))] border-0 font-bold py-6 text-base disabled:opacity-50"
           >
-            {submitting ? 'جاري إرسال الطلب...' : `تأكيد الطلب • ${total} ر.س`}
+            {submitting ? 'جاري إرسال الطلب...' : `تأكيد الطلب • ${formatSARText(total)}`}
           </Button>
         </div>
       </div>

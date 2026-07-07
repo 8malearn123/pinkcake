@@ -14,6 +14,7 @@ import { toast } from '@/hooks/use-toast';
 import LozaShell from './LozaShell';
 import Cake2DPreview from '@/components/loza/Cake2DPreview';
 import { useLozaCart } from '@/contexts/LozaCartContext';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 const STEPS = [
   { id: 1, title: 'الأساس', icon: Cake },
@@ -198,7 +199,7 @@ export default function LozaCustomizer() {
           </div>
           <div className="text-end min-w-[80px]">
             <div className="text-[10px] text-muted-foreground">السعر</div>
-            <div className="text-base font-extrabold text-gradient-loza">{total} ر.س</div>
+            <div className="text-base font-extrabold text-gradient-loza">{total} <RiyalSymbol /></div>
           </div>
         </div>
 
@@ -332,7 +333,7 @@ export default function LozaCustomizer() {
                       <div className="font-bold text-sm">{b.name}</div>
                       <div className="text-[11px] text-muted-foreground mt-0.5">{b.desc}</div>
                       <div className="text-xs text-primary font-extrabold mt-1.5">
-                        {b.price > 0 ? `من ${b.price} ر.س` : 'مجاناً'}
+                        {b.price > 0 ? <>من {b.price} <RiyalSymbol /></> : 'مجاناً'}
                       </div>
                     </button>
                   );
@@ -373,7 +374,7 @@ export default function LozaCustomizer() {
                       </div>
                       <div className="font-bold text-xs">{f.name}</div>
                       {f.price > 0 && (
-                        <div className="text-[10px] text-primary font-bold mt-0.5">+{f.price} ر.س</div>
+                        <div className="text-[10px] text-primary font-bold mt-0.5">+{f.price} <RiyalSymbol /></div>
                       )}
                     </button>
                   );
@@ -487,7 +488,7 @@ export default function LozaCustomizer() {
                       <div className="font-bold text-sm">{d.name}</div>
                       <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{d.desc}</div>
                       <div className="text-[11px] text-primary font-bold mt-1.5">
-                        {d.price > 0 ? `+${d.price} ر.س` : 'مجاناً'}
+                        {d.price > 0 ? <>+{d.price} <RiyalSymbol /></> : 'مجاناً'}
                       </div>
                     </button>
                   );
@@ -505,7 +506,7 @@ export default function LozaCustomizer() {
                   <div className="flex-1">
                     <Label className="font-bold text-sm">كتابة على الكيكة</Label>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
-                      تكتب بالكريمة • +{PRINT_PRICE} ر.س
+                      تكتب بالكريمة • +{PRINT_PRICE} <RiyalSymbol />
                     </p>
                   </div>
                   <Switch checked={s.hasText} onCheckedChange={(v) => setS((p) => ({ ...p, hasText: v }))} />
@@ -531,7 +532,7 @@ export default function LozaCustomizer() {
                   <div className="flex-1">
                     <Label className="font-bold text-sm">طباعة صورة على الكيكة</Label>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
-                      صورة أكلة • +{PRINT_PRICE} ر.س
+                      صورة أكلة • +{PRINT_PRICE} <RiyalSymbol />
                     </p>
                   </div>
                   <Switch checked={s.hasPrint} onCheckedChange={(v) => setS((p) => ({ ...p, hasPrint: v }))} />
@@ -580,7 +581,7 @@ export default function LozaCustomizer() {
                   {s.hasPrint && <Row label="طباعة" value="نعم" />}
                   <div className="flex justify-between font-bold text-lg pt-3 border-t border-white/20 mt-3">
                     <span>الإجمالي</span>
-                    <span className="text-[hsl(var(--loza-gold-light))]">{total} ر.س</span>
+                    <span className="text-[hsl(var(--loza-gold-light))]">{total} <RiyalSymbol /></span>
                   </div>
                 </div>
               </div>
@@ -603,7 +604,7 @@ export default function LozaCustomizer() {
           </Button>
           <div className="flex-1 text-center">
             <div className="text-[10px] text-muted-foreground">المجموع</div>
-            <div className="font-extrabold text-gradient-loza text-base leading-tight">{total} ر.س</div>
+            <div className="font-extrabold text-gradient-loza text-base leading-tight">{total} <RiyalSymbol /></div>
           </div>
           {step < 5 ? (
             <Button

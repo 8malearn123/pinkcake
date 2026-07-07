@@ -34,9 +34,9 @@ export interface EventLineItem {
   unitPrice: number;
   unitLabel: string;
   qty: number;
-  /** e.g. "٢٠ قطعة بالعلبة" */
+  /** e.g. "20 قطعة بالعلبة" */
   meta?: string;
-  /** e.g. "يكفي تقريبًا لـ ٤٠ ضيف" */
+  /** e.g. "يكفي تقريبًا لـ 40 ضيف" */
   servesHint?: string;
 }
 

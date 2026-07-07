@@ -11,6 +11,7 @@ import { ProductCardRefined } from '@/components/store/ProductCardRefined';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
 import { BackToTop } from '@/components/store/BackToTop';
 import { Reveal } from '@/components/Reveal';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -279,7 +280,7 @@ export default function ProductDetails() {
               {/* Price */}
               <div className="mt-6 flex items-end gap-3">
                 <div className="font-display text-4xl text-primary leading-none">
-                  {product.price} <span className="text-base text-muted-foreground font-sans">ر.س</span>
+                  {product.price} <RiyalSymbol className="text-base text-muted-foreground font-sans" />
                 </div>
                 {soldOut ? (
                   <span className="mb-1 inline-flex items-center gap-1.5 text-xs text-destructive font-medium">
@@ -350,16 +351,16 @@ export default function ProductDetails() {
                   className="press mt-3 w-full rounded-full h-[52px] px-7 border border-border bg-card text-foreground font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
                 >
                   اشترِ الآن
-                  {qty > 1 && <span className="text-muted-foreground font-normal">· {lineTotal} ر.س</span>}
+                  {qty > 1 && <span className="text-muted-foreground font-normal">· {lineTotal} <RiyalSymbol /></span>}
                 </button>
               )}
 
               {/* Trust */}
               <div className="mt-7 grid grid-cols-3 gap-3 border-t border-border/60 pt-6">
                 {[
-                  { icon: Truck, label: 'توصيل مجاني فوق ٢٠٠ ر.س' },
-                  { icon: Clock, label: 'تحضير خلال ٢٤ ساعة' },
-                  { icon: ShieldCheck, label: 'دفع آمن ١٠٠٪' },
+                  { icon: Truck, label: 'توصيل مجاني فوق 200 ر.س' },
+                  { icon: Clock, label: 'تحضير خلال 24 ساعة' },
+                  { icon: ShieldCheck, label: 'دفع آمن 100٪' },
                 ].map((t) => (
                   <div key={t.label} className="flex flex-col items-center text-center gap-1.5">
                     <t.icon className="w-5 h-5 text-primary" />
@@ -421,7 +422,7 @@ export default function ProductDetails() {
         <div className="shrink-0">
           <div className="text-[10px] text-muted-foreground uppercase tracking-widest">الإجمالي</div>
           <div className="font-display text-2xl text-primary leading-none">
-            {lineTotal} <span className="text-xs text-muted-foreground font-sans">ر.س</span>
+            {lineTotal} <RiyalSymbol className="text-xs text-muted-foreground font-sans" />
           </div>
         </div>
         <button

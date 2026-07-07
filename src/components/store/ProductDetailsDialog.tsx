@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useProductDetails, ProductOption, ProductOptionValue } from '@/hooks/useProductDetails';
 import { Cake, Plus, Minus, ShoppingCart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 interface ProductDetailsDialogProps {
   open: boolean;
@@ -221,7 +222,7 @@ export function ProductDetailsDialog({
                   <h2 className="text-2xl font-bold">{product.name}</h2>
                   <div className="flex items-center gap-4 mt-2">
                     <span className="text-2xl font-bold text-primary">
-                      {product.price.toFixed(2)} ر.س
+                      {product.price.toFixed(2)} <RiyalSymbol />
                     </span>
                   </div>
                 </div>
@@ -276,7 +277,7 @@ export function ProductDetailsDialog({
                                   {value.value_name}
                                   {value.price_adjustment !== 0 && (
                                     <span className="ms-1 text-xs">
-                                      ({value.price_adjustment > 0 ? '+' : ''}{value.price_adjustment} ر.س)
+                                      ({value.price_adjustment > 0 ? '+' : ''}{value.price_adjustment} <RiyalSymbol />)
                                     </span>
                                   )}
                                 </Label>
@@ -301,7 +302,7 @@ export function ProductDetailsDialog({
                                   {value.value_name}
                                   {value.price_adjustment !== 0 && (
                                     <span className="ms-1 text-xs">
-                                      ({value.price_adjustment > 0 ? '+' : ''}{value.price_adjustment} ر.س)
+                                      ({value.price_adjustment > 0 ? '+' : ''}{value.price_adjustment} <RiyalSymbol />)
                                     </span>
                                   )}
                                 </button>
@@ -343,7 +344,7 @@ export function ProductDetailsDialog({
             <DialogFooter className="border-t pt-4 mt-4">
               <div className="w-full flex items-center justify-between gap-4">
                 <div className="text-lg font-bold">
-                  المجموع: <span className="text-primary">{totalPrice.toFixed(2)} ر.س</span>
+                  المجموع: <span className="text-primary">{totalPrice.toFixed(2)} <RiyalSymbol /></span>
                 </div>
                 <Button onClick={handleAddToCart} className="gap-2">
                   <ShoppingCart className="w-4 h-4" />

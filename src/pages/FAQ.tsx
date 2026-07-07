@@ -1,6 +1,8 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { HelpCircle, MessageCircle } from 'lucide-react';
 import { InfoPageLayout } from '@/components/store/InfoPageLayout';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import {
   Accordion,
   AccordionItem,
@@ -10,7 +12,7 @@ import {
 
 interface QA {
   q: string;
-  a: string;
+  a: ReactNode;
 }
 
 interface FaqGroup {
@@ -74,7 +76,11 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: 'كم تبلغ رسوم التوصيل؟ وهل هناك توصيل مجاني؟',
-        a: 'تبدأ رسوم التوصيل من 25 ر.س وتختلف حسب المنطقة. ونسعد بتقديم توصيل مجاني لكل طلب تتجاوز قيمته 200 ر.س داخل الرياض.',
+        a: (
+          <>
+            تبدأ رسوم التوصيل من 25 <RiyalSymbol /> وتختلف حسب المنطقة. ونسعد بتقديم توصيل مجاني لكل طلب تتجاوز قيمته 200 <RiyalSymbol /> داخل الرياض.
+          </>
+        ),
       },
       {
         q: 'كم يستغرق تحضير الطلب قبل التوصيل؟',

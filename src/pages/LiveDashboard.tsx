@@ -30,6 +30,7 @@ import {
 import { format, formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { Enums } from '@/integrations/supabase/types';
 
 type OrderStatus = Enums<'order_status'>;
@@ -78,9 +79,8 @@ export default function LiveDashboard() {
   }, []);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-SA', {
-      style: 'currency',
-      currency: 'SAR',
+    return new Intl.NumberFormat('en-US', {
+      style: 'decimal',
       maximumFractionDigits: 0,
     }).format(amount);
   };
@@ -160,7 +160,7 @@ export default function LiveDashboard() {
                       <TrendingUp className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold leading-none">{formatCurrency(stats.todayRevenue)}</p>
+                      <p className="text-2xl font-bold leading-none">{formatCurrency(stats.todayRevenue)}{' '}<RiyalSymbol /></p>
                       <p className="text-xs text-muted-foreground mt-1.5">إيرادات اليوم</p>
                     </div>
                   </div>
@@ -218,7 +218,7 @@ export default function LiveDashboard() {
                             </div>
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-muted-foreground truncate">{order.customer?.name || '-'}</span>
-                              <span className="font-semibold shrink-0 ms-2">{formatCurrency(order.total_amount)}</span>
+                              <span className="font-semibold shrink-0 ms-2">{formatCurrency(order.total_amount)}{' '}<RiyalSymbol /></span>
                             </div>
                             <div className="flex items-center justify-between mt-2">
                               <DeliveryCountdown

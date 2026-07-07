@@ -166,7 +166,7 @@ export const LOZA_VENDORS: LozaVendor[] = [
     city: 'جازان',
     cover: 'from-[hsl(var(--loza-gold))] to-[hsl(var(--loza-gold-dark))]',
     cakeIds: ['c1', 'c4'],
-    desc: 'متجر متخصص في الكيك الفاخر والحلويات الشرقية منذ ١٩٩٨',
+    desc: 'متجر متخصص في الكيك الفاخر والحلويات الشرقية منذ 1998',
   },
   {
     id: 'v2',

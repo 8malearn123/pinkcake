@@ -33,6 +33,7 @@ import { Tables } from '@/integrations/supabase/types';
 import { Loader2, Plus } from 'lucide-react';
 import { ImageUpload } from './ImageUpload';
 import { useProducts } from '@/hooks/useProducts';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 const productSchema = z.object({
   name: z.string().trim().min(2, 'اسم المنتج مطلوب (حرفين على الأقل)').max(100, 'الاسم طويل جداً'),
@@ -168,7 +169,7 @@ export function ProductForm({
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>السعر (ر.س) *</FormLabel>
+                    <FormLabel>السعر (<RiyalSymbol />) *</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" min="0" {...field} />
                     </FormControl>

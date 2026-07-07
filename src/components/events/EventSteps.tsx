@@ -128,7 +128,7 @@ export function GuestCountStep({ value, onChange }: { value: number; onChange: (
             inputMode="numeric"
             value={value || ''}
             onChange={(e) => onChange(Math.max(0, parseInt(e.target.value, 10) || 0))}
-            placeholder="٨٠"
+            placeholder="80"
             dir="ltr"
             className="w-full bg-transparent outline-none text-lg font-bold text-start"
           />
@@ -271,7 +271,7 @@ export function WhenWhereStep({ eventDate, branchId, fulfillmentMode, branches, 
 }) {
   return (
     <div>
-      <StepHeading title="متى وأين؟" sub="ضيافة المناسبات تحتاج تجهيز مسبق — يُفضّل الطلب قبل ٣ أيام على الأقل." />
+      <StepHeading title="متى وأين؟" sub="ضيافة المناسبات تحتاج تجهيز مسبق — يُفضّل الطلب قبل 3 أيام على الأقل." />
       <div className="space-y-5 max-w-md">
         <div>
           <label className="text-sm font-semibold mb-2 flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> تاريخ المناسبة</label>

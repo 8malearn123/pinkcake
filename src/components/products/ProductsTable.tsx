@@ -44,6 +44,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { MoreHorizontal, Pencil, Trash2, ImageOff, GripVertical } from 'lucide-react';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 type Product = Tables<'products'>;
 
@@ -124,7 +125,7 @@ function SortableRow({ product, onEdit, onDeleteClick, formatPrice }: SortableRo
         )}
       </TableCell>
       <TableCell className="font-medium">
-        {formatPrice(product.price)}
+        {formatPrice(product.price)}{' '}<RiyalSymbol />
       </TableCell>
       <TableCell>
         <Badge variant={product.is_active ? 'default' : 'secondary'}>
@@ -188,9 +189,10 @@ export function ProductsTable({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ar-SA', {
-      style: 'currency',
-      currency: 'SAR',
+    return new Intl.NumberFormat('en-US', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(price);
   };
 

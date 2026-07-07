@@ -3,8 +3,9 @@ import { ArrowRight, Trash2, Plus, Minus, ShoppingBag, Sparkles, Tag } from 'luc
 import LozaShell from './LozaShell';
 import { useLozaCart } from '@/contexts/LozaCartContext';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 export default function LozaCart() {
   const { items, updateQty, remove, subtotal, count } = useLozaCart();
@@ -87,7 +88,7 @@ export default function LozaCart() {
                           <Plus className="w-3 h-3 text-[hsl(var(--loza-brown))]" />
                         </button>
                       </div>
-                      <div className="font-extrabold text-gradient-loza">{item.unitPrice * item.quantity} ر.س</div>
+                      <div className="font-extrabold text-gradient-loza">{item.unitPrice * item.quantity} <RiyalSymbol /></div>
                     </div>
                   </div>
                 </article>
@@ -110,16 +111,16 @@ export default function LozaCart() {
 
             {/* Summary */}
             <div className="mt-4 bg-card rounded-3xl shadow-loza p-4 border border-border/40 text-sm space-y-2">
-              <Row label="المجموع الفرعي" value={`${subtotal} ر.س`} />
-              {discount > 0 && <Row label="الخصم" value={`- ${discount} ر.س`} accent />}
-              <Row label="التوصيل" value={delivery === 0 ? 'مجاني 🎉' : `${delivery} ر.س`} />
+              <Row label="المجموع الفرعي" value={<>{subtotal} <RiyalSymbol /></>} />
+              {discount > 0 && <Row label="الخصم" value={<>- {discount} <RiyalSymbol /></>} accent />}
+              <Row label="التوصيل" value={delivery === 0 ? 'مجاني 🎉' : <>{delivery} <RiyalSymbol /></>} />
               <div className="border-t border-border/60 pt-2 mt-2 flex justify-between font-extrabold text-base">
                 <span>الإجمالي</span>
-                <span className="text-gradient-loza">{total} ر.س</span>
+                <span className="text-gradient-loza">{total} <RiyalSymbol /></span>
               </div>
               {subtotal < 200 && (
                 <p className="text-[11px] text-center text-muted-foreground bg-muted/40 rounded-xl p-2 mt-2">
-                  أضف <b className="text-primary">{200 - subtotal} ر.س</b> للحصول على توصيل مجاني 🚚
+                  أضف <b className="text-primary">{200 - subtotal} <RiyalSymbol /></b> للحصول على توصيل مجاني 🚚
                 </p>
               )}
             </div>
@@ -132,7 +133,7 @@ export default function LozaCart() {
           <div className="container mx-auto max-w-2xl px-4 py-3 flex items-center gap-3">
             <div className="flex-1">
               <div className="text-[10px] text-muted-foreground">الإجمالي</div>
-              <div className="font-extrabold text-gradient-loza text-lg leading-tight">{total} ر.س</div>
+              <div className="font-extrabold text-gradient-loza text-lg leading-tight">{total} <RiyalSymbol /></div>
             </div>
             <Button
               onClick={() => navigate('/loza/checkout', { state: { discount, delivery } })}
@@ -148,7 +149,7 @@ export default function LozaCart() {
   );
 }
 
-function Row({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Row({ label, value, accent }: { label: string; value: ReactNode; accent?: boolean }) {
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>

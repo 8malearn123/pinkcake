@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowRight, Star, MapPin, Phone, Clock } from 'lucide-react';
 import LozaShell from './LozaShell';
 import { findVendor, LOZA_CAKES } from '@/data/lozaCatalog';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 export default function LozaVendor() {
   const { id } = useParams();
@@ -63,7 +64,7 @@ export default function LozaVendor() {
               <div className="p-3">
                 <h4 className="font-bold text-sm line-clamp-2">{c.name}</h4>
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-primary font-extrabold text-sm">{c.price} ر.س</span>
+                  <span className="text-primary font-extrabold text-sm">{c.price} <RiyalSymbol /></span>
                   <span className="text-[10px] flex items-center gap-0.5">
                     <Star className="w-3 h-3 fill-primary text-primary" /> {c.rating}
                   </span>

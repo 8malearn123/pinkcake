@@ -17,6 +17,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { Enums } from '@/integrations/supabase/types';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 type OrderStatus = Enums<'order_status'>;
 
@@ -109,7 +110,7 @@ export default function TrackOrder() {
 
   const formatDate = (date: string | null) => {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('ar-SA');
+    return new Date(date).toLocaleDateString('ar-SA-u-nu-latn');
   };
 
   const formatTime = (time: string | null) => {
@@ -186,12 +187,12 @@ export default function TrackOrder() {
                         <span>{item.product_name}</span>
                         <span className="text-muted-foreground">×{item.quantity}</span>
                       </div>
-                      <span className="font-medium">{item.total_price} ر.س</span>
+                      <span className="font-medium">{item.total_price} <RiyalSymbol /></span>
                     </div>
                   ))}
                   <div className="flex justify-between items-center pt-3 font-bold text-lg">
                     <span>الإجمالي</span>
-                    <span className="text-primary">{order.total_amount} ر.س</span>
+                    <span className="text-primary">{order.total_amount} <RiyalSymbol /></span>
                   </div>
                 </div>
               </div>

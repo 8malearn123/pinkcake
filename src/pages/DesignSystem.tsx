@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { ORDER_STATUS_LABELS, OrderStatus } from '@/types/order';
 import {
   Palette,
@@ -186,7 +187,7 @@ export default function DesignSystem() {
                 <ClassChip>text-base (Cairo)</ClassChip>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">نص ثانوي — آخر تحديث قبل ٥ دقائق</p>
+                <p className="text-sm text-muted-foreground">نص ثانوي — آخر تحديث قبل 5 دقائق</p>
                 <ClassChip>text-sm text-muted-foreground</ClassChip>
               </div>
               <div>
@@ -460,7 +461,7 @@ export default function DesignSystem() {
           <div className="rounded-xl bg-muted/50 p-4 text-sm text-muted-foreground mt-4 space-y-1 leading-relaxed">
             <p>• عربية فصحى مبسّطة، دافئة ومباشرة. جملة واحدة تكفي غالباً.</p>
             <p>• الإيموجي: مسموح بقطعة واحدة في لحظات الاحتفال للعميل (تم الطلب، اكتمل التسليم) — ممنوع في لوحات الموظفين والأخطاء.</p>
-            <p>• المبالغ: <span dir="ltr" className="font-mono text-xs">1,250 ر.س</span> — التاريخ بالميلادي، والوقت بصيغة 12 ساعة (مساءً/صباحاً).</p>
+            <p>• المبالغ: <span dir="ltr" className="font-mono text-xs">1,250 <RiyalSymbol /></span> — التاريخ بالميلادي، والوقت بصيغة 12 ساعة (مساءً/صباحاً).</p>
             <p>• رسالة الخطأ تقول دائماً: ماذا حدث + ماذا يفعل المستخدم الآن.</p>
           </div>
         </SectionCard>

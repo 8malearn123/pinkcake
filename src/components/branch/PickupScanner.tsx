@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useOrderByPickupCode, useProcessPickup } from '@/hooks/usePickupBarcode';
 import { cn } from '@/lib/utils';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 export function PickupScanner() {
   const [isScanning, setIsScanning] = useState(false);
@@ -248,14 +249,14 @@ export function PickupScanner() {
                       {Array.isArray(orderDetails.items) && orderDetails.items.map((item: { product_name: string; quantity: number; total_price: number }, idx: number) => (
                         <div key={idx} className="flex justify-between text-sm bg-muted/50 p-2 rounded">
                           <span>{item.product_name} × {item.quantity}</span>
-                          <span>{item.total_price} ر.س</span>
+                          <span>{item.total_price} <RiyalSymbol /></span>
                         </div>
                       ))}
                     </div>
 
                     <div className="flex justify-between items-center font-bold text-lg pt-2">
                       <span>الإجمالي</span>
-                      <span className="text-primary">{orderDetails.total_amount} ر.س</span>
+                      <span className="text-primary">{orderDetails.total_amount} <RiyalSymbol /></span>
                     </div>
 
                     {orderDetails.can_process && (

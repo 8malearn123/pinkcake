@@ -27,6 +27,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 export default function MyOrderDetails() {
   const { id } = useParams<{ id: string }>();
@@ -219,10 +220,10 @@ export default function MyOrderDetails() {
                       <Cake className="w-4 h-4 text-primary mt-1" />
                       <div>
                         <p className="font-medium">{item.product_name}</p>
-                        <p className="text-sm text-muted-foreground">{item.quantity} × {item.unit_price} ر.س</p>
+                        <p className="text-sm text-muted-foreground">{item.quantity} × {item.unit_price} <RiyalSymbol /></p>
                       </div>
                     </div>
-                    <span className="font-medium">{item.total_price} ر.س</span>
+                    <span className="font-medium">{item.total_price} <RiyalSymbol /></span>
                   </div>
                   {index < (order.items?.length || 0) - 1 && <Separator className="my-3" />}
                 </div>
@@ -234,7 +235,7 @@ export default function MyOrderDetails() {
             <div className="flex justify-between items-baseline">
               <span className="font-semibold">المجموع الكلي</span>
               <span className="font-display text-3xl text-primary">
-                {order.total_amount} <span className="text-sm text-muted-foreground">ر.س</span>
+                {order.total_amount} <RiyalSymbol className="text-sm text-muted-foreground" />
               </span>
             </div>
           </CardContent>

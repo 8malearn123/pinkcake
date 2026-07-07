@@ -5,6 +5,7 @@ import {
   SHAPES, FLAVORS, COLORS, DESIGNS, buildCake, miniCakeHTML, price, makeCustomColor, type CakeConfig,
 } from '@/lib/cakeBuilder';
 import { Wand2, ShoppingBag, SlidersHorizontal, Users, Star, Pipette } from 'lucide-react';
+import { RiyalSymbol } from '@/components/ui/riyal';
 
 // A complete (compatible) config so the live cake renders immediately and the
 // selections carry straight into /customize.
@@ -131,7 +132,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                         <Users className="w-3 h-3 text-primary" /><bdi dir="ltr">{sh.serves}</bdi>
                       </div>
                       <div className="text-[11px] text-muted-foreground mt-1">
-                        من <span className="font-display text-foreground text-[14px]">{sh.price}</span> ر.س
+                        من <span className="font-display text-foreground text-[14px]">{sh.price}</span> <RiyalSymbol />
                       </div>
                     </button>
                   );
@@ -169,7 +170,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                         style={{ background: f.dot }}
                       />
                       <div className="font-bold text-[12px] leading-tight">{f.name}</div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">{f.add ? `+${f.add} ر.س` : 'مشمولة'}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">{f.add ? <>+{f.add} <RiyalSymbol /></> : 'مشمولة'}</div>
                     </button>
                   );
                 })}
@@ -230,7 +231,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
                 <div className="text-[10px] text-muted-foreground uppercase tracking-widest">الإجمالي التقديري</div>
                 <div className="font-display text-3xl text-primary leading-none mt-1">
                   <span key={total} className="badge-pop inline-block">{total}</span>{' '}
-                  <span className="text-sm text-muted-foreground">ر.س</span>
+                  <RiyalSymbol className="text-sm text-muted-foreground" />
                 </div>
               </div>
               <button
