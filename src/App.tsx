@@ -18,7 +18,6 @@ import { LOZA_ENABLED } from "./lib/featureFlags";
 // Route components are code-split: each page ships in its own lazy chunk so the
 // initial bundle stays small and heavy routes (Reports, Store, customizers) load
 // on demand.
-const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Orders = lazy(() => import("./pages/Orders"));
 const NewOrder = lazy(() => import("./pages/NewOrder"));
 const OrderDetails = lazy(() => import("./pages/OrderDetails"));
@@ -179,15 +178,8 @@ const App = () => (
               <Route path="/my-orders/:id" element={<MyOrderDetails />} />
               <Route path="/my-profile" element={<CustomerProfile />} />
               
-              {/* Staff Dashboard */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute requiredRoles={['admin', 'call_center']}>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Dashboard consolidated into the live board (المتابعة المباشرة) */}
+              <Route path="/dashboard" element={<Navigate to="/live" replace />} />
               <Route
                 path="/orders"
                 element={

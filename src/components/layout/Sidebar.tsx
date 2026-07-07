@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
-  LayoutDashboard,
   ClipboardList,
   PlusCircle,
   ChefHat,
@@ -32,108 +31,55 @@ interface MenuItem {
   allowedRoles: AppRole[];
 }
 
-const menuItems: MenuItem[] = [
-  { 
-    icon: LayoutDashboard, 
-    label: 'لوحة التحكم', 
-    path: '/dashboard',
-    allowedRoles: ['admin', 'call_center']
-  },
-  { 
-    icon: Activity, 
-    label: 'المتابعة المباشرة', 
-    path: '/live',
-    allowedRoles: ['admin', 'call_center', 'kitchen']
-  },
-  { 
-    icon: PlusCircle, 
-    label: 'طلب جديد', 
-    path: '/orders/new',
-    allowedRoles: ['admin', 'call_center']
-  },
-  { 
-    icon: ClipboardList, 
-    label: 'جميع الطلبات', 
-    path: '/orders',
-    allowedRoles: ['admin', 'call_center']
-  },
-  { 
-    icon: Package, 
-    label: 'المنتجات', 
-    path: '/products',
-    allowedRoles: ['admin']
-  },
-  { 
-    icon: ChefHat, 
-    label: 'المطبخ المركزي', 
-    path: '/kitchen',
-    allowedRoles: ['admin', 'kitchen']
-  },
-  { 
-    icon: Store, 
-    label: 'طلبات الفرع', 
-    path: '/branch-orders',
-    allowedRoles: ['admin', 'branch']
-  },
-  { 
-    icon: QrCode, 
-    label: 'ماسح الاستلام', 
-    path: '/branch-pickup',
-    allowedRoles: ['branch']
-  },
-  { 
-    icon: Activity, 
-    label: 'العمليات المباشرة', 
-    path: '/branch-live',
-    allowedRoles: ['admin', 'branch']
-  },
-  { 
-    icon: Truck, 
-    label: 'لوحة السائق',
-    path: '/driver',
-    allowedRoles: ['admin', 'driver']
-  },
-  { 
-    icon: Store, 
-    label: 'إدارة الفروع', 
-    path: '/branches',
-    allowedRoles: ['admin']
-  },
-  { 
-    icon: BarChart3,
-    label: 'التقارير', 
-    path: '/reports',
-    allowedRoles: ['admin']
-  },
-  { 
-    icon: Cake, 
-    label: 'طلب مخصص', 
-    path: '/custom-orders',
-    allowedRoles: ['admin', 'customer_support']
-  },
-  { 
-    icon: MessageCircle, 
-    label: 'الرسائل والطلبات', 
-    path: '/submissions',
-    allowedRoles: ['admin', 'customer_support', 'call_center']
-  },
-  { 
-    icon: Users, 
-    label: 'المستخدمين', 
-    path: '/users',
-    allowedRoles: ['admin']
+interface MenuGroup {
+  label: string;
+  items: MenuItem[];
+}
+
+/* Grouped navigation — items are role-filtered per group; empty groups drop out.
+   Section headings only appear when more than one group is visible, so a role
+   with a single relevant section still gets a clean, flat list. */
+const menuGroups: MenuGroup[] = [
+  {
+    label: 'الرئيسية',
+    items: [
+      { icon: Activity, label: 'المتابعة المباشرة', path: '/live', allowedRoles: ['admin', 'call_center', 'kitchen'] },
+    ],
   },
   {
-    icon: Settings,
-    label: 'الإعدادات',
-    path: '/settings',
-    allowedRoles: ['admin']
+    label: 'الطلبات',
+    items: [
+      { icon: MessageCircle, label: 'الرسائل والطلبات', path: '/submissions', allowedRoles: ['admin', 'customer_support', 'call_center'] },
+      { icon: ClipboardList, label: 'جميع الطلبات', path: '/orders', allowedRoles: ['admin', 'call_center'] },
+      { icon: PlusCircle, label: 'طلب جديد', path: '/orders/new', allowedRoles: ['admin', 'call_center'] },
+      { icon: Cake, label: 'طلب مخصص', path: '/custom-orders', allowedRoles: ['admin', 'customer_support'] },
+    ],
   },
   {
-    icon: Palette,
-    label: 'دليل التصميم',
-    path: '/design-system',
-    allowedRoles: ['admin']
+    label: 'العمليات',
+    items: [
+      { icon: ChefHat, label: 'المطبخ المركزي', path: '/kitchen', allowedRoles: ['admin', 'kitchen'] },
+      { icon: Store, label: 'طلبات الفرع', path: '/branch-orders', allowedRoles: ['admin', 'branch'] },
+      { icon: QrCode, label: 'ماسح الاستلام', path: '/branch-pickup', allowedRoles: ['branch'] },
+      { icon: Activity, label: 'العمليات المباشرة', path: '/branch-live', allowedRoles: ['admin', 'branch'] },
+      { icon: Truck, label: 'لوحة السائق', path: '/driver', allowedRoles: ['admin', 'driver'] },
+    ],
+  },
+  {
+    label: 'الإدارة',
+    items: [
+      { icon: Package, label: 'المنتجات', path: '/products', allowedRoles: ['admin'] },
+      { icon: Store, label: 'إدارة الفروع', path: '/branches', allowedRoles: ['admin'] },
+      { icon: Users, label: 'المستخدمين', path: '/users', allowedRoles: ['admin'] },
+      { icon: BarChart3, label: 'التقارير', path: '/reports', allowedRoles: ['admin'] },
+    ],
+  },
+  {
+    label: 'النظام',
+    items: [
+      { icon: Settings, label: 'الإعدادات', path: '/settings', allowedRoles: ['admin'] },
+      { icon: Palette, label: 'دليل التصميم', path: '/design-system', allowedRoles: ['admin'] },
+    ],
   },
 ];
 
@@ -142,11 +88,14 @@ export function Sidebar() {
   const location = useLocation();
   const { data: roles = [] } = useMyRoles();
 
-  // Filter menu items based on user roles
-  const visibleMenuItems = menuItems.filter(item => {
-    // If user has any of the allowed roles for this menu item, show it
-    return item.allowedRoles.some(role => roles.includes(role));
-  });
+  const visibleGroups = menuGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => item.allowedRoles.some((role) => roles.includes(role))),
+    }))
+    .filter((group) => group.items.length > 0);
+
+  const showHeadings = visibleGroups.length > 1;
 
   return (
     <>
@@ -180,27 +129,38 @@ export function Sidebar() {
           <SidebarLogo />
         </div>
 
-        {/* Navigation - Scrollable */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-          {visibleMenuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                  isActive
-                    ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-warm'
-                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
+        {/* Navigation - Scrollable, grouped */}
+        <nav className="flex-1 overflow-y-auto p-4">
+          {visibleGroups.map((group, gi) => (
+            <div key={group.label} className={cn(gi > 0 && 'mt-5')}>
+              {showHeadings && (
+                <div className="px-4 pb-2 pt-1 text-[11px] font-semibold text-sidebar-foreground/40">
+                  {group.label}
+                </div>
+              )}
+              <div className="space-y-1">
+                {group.items.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                        isActive
+                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-warm'
+                          : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* User Info - Fixed at bottom */}

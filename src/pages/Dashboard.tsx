@@ -1,16 +1,17 @@
+import { Fragment } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader, StatTile, EmptyState, LoadingState, ErrorState, SectionHeading } from '@/components/ds';
-import { OrdersTable } from '@/components/dashboard/OrdersTable';
+import { PageHeader, EmptyState, LoadingState, ErrorState, SectionHeading } from '@/components/ds';
+import { OrderCardList } from '@/components/dashboard/OrderCardList';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useOrders';
 import {
   ClipboardList,
   Clock,
   CheckCircle2,
   ChefHat,
-  Plus,
+  ChevronLeft,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { OrderStatus } from '@/types/order';
 
 export default function Dashboard() {
@@ -35,6 +36,15 @@ export default function Dashboard() {
       const orderDate = new Date(o.updated_at).toDateString();
       return today === orderDate;
     }).length || 0;
+
+  const totalOrders = orders?.length || 0;
+
+  // The order lifecycle for the command-bar pipeline: awaiting approval → prep → delivered.
+  const pipeline = [
+    { key: 'pending', label: 'بانتظار الاعتماد', value: pendingOrders, icon: Clock, box: 'bg-warning/10 text-warning', text: 'text-warning' },
+    { key: 'preparing', label: 'قيد التجهيز', value: preparingOrders, icon: ChefHat, box: 'bg-info/10 text-info', text: 'text-info' },
+    { key: 'completed', label: 'تم التسليم اليوم', value: completedToday, icon: CheckCircle2, box: 'bg-success/10 text-success', text: 'text-success' },
+  ];
 
   // Map database orders to the format expected by OrdersTable
   const mappedOrders = orders?.slice(0, 10).map((order) => ({
@@ -61,22 +71,36 @@ export default function Dashboard() {
         <PageHeader
           title="لوحة التحكم"
           description="مرحباً، هذا ملخص اليوم"
-          actions={
-            <Link to="/orders/new">
-              <Button className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
-                <Plus className="w-5 h-5 me-2" />
-                طلب جديد
-              </Button>
-            </Link>
-          }
         />
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatTile label="إجمالي الطلبات" value={orders?.length || 0} icon={ClipboardList} tone="primary" />
-          <StatTile label="بانتظار الاعتماد" value={pendingOrders} icon={Clock} tone="warning" />
-          <StatTile label="قيد التجهيز" value={preparingOrders} icon={ChefHat} tone="info" />
-          <StatTile label="تم التسليم اليوم" value={completedToday} icon={CheckCircle2} tone="success" />
+        {/* Command bar — total (hero) + the order-lifecycle pipeline */}
+        <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-sm">
+          <div className="flex flex-col lg:flex-row">
+            <div className="flex items-center gap-3 p-5 bg-primary/[0.04] border-b lg:border-b-0 lg:border-e border-border/60 shrink-0">
+              <div className="w-12 h-12 rounded-xl gradient-pink shadow-warm flex items-center justify-center shrink-0">
+                <ClipboardList className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold leading-none">{totalOrders}</p>
+                <p className="text-xs text-muted-foreground mt-1.5">إجمالي الطلبات</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-1 p-4 flex-1 overflow-x-auto">
+              {pipeline.map((stage, i) => (
+                <Fragment key={stage.key}>
+                  <div className="flex flex-col items-center gap-1.5 px-2 shrink-0">
+                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stage.box)}>
+                      <stage.icon className="w-5 h-5" />
+                    </div>
+                    <p className={cn('text-xl font-bold leading-none', stage.text)}>{stage.value}</p>
+                    <p className="text-xs text-muted-foreground text-center leading-tight whitespace-nowrap">{stage.label}</p>
+                  </div>
+                  {i < pipeline.length - 1 && <ChevronLeft className="w-4 h-4 text-muted-foreground/30 shrink-0" />}
+                </Fragment>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Recent Orders */}
@@ -94,7 +118,7 @@ export default function Dashboard() {
           ) : isError ? (
             <ErrorState title="تعذّر تحميل الطلبات" onRetry={() => refetch()} />
           ) : mappedOrders && mappedOrders.length > 0 ? (
-            <OrdersTable
+            <OrderCardList
               orders={mappedOrders}
               onApprove={handleApprove}
               onSendPaymentLink={handleSendPaymentLink}

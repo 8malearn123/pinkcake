@@ -4,8 +4,8 @@ import { useMyRoles, AppRole } from './useMyRoles';
 
 // Define role-based landing pages (staff go to dashboards, customers stay on store)
 const ROLE_LANDING_PAGES: Record<AppRole, string> = {
-  admin: '/dashboard',
-  call_center: '/dashboard',
+  admin: '/live',
+  call_center: '/live',
   kitchen: '/kitchen',
   branch: '/branch-orders',
   customer: '/store',
@@ -40,8 +40,8 @@ export function useRoleRedirect() {
 
   // Get the appropriate landing page for the user's primary role
   const getLandingPage = (): string => {
-    if (roles.includes('admin')) return '/dashboard';
-    if (roles.includes('call_center')) return '/dashboard';
+    if (roles.includes('admin')) return '/live';
+    if (roles.includes('call_center')) return '/live';
     if (roles.includes('customer_support')) return '/submissions';
     if (roles.includes('kitchen')) return '/kitchen';
     if (roles.includes('branch')) return '/branch-orders';
