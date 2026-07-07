@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { ProductsTable } from '@/components/products/ProductsTable';
 import { ProductForm } from '@/components/products/ProductForm';
+import { PageHeader, LoadingState, ErrorState } from '@/components/ds';
 import {
   useProducts,
   useCreateProduct,
@@ -21,7 +21,8 @@ import {
   useReorderProducts,
 } from '@/hooks/useProducts';
 import { Tables } from '@/integrations/supabase/types';
-import { Package, Plus, Search, Loader2, Tag, X, ArrowUpDown, GripVertical } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Package, Plus, Search, Tag, X, ArrowUpDown, GripVertical, ChevronLeft, CheckCircle2, XCircle } from 'lucide-react';
 
 type Product = Tables<'products'>;
 type SortOption = 'custom' | 'name_asc' | 'name_desc' | 'price_asc' | 'price_desc' | 'date_asc' | 'date_desc';
@@ -115,52 +116,55 @@ export default function Products() {
     inactive: products?.filter((p) => !p.is_active).length || 0,
   };
 
+  // Product availability pipeline: available for sale → unavailable.
+  const pipeline = [
+    { key: 'active', label: 'متاح للبيع', value: stats.active, icon: CheckCircle2, box: 'bg-success/10 text-success', text: 'text-success' },
+    { key: 'inactive', label: 'غير متاح', value: stats.inactive, icon: XCircle, box: 'bg-warning/10 text-warning', text: 'text-warning' },
+  ];
+
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
-                <Package className="w-5 h-5 text-white" />
-              </div>
-              إدارة المنتجات
-            </h1>
-            <p className="text-muted-foreground mt-1">إضافة وتعديل وحذف الحلويات</p>
-          </div>
-          <Button onClick={() => setIsFormOpen(true)} className="gap-2">
-            <Plus className="w-4 h-4" />
-            إضافة منتج
-          </Button>
-        </div>
+        <PageHeader
+          title="إدارة المنتجات"
+          description="إضافة وتعديل وحذف الحلويات"
+          icon={Package}
+          actions={
+            <Button onClick={() => setIsFormOpen(true)} className="gap-2">
+              <Plus className="w-4 h-4" />
+              إضافة منتج
+            </Button>
+          }
+        />
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-primary">{stats.total}</p>
-                <p className="text-sm text-muted-foreground">إجمالي المنتجات</p>
+        {/* Command bar — total (hero) + the product-availability pipeline */}
+        <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-sm">
+          <div className="flex flex-col lg:flex-row">
+            <div className="flex items-center gap-3 p-5 bg-primary/[0.04] border-b lg:border-b-0 lg:border-e border-border/60 shrink-0">
+              <div className="w-12 h-12 rounded-xl gradient-pink shadow-warm flex items-center justify-center shrink-0">
+                <Package className="w-6 h-6 text-white" />
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-success">{stats.active}</p>
-                <p className="text-sm text-muted-foreground">متاح للبيع</p>
+              <div>
+                <p className="text-2xl font-bold leading-none">{stats.total}</p>
+                <p className="text-xs text-muted-foreground mt-1.5">إجمالي المنتجات</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-muted-foreground">{stats.inactive}</p>
-                <p className="text-sm text-muted-foreground">غير متاح</p>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            <div className="flex items-center justify-between gap-1 p-4 flex-1 overflow-x-auto">
+              {pipeline.map((stage, i) => (
+                <Fragment key={stage.key}>
+                  <div className="flex flex-col items-center gap-1.5 px-2 shrink-0">
+                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stage.box)}>
+                      <stage.icon className="w-5 h-5" />
+                    </div>
+                    <p className={cn('text-xl font-bold leading-none', stage.text)}>{stage.value}</p>
+                    <p className="text-xs text-muted-foreground text-center leading-tight whitespace-nowrap">{stage.label}</p>
+                  </div>
+                  {i < pipeline.length - 1 && <ChevronLeft className="w-4 h-4 text-muted-foreground/30 shrink-0" />}
+                </Fragment>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Search and Filter */}
@@ -232,16 +236,9 @@ export default function Products() {
 
         {/* Content */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
+          <LoadingState label="جاري تحميل المنتجات..." />
         ) : error ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-destructive">حدث خطأ في تحميل المنتجات</p>
-              <p className="text-sm text-muted-foreground mt-1">{error.message}</p>
-            </CardContent>
-          </Card>
+          <ErrorState title="حدث خطأ في تحميل المنتجات" description={error.message} />
         ) : (
           <ProductsTable
             products={filteredAndSortedProducts}

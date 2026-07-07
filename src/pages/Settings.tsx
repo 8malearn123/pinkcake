@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader, SectionCard } from '@/components/ds';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -45,24 +45,19 @@ export default function Settings() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
-                <SettingsIcon className="w-5 h-5 text-white" />
-              </div>
-              الإعدادات
-            </h1>
-            <p className="text-muted-foreground mt-1">تخصيص مظهر النظام ومعلومات المتجر</p>
-          </div>
-          <Button variant="outline" onClick={handleResetColors} className="gap-2">
-            <RotateCcw className="w-4 h-4" />
-            إعادة التعيين
-          </Button>
-        </div>
+        <PageHeader
+          title="الإعدادات"
+          description="تخصيص مظهر النظام ومعلومات المتجر"
+          icon={SettingsIcon}
+          actions={
+            <Button variant="outline" onClick={handleResetColors} className="gap-2">
+              <RotateCcw className="w-4 h-4" />
+              إعادة التعيين
+            </Button>
+          }
+        />
 
-        <Tabs defaultValue="store" className="w-full">
+        <Tabs defaultValue="store" dir="rtl" className="w-full">
           <TabsList className={NOTIFICATIONS_UI_ENABLED ? 'grid w-full max-w-xl grid-cols-3' : 'grid w-full max-w-md grid-cols-2'}>
             <TabsTrigger value="store" className="gap-2">
               <Store className="w-4 h-4" />
@@ -81,17 +76,10 @@ export default function Settings() {
           </TabsList>
 
           <TabsContent value="store" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Store className="w-5 h-5" />
-                  معلومات المتجر
-                </CardTitle>
-                <CardDescription>
+            <SectionCard title="معلومات المتجر" icon={Store} contentClassName="space-y-6">
+                <p className="text-sm text-muted-foreground -mt-2">
                   تخصيص اسم المتجر والوصف الذي يظهر في الشريط الجانبي
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
+                </p>
                 <div className="space-y-2">
                   <Label htmlFor="storeName">اسم المتجر</Label>
                   <Input
@@ -142,8 +130,7 @@ export default function Settings() {
                     </>
                   )}
                 </Button>
-              </CardContent>
-            </Card>
+            </SectionCard>
           </TabsContent>
 
           <TabsContent value="colors" className="mt-6 space-y-6">
@@ -164,17 +151,10 @@ export default function Settings() {
             />
 
             {/* Custom Colors */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="w-5 h-5" />
-                  تخصيص الألوان يدوياً
-                </CardTitle>
-                <CardDescription>
+            <SectionCard title="تخصيص الألوان يدوياً" icon={Palette}>
+                <p className="text-sm text-muted-foreground -mt-2 mb-6">
                   اختر الألوان المناسبة لعلامتك التجارية
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </p>
                 <div className="grid gap-6 md:grid-cols-2">
                   <ColorPicker
                     label="اللون الرئيسي"
@@ -197,16 +177,11 @@ export default function Settings() {
                     onChange={(value) => updateColors({ primaryDark: value })}
                   />
                 </div>
-              </CardContent>
-            </Card>
+            </SectionCard>
 
             {/* Live Preview */}
-            <Card>
-              <CardHeader>
-                <CardTitle>معاينة مباشرة</CardTitle>
-                <CardDescription>شاهد كيف تبدو الألوان المختارة</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <SectionCard title="معاينة مباشرة" icon={Palette}>
+                <p className="text-sm text-muted-foreground -mt-2 mb-4">شاهد كيف تبدو الألوان المختارة</p>
                 <div className="flex flex-wrap gap-4">
                   <Button>زر رئيسي</Button>
                   <Button variant="secondary">زر ثانوي</Button>
@@ -225,8 +200,7 @@ export default function Settings() {
                   <p className="font-medium">خلفية متدرجة</p>
                   <p className="text-sm opacity-90">هذا مثال على التدرج اللوني</p>
                 </div>
-              </CardContent>
-            </Card>
+            </SectionCard>
           </TabsContent>
 
           {NOTIFICATIONS_UI_ENABLED && (
