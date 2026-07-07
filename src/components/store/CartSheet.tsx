@@ -17,6 +17,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import { toast } from '@/hooks/use-toast';
 import {
   ShoppingCart, Plus, Minus, Trash2, Cake, Loader2, Calendar, Clock, MapPin,
@@ -208,7 +209,7 @@ export function CartSheet() {
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-sm line-clamp-1">{item.product.name}</h4>
                       <p className="text-primary font-display text-base mt-0.5">
-                        {item.product.price} <span className="text-xs text-muted-foreground">ر.س</span>
+                        {item.product.price} <RiyalSymbol className="text-xs text-muted-foreground" />
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <Button size="icon" variant="outline" aria-label="إنقاص الكمية" className="h-7 w-7 rounded-full" onClick={() => updateQuantity(item.product.id, -1)}>
@@ -236,7 +237,7 @@ export function CartSheet() {
                 {toFree > 0 ? (
                   <div className="text-[12px] text-muted-foreground bg-secondary/50 rounded-xl px-3 py-2 flex items-center gap-2">
                     <Truck className="w-4 h-4 text-primary shrink-0" />
-                    أضف <b className="text-foreground">{toFree.toFixed(0)} ر.س</b> للحصول على توصيل مجاني
+                    أضف <b className="text-foreground">{toFree.toFixed(0)} <RiyalSymbol /></b> للحصول على توصيل مجاني
                   </div>
                 ) : (
                   <div className="text-[12px] text-green-700 bg-green-600/10 rounded-xl px-3 py-2 flex items-center gap-2">
@@ -246,11 +247,19 @@ export function CartSheet() {
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm text-muted-foreground">المجموع</span>
                   <span className="font-display text-3xl text-primary">
-                    {cartTotal.toFixed(2)} <span className="text-sm text-muted-foreground">ر.س</span>
+                    {cartTotal.toFixed(2)} <RiyalSymbol className="text-sm text-muted-foreground" />
                   </span>
                 </div>
                 <Button className="w-full h-12 rounded-full bg-foreground text-background hover:bg-foreground/90" onClick={startCheckout}>
                   إتمام الطلب
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full h-11 rounded-full gap-1.5 border-primary/40 text-primary hover:bg-primary/5 hover:text-primary"
+                  onClick={() => { setOpen(false); navigate('/shop'); }}
+                >
+                  <ChevronLeft className="w-4 h-4 cta-arrow" />
+                  متابعة التسوّق
                 </Button>
               </div>
             </SheetFooter>
@@ -419,16 +428,16 @@ export function CartSheet() {
                   {cart.map((item) => (
                     <div key={item.product.id} className="flex justify-between text-[13px]">
                       <span className="text-muted-foreground">{item.product.name} × <bdi dir="ltr">{item.quantity}</bdi></span>
-                      <span className="font-medium"><bdi dir="ltr">{(item.product.price * item.quantity).toFixed(2)}</bdi> ر.س</span>
+                      <span className="font-medium"><bdi dir="ltr">{(item.product.price * item.quantity).toFixed(2)}</bdi> <RiyalSymbol /></span>
                     </div>
                   ))}
                   <div className="flex justify-between text-[13px] pt-1">
                     <span className="text-muted-foreground">التوصيل</span>
-                    <span className="font-medium">{deliveryFee === 0 ? <span className="text-green-700">مجاني</span> : <><bdi dir="ltr">{deliveryFee}</bdi> ر.س</>}</span>
+                    <span className="font-medium">{deliveryFee === 0 ? <span className="text-green-700">مجاني</span> : <><bdi dir="ltr">{deliveryFee}</bdi> <RiyalSymbol /></>}</span>
                   </div>
                   <div className="border-t border-border/60 pt-2 mt-1 flex justify-between items-baseline">
                     <span className="font-bold">الإجمالي</span>
-                    <span className="font-display text-2xl text-primary"><bdi dir="ltr">{grandTotal.toFixed(2)}</bdi> <span className="text-xs text-muted-foreground">ر.س</span></span>
+                    <span className="font-display text-2xl text-primary"><bdi dir="ltr">{grandTotal.toFixed(2)}</bdi> <RiyalSymbol className="text-xs text-muted-foreground" /></span>
                   </div>
                 </div>
               </div>
@@ -437,7 +446,7 @@ export function CartSheet() {
                 <Button variant="outline" onClick={() => setCheckoutOpen(false)} className="rounded-full h-12 px-5">إلغاء</Button>
                 <Button onClick={handleCheckout} disabled={createOrder.isPending} className="flex-1 rounded-full h-12 bg-foreground text-background hover:bg-foreground/90 gap-2">
                   {createOrder.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : user ? <Sparkles className="w-4 h-4" /> : null}
-                  {user ? <>تأكيد الطلب · <bdi dir="ltr">{grandTotal.toFixed(0)}</bdi> ر.س</> : 'تسجيل الدخول للمتابعة'}
+                  {user ? <>تأكيد الطلب · <bdi dir="ltr">{grandTotal.toFixed(0)}</bdi> <RiyalSymbol /></> : 'تسجيل الدخول للمتابعة'}
                   {user && <ChevronLeft className="w-4 h-4" />}
                 </Button>
               </div>

@@ -166,12 +166,11 @@ export default function Store() {
         </div>
       </header>
 
+      {/* ── Full-bleed hero — edge to edge, flush under the nav ── */}
+      <HeroCarousel onShopClick={() => goToShop()} onCustomizeClick={() => navigate('/customize')} />
+
       {/* ── Main ── */}
       <main className="container mx-auto px-4 lg:px-6 py-6 lg:py-10 space-y-8 lg:space-y-12">
-        <Reveal>
-          <HeroCarousel onShopClick={() => goToShop()} onCustomizeClick={() => navigate('/customize')} />
-        </Reveal>
-
         <Reveal>
           <PromoStrip />
         </Reveal>
@@ -198,7 +197,7 @@ export default function Store() {
           <CategoryChips categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
 
           {productsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="rounded-3xl overflow-hidden border border-border/60 bg-card">
                   <Skeleton className="aspect-[4/5]" />
@@ -221,7 +220,7 @@ export default function Store() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
               {filteredProducts.map((product) => (
                 <ProductCardRefined
                   key={product.id}

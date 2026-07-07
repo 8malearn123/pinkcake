@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, ArrowLeft } from 'lucide-react';
+import { Sparkles, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import hero1 from '@/assets/hero-cake-1.jpg';
 import hero2 from '@/assets/hero-cake-2.jpg';
@@ -41,7 +41,7 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
   };
 
   return (
-    <section className="relative overflow-hidden rounded-[2rem] bg-foreground shadow-rose-glow">
+    <section className="relative overflow-hidden bg-foreground">
       <div className="relative h-[440px] sm:h-[480px] md:h-[520px]" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {SLIDES.map((s, i) => (
           <div key={i} className={cn('hero-slide', i === index && 'hero-active')}>
@@ -78,29 +78,13 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
                   </div>
                   <div className="mt-4 flex items-center gap-2 text-white/75 text-xs">
                     <Sparkles className="w-3.5 h-3.5 text-primary" />
-                    <span>تُحضّر طازجة وتُوصل خلال ٢٤ ساعة</span>
+                    <span>تُحضّر طازجة وتُوصل خلال 24 ساعة</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         ))}
-
-        {/* Arrows */}
-        <button
-          onClick={() => go(-1)}
-          aria-label="السابق"
-          className="absolute start-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur border border-white/20 hidden md:flex items-center justify-center text-white press transition-colors"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => go(1)}
-          aria-label="التالي"
-          className="absolute end-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur border border-white/20 hidden md:flex items-center justify-center text-white press transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
 
         {/* Dots — centered via inset-x-0 + flex (RTL-safe) */}
         <div className="absolute bottom-5 inset-x-0 z-20 flex justify-center gap-2">

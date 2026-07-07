@@ -19,7 +19,7 @@ import { CategoryChips } from '@/components/store/CategoryChips';
 import { ProductCardRefined } from '@/components/store/ProductCardRefined';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
 import { BackToTop } from '@/components/store/BackToTop';
-import { Cake, ShoppingCart, Search, ArrowUpDown } from 'lucide-react';
+import { Cake, ShoppingCart, Search, ArrowUpDown, Sparkles, ArrowLeft } from 'lucide-react';
 
 const SORTS = [
   { value: 'featured', label: 'المميّزة' },
@@ -189,7 +189,7 @@ export default function Shop() {
 
         {/* Grid / states */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="rounded-3xl overflow-hidden border border-border/60 bg-card">
                 <Skeleton className="aspect-[4/5]" />
@@ -220,7 +220,7 @@ export default function Shop() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
             {results.map((p) => (
               <ProductCardRefined
                 key={p.id}
@@ -234,6 +234,34 @@ export default function Shop() {
             ))}
           </div>
         )}
+
+        {/* Customize-your-cake CTA */}
+        <section className="mt-12 lg:mt-16">
+          <div className="relative overflow-hidden rounded-3xl gradient-pink text-white shadow-rose-glow p-8 sm:p-12">
+            <div aria-hidden className="pointer-events-none absolute -top-16 -end-10 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
+            <div aria-hidden className="pointer-events-none absolute -bottom-16 -start-8 w-52 h-52 rounded-full bg-white/10 blur-2xl" />
+            <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:items-center lg:justify-between lg:text-start">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  تصميم خاص
+                </div>
+                <h2 className="font-display text-3xl sm:text-4xl mt-3 leading-tight">صمّم كيكتك الخاصة</h2>
+                <p className="text-white/85 mt-2 max-w-md leading-relaxed">
+                  اختر الشكل والنكهة والحشوة واللون والكتابة — كيكة فريدة تُصنع خصيصاً لمناسبتك.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate('/customize')}
+                className="press sheen group shrink-0 inline-flex items-center gap-2 rounded-full h-12 ps-7 pe-5 bg-white text-foreground font-semibold shadow-lg hover:bg-white/90 transition-colors"
+              >
+                <Cake className="w-5 h-5" />
+                ابدأ التصميم
+                <ArrowLeft className="cta-arrow w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
 
       <FloatingContactButton />
