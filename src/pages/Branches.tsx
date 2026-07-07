@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent } from '@/components/ui/card';
+import { PageHeader, EmptyState, LoadingState, ErrorState } from '@/components/ds';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BranchesTable } from '@/components/branches/BranchesTable';
@@ -32,7 +32,7 @@ export default function Branches() {
   const [isExporting, setIsExporting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const { data: branches, isLoading, error } = useBranches();
+  const { data: branches, isLoading, error, refetch } = useBranches();
   const { data: employeeCounts } = useBranchEmployeeCounts();
   const createBranch = useCreateBranch();
   const updateBranch = useUpdateBranch();
@@ -79,16 +79,13 @@ export default function Branches() {
 
       if (assignmentsError) throw assignmentsError;
 
-      // Get unique user IDs
-      const userIds = [...new Set((assignments || []).map((a) => a.user_id))];
-
       // Use secure RPC function instead of direct query to protect phone numbers
       const { data: employees, error: employeesError } = await supabase.rpc('get_employees_secure');
 
       if (employeesError) throw employeesError;
       
       // Map employees to profiles format for compatibility
-      const profiles = (employees || []).map((emp: any) => ({
+      const profiles = (employees || []).map((emp) => ({
         id: emp.id,
         full_name: emp.full_name,
         phone: emp.phone, // Will be null for non-admin users due to RPC function
@@ -147,7 +144,7 @@ export default function Branches() {
             name: 'الموظفين',
           },
         ],
-        `الفروع_والموظفين_${new Date().toLocaleDateString('ar-EG')}`
+        `الفروع_والموظفين_${new Date().toLocaleDateString('ar-EG-u-nu-latn')}`
       );
 
       toast({
@@ -185,16 +182,13 @@ export default function Branches() {
 
       if (assignmentsError) throw assignmentsError;
 
-      // Get unique user IDs
-      const userIds = [...new Set((assignments || []).map((a) => a.user_id))];
-
       // Use secure RPC function instead of direct query to protect phone numbers
       const { data: employees, error: employeesError } = await supabase.rpc('get_employees_secure');
 
       if (employeesError) throw employeesError;
       
       // Map employees to profiles format for compatibility
-      const profiles = (employees || []).map((emp: any) => ({
+      const profiles = (employees || []).map((emp) => ({
         id: emp.id,
         full_name: emp.full_name,
         phone: emp.phone, // Will be null for non-admin users due to RPC function
@@ -273,49 +267,45 @@ export default function Branches() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
-                <Store className="w-5 h-5 text-white" />
-              </div>
-              إدارة الفروع
-            </h1>
-            <p className="text-muted-foreground mt-1">إضافة وتعديل بيانات الفروع</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setIsFormOpen(true)} className="gap-2">
-              <Plus className="w-4 h-4" />
-              إضافة فرع
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleExport}
-              disabled={isExporting || !branches?.length}
-              className="gap-2"
-            >
-              {isExporting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Download className="w-4 h-4" />
-              )}
-              تصدير Excel
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handlePrint}
-              disabled={isPrinting || !branches?.length}
-              className="gap-2"
-            >
-              {isPrinting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Printer className="w-4 h-4" />
-              )}
-              طباعة
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          title="إدارة الفروع"
+          description="إضافة وتعديل بيانات الفروع"
+          icon={Store}
+          actions={
+            <>
+              <Button onClick={() => setIsFormOpen(true)} className="gap-2">
+                <Plus className="w-4 h-4" />
+                إضافة فرع
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                disabled={isExporting || !branches?.length}
+                className="gap-2"
+              >
+                {isExporting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                تصدير Excel
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handlePrint}
+                disabled={isPrinting || !branches?.length}
+                className="gap-2"
+              >
+                {isPrinting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Printer className="w-4 h-4" />
+                )}
+                طباعة
+              </Button>
+            </>
+          }
+        />
 
         {/* Employee Distribution Stats */}
         {branches && branches.length > 0 && employeeCounts && (
@@ -338,19 +328,26 @@ export default function Branches() {
 
         {/* Content */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
+          <LoadingState label="جاري تحميل الفروع..." />
         ) : error ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-destructive">حدث خطأ في تحميل الفروع</p>
-              <p className="text-sm text-muted-foreground mt-1">{error.message}</p>
-            </CardContent>
-          </Card>
+          <ErrorState
+            title="تعذّر تحميل الفروع"
+            description={error.message}
+            onRetry={() => refetch()}
+          />
+        ) : !filteredBranches || filteredBranches.length === 0 ? (
+          <EmptyState
+            icon={Store}
+            title={searchQuery ? 'لا توجد نتائج' : 'لا توجد فروع بعد'}
+            description={
+              searchQuery
+                ? 'جرّب تعديل كلمات البحث'
+                : 'ابدأ بإضافة أول فرع لإدارة بياناته وموظفيه'
+            }
+          />
         ) : (
           <BranchesTable
-            branches={filteredBranches || []}
+            branches={filteredBranches}
             onEdit={handleEdit}
             onDelete={(id) => deleteBranch.mutate(id)}
             isDeleting={deleteBranch.isPending}

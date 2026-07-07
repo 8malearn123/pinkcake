@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { PageHeader, LoadingState, EmptyState } from '@/components/ds';
 import { useMyBranch } from '@/hooks/useMyRoles';
 import { useBranchOrders } from '@/hooks/useBranchOrders';
 import { HandoverBarcodeScanner } from '@/components/orders/HandoverBarcodeScanner';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  Activity, 
-  Package, 
-  ScanLine, 
-  Clock, 
+import { cn } from '@/lib/utils';
+import {
+  Activity,
+  Package,
+  ScanLine,
+  Clock,
   Truck,
   CheckCircle2,
   AlertCircle,
-  Loader2,
   MapPin,
   QrCode,
   RefreshCw,
+  ChevronLeft,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
 
@@ -41,6 +41,54 @@ interface LiveOrder {
   delivery_time: string | null;
   items: LiveOrderItem[];
   created_at: string;
+}
+
+/* Live "ticket" — order no + status ride the top, then time/customer, the
+   product list, and a status-appropriate footer note. Same card language as
+   the branch orders board. */
+function LiveOrderCard({ order, mode }: { order: LiveOrder; mode: 'incoming' | 'ready' }) {
+  return (
+    <div className="flex flex-col p-4 rounded-2xl border border-border/60 bg-card shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-primary/40 transition-all duration-200">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <span className="font-mono text-sm font-bold text-primary">{order.order_number}</span>
+        <StatusBadge status={order.status} showIcon={false} />
+      </div>
+
+      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        {mode === 'incoming' ? (
+          <>
+            <Clock className="w-3.5 h-3.5 shrink-0" />
+            <span className="tabular-nums">
+              {order.delivery_time?.substring(0, 5) || '-'}
+              {order.delivery_date ? ` · ${new Date(order.delivery_date).toLocaleDateString('ar-SA-u-nu-latn')}` : ''}
+            </span>
+          </>
+        ) : (
+          <>
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{order.customer_name}</span>
+          </>
+        )}
+      </div>
+
+      {order.items && order.items.length > 0 && (
+        <div className="mt-3 space-y-1.5 border-t border-border/50 pt-3">
+          <p className="text-xs font-medium text-muted-foreground">المنتجات</p>
+          {order.items.map((item, index) => (
+            <div key={index} className="flex items-center justify-between gap-2 text-sm">
+              <span className="truncate">{item.product_name}</span>
+              <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-xs tabular-nums">×{item.quantity}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className={cn('mt-3 flex items-center gap-1.5 border-t border-border/50 pt-3 text-xs', mode === 'ready' ? 'text-success' : 'text-muted-foreground')}>
+        {mode === 'ready' ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> : <Truck className="w-3.5 h-3.5 shrink-0" />}
+        {mode === 'ready' ? 'جاهز لاستلام العميل' : 'بانتظار وصول السائق — امسح الباركود لاستلام الطلب'}
+      </div>
+    </div>
+  );
 }
 
 export default function BranchLive() {
@@ -83,10 +131,7 @@ export default function BranchLive() {
   if (branchLoading) {
     return (
       <MainLayout>
-        <div className="max-w-6xl mx-auto space-y-6">
-          <Skeleton className="h-12 w-64" />
-          <Skeleton className="h-96 w-full" />
-        </div>
+        <LoadingState label="جاري التحميل..." />
       </MainLayout>
     );
   }
@@ -94,19 +139,11 @@ export default function BranchLive() {
   if (!myBranch) {
     return (
       <MainLayout>
-        <div className="max-w-lg mx-auto">
-          <Card className="border-destructive/30">
-            <CardContent className="p-8 text-center space-y-4">
-              <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
-              <h2 className="text-xl font-bold text-destructive">
-                لا يمكن الوصول
-              </h2>
-              <p className="text-muted-foreground">
-                لم يتم تعيين فرع لحسابك. يرجى التواصل مع الإدارة.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <EmptyState
+          icon={AlertCircle}
+          title="لا يمكن الوصول"
+          description="لم يتم تعيين فرع لحسابك. يرجى التواصل مع الإدارة."
+        />
       </MainLayout>
     );
   }
@@ -119,104 +156,78 @@ export default function BranchLive() {
     return o.delivery_date === today;
   });
 
+  const stages = [
+    { key: 'in_transit', label: 'في الطريق', value: incomingOrders.length, icon: Truck, box: 'bg-info/10 text-info', text: 'text-info' },
+    { key: 'ready', label: 'جاهز للاستلام', value: readyOrders.length, icon: CheckCircle2, box: 'bg-success/10 text-success', text: 'text-success' },
+    { key: 'today', label: 'طلبات اليوم', value: todayOrders.length, icon: Clock, box: 'bg-warning/10 text-warning', text: 'text-warning' },
+  ];
+
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-              <Activity className="w-7 h-7 text-white" />
+        <PageHeader
+          title="العمليات المباشرة"
+          description={`فرع: ${myBranch.name}`}
+          icon={Activity}
+          actions={
+            <div className="flex items-center gap-3">
+              <span className="whitespace-nowrap text-xs text-muted-foreground">
+                آخر تحديث: {lastRefresh.toLocaleTimeString('ar-SA-u-nu-latn')}
+              </span>
+              <Button variant="outline" size="sm" className="gap-2" onClick={handleRefresh}>
+                <RefreshCw className="w-4 h-4" />
+                تحديث
+              </Button>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold">العمليات المباشرة</h1>
-              <p className="text-muted-foreground">
-                فرع: <span className="font-medium text-foreground">{myBranch.name}</span>
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground">
-              آخر تحديث: {lastRefresh.toLocaleTimeString('ar-SA')}
-            </span>
-            <Button variant="outline" size="sm" onClick={handleRefresh}>
-              <RefreshCw className="w-4 h-4 me-1" />
-              تحديث
-            </Button>
-          </div>
-        </div>
+          }
+        />
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <Card className="bg-info/10 border-info">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-info/20 flex items-center justify-center">
-                  <Truck className="w-5 h-5 text-info" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">في الطريق</p>
-                  <p className="text-2xl font-bold text-info">{incomingOrders.length}</p>
-                </div>
+        {/* Command bar — total (hero) + the branch flow */}
+        <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-sm">
+          <div className="flex flex-col lg:flex-row">
+            <div className="flex items-center gap-3 p-5 bg-primary/[0.04] border-b lg:border-b-0 lg:border-e border-border/60 shrink-0">
+              <div className="w-12 h-12 rounded-xl gradient-pink shadow-warm flex items-center justify-center shrink-0">
+                <Package className="w-6 h-6 text-white" />
               </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-success/10 border-success">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-success" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">جاهز للاستلام</p>
-                  <p className="text-2xl font-bold text-success">{readyOrders.length}</p>
-                </div>
+              <div>
+                <p className="text-2xl font-bold leading-none">{orders.length}</p>
+                <p className="text-xs text-muted-foreground mt-1.5">إجمالي الطلبات</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-warning/10 border-warning">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-warning" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">طلبات اليوم</p>
-                  <p className="text-2xl font-bold text-warning">{todayOrders.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-primary/10 border-primary">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Package className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">إجمالي الطلبات</p>
-                  <p className="text-2xl font-bold text-primary">{orders.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            <div className="flex items-center justify-between gap-1 p-4 flex-1 overflow-x-auto">
+              {stages.map((stage, i) => (
+                <Fragment key={stage.key}>
+                  <div className="flex flex-col items-center gap-1.5 px-2 shrink-0">
+                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stage.box)}>
+                      <stage.icon className="w-5 h-5" />
+                    </div>
+                    <p className={cn('text-xl font-bold leading-none', stage.text)}>{stage.value}</p>
+                    <p className="text-xs text-muted-foreground text-center leading-tight whitespace-nowrap">{stage.label}</p>
+                  </div>
+                  {i < stages.length - 1 && <ChevronLeft className="w-4 h-4 text-muted-foreground/30 shrink-0" />}
+                </Fragment>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Barcode Notice */}
         <Alert className="border-primary/30 bg-primary/5">
           <ScanLine className="h-4 w-4" />
           <AlertDescription>
-            <strong>نظام الاستلام بالباركود:</strong> استخدم ماسح الباركود لاستلام الطلبات من السائق. 
-            لا يمكن قبول الطلبات يدوياً - يجب مسح الباركود.
+            <strong>نظام الاستلام بالباركود:</strong> استخدم ماسح الباركود لاستلام الطلبات من السائق.
+            لا يمكن قبول الطلبات يدوياً — يجب مسح الباركود.
           </AlertDescription>
         </Alert>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        {/* Tabs — dir="rtl" so the card grid inside lays out RTL */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="live" className="gap-2">
               <Activity className="w-4 h-4" />
-              الطلبات الواردة ({incomingOrders.length})
+              الطلبات الواردة
+              {incomingOrders.length > 0 && <Badge variant="secondary" className="ms-1">{incomingOrders.length}</Badge>}
             </TabsTrigger>
             <TabsTrigger value="scan" className="gap-2">
               <ScanLine className="w-4 h-4" />
@@ -224,128 +235,58 @@ export default function BranchLive() {
             </TabsTrigger>
             <TabsTrigger value="ready" className="gap-2">
               <Package className="w-4 h-4" />
-              جاهز للاستلام ({readyOrders.length})
+              جاهز للاستلام
+              {readyOrders.length > 0 && <Badge variant="secondary" className="ms-1">{readyOrders.length}</Badge>}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="live" className="space-y-4">
+          <TabsContent value="live" className="mt-5">
             {ordersLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
+              <LoadingState label="جاري تحميل الطلبات..." />
             ) : incomingOrders.length === 0 ? (
-              <div className="text-center py-16">
-                <Truck className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-xl font-medium text-muted-foreground">لا توجد طلبات في الطريق</p>
-                <p className="text-sm text-muted-foreground mt-2">ستظهر الطلبات هنا فور إرسالها من المطبخ</p>
-              </div>
+              <EmptyState
+                icon={Truck}
+                title="لا توجد طلبات في الطريق"
+                description="ستظهر الطلبات هنا فور إرسالها من المطبخ."
+              />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {incomingOrders.map((order) => (
-                  <Card key={order.id} className="overflow-hidden">
-                    <CardHeader className="pb-3 bg-info/5">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="font-mono text-lg">{order.order_number}</CardTitle>
-                        <StatusBadge status={order.status as OrderStatus} showIcon={false} />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-4 space-y-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span>
-                          {order.delivery_time?.substring(0, 5) || '-'} - {order.delivery_date ? new Date(order.delivery_date).toLocaleDateString('ar-SA') : '-'}
-                        </span>
-                      </div>
-                      
-                      <div className="border-t pt-3">
-                        <p className="text-sm font-medium mb-2">المنتجات:</p>
-                        <div className="space-y-1">
-                          {order.items?.map((item: LiveOrderItem, index: number) => (
-                            <div key={index} className="flex justify-between text-sm">
-                              <span>{item.product_name}</span>
-                              <Badge variant="secondary">×{item.quantity}</Badge>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Truck className="w-3 h-3" />
-                          بانتظار وصول السائق - امسح الباركود لاستلام الطلب
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <LiveOrderCard key={order.id} order={order} mode="incoming" />
                 ))}
               </div>
             )}
           </TabsContent>
 
-          <TabsContent value="scan">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <QrCode className="w-5 h-5" />
-                  مسح باركود التسليم
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <HandoverBarcodeScanner
-                  title="مسح باركود السائق"
-                  description="امسح الباركود من جوال السائق لتأكيد استلام الطلب"
-                  expectedBarcodeTypes={['branch_handover']}
-                  onScanSuccess={() => {
-                    setActiveTab('ready');
-                    refetch();
-                  }}
-                />
-              </CardContent>
-            </Card>
+          <TabsContent value="scan" className="mt-5">
+            <div className="glass-card mx-auto max-w-xl rounded-2xl p-6">
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
+                <QrCode className="w-5 h-5 text-primary" />
+                مسح باركود التسليم
+              </h2>
+              <HandoverBarcodeScanner
+                title="مسح باركود السائق"
+                description="امسح الباركود من جوال السائق لتأكيد استلام الطلب"
+                expectedBarcodeTypes={['branch_handover']}
+                onScanSuccess={() => {
+                  setActiveTab('ready');
+                  refetch();
+                }}
+              />
+            </div>
           </TabsContent>
 
-          <TabsContent value="ready" className="space-y-4">
+          <TabsContent value="ready" className="mt-5">
             {readyOrders.length === 0 ? (
-              <div className="text-center py-16">
-                <Package className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-xl font-medium text-muted-foreground">لا توجد طلبات جاهزة للاستلام</p>
-              </div>
+              <EmptyState
+                icon={Package}
+                title="لا توجد طلبات جاهزة للاستلام"
+                description="الطلبات المستلمة من السائق ستظهر هنا."
+              />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {readyOrders.map((order) => (
-                  <Card key={order.id} className="overflow-hidden">
-                    <CardHeader className="pb-3 bg-success/5">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="font-mono text-lg">{order.order_number}</CardTitle>
-                        <StatusBadge status={order.status as OrderStatus} showIcon={false} />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-4 space-y-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
-                        <span>{order.customer_name}</span>
-                      </div>
-                      
-                      <div className="border-t pt-3">
-                        <p className="text-sm font-medium mb-2">المنتجات:</p>
-                        <div className="space-y-1">
-                          {order.items?.map((item: LiveOrderItem, index: number) => (
-                            <div key={index} className="flex justify-between text-sm">
-                              <span>{item.product_name}</span>
-                              <Badge variant="secondary">×{item.quantity}</Badge>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <p className="text-xs text-success flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          جاهز لاستلام العميل
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <LiveOrderCard key={order.id} order={order} mode="ready" />
                 ))}
               </div>
             )}
