@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Price } from '@/components/ui/riyal';
 import {
   Table,
   TableBody,
@@ -145,7 +146,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                 <p className="text-sm text-muted-foreground">الأعلى إيرادات</p>
                 <p className="text-lg font-bold">{sortedByRevenue[0]?.branch_name || '-'}</p>
                 <p className="text-sm text-primary font-medium">
-                  {formatCurrency(sortedByRevenue[0]?.revenue || 0)}
+                  <Price amount={sortedByRevenue[0]?.revenue || 0} />
                 </p>
               </div>
             </div>
@@ -179,7 +180,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                 <p className="text-sm text-muted-foreground">الأعلى متوسط طلب</p>
                 <p className="text-lg font-bold">{sortedByAvg[0]?.branch_name || '-'}</p>
                 <p className="text-sm text-success font-medium">
-                  {formatCurrency(sortedByAvg[0]?.avgOrderValue || 0)}
+                  <Price amount={sortedByAvg[0]?.avgOrderValue || 0} />
                 </p>
               </div>
             </div>
@@ -309,7 +310,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <span className="font-bold">{formatCurrency(branch.revenue)}</span>
+                          <span className="font-bold"><Price amount={branch.revenue} /></span>
                           <div className={cn('w-6 h-6 rounded-full flex items-center justify-center', revenueIndicator.bg)}>
                             <revenueIndicator.icon className={cn('w-3 h-3', revenueIndicator.color)} />
                           </div>
@@ -336,7 +337,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-medium">
-                        {formatCurrency(branch.avgOrderValue)}
+                        <Price amount={branch.avgOrderValue} />
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -371,7 +372,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm">متوسط الإيرادات:</span>
-                <Badge variant="secondary">{formatCurrency(avgRevenue)}</Badge>
+                <Badge variant="secondary"><Price amount={avgRevenue} /></Badge>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm">متوسط الطلبات:</span>
@@ -379,7 +380,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm">متوسط قيمة الطلب:</span>
-                <Badge variant="secondary">{formatCurrency(avgOrderValue)}</Badge>
+                <Badge variant="secondary"><Price amount={avgOrderValue} /></Badge>
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader, LoadingState, ErrorState, SectionCard } from '@/components/ds';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -40,8 +41,8 @@ import { BranchComparison } from '@/components/reports/BranchComparison';
 import {
   BarChart3,
   Calendar as CalendarIcon,
+  CalendarRange,
   Printer,
-  Loader2,
   TrendingUp,
   Package,
   Clock,
@@ -51,6 +52,7 @@ import {
   Filter,
   FileSpreadsheet,
   GitCompare,
+  PieChart as PieChartIcon,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -65,11 +67,14 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
+  ComposedChart,
+  Area,
   Line,
   Legend,
 } from 'recharts';
 import { cn } from '@/lib/utils';
+import { Price } from '@/components/ui/riyal';
+import { formatSARText } from '@/lib/currency';
 import * as XLSX from 'xlsx';
 import { Enums } from '@/integrations/supabase/types';
 
@@ -94,7 +99,16 @@ const STATUS_OPTIONS = [
   { value: 'completed', label: 'مكتمل' },
 ];
 
-const CHART_COLORS = ['#be7b7c', '#7cb87c', '#7c7cb8', '#b87c7c', '#7cb8b8', '#b8b87c', '#b87cb8', '#7c7c7c'];
+const CHART_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--info))',
+  'hsl(var(--success))',
+  'hsl(var(--warning))',
+  'hsl(var(--destructive))',
+  'hsl(var(--primary) / 0.6)',
+  'hsl(var(--info) / 0.6)',
+  'hsl(var(--success) / 0.6)',
+];
 
 export default function Reports() {
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('this_month');
@@ -106,7 +120,7 @@ export default function Reports() {
   const [showFilters, setShowFilters] = useState(false);
 
   const { data: branches } = useBranches();
-  const { data: reportData, isLoading, error } = useReportData(filters);
+  const { data: reportData, isLoading, error, refetch } = useReportData(filters);
 
   const handleQuickFilterChange = (value: QuickFilter) => {
     setQuickFilter(value);
@@ -157,12 +171,9 @@ export default function Reports() {
     }));
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-SA', {
-      style: 'currency',
-      currency: 'SAR',
-    }).format(amount);
-  };
+  // Text form (number + "ر.س") for non-JSX contexts — chart string formatters,
+  // print HTML, and the BranchComparison prop. On-screen values use <Price /> (SVG symbol).
+  const formatCurrency = (amount: number) => formatSARText(amount);
 
   const handleExportExcel = () => {
     if (!reportData?.orders) return;
@@ -267,56 +278,115 @@ export default function Reports() {
 
   const stats = reportData?.stats;
 
+  // KPI cards — revenue is featured (gradient); the rest track the order lifecycle.
+  const kpis = [
+    { key: 'total', label: 'إجمالي الطلبات', value: stats?.totalOrders ?? 0, icon: Package, box: 'bg-primary/10 text-primary' },
+    { key: 'pending', label: 'بانتظار الموافقة', value: stats?.pendingApproval ?? 0, icon: Clock, box: 'bg-warning/10 text-warning' },
+    { key: 'preparing', label: 'قيد التحضير', value: stats?.inPreparation ?? 0, icon: TrendingUp, box: 'bg-info/10 text-info' },
+    { key: 'completed', label: 'مكتملة', value: stats?.completed ?? 0, icon: CheckCircle2, box: 'bg-success/10 text-success' },
+  ];
+
+  // Derived chart data — donut needs per-slice colours + a total for the centre label.
+  const statusData = (stats?.ordersByStatus ?? []).map((s, i) => ({
+    ...s,
+    name: STATUS_LABELS[s.status] || s.status,
+    color: CHART_COLORS[i % CHART_COLORS.length],
+  }));
+  const statusTotal = statusData.reduce((sum, d) => sum + d.count, 0);
+  const compactNumber = (v: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(v);
+
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-white" />
-              </div>
-              التقارير والإحصائيات
-            </h1>
-            <p className="text-muted-foreground mt-1">تحليل شامل للطلبات والإيرادات</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handlePrint} className="gap-2">
-              <Printer className="w-4 h-4" />
-              طباعة
-            </Button>
-            <Button variant="outline" onClick={handleExportExcel} className="gap-2">
-              <FileSpreadsheet className="w-4 h-4" />
-              تصدير Excel
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          title="التقارير والإحصائيات"
+          description="تحليل شامل للطلبات والإيرادات"
+          icon={BarChart3}
+          actions={
+            <>
+              <Button variant="outline" onClick={handlePrint} className="gap-2">
+                <Printer className="w-4 h-4" />
+                طباعة
+              </Button>
+              <Button variant="outline" onClick={handleExportExcel} className="gap-2">
+                <FileSpreadsheet className="w-4 h-4" />
+                تصدير Excel
+              </Button>
+            </>
+          }
+        />
 
-        {/* Quick Filters */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Quick Filter Buttons */}
-              <div className="flex flex-wrap gap-2">
-                {QUICK_FILTERS.map((qf) => (
-                  <Button
-                    key={qf.value}
-                    variant={quickFilter === qf.value ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => handleQuickFilterChange(qf.value)}
-                  >
-                    {qf.label}
-                  </Button>
-                ))}
+        {/* Quick Filters — command bar */}
+        <Card className="rounded-2xl border-border/60 bg-card shadow-sm">
+          <CardContent className="p-4 sm:p-5">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Label — anchors the bar; subtitle live-derives the active preset */}
+              <div className="flex shrink-0 items-center gap-2.5">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl gradient-pink shadow-warm">
+                  <CalendarRange className="h-5 w-5 text-white" />
+                </div>
+                <div className="leading-tight">
+                  <p className="text-sm font-semibold text-foreground">الفترة الزمنية</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {QUICK_FILTERS.find((qf) => qf.value === quickFilter)?.label}
+                  </p>
+                </div>
               </div>
 
-              {/* Date Range Pickers */}
-              <div className="flex items-center gap-2">
+              {/* Divider */}
+              <div className="hidden h-8 self-center border-e border-border/60 sm:block" aria-hidden="true" />
+
+              {/* Preset segmented control — one connected track; scrolls rather than wraps */}
+              <div className="min-w-0 overflow-x-auto scrollbar-none">
+                <div
+                  role="group"
+                  aria-label="اختصارات الفترة"
+                  className="inline-flex h-11 w-max items-center gap-1 rounded-xl border border-border/60 bg-muted/40 p-1"
+                >
+                  {QUICK_FILTERS.map((qf) => {
+                    const isActive = quickFilter === qf.value;
+                    return (
+                      <button
+                        key={qf.value}
+                        type="button"
+                        aria-pressed={isActive}
+                        onClick={() => handleQuickFilterChange(qf.value)}
+                        className={cn(
+                          'press h-full whitespace-nowrap rounded-lg px-3.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                          isActive
+                            ? 'gradient-pink sheen text-white shadow-warm'
+                            : 'text-muted-foreground hover:bg-background hover:text-foreground'
+                        )}
+                      >
+                        {qf.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Date range — two single-date pickers; foregrounds when 'مخصص' (custom) is active */}
+              <div
+                className={cn(
+                  'flex h-11 shrink-0 items-center gap-0.5 rounded-xl border p-1 transition-all duration-200',
+                  quickFilter === 'custom'
+                    ? 'border-primary/50 bg-primary/[0.05] shadow-warm ring-2 ring-primary/15'
+                    : 'border-border/60 bg-background'
+                )}
+              >
+                <CalendarIcon
+                  className={cn(
+                    'ms-1.5 me-0.5 h-4 w-4 shrink-0 transition-colors',
+                    quickFilter === 'custom' ? 'text-primary' : 'text-muted-foreground'
+                  )}
+                />
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <CalendarIcon className="w-4 h-4" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="press h-9 rounded-lg px-2.5 font-medium tabular-nums hover:bg-primary/10"
+                    >
                       {format(filters.dateRange.from, 'dd/MM/yyyy')}
                     </Button>
                   </PopoverTrigger>
@@ -325,15 +395,19 @@ export default function Reports() {
                       mode="single"
                       selected={filters.dateRange.from}
                       onSelect={(date) => handleDateChange('from', date)}
+                      locale={ar}
                       className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
-                <span className="text-muted-foreground">إلى</span>
+                <span className="select-none px-0.5 text-xs font-medium text-muted-foreground">إلى</span>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <CalendarIcon className="w-4 h-4" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="press h-9 rounded-lg px-2.5 font-medium tabular-nums hover:bg-primary/10"
+                    >
                       {format(filters.dateRange.to, 'dd/MM/yyyy')}
                     </Button>
                   </PopoverTrigger>
@@ -342,23 +416,33 @@ export default function Reports() {
                       mode="single"
                       selected={filters.dateRange.to}
                       onSelect={(date) => handleDateChange('to', date)}
+                      locale={ar}
                       className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
               </div>
 
-              {/* Advanced Filters Toggle */}
+              {/* Advanced filters — pinned to the inline-end; tints when open */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowFilters(!showFilters)}
-                className="gap-2"
+                aria-expanded={showFilters}
+                className={cn(
+                  'press h-11 shrink-0 gap-2 rounded-xl border px-4 ms-auto',
+                  showFilters
+                    ? 'border-primary/40 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary'
+                    : 'border-border/60 bg-card text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
               >
-                <Filter className="w-4 h-4" />
+                <Filter className="h-4 w-4" />
                 فلاتر متقدمة
                 {(filters.branchIds.length > 0 || filters.statuses.length > 0) && (
-                  <Badge variant="secondary" className="ms-1">
+                  <Badge
+                    variant="secondary"
+                    className="ms-1 h-5 min-w-5 justify-center rounded-full px-1.5 tabular-nums"
+                  >
                     {filters.branchIds.length + filters.statuses.length}
                   </Badge>
                 )}
@@ -430,92 +514,43 @@ export default function Reports() {
         </Card>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
+          <LoadingState label="جاري تحميل التقارير..." />
         ) : error ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-destructive">حدث خطأ في تحميل التقارير</p>
-            </CardContent>
-          </Card>
+          <ErrorState title="حدث خطأ في تحميل التقارير" onRetry={() => refetch()} />
         ) : (
           <>
-            {/* Summary Cards */}
+            {/* KPI cards — revenue featured (gradient), then order-lifecycle stats */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Package className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold">{stats?.totalOrders || 0}</p>
-                      <p className="text-sm text-muted-foreground">إجمالي الطلبات</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Revenue — featured */}
+              <div className="col-span-2 lg:col-span-1 relative overflow-hidden rounded-2xl gradient-pink text-white shadow-warm p-5 flex flex-col justify-between min-h-[128px]">
+                <div className="absolute -top-8 -end-8 w-28 h-28 rounded-full bg-white/10" aria-hidden="true" />
+                <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
+                  <DollarSign className="w-6 h-6" />
+                </div>
+                <div className="relative">
+                  <Price amount={stats?.totalRevenue ?? 0} className="text-2xl font-bold leading-tight" />
+                  <p className="text-xs text-white/85 mt-1">إجمالي الإيرادات</p>
+                </div>
+              </div>
 
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-warning" />
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold">{stats?.pendingApproval || 0}</p>
-                      <p className="text-sm text-muted-foreground">بانتظار الموافقة</p>
-                    </div>
+              {kpis.map((k) => (
+                <div
+                  key={k.key}
+                  className="rounded-2xl border border-border/60 bg-card shadow-sm p-5 flex flex-col justify-between min-h-[128px] transition-shadow hover:shadow-warm"
+                >
+                  <div className={cn('w-11 h-11 rounded-xl flex items-center justify-center', k.box)}>
+                    <k.icon className="w-6 h-6" />
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-info/20 flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-info" />
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold">{stats?.inPreparation || 0}</p>
-                      <p className="text-sm text-muted-foreground">قيد التحضير</p>
-                    </div>
+                  <div>
+                    <p className="text-2xl font-bold leading-none tabular-nums">{k.value}</p>
+                    <p className="text-xs text-muted-foreground mt-1.5">{k.label}</p>
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center">
-                      <CheckCircle2 className="w-6 h-6 text-success" />
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold">{stats?.completed || 0}</p>
-                      <p className="text-sm text-muted-foreground">مكتملة</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="col-span-2 lg:col-span-1">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <DollarSign className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">{formatCurrency(stats?.totalRevenue || 0)}</p>
-                      <p className="text-sm text-muted-foreground">إجمالي الإيرادات</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+              ))}
             </div>
 
             {/* Tabs for Reports Sections */}
-            <Tabs defaultValue="overview" className="space-y-6">
+            <Tabs defaultValue="overview" dir="rtl" className="space-y-6">
               <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
                 <TabsTrigger value="overview" className="gap-2">
                   <BarChart3 className="w-4 h-4" />
@@ -524,10 +559,16 @@ export default function Reports() {
                 <TabsTrigger value="comparison" className="gap-2">
                   <GitCompare className="w-4 h-4" />
                   مقارنة الفروع
+                  {(stats?.revenueByBranch.length ?? 0) > 0 && (
+                    <Badge variant="secondary" className="ms-1">{stats?.revenueByBranch.length}</Badge>
+                  )}
                 </TabsTrigger>
                 <TabsTrigger value="details" className="gap-2">
                   <Store className="w-4 h-4" />
                   تفاصيل الطلبات
+                  {(reportData?.orders.length ?? 0) > 0 && (
+                    <Badge variant="secondary" className="ms-1">{reportData?.orders.length}</Badge>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
@@ -536,119 +577,170 @@ export default function Reports() {
                 {/* Charts Row */}
                 <div className="grid lg:grid-cols-2 gap-6">
                   {/* Orders Over Time */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">الطلبات حسب التاريخ</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {stats?.ordersByDate && stats.ordersByDate.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={300}>
-                          <LineChart data={stats.ordersByDate}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis
-                              dataKey="date"
-                              tickFormatter={(value) => format(new Date(value), 'dd/MM')}
-                            />
-                            <YAxis />
-                            <Tooltip
-                              labelFormatter={(value) => format(new Date(value), 'dd MMMM yyyy', { locale: ar })}
-                              formatter={(value: number, name: string) => [
-                                name === 'count' ? value : formatCurrency(value),
-                                name === 'count' ? 'عدد الطلبات' : 'الإيرادات',
-                              ]}
-                            />
-                            <Legend />
-                            <Line
-                              type="monotone"
-                              dataKey="count"
-                              name="عدد الطلبات"
-                              stroke="#be7b7c"
-                              strokeWidth={2}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="revenue"
-                              name="الإيرادات"
-                              stroke="#7cb87c"
-                              strokeWidth={2}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      ) : (
-                        <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                          لا توجد بيانات
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                  <SectionCard title="الطلبات حسب التاريخ" icon={TrendingUp}>
+                    {stats?.ordersByDate && stats.ordersByDate.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={280}>
+                        <ComposedChart data={stats.ordersByDate} margin={{ top: 10, right: 4, left: -8, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="ordersFill" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.28} />
+                              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                          <XAxis
+                            dataKey="date"
+                            tickFormatter={(value) => format(new Date(value), 'dd/MM')}
+                            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                            tickLine={false}
+                            axisLine={false}
+                          />
+                          <YAxis
+                            yAxisId="count"
+                            tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                            tickLine={false}
+                            axisLine={false}
+                            width={32}
+                            allowDecimals={false}
+                          />
+                          <YAxis
+                            yAxisId="revenue"
+                            orientation="right"
+                            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                            tickLine={false}
+                            axisLine={false}
+                            width={44}
+                            tickFormatter={compactNumber}
+                          />
+                          <Tooltip
+                            contentStyle={{ borderRadius: 12, border: '1px solid hsl(var(--border))', fontSize: 13, boxShadow: '0 8px 24px hsl(var(--primary) / 0.12)' }}
+                            labelFormatter={(value) => format(new Date(value), 'dd MMMM yyyy', { locale: ar })}
+                            formatter={(value: number, name: string) => [
+                              name === 'الإيرادات' ? formatCurrency(value) : value,
+                              name,
+                            ]}
+                          />
+                          <Legend iconType="circle" wrapperStyle={{ fontSize: 13, paddingTop: 8 }} />
+                          <Area
+                            yAxisId="count"
+                            type="monotone"
+                            dataKey="count"
+                            name="عدد الطلبات"
+                            stroke="hsl(var(--primary))"
+                            strokeWidth={2.5}
+                            fill="url(#ordersFill)"
+                            dot={{ r: 3, strokeWidth: 0, fill: 'hsl(var(--primary))' }}
+                            activeDot={{ r: 5 }}
+                          />
+                          <Line
+                            yAxisId="revenue"
+                            type="monotone"
+                            dataKey="revenue"
+                            name="الإيرادات"
+                            stroke="hsl(var(--success))"
+                            strokeWidth={2.5}
+                            dot={{ r: 3, strokeWidth: 0, fill: 'hsl(var(--success))' }}
+                            activeDot={{ r: 5 }}
+                          />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-[280px] flex items-center justify-center text-muted-foreground">
+                        لا توجد بيانات
+                      </div>
+                    )}
+                  </SectionCard>
 
                   {/* Status Distribution */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">توزيع حالات الطلبات</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {stats?.ordersByStatus && stats.ordersByStatus.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={300}>
-                          <PieChart>
-                            <Pie
-                              data={stats.ordersByStatus.map((s) => ({
-                                ...s,
-                                name: STATUS_LABELS[s.status] || s.status,
-                              }))}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={60}
-                              outerRadius={100}
-                              paddingAngle={2}
-                              dataKey="count"
-                              nameKey="name"
-                              label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                            >
-                              {stats.ordersByStatus.map((_, index) => (
-                                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      ) : (
-                        <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                          لا توجد بيانات
+                  <SectionCard title="توزيع حالات الطلبات" icon={PieChartIcon}>
+                    {statusData.length > 0 ? (
+                      <div className="flex flex-col sm:flex-row items-center gap-6">
+                        <div className="relative shrink-0" style={{ width: 216, height: 216 }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={statusData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={72}
+                                outerRadius={104}
+                                paddingAngle={3}
+                                dataKey="count"
+                                nameKey="name"
+                                stroke="none"
+                              >
+                                {statusData.map((d, index) => (
+                                  <Cell key={`cell-${index}`} fill={d.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip
+                                contentStyle={{ borderRadius: 12, border: '1px solid hsl(var(--border))', fontSize: 13 }}
+                                formatter={(value: number, name: string) => [value, name]}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span className="text-3xl font-bold leading-none tabular-nums">{statusTotal}</span>
+                            <span className="text-xs text-muted-foreground mt-1">إجمالي الطلبات</span>
+                          </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                        <div className="flex-1 w-full space-y-2.5">
+                          {statusData.map((d, index) => (
+                            <div key={index} className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                                <span className="text-sm truncate">{d.name}</span>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-sm font-semibold tabular-nums">{d.count}</span>
+                                <span className="text-xs text-muted-foreground tabular-nums w-9 text-start">
+                                  {statusTotal ? Math.round((d.count / statusTotal) * 100) : 0}%
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-[216px] flex items-center justify-center text-muted-foreground">
+                        لا توجد بيانات
+                      </div>
+                    )}
+                  </SectionCard>
                 </div>
 
                 {/* Revenue by Branch */}
                 {stats?.revenueByBranch && stats.revenueByBranch.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <Store className="w-5 h-5" />
-                        الإيرادات حسب الفرع
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={stats.revenueByBranch}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="branch_name" />
-                          <YAxis />
-                          <Tooltip
-                            formatter={(value: number, name: string) => [
-                              name === 'orders' ? value : formatCurrency(value),
-                              name === 'orders' ? 'عدد الطلبات' : 'الإيرادات',
-                            ]}
-                          />
-                          <Legend />
-                          <Bar dataKey="revenue" name="الإيرادات" fill="#be7b7c" radius={[4, 4, 0, 0]} />
-                          <Bar dataKey="orders" name="عدد الطلبات" fill="#7cb8b8" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
+                  <SectionCard title="الإيرادات حسب الفرع" icon={Store}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={stats.revenueByBranch} margin={{ top: 10, right: 4, left: 4, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                        <XAxis
+                          dataKey="branch_name"
+                          tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                          tickLine={false}
+                          axisLine={false}
+                          width={52}
+                          tickFormatter={compactNumber}
+                        />
+                        <Tooltip
+                          cursor={{ fill: 'hsl(var(--muted) / 0.5)' }}
+                          contentStyle={{ borderRadius: 12, border: '1px solid hsl(var(--border))', fontSize: 13 }}
+                          formatter={(value: number) => [formatCurrency(value), 'الإيرادات']}
+                        />
+                        <Bar dataKey="revenue" name="الإيرادات" radius={[8, 8, 0, 0]} maxBarSize={72}>
+                          {stats.revenueByBranch.map((_, index) => (
+                            <Cell key={`bar-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </SectionCard>
                 )}
               </TabsContent>
 
@@ -663,77 +755,72 @@ export default function Reports() {
 
               {/* Details Tab */}
               <TabsContent value="details">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">تفاصيل الطلبات ({reportData?.orders.length || 0})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="rounded-lg border overflow-auto">
-                      <Table>
-                        <TableHeader>
+                <SectionCard title={`تفاصيل الطلبات (${reportData?.orders.length || 0})`} icon={Package}>
+                  <div className="rounded-lg border overflow-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>رقم الطلب</TableHead>
+                          <TableHead>العميل</TableHead>
+                          <TableHead>الفرع</TableHead>
+                          <TableHead>الحالة</TableHead>
+                          <TableHead>موعد الاستلام</TableHead>
+                          <TableHead>المبلغ</TableHead>
+                          <TableHead>حالة الدفع</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {reportData?.orders.length === 0 ? (
                           <TableRow>
-                            <TableHead>رقم الطلب</TableHead>
-                            <TableHead>العميل</TableHead>
-                            <TableHead>الفرع</TableHead>
-                            <TableHead>الحالة</TableHead>
-                            <TableHead>موعد الاستلام</TableHead>
-                            <TableHead>المبلغ</TableHead>
-                            <TableHead>حالة الدفع</TableHead>
+                            <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                              لا توجد طلبات في هذه الفترة
+                            </TableCell>
                           </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {reportData?.orders.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                                لا توجد طلبات في هذه الفترة
+                        ) : (
+                          reportData?.orders.slice(0, 50).map((order) => (
+                            <TableRow key={order.id}>
+                              <TableCell className="font-mono">{order.order_number}</TableCell>
+                              <TableCell>{order.customer_name || '-'}</TableCell>
+                              <TableCell>{order.branch_name || '-'}</TableCell>
+                              <TableCell>
+                                <Badge variant="secondary">
+                                  {STATUS_LABELS[order.status] || order.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {order.delivery_date ? (
+                                  <div className="text-sm">
+                                    <p>{format(new Date(order.delivery_date), 'dd/MM/yyyy')}</p>
+                                    {order.delivery_time && (
+                                      <p className="text-muted-foreground">{order.delivery_time}</p>
+                                    )}
+                                  </div>
+                                ) : (
+                                  '-'
+                                )}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                <Price amount={order.total_amount} />
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={order.payment_status === 'paid' ? 'default' : 'outline'}
+                                >
+                                  {PAYMENT_STATUS_LABELS[order.payment_status || ''] || order.payment_status || '-'}
+                                </Badge>
                               </TableCell>
                             </TableRow>
-                          ) : (
-                            reportData?.orders.slice(0, 50).map((order) => (
-                              <TableRow key={order.id}>
-                                <TableCell className="font-mono">{order.order_number}</TableCell>
-                                <TableCell>{order.customer_name || '-'}</TableCell>
-                                <TableCell>{order.branch_name || '-'}</TableCell>
-                                <TableCell>
-                                  <Badge variant="secondary">
-                                    {STATUS_LABELS[order.status] || order.status}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell>
-                                  {order.delivery_date ? (
-                                    <div className="text-sm">
-                                      <p>{format(new Date(order.delivery_date), 'dd/MM/yyyy')}</p>
-                                      {order.delivery_time && (
-                                        <p className="text-muted-foreground">{order.delivery_time}</p>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    '-'
-                                  )}
-                                </TableCell>
-                                <TableCell className="font-medium">
-                                  {formatCurrency(order.total_amount)}
-                                </TableCell>
-                                <TableCell>
-                                  <Badge
-                                    variant={order.payment_status === 'paid' ? 'default' : 'outline'}
-                                  >
-                                    {PAYMENT_STATUS_LABELS[order.payment_status || ''] || order.payment_status || '-'}
-                                  </Badge>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
-                    {reportData?.orders && reportData.orders.length > 50 && (
-                      <p className="text-sm text-muted-foreground mt-4 text-center">
-                        يتم عرض أول 50 طلب. للاطلاع على جميع الطلبات، قم بتصدير التقرير.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  {reportData?.orders && reportData.orders.length > 50 && (
+                    <p className="text-sm text-muted-foreground mt-4 text-center">
+                      يتم عرض أول 50 طلب. للاطلاع على جميع الطلبات، قم بتصدير التقرير.
+                    </p>
+                  )}
+                </SectionCard>
               </TabsContent>
             </Tabs>
           </>
