@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { OrdersTable } from '@/components/dashboard/OrdersTable';
+import { PageHeader, EmptyState, LoadingState, ErrorState } from '@/components/ds';
+import { OrderCardList } from '@/components/dashboard/OrderCardList';
 import { useOrders, useUpdateOrderStatus } from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,13 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Search, Filter, Loader2 } from 'lucide-react';
+import { Plus, Search, Filter, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ORDER_STATUS_LABELS, OrderStatus } from '@/types/order';
-import { Card, CardContent } from '@/components/ui/card';
 
 export default function Orders() {
-  const { data: orders, isLoading, error } = useOrders();
+  const { data: orders, isLoading, error, refetch } = useOrders();
   const updateStatus = useUpdateOrderStatus();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -66,19 +66,19 @@ export default function Orders() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">جميع الطلبات</h1>
-            <p className="text-muted-foreground mt-1">إدارة ومتابعة جميع الطلبات</p>
-          </div>
-          <Link to="/orders/new">
-            <Button className="gradient-pink text-white shadow-warm">
-              <Plus className="w-5 h-5 me-2" />
-              طلب جديد
-            </Button>
-          </Link>
-        </div>
+        <PageHeader
+          title="جميع الطلبات"
+          description="إدارة ومتابعة جميع الطلبات"
+          icon={ClipboardList}
+          actions={
+            <Link to="/orders/new">
+              <Button className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
+                <Plus className="w-5 h-5 me-2" />
+                طلب جديد
+              </Button>
+            </Link>
+          }
+        />
 
         {/* Filters */}
         <div className="glass-card rounded-2xl p-4">
@@ -111,26 +111,21 @@ export default function Orders() {
 
         {/* Content */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
+          <LoadingState label="جاري تحميل الطلبات..." />
         ) : error ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-destructive">حدث خطأ في تحميل الطلبات</p>
-              <p className="text-sm text-muted-foreground mt-1">{error.message}</p>
-            </CardContent>
-          </Card>
+          <ErrorState title="تعذّر تحميل الطلبات" description={error.message} onRetry={() => refetch()} />
         ) : mappedOrders && mappedOrders.length > 0 ? (
-          <OrdersTable
+          <OrderCardList
             orders={mappedOrders}
             onApprove={handleApprove}
             onSendPaymentLink={handleSendPaymentLink}
           />
         ) : (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">لا توجد طلبات</p>
-          </div>
+          <EmptyState
+            icon={ClipboardList}
+            title="لا توجد طلبات"
+            description="لم يُعثر على طلبات مطابقة. جرّب تعديل البحث أو تصفية الحالة."
+          />
         )}
       </div>
     </MainLayout>

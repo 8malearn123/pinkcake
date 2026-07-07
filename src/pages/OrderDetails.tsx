@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { LoadingState, EmptyState } from '@/components/ds';
 import { useOrder } from '@/hooks/useOrders';
 import { useUpdateOrderStatus } from '@/hooks/useOrders';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -12,6 +13,7 @@ import { OrderTransferDialog } from '@/components/orders/OrderTransferDialog';
 import { RevealCustomerPhoneButton } from '@/components/orders/RevealCustomerPhoneButton';
 import { AdminStatusOverride } from '@/components/orders/AdminStatusOverride';
 import { Button } from '@/components/ui/button';
+import { RiyalSymbol } from '@/components/ui/riyal';
 import {
   ArrowRight,
   User,
@@ -23,6 +25,7 @@ import {
   MessageCircle,
   ArrowLeftRight,
   Shield,
+  PackageX,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
 import { useIsAdmin, useHasRole } from '@/hooks/useMyRoles';
@@ -38,9 +41,7 @@ export default function OrderDetails() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
+        <LoadingState label="جارٍ تحميل الطلب..." />
       </MainLayout>
     );
   }
@@ -48,12 +49,16 @@ export default function OrderDetails() {
   if (error || !order) {
     return (
       <MainLayout>
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">الطلب غير موجود</p>
-          <Link to="/orders">
-            <Button className="mt-4">العودة للطلبات</Button>
-          </Link>
-        </div>
+        <EmptyState
+          icon={PackageX}
+          title="الطلب غير موجود"
+          description="تعذّر العثور على هذا الطلب. ربما تم حذفه أو أن الرابط غير صحيح."
+          action={
+            <Link to="/orders">
+              <Button>العودة للطلبات</Button>
+            </Link>
+          }
+        />
       </MainLayout>
     );
   }
@@ -85,7 +90,7 @@ export default function OrderDetails() {
                 <StatusBadge status={order.status as OrderStatus} />
               </div>
               <p className="text-muted-foreground mt-1">
-                تم الإنشاء: {new Date(order.created_at).toLocaleString('ar-SA')}
+                تم الإنشاء: {new Date(order.created_at).toLocaleString('ar-SA-u-nu-latn')}
               </p>
             </div>
             <div className="flex gap-2">
@@ -229,15 +234,15 @@ export default function OrderDetails() {
                     <div>
                       <p className="font-medium">{item.product_name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {item.unit_price} ر.س × {item.quantity}
+                        {item.unit_price} <RiyalSymbol /> × {item.quantity}
                       </p>
                     </div>
-                    <p className="font-bold">{item.total_price} ر.س</p>
+                    <p className="font-bold">{item.total_price} <RiyalSymbol /></p>
                   </div>
                 ))}
                 <div className="flex justify-between items-center p-4 rounded-xl bg-primary/10 border border-primary/20">
                   <span className="text-lg font-bold">الإجمالي</span>
-                  <span className="text-2xl font-bold text-primary">{order.total_amount} ر.س</span>
+                  <span className="text-2xl font-bold text-primary">{order.total_amount} <RiyalSymbol /></span>
                 </div>
               </>
             ) : (

@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Fragment, useState } from 'react';
+import { useForm, type Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -21,13 +20,26 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SectionCard } from '@/components/ds';
 import { useBranches } from '@/hooks/useBranches';
 import { useCreateCustomOrder, CustomOrderFormData } from '@/hooks/useCustomOrders';
-import { Upload, Loader2 } from 'lucide-react';
+import {
+  Upload,
+  Loader2,
+  User,
+  MapPin,
+  Sparkles,
+  ClipboardCheck,
+  Check,
+  X,
+  ArrowRight,
+  ArrowLeft,
+  Pencil,
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { nameSchema, ksaPhoneSchema } from '@/lib/validation';
+import { cn } from '@/lib/utils';
 
 const customOrderSchema = z.object({
   customerName: nameSchema,
@@ -101,14 +113,149 @@ const fillings = [
 
 const sugarLevels = ['عادي', 'قليل السكر', 'بدون سكر', 'بديل سكر'];
 
+// The four wizard steps, in order. `fields` drives per-step validation
+// (form.trigger) and jump-to-error on final submit.
+const STEPS: {
+  id: string;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  fields: Path<FormData>[];
+}[] = [
+  { id: 'customer', title: 'العميل', icon: User, fields: ['customerName', 'customerPhone', 'customerAddress'] },
+  { id: 'pickup', title: 'الاستلام', icon: MapPin, fields: ['branchId', 'pickupDate', 'pickupTime'] },
+  {
+    id: 'details',
+    title: 'التفاصيل',
+    icon: Sparkles,
+    fields: [
+      'productType',
+      'occasion',
+      'numberOfPeople',
+      'flavor',
+      'filling',
+      'sugarLevel',
+      'writingText',
+      'designDescription',
+      'notes',
+    ],
+  },
+  { id: 'review', title: 'المراجعة', icon: ClipboardCheck, fields: [] },
+];
+
+/** Progress stepper — RTL-aware (steps flow right→left under dir="rtl"). */
+function Stepper({
+  current,
+  onStepClick,
+}: {
+  current: number;
+  onStepClick: (index: number) => void;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-2">
+      {STEPS.map((step, i) => {
+        const done = i < current;
+        const active = i === current;
+        const Icon = step.icon;
+        return (
+          <Fragment key={step.id}>
+            <button
+              type="button"
+              disabled={i > current}
+              onClick={() => i <= current && onStepClick(i)}
+              className="flex shrink-0 flex-col items-center gap-2 disabled:cursor-not-allowed"
+            >
+              <span
+                className={cn(
+                  'flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all',
+                  active && 'gradient-pink border-transparent text-white shadow-warm',
+                  done && 'border-primary/30 bg-primary/10 text-primary',
+                  !active && !done && 'border-border bg-muted text-muted-foreground',
+                )}
+              >
+                {done ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+              </span>
+              <span
+                className={cn(
+                  'text-xs font-medium transition-colors',
+                  active ? 'text-foreground' : 'text-muted-foreground',
+                )}
+              >
+                {step.title}
+              </span>
+            </button>
+            {i < STEPS.length - 1 && (
+              <span
+                className={cn(
+                  'mt-5 h-0.5 flex-1 rounded-full transition-colors',
+                  i < current ? 'bg-primary' : 'bg-border',
+                )}
+              />
+            )}
+          </Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Single-select pill group used for the taste/occasion choices. */
+function ChipGroup({
+  options,
+  value,
+  onChange,
+}: {
+  options: string[];
+  value: string | undefined;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => {
+        const active = value === option;
+        return (
+          <button
+            type="button"
+            key={option}
+            onClick={() => onChange(active ? '' : option)}
+            aria-pressed={active}
+            className={cn(
+              'rounded-full border px-4 py-2 text-sm font-medium transition-all',
+              active
+                ? 'gradient-pink border-transparent text-white shadow-warm'
+                : 'border-border bg-background text-foreground hover:border-primary/50 hover:bg-muted/50',
+            )}
+          >
+            {option}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** One label/value row in the review summary. */
+function SummaryRow({ label, value }: { label: string; value?: string | number }) {
+  const display = value === undefined || value === '' ? '—' : value;
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-border/50 py-2 last:border-0">
+      <span className="shrink-0 text-sm text-muted-foreground">{label}</span>
+      <span className="text-end text-sm font-medium text-foreground">{display}</span>
+    </div>
+  );
+}
+
 export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderFormProps) {
   const { data: branches = [] } = useBranches();
   const createOrder = useCreateCustomOrder();
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [step, setStep] = useState(0);
+  const isReview = step === STEPS.length - 1;
 
   const form = useForm<FormData>({
     resolver: zodResolver(customOrderSchema),
+    mode: 'onTouched',
     defaultValues: {
       customerName: '',
       customerPhone: '',
@@ -129,10 +276,7 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
     },
   });
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadFile = async (file: File) => {
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
@@ -150,15 +294,13 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
         .createSignedUrl(fileName, 60 * 60 * 24 * 7); // 7 days expiry
 
       if (signedUrlError) throw signedUrlError;
-      
-      const imageUrl = signedUrlData.signedUrl;
 
-      setImageUrl(imageUrl);
+      setImageUrl(signedUrlData.signedUrl);
       toast({
         title: 'تم رفع الصورة',
         description: 'تم رفع الصورة المرجعية بنجاح',
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Upload error:', error);
       toast({
         title: 'خطأ',
@@ -169,6 +311,25 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
       setUploading(false);
     }
   };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) uploadFile(file);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) uploadFile(file);
+  };
+
+  const goNext = async () => {
+    const valid = await form.trigger(STEPS[step].fields);
+    if (valid) setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  };
+
+  const goBack = () => setStep((s) => Math.max(0, s - 1));
 
   const onSubmit = async (data: FormData) => {
     const formData: CustomOrderFormData = {
@@ -190,22 +351,55 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
       notes: data.notes,
       referenceImageUrl: imageUrl || undefined,
     };
-    
+
     await createOrder.mutateAsync(formData);
     form.reset();
     setImageUrl(null);
+    setStep(0);
     onSuccess?.();
   };
 
+  // If final validation fails, jump to the first step that has an errored field.
+  const onInvalid = (errors: Record<string, unknown>) => {
+    const firstBadStep = STEPS.findIndex((s) => s.fields.some((f) => errors[f]));
+    if (firstBadStep >= 0) setStep(firstBadStep);
+  };
+
+  // Read (don't subscribe) for the review summary — the review step has no
+  // editable inputs, so form.getValues() at render is enough. Using form.watch()
+  // here would re-render the whole form on every keystroke/blur and can cancel
+  // the "next" click mid-interaction.
+  const values = form.getValues();
+  const branchName = branches.find((b) => b.id === values.branchId)?.name;
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Customer Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">معلومات العميل</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+        // Don't let Enter submit the whole form from an early step's input.
+        onKeyDown={(e) => {
+          if (
+            e.key === 'Enter' &&
+            !isReview &&
+            (e.target as HTMLElement).tagName !== 'TEXTAREA'
+          ) {
+            e.preventDefault();
+          }
+        }}
+        className="space-y-6"
+      >
+        <div className="glass-card rounded-2xl p-6">
+          <Stepper current={step} onStepClick={setStep} />
+        </div>
+
+        {/* Step 1 — Customer */}
+        {step === 0 && (
+          <SectionCard
+            title="معلومات العميل"
+            icon={User}
+            className="animate-fade-in"
+            contentClassName="grid gap-4 md:grid-cols-2"
+          >
             <FormField
               control={form.control}
               name="customerName"
@@ -247,15 +441,17 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
                 </FormItem>
               )}
             />
-          </CardContent>
-        </Card>
+          </SectionCard>
+        )}
 
-        {/* Pickup Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">معلومات الاستلام</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
+        {/* Step 2 — Pickup */}
+        {step === 1 && (
+          <SectionCard
+            title="معلومات الاستلام"
+            icon={MapPin}
+            className="animate-fade-in"
+            contentClassName="grid gap-4 md:grid-cols-3"
+          >
             <FormField
               control={form.control}
               name="branchId"
@@ -308,35 +504,26 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
                 </FormItem>
               )}
             />
-          </CardContent>
-        </Card>
+          </SectionCard>
+        )}
 
-        {/* Order Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">تفاصيل الطلب المخصص</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
+        {/* Step 3 — Details */}
+        {step === 2 && (
+          <SectionCard
+            title="تفاصيل الطلب المخصص"
+            icon={Sparkles}
+            className="animate-fade-in"
+            contentClassName="space-y-6"
+          >
             <FormField
               control={form.control}
               name="productType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>نوع المنتج *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر نوع المنتج" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {productTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <ChipGroup options={productTypes} value={field.value} onChange={field.onChange} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -348,20 +535,9 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>المناسبة</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المناسبة" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {occasions.map((occasion) => (
-                        <SelectItem key={occasion} value={occasion}>
-                          {occasion}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <ChipGroup options={occasions} value={field.value} onChange={field.onChange} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -374,11 +550,13 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
                 <FormItem>
                   <FormLabel>عدد الأشخاص</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field} 
-                      placeholder="مثال: 20" 
+                    <Input
+                      type="number"
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder="مثال: 20"
                       min={1}
+                      className="max-w-[200px]"
                     />
                   </FormControl>
                   <FormMessage />
@@ -392,20 +570,9 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>النكهة</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر النكهة" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {flavors.map((flavor) => (
-                        <SelectItem key={flavor} value={flavor}>
-                          {flavor}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <ChipGroup options={flavors} value={field.value} onChange={field.onChange} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -417,20 +584,9 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>الحشوة</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الحشوة" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {fillings.map((filling) => (
-                        <SelectItem key={filling} value={filling}>
-                          {filling}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <ChipGroup options={fillings} value={field.value} onChange={field.onChange} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -442,20 +598,9 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>مستوى السكر</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر مستوى السكر" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {sugarLevels.map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <ChipGroup options={sugarLevels} value={field.value} onChange={field.onChange} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -465,7 +610,7 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               control={form.control}
               name="writingText"
               render={({ field }) => (
-                <FormItem className="md:col-span-2">
+                <FormItem>
                   <FormLabel>نص الكتابة على الكيك</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="مثال: عيد ميلاد سعيد يا محمد" />
@@ -479,47 +624,69 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               control={form.control}
               name="designDescription"
               render={({ field }) => (
-                <FormItem className="md:col-span-2">
+                <FormItem>
                   <FormLabel>وصف التصميم</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      {...field} 
-                      placeholder="صف التصميم المطلوب بالتفصيل..."
-                      rows={3}
-                    />
+                    <Textarea {...field} placeholder="صف التصميم المطلوب بالتفصيل..." rows={3} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Image Upload */}
-            <div className="md:col-span-2">
-              <Label>صورة مرجعية</Label>
-              <div className="mt-2 flex items-center gap-4">
-                <label className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-muted-foreground/50 px-4 py-3 hover:bg-muted/50">
-                  {uploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4" />
-                  )}
-                  <span className="text-sm">
-                    {uploading ? 'جاري الرفع...' : 'اختر صورة'}
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                    disabled={uploading}
-                  />
-                </label>
-                {imageUrl && (
-                  <img
-                    src={imageUrl}
-                    alt="Reference"
-                    className="h-16 w-16 rounded-md object-cover"
-                  />
+            {/* Reference image — drag & drop */}
+            <div>
+              <FormLabel>صورة مرجعية</FormLabel>
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                className={cn(
+                  'mt-2 rounded-2xl border-2 border-dashed p-6 transition-colors',
+                  dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40',
+                )}
+              >
+                {imageUrl ? (
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={imageUrl}
+                      alt="مرجع"
+                      className="h-20 w-20 rounded-xl object-cover shadow-sm"
+                    />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-foreground">تم رفع الصورة المرجعية</p>
+                      <button
+                        type="button"
+                        onClick={() => setImageUrl(null)}
+                        className="inline-flex items-center gap-1 text-sm text-destructive hover:underline"
+                      >
+                        <X className="h-4 w-4" />
+                        إزالة الصورة
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex cursor-pointer flex-col items-center justify-center gap-2 py-2 text-center">
+                    {uploading ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    ) : (
+                      <Upload className="h-6 w-6 text-muted-foreground" />
+                    )}
+                    <span className="text-sm font-medium text-foreground">
+                      {uploading ? 'جاري الرفع...' : 'اسحب صورة هنا أو اضغط للاختيار'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">PNG أو JPG</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                    />
+                  </label>
                 )}
               </div>
             </div>
@@ -528,14 +695,10 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               control={form.control}
               name="notes"
               render={({ field }) => (
-                <FormItem className="md:col-span-2">
+                <FormItem>
                   <FormLabel>ملاحظات إضافية</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      {...field} 
-                      placeholder="أي ملاحظات أخرى..."
-                      rows={2}
-                    />
+                    <Textarea {...field} placeholder="أي ملاحظات أخرى..." rows={2} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -547,7 +710,7 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
                 control={form.control}
                 name="referenceOrderId"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
+                  <FormItem>
                     <FormLabel>مرتبط بطلب سابق</FormLabel>
                     <FormControl>
                       <Input {...field} disabled />
@@ -556,26 +719,130 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
                 )}
               />
             )}
-          </CardContent>
-        </Card>
+          </SectionCard>
+        )}
 
-        <div className="flex justify-end gap-4">
-          <Button 
-            type="submit" 
-            disabled={createOrder.isPending}
-            className="min-w-[150px]"
+        {/* Step 4 — Review */}
+        {isReview && (
+          <SectionCard
+            title="مراجعة الطلب"
+            icon={ClipboardCheck}
+            className="animate-fade-in"
+            contentClassName="space-y-6"
           >
-            {createOrder.isPending ? (
-              <>
-                <Loader2 className="me-2 h-4 w-4 animate-spin" />
-                جاري الإرسال...
-              </>
-            ) : (
-              'إرسال للمطبخ'
-            )}
-          </Button>
+            <p className="text-sm text-muted-foreground">
+              راجع تفاصيل الطلب قبل الإرسال. سيتم إرساله للمطبخ لتحديد السعر ووقت التحضير.
+            </p>
+
+            <ReviewGroup title="معلومات العميل" onEdit={() => setStep(0)}>
+              <SummaryRow label="اسم العميل" value={values.customerName} />
+              <SummaryRow label="رقم الهاتف" value={values.customerPhone} />
+              <SummaryRow label="العنوان" value={values.customerAddress} />
+            </ReviewGroup>
+
+            <ReviewGroup title="معلومات الاستلام" onEdit={() => setStep(1)}>
+              <SummaryRow label="الفرع" value={branchName} />
+              <SummaryRow label="تاريخ الاستلام" value={values.pickupDate} />
+              <SummaryRow label="وقت الاستلام" value={values.pickupTime} />
+            </ReviewGroup>
+
+            <ReviewGroup title="تفاصيل الطلب" onEdit={() => setStep(2)}>
+              <SummaryRow label="نوع المنتج" value={values.productType} />
+              <SummaryRow label="المناسبة" value={values.occasion} />
+              <SummaryRow label="عدد الأشخاص" value={values.numberOfPeople} />
+              <SummaryRow label="النكهة" value={values.flavor} />
+              <SummaryRow label="الحشوة" value={values.filling} />
+              <SummaryRow label="مستوى السكر" value={values.sugarLevel} />
+              <SummaryRow label="نص الكتابة" value={values.writingText} />
+              <SummaryRow label="وصف التصميم" value={values.designDescription} />
+              <SummaryRow label="ملاحظات" value={values.notes} />
+              {imageUrl && (
+                <div className="flex items-center justify-between gap-4 py-2">
+                  <span className="text-sm text-muted-foreground">صورة مرجعية</span>
+                  <img src={imageUrl} alt="مرجع" className="h-14 w-14 rounded-lg object-cover" />
+                </div>
+              )}
+            </ReviewGroup>
+          </SectionCard>
+        )}
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between gap-4">
+          {step > 0 ? (
+            <Button type="button" variant="outline" onClick={goBack}>
+              <ArrowRight className="me-2 h-4 w-4" />
+              السابق
+            </Button>
+          ) : (
+            <span />
+          )}
+
+          {isReview ? (
+            // type="button" + explicit submit (not type="submit"): advancing into
+            // the review step must never trigger a native form-submit as a side
+            // effect. The distinct key stops React from reusing the "next" button's
+            // DOM node (which would otherwise flip type mid-click and auto-submit).
+            <Button
+              key="submit"
+              type="button"
+              onClick={form.handleSubmit(onSubmit, onInvalid)}
+              disabled={createOrder.isPending}
+              className="min-w-[150px]"
+            >
+              {createOrder.isPending ? (
+                <>
+                  <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                  جاري الإرسال...
+                </>
+              ) : (
+                'إرسال للمطبخ'
+              )}
+            </Button>
+          ) : (
+            <Button
+              key="next"
+              type="button"
+              // Keep focus on the active field so pressing "next" doesn't blur it
+              // first — an on-blur validation re-render can shift layout and
+              // swallow the click. goNext() validates the step explicitly.
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={goNext}
+              className="min-w-[120px]"
+            >
+              التالي
+              <ArrowLeft className="ms-2 h-4 w-4" />
+            </Button>
+          )}
         </div>
       </form>
     </Form>
+  );
+}
+
+/** A titled block inside the review step, with a jump-to-step edit button. */
+function ReviewGroup({
+  title,
+  onEdit,
+  children,
+}: {
+  title: string;
+  onEdit: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="font-bold text-foreground">{title}</h3>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          تعديل
+        </button>
+      </div>
+      <div>{children}</div>
+    </div>
   );
 }

@@ -16,7 +16,9 @@ import { useProducts } from '@/hooks/useProducts';
 import { useCreateOrder, CreateOrderData } from '@/hooks/useOrders';
 import { toast } from '@/hooks/use-toast';
 import { validateKsaPhone } from '@/lib/validation';
-import { Plus, Minus, Trash2, ShoppingBag, Loader2 } from 'lucide-react';
+import { SectionCard, LoadingState, EmptyState } from '@/components/ds';
+import { RiyalSymbol } from '@/components/ui/riyal';
+import { Plus, Minus, Trash2, ShoppingBag, Loader2, User, MapPin, StickyNote } from 'lucide-react';
 
 interface OrderItemLocal {
   productId?: string;
@@ -150,22 +152,13 @@ export function NewOrderForm() {
   const isLoading = branchesLoading || productsLoading;
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingState label="جاري التحميل..." />;
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Customer Information */}
-      <div className="glass-card rounded-2xl p-6">
-        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <ShoppingBag className="w-6 h-6 text-primary" />
-          معلومات العميل
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <SectionCard title="معلومات العميل" icon={User} contentClassName="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="customerName">اسم العميل *</Label>
             <Input
@@ -207,13 +200,10 @@ export function NewOrderForm() {
               className="text-start"
             />
           </div>
-        </div>
-      </div>
+      </SectionCard>
 
       {/* Branch & Pickup */}
-      <div className="glass-card rounded-2xl p-6">
-        <h2 className="text-xl font-bold mb-6">الفرع وموعد الاستلام</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <SectionCard title="الفرع وموعد الاستلام" icon={MapPin} contentClassName="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
             <Label>الفرع *</Label>
             <Select value={branchId} onValueChange={setBranchId} required>
@@ -249,13 +239,10 @@ export function NewOrderForm() {
               required
             />
           </div>
-        </div>
-      </div>
+      </SectionCard>
 
       {/* Products */}
-      <div className="glass-card rounded-2xl p-6">
-        <h2 className="text-xl font-bold mb-6">المنتجات</h2>
-
+      <SectionCard title="المنتجات" icon={ShoppingBag}>
         {/* Add Product */}
         <div className="flex gap-4 mb-6">
           <Select value={selectedProduct} onValueChange={setSelectedProduct}>
@@ -267,7 +254,7 @@ export function NewOrderForm() {
                 ?.filter((p) => p.is_active !== false)
                 .map((product) => (
                   <SelectItem key={product.id} value={product.id}>
-                    {product.name} - {product.price} ر.س
+                    {product.name} - {product.price} <RiyalSymbol />
                   </SelectItem>
                 ))}
             </SelectContent>
@@ -288,7 +275,7 @@ export function NewOrderForm() {
               >
                 <div>
                   <p className="font-medium">{item.productName}</p>
-                  <p className="text-sm text-muted-foreground">{item.unitPrice} ر.س للوحدة</p>
+                  <p className="text-sm text-muted-foreground">{item.unitPrice} <RiyalSymbol /> للوحدة</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -312,7 +299,7 @@ export function NewOrderForm() {
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>
-                  <p className="font-bold w-24 text-end">{item.totalPrice} ر.س</p>
+                  <p className="font-bold w-24 text-end">{item.totalPrice} <RiyalSymbol /></p>
                   <Button
                     type="button"
                     variant="ghost"
@@ -329,27 +316,27 @@ export function NewOrderForm() {
             {/* Total */}
             <div className="flex justify-between items-center p-4 rounded-xl bg-primary/10 border border-primary/20">
               <span className="text-lg font-bold">الإجمالي</span>
-              <span className="text-2xl font-bold text-primary">{totalAmount} ر.س</span>
+              <span className="text-2xl font-bold text-primary">{totalAmount} <RiyalSymbol /></span>
             </div>
           </div>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p>لم يتم إضافة منتجات بعد</p>
-          </div>
+          <EmptyState
+            icon={ShoppingBag}
+            title="لم يتم إضافة منتجات بعد"
+            description="اختر منتجاً من القائمة أعلاه وأضفه إلى الطلب."
+          />
         )}
-      </div>
+      </SectionCard>
 
       {/* Notes */}
-      <div className="glass-card rounded-2xl p-6">
-        <h2 className="text-xl font-bold mb-6">ملاحظات</h2>
+      <SectionCard title="ملاحظات" icon={StickyNote}>
         <Textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="أي ملاحظات إضافية على الطلب..."
           className="min-h-[100px]"
         />
-      </div>
+      </SectionCard>
 
       {/* Submit */}
       <div className="flex gap-4 justify-end">
