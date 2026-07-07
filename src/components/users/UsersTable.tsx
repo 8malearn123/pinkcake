@@ -27,6 +27,11 @@ import { useAuth } from '@/contexts/AuthContext';
 
 type AppRole = Enums<'app_role'>;
 
+// Staff roles. Customers (only the `customer` role, or none) can't be assigned
+// roles or branches, so those row actions are hidden for them.
+const EMPLOYEE_ROLES: AppRole[] = ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer_support'];
+const isEmployee = (u: UserWithRole) => u.user_roles.some((r) => EMPLOYEE_ROLES.includes(r.role as AppRole));
+
 interface UsersTableProps {
   users: UserWithRole[];
   onManageRoles: (user: UserWithRole) => void;
@@ -43,7 +48,7 @@ export function UsersTable({
   const [impersonateTarget, setImpersonateTarget] = useState<{ id: string; fullName: string | null } | null>(null);
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('ar-SA', {
+    return new Date(dateStr).toLocaleDateString('ar-SA-u-nu-latn', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -144,21 +149,26 @@ export function UsersTable({
                       <DropdownMenuContent align="end" className="bg-popover border shadow-md">
                         <DropdownMenuLabel>إدارة المستخدم</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onManageRoles(targetUser)}>
-                          <Shield className="w-4 h-4 me-2" />
-                          إدارة الأدوار
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onManageBranch(targetUser)}>
-                          <MapPin className="w-4 h-4 me-2" />
-                          تعيين فرع
-                        </DropdownMenuItem>
+                        {/* Roles & branches are staff-only — hidden for customers */}
+                        {isEmployee(targetUser) && (
+                          <>
+                            <DropdownMenuItem onClick={() => onManageRoles(targetUser)}>
+                              <Shield className="w-4 h-4 me-2" />
+                              إدارة الأدوار
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onManageBranch(targetUser)}>
+                              <MapPin className="w-4 h-4 me-2" />
+                              تعيين فرع
+                            </DropdownMenuItem>
+                          </>
+                        )}
                         {canImpersonate(targetUser) && (
                           <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              onClick={() => setImpersonateTarget({ 
-                                id: targetUser.id, 
-                                fullName: targetUser.full_name 
+                            {isEmployee(targetUser) && <DropdownMenuSeparator />}
+                            <DropdownMenuItem
+                              onClick={() => setImpersonateTarget({
+                                id: targetUser.id,
+                                fullName: targetUser.full_name
                               })}
                               className="text-primary"
                             >

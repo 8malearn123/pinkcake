@@ -51,25 +51,40 @@ export const BRANCHES = [
 /* ── Orders ────────────────────────────────────────────────────────────── */
 const item = (name: string, qty: number, price: number) => ({ product_name: name, quantity: qty, unit_price: price, total_price: qty * price, notes: null });
 
-const order = (i: number, status: string, opts: Partial<Record<string, unknown>> = {}) => ({
-  id: `o${i}`,
-  order_number: `ORD-${1000 + i}`,
-  status,
-  payment_status: status === 'awaiting_payment' ? 'unpaid' : 'paid',
-  total_amount: 145 + i * 20,
-  branch_id: 'b1',
-  branch_name: 'فرع العليا',
-  customer_id: `c${i}`,
-  customer_name: ['نورة', 'سارة', 'محمد', 'عبدالله', 'ريم', 'فهد'][i % 6],
-  customer_phone: '+966••••6' + (10 + i),
-  tracking_code: `TRK${1000 + i}`,
-  delivery_date: today,
-  delivery_time: `${14 + (i % 6)}:00`,
-  created_at: iso(i * 37),
-  notes: i % 3 === 0 ? 'بدون مكسرات' : null,
-  items: [item(PRODUCTS[i % PRODUCTS.length].name, 1 + (i % 2), PRODUCTS[i % PRODUCTS.length].price)],
-  ...opts,
-});
+// Rotate orders across branches so reports (revenue-by-branch, comparison) are populated.
+const BRANCH_ROT = [
+  { id: 'b1', name: 'فرع العليا' },
+  { id: 'b2', name: 'فرع النخيل' },
+  { id: 'b3', name: 'فرع الروضة' },
+];
+
+const order = (i: number, status: string, opts: Partial<Record<string, unknown>> = {}) => {
+  const br = BRANCH_ROT[i % BRANCH_ROT.length];
+  const customerName = ['نورة', 'سارة', 'محمد', 'عبدالله', 'ريم', 'فهد'][i % 6];
+  return {
+    id: `o${i}`,
+    order_number: `ORD-${1000 + i}`,
+    status,
+    payment_status: status === 'awaiting_payment' ? 'unpaid' : 'paid',
+    total_amount: 145 + i * 20,
+    branch_id: br.id,
+    branch_name: br.name,
+    // Nested join shape — admin/report queries read o.branches.name / o.customers.name.
+    branches: { id: br.id, name: br.name },
+    customer_id: `c${i}`,
+    customer_name: customerName,
+    customers: { name: customerName },
+    customer_phone: '+966••••6' + (10 + i),
+    tracking_code: `TRK${1000 + i}`,
+    delivery_date: today,
+    delivery_time: `${14 + (i % 6)}:00`,
+    // Spread across several days so the "orders by date" trend has real shape.
+    created_at: iso(i * 60 * 20),
+    notes: i % 3 === 0 ? 'بدون مكسرات' : null,
+    items: [item(PRODUCTS[i % PRODUCTS.length].name, 1 + (i % 2), PRODUCTS[i % PRODUCTS.length].price)],
+    ...opts,
+  };
+};
 
 export const ORDERS = [
   order(1, 'paid'),
@@ -94,16 +109,33 @@ export const CUSTOM_ORDERS = [
 ];
 
 export const SUBMISSIONS = [
-  { id: 's1', type: 'contact', customer_name: 'أحمد', phone: '+966••••701', email: 'a@test.co', message: 'هل تتوفر كيكات خالية من الجلوتين؟', status: 'new', internal_notes: null, created_at: iso(45) },
-  { id: 's2', type: 'complaint', customer_name: 'منى', phone: '+966••••702', email: null, message: 'تأخر طلبي عن الموعد', status: 'in_progress', internal_notes: 'تم التواصل', created_at: iso(180) },
-  { id: 's3', type: 'custom_order', customer_name: 'سعد', phone: '+966••••703', email: null, message: 'أريد كيكة مخصصة لتخرج', status: 'closed', internal_notes: 'تم التحويل لقسم المخصص', created_at: iso(600) },
+  { id: 's1', submission_type: 'contact', customer_name: 'أحمد', phone: '+966••••701', email: 'a@test.co', message: 'هل تتوفر كيكات خالية من الجلوتين؟', status: 'new', internal_notes: null, created_at: iso(45) },
+  { id: 's2', submission_type: 'complaint', customer_name: 'منى', phone: '+966••••702', email: null, message: 'تأخر طلبي عن الموعد', status: 'in_progress', internal_notes: 'تم التواصل', created_at: iso(180) },
+  { id: 's3', submission_type: 'custom_order', customer_name: 'سعد', phone: '+966••••703', email: null, message: 'أريد كيكة مخصصة لتخرج', status: 'closed', internal_notes: 'تم التحويل لقسم المخصص', created_at: iso(600) },
 ];
 
-export const PROFILES = [
-  { id: 'demo-user-0001', user_id: 'demo-user-0001', full_name: 'مستخدم تجريبي', email: 'demo@pinkcake.test', phone: '+966••••600', roles: ['admin'], created_at: iso(60 * 24 * 30) },
-  { id: 'u2', user_id: 'u2', full_name: 'شيف المطبخ', email: 'kitchen@pinkcake.test', phone: '+966••••611', roles: ['kitchen'], created_at: iso(60 * 24 * 20) },
-  { id: 'u3', user_id: 'u3', full_name: 'موظف الفرع', email: 'branch@pinkcake.test', phone: '+966••••612', roles: ['branch'], created_at: iso(60 * 24 * 15) },
-  { id: 'u4', user_id: 'u4', full_name: 'سائق التوصيل', email: 'driver@pinkcake.test', phone: '+966••••613', roles: ['driver'], created_at: iso(60 * 24 * 10) },
+// `phone` is the masked value shown by default; `phone_full` is the real number
+// revealed via the audited get_profile_phone_audited flow on the Users screen.
+export const PROFILES: Record<string, unknown>[] = [
+  { id: 'demo-user-0001', user_id: 'demo-user-0001', full_name: 'مستخدم تجريبي', email: 'demo@pinkcake.test', phone: '+966••••600', phone_full: '+966501110600', roles: ['admin'], avatar_url: null, created_at: iso(60 * 24 * 30) },
+  { id: 'u2', user_id: 'u2', full_name: 'شيف المطبخ', email: 'kitchen@pinkcake.test', phone: '+966••••611', phone_full: '+966501110611', roles: ['kitchen'], avatar_url: null, created_at: iso(60 * 24 * 20) },
+  { id: 'u3', user_id: 'u3', full_name: 'موظف الفرع', email: 'branch@pinkcake.test', phone: '+966••••612', phone_full: '+966501110612', roles: ['branch'], avatar_url: null, created_at: iso(60 * 24 * 15) },
+  { id: 'u4', user_id: 'u4', full_name: 'سائق التوصيل', email: 'driver@pinkcake.test', phone: '+966••••613', phone_full: '+966501110613', roles: ['driver'], avatar_url: null, created_at: iso(60 * 24 * 10) },
+  { id: 'u5', user_id: 'u5', full_name: 'موظفة مركز الاتصال', email: 'callcenter@pinkcake.test', phone: '+966••••614', phone_full: '+966501110614', roles: ['call_center'], avatar_url: null, created_at: iso(60 * 24 * 8) },
+  { id: 'u6', user_id: 'u6', full_name: 'أخصائي خدمة العملاء', email: 'support@pinkcake.test', phone: '+966••••615', phone_full: '+966501110615', roles: ['customer_support'], avatar_url: null, created_at: iso(60 * 24 * 6) },
+  { id: 'u7', user_id: 'u7', full_name: 'نورة الشمري', email: 'noura@example.com', phone: '+966••••701', phone_full: '+966501110701', roles: ['customer'], avatar_url: null, created_at: iso(60 * 24 * 4) },
+  { id: 'u8', user_id: 'u8', full_name: 'سارة القحطاني', email: 'sara@example.com', phone: '+966••••702', phone_full: '+966501110702', roles: ['customer'], avatar_url: null, created_at: iso(60 * 24 * 2) },
+];
+
+// Flattened role rows (one per user×role) — the live source of truth for the
+// Users screen's role column. Mutated in place by assign/remove-role in demo.
+export const USER_ROLES: Record<string, unknown>[] = PROFILES.flatMap((p) =>
+  (p.roles as string[]).map((role) => ({ id: `ur-${p.user_id as string}-${role}`, user_id: p.user_id, role })),
+);
+
+// Branch assignments. Shape matches the app's join read (`a.branches.name`).
+export const USER_BRANCH_ASSIGNMENTS: Record<string, unknown>[] = [
+  { id: 'uba-u3', user_id: 'u3', branch_id: 'b1', branches: { name: 'فرع العليا' } },
 ];
 
 export const REVIEWS = [
@@ -131,8 +163,8 @@ export const TABLES: Record<string, Record<string, unknown>[]> = {
   order_items: ORDERS.flatMap((o) => (o.items as Record<string, unknown>[]) ?? []),
   order_logs: ORDER_LOGS,
   profiles: PROFILES,
-  user_roles: PROFILES.flatMap((p) => (p.roles as string[]).map((role) => ({ user_id: p.user_id, role }))),
-  user_branch_assignments: [{ user_id: 'u3', branch_id: 'b1', branch_name: 'فرع العليا' }],
+  user_roles: USER_ROLES,
+  user_branch_assignments: USER_BRANCH_ASSIGNMENTS,
   notification_settings: [{ id: true, ...NOTIFICATION_SETTINGS }],
   notification_log: NOTIFICATION_LOG,
 };
@@ -148,6 +180,108 @@ export function mutateOrderStatus(id: unknown, patch: Record<string, unknown>): 
     (CUSTOM_ORDERS as Record<string, unknown>[]).find((o) => o.id === id);
   if (row) Object.assign(row, patch);
   return row;
+}
+
+/* ── Stateful user management (demo) ───────────────────────────────────────
+   These tables persist so the admin Users/Branches flows actually take effect
+   in demo mode instead of returning fake success. The demo client routes
+   inserts/deletes/selects for LIVE_TABLES through the helpers below with real
+   .eq() filtering, against the same arrays the read queries return. */
+export const LIVE_TABLES = new Set(['user_roles', 'user_branch_assignments']);
+
+let demoSeq = 0;
+const nextDemoId = (prefix = 'demo') => `${prefix}-${Date.now()}-${++demoSeq}`;
+
+const maskPhone = (p?: string | null): string | null =>
+  p ? `+966••••${p.replace(/\D/g, '').slice(-3)}` : null;
+
+const matchesFilters = (row: Record<string, unknown>, filters: [string, unknown][]) =>
+  filters.every(([col, val]) => row[col] === val);
+
+// Attach the shape a later read expects (the branch join reads `a.branches.name`).
+const enrichRow = (table: string, row: Record<string, unknown>): Record<string, unknown> => {
+  if (table === 'user_branch_assignments' && row.branch_id && !row.branches) {
+    const b = BRANCHES.find((x) => x.id === row.branch_id);
+    return { ...row, branches: b ? { name: b.name } : null };
+  }
+  return row;
+};
+
+export function insertDemoRows(table: string, payload: unknown): Record<string, unknown>[] {
+  const target = TABLES[table];
+  const arr = Array.isArray(payload) ? payload : [payload];
+  const rows = arr.map((r) => enrichRow(table, { id: nextDemoId(table), ...(r as object) }));
+  if (target) target.push(...rows);
+  return rows;
+}
+
+export function deleteDemoRows(table: string, filters: [string, unknown][]): void {
+  const target = TABLES[table];
+  if (!target) return;
+  for (let i = target.length - 1; i >= 0; i--) {
+    if (matchesFilters(target[i], filters)) target.splice(i, 1);
+  }
+}
+
+export function updateDemoRows(
+  table: string,
+  filters: [string, unknown][],
+  patch: Record<string, unknown>,
+): Record<string, unknown>[] {
+  const target = TABLES[table] ?? [];
+  const updated: Record<string, unknown>[] = [];
+  target.forEach((row) => {
+    if (matchesFilters(row, filters)) {
+      Object.assign(row, patch);
+      updated.push(row);
+    }
+  });
+  return updated;
+}
+
+export function selectDemoRows(table: string, filters: [string, unknown][]): Record<string, unknown>[] {
+  const target = TABLES[table] ?? [];
+  return filters.length ? target.filter((r) => matchesFilters(r, filters)) : [...target];
+}
+
+/** create-user edge function (demo) — add a full user: profile + roles + branch. */
+export function createDemoUser(body: Record<string, unknown> | undefined) {
+  const { email, full_name, phone, roles = [], branch_id } = (body ?? {}) as {
+    email?: string; full_name?: string; phone?: string; roles?: string[]; branch_id?: string | null;
+  };
+  const id = nextDemoId('user');
+  PROFILES.unshift({
+    id,
+    user_id: id,
+    full_name: full_name || 'مستخدم جديد',
+    email: email || '',
+    phone: maskPhone(phone),
+    phone_full: phone || null,
+    roles: [...roles],
+    avatar_url: null,
+    created_at: new Date().toISOString(),
+  });
+  roles.forEach((role) => USER_ROLES.push({ id: `ur-${id}-${role}`, user_id: id, role }));
+  if (branch_id) insertDemoRows('user_branch_assignments', { user_id: id, branch_id });
+  return { success: true, user_id: id };
+}
+
+/** admin-impersonate edge function (demo) — resolve the target's live roles/branch. */
+export function getDemoImpersonation(targetUserId: unknown) {
+  const p = PROFILES.find((x) => x.id === targetUserId || x.user_id === targetUserId);
+  if (!p) return null;
+  const uid = (p.user_id ?? p.id) as string;
+  const roles = USER_ROLES.filter((r) => r.user_id === uid).map((r) => r.role as string);
+  const assignment = USER_BRANCH_ASSIGNMENTS.find((a) => a.user_id === uid) as
+    | { branch_id?: string; branches?: { name?: string } }
+    | undefined;
+  return {
+    id: p.id,
+    fullName: p.full_name,
+    roles,
+    branchId: assignment?.branch_id ?? null,
+    branchName: assignment?.branches?.name ?? null,
+  };
 }
 
 /** Roles for the current demo session (drives ProtectedRoute / dashboards). */

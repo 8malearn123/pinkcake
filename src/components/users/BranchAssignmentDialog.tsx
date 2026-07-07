@@ -1,4 +1,4 @@
-import { UserWithRole, useAssignBranch, useRemoveBranchAssignment } from '@/hooks/useUsers';
+import { UserWithRole, useAssignBranch, useRemoveBranchAssignment, useUsers } from '@/hooks/useUsers';
 import { useBranches } from '@/hooks/useBranches';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,23 +33,27 @@ export function BranchAssignmentDialog({
   const assignBranch = useAssignBranch();
   const removeBranchAssignment = useRemoveBranchAssignment();
   const [selectedBranch, setSelectedBranch] = useState<string>('');
+  // Re-derive from the live query so the dialog reflects assign/remove
+  // immediately after refetch (the `user` prop is a snapshot from open time).
+  const { data: users } = useUsers();
+  const liveUser = users?.find((u) => u.id === user?.id) ?? user;
 
-  if (!user) return null;
+  if (!liveUser) return null;
 
-  const currentBranch = user.user_branch_assignments[0];
+  const currentBranch = liveUser.user_branch_assignments[0];
   const isLoading = assignBranch.isPending || removeBranchAssignment.isPending;
 
   const handleAssign = () => {
     if (selectedBranch) {
       assignBranch.mutate(
-        { userId: user.id, branchId: selectedBranch },
+        { userId: liveUser.id, branchId: selectedBranch },
         { onSuccess: () => setSelectedBranch('') }
       );
     }
   };
 
   const handleRemove = () => {
-    removeBranchAssignment.mutate(user.id);
+    removeBranchAssignment.mutate(liveUser.id);
   };
 
   return (
@@ -58,7 +62,7 @@ export function BranchAssignmentDialog({
         <DialogHeader>
           <DialogTitle>تعيين فرع للمستخدم</DialogTitle>
           <DialogDescription>
-            {user.full_name || 'المستخدم'}
+            {liveUser.full_name || 'المستخدم'}
           </DialogDescription>
         </DialogHeader>
 

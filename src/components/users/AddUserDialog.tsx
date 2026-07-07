@@ -43,7 +43,6 @@ const formSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
   password: z.string().min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'),
   phone: z.string().optional(),
-  roles: z.array(z.string()).default([]),
   branch_id: z.string().optional(),
 });
 
@@ -69,7 +68,6 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
       email: '',
       password: '',
       phone: '',
-      roles: [],
       branch_id: '',
     },
   });
@@ -120,6 +118,12 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
   };
 
   const onSubmit = (data: FormData) => {
+    // Branch/driver staff must be tied to a branch — otherwise the assignment is
+    // silently dropped and the user lands with no branch context.
+    if (showBranchSelector && !!branches?.length && !data.branch_id) {
+      form.setError('branch_id', { message: 'يرجى اختيار الفرع المعيّن لموظفي الفرع والسائقين' });
+      return;
+    }
     createUserMutation.mutate(data);
   };
 
@@ -333,7 +337,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
                 name="branch_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>الفرع المعين</FormLabel>
+                    <FormLabel>الفرع المعين *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

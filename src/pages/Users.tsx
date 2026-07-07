@@ -1,26 +1,28 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { UsersTable } from '@/components/users/UsersTable';
 import { RoleManagerDialog } from '@/components/users/RoleManagerDialog';
 import { BranchAssignmentDialog } from '@/components/users/BranchAssignmentDialog';
 import { AddUserDialog } from '@/components/users/AddUserDialog';
-import { useUsers, UserWithRole, ROLE_LABELS } from '@/hooks/useUsers';
+import { useUsers, UserWithRole } from '@/hooks/useUsers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users as UsersIcon, 
-  Search, 
-  Loader2, 
-  Shield, 
-  UserCheck, 
-  ChefHat, 
-  Store, 
+import { PageHeader, LoadingState, ErrorState, EmptyState } from '@/components/ds';
+import { cn } from '@/lib/utils';
+import {
+  Users as UsersIcon,
+  Search,
+  Shield,
+  UserCheck,
+  ChefHat,
+  Store,
   UserPlus,
   Truck,
   HeadphonesIcon,
   UserCircle,
+  ChevronLeft,
 } from 'lucide-react';
 
 type UserFilter = 'all' | 'employees' | 'customers';
@@ -32,7 +34,7 @@ export default function Users() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [activeFilter, setActiveFilter] = useState<UserFilter>('all');
 
-  const { data: users, isLoading, error } = useUsers();
+  const { data: users, isLoading, isError, refetch } = useUsers();
 
   // Filter users based on active filter and search query
   const filteredUsers = users?.filter((user) => {
@@ -70,154 +72,85 @@ export default function Users() {
       u.user_roles.some((r) => r.role === 'customer') || 
       u.user_roles.length === 0
     ).length || 0,
-    employees: users?.filter((u) => 
+    employees: users?.filter((u) =>
       u.user_roles.some((r) => ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer_support'].includes(r.role))
     ).length || 0,
   };
 
+  // The role breakdown for the command-bar pipeline.
+  const pipeline = [
+    { key: 'admins', label: 'مدراء', value: stats.admins, icon: Shield, box: 'bg-primary/10 text-primary' },
+    { key: 'callCenter', label: 'كول سنتر', value: stats.callCenter, icon: UserCheck, box: 'bg-info/10 text-info' },
+    { key: 'kitchen', label: 'مطبخ', value: stats.kitchen, icon: ChefHat, box: 'bg-warning/10 text-warning' },
+    { key: 'branch', label: 'فروع', value: stats.branch, icon: Store, box: 'bg-success/10 text-success' },
+    { key: 'drivers', label: 'سائقين', value: stats.drivers, icon: Truck, box: 'bg-info/10 text-info' },
+    { key: 'support', label: 'دعم', value: stats.support, icon: HeadphonesIcon, box: 'bg-info/10 text-info' },
+    { key: 'customers', label: 'عملاء', value: stats.customers, icon: UserCircle, box: 'bg-primary/10 text-primary' },
+  ];
+
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
-                <UsersIcon className="w-5 h-5 text-white" />
-              </div>
-              إدارة المستخدمين
-            </h1>
-            <p className="text-muted-foreground mt-1">عرض المستخدمين وتعيين الأدوار والفروع</p>
-          </div>
-          <Button onClick={() => setShowAddDialog(true)} className="gap-2">
-            <UserPlus className="w-4 h-4" />
-            إضافة مستخدم
-          </Button>
-        </div>
+        <PageHeader
+          title="إدارة المستخدمين"
+          description="عرض المستخدمين وتعيين الأدوار والفروع"
+          icon={UsersIcon}
+          actions={
+            <Button onClick={() => setShowAddDialog(true)} className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity">
+              <UserPlus className="w-4 h-4 me-2" />
+              إضافة مستخدم
+            </Button>
+          }
+        />
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <UsersIcon className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.total}</p>
-                  <p className="text-[10px] text-muted-foreground">إجمالي</p>
-                </div>
+        {/* Command bar — total (hero) + the role breakdown pipeline */}
+        <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-sm">
+          <div className="flex flex-col lg:flex-row">
+            <div className="flex items-center gap-3 p-5 bg-primary/[0.04] border-b lg:border-b-0 lg:border-e border-border/60 shrink-0">
+              <div className="w-12 h-12 rounded-xl gradient-pink shadow-warm flex items-center justify-center shrink-0">
+                <UsersIcon className="w-6 h-6 text-white" />
               </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Shield className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.admins}</p>
-                  <p className="text-[10px] text-muted-foreground">مدراء</p>
-                </div>
+              <div>
+                <p className="text-2xl font-bold leading-none">{stats.total}</p>
+                <p className="text-xs text-muted-foreground mt-1.5">إجمالي المستخدمين</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
-                  <UserCheck className="w-4 h-4 text-info" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.callCenter}</p>
-                  <p className="text-[10px] text-muted-foreground">كول سنتر</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
-                  <ChefHat className="w-4 h-4 text-warning" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.kitchen}</p>
-                  <p className="text-[10px] text-muted-foreground">مطبخ</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
-                  <Store className="w-4 h-4 text-success" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.branch}</p>
-                  <p className="text-[10px] text-muted-foreground">فروع</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
-                  <Truck className="w-4 h-4 text-info" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.drivers}</p>
-                  <p className="text-[10px] text-muted-foreground">سائقين</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
-                  <HeadphonesIcon className="w-4 h-4 text-info" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.support}</p>
-                  <p className="text-[10px] text-muted-foreground">دعم</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardContent className="pt-4 pb-3 px-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <UserCircle className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{stats.customers}</p>
-                  <p className="text-[10px] text-muted-foreground">عملاء</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            <div className="flex items-center justify-between gap-1 p-4 flex-1 overflow-x-auto">
+              {pipeline.map((stage, i) => (
+                <Fragment key={stage.key}>
+                  <div className="flex flex-col items-center gap-1.5 px-2 shrink-0">
+                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stage.box)}>
+                      <stage.icon className="w-5 h-5" />
+                    </div>
+                    <p className="text-xl font-bold leading-none">{stage.value}</p>
+                    <p className="text-xs text-muted-foreground text-center leading-tight whitespace-nowrap">{stage.label}</p>
+                  </div>
+                  {i < pipeline.length - 1 && <ChevronLeft className="w-4 h-4 text-muted-foreground/30 shrink-0" />}
+                </Fragment>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Tabs & Search */}
-        <Tabs value={activeFilter} onValueChange={(v) => setActiveFilter(v as UserFilter)} className="space-y-4">
+        <Tabs dir="rtl" value={activeFilter} onValueChange={(v) => setActiveFilter(v as UserFilter)} className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <TabsList>
               <TabsTrigger value="all" className="gap-2">
                 <UsersIcon className="w-4 h-4" />
-                الكل ({stats.total})
+                الكل
+                <Badge variant="secondary" className="ms-1">{stats.total}</Badge>
               </TabsTrigger>
               <TabsTrigger value="employees" className="gap-2">
                 <Shield className="w-4 h-4" />
-                الموظفين ({stats.employees})
+                الموظفين
+                <Badge variant="secondary" className="ms-1">{stats.employees}</Badge>
               </TabsTrigger>
               <TabsTrigger value="customers" className="gap-2">
                 <UserCircle className="w-4 h-4" />
-                العملاء ({stats.customers})
+                العملاء
+                <Badge variant="secondary" className="ms-1">{stats.customers}</Badge>
               </TabsTrigger>
             </TabsList>
 
@@ -234,16 +167,15 @@ export default function Users() {
 
           {/* Content */}
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-          ) : error ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-destructive">حدث خطأ في تحميل المستخدمين</p>
-                <p className="text-sm text-muted-foreground mt-1">{error.message}</p>
-              </CardContent>
-            </Card>
+            <LoadingState label="جاري تحميل المستخدمين..." />
+          ) : isError ? (
+            <ErrorState title="تعذّر تحميل المستخدمين" onRetry={() => refetch()} />
+          ) : !filteredUsers || filteredUsers.length === 0 ? (
+            <EmptyState
+              icon={UsersIcon}
+              title="لا يوجد مستخدمون"
+              description="لم يتم العثور على مستخدمين مطابقين. جرّب تعديل البحث أو التصنيف."
+            />
           ) : (
             <>
               <TabsContent value="all" className="mt-0">

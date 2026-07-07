@@ -1,24 +1,47 @@
 /**
  * A stand-in for the Supabase client used only in DEMO_MODE. It implements just
  * enough of the surface the app touches (from/rpc/auth/channel/functions/storage)
- * to render every screen with sample data. Filters (.eq/.order/…) are accepted
- * but mostly no-ops — design mode wants populated screens, not query fidelity.
+ * to render every screen with sample data.
+ *
+ * Most tables use a lightweight "echo" behaviour: filters (.eq/.order/…) are
+ * accepted but no-op, and mutations echo their payload back — design mode wants
+ * populated screens, not query fidelity. The user-management tables (LIVE_TABLES)
+ * are the exception: they persist against the shared demo arrays with real .eq()
+ * filtering, so the admin Users/Branches flows (add user, assign role, assign
+ * branch, impersonate) actually take effect and reflect on refetch instead of
+ * feeling like dead buttons.
  */
-import { TABLES, demoUser, demoSession, mutateOrderStatus } from './data';
-import { resolveRpc } from './rpc';
+import {
+  TABLES,
+  demoUser,
+  demoSession,
+  mutateOrderStatus,
+  LIVE_TABLES,
+  insertDemoRows,
+  deleteDemoRows,
+  updateDemoRows,
+  selectDemoRows,
+} from './data';
+import { resolveRpc, resolveFunction } from './rpc';
 
 type Result = { data: unknown; error: null };
+type Filter = [string, unknown];
 
 class DemoQuery implements PromiseLike<Result> {
   private table: string;
+  private isLive: boolean;
   private rows: Record<string, unknown>[];
   private singleMode = false;
-  private eqFilters: [string, unknown][] = [];
+  private eqFilters: Filter[] = [];
+  private op: 'select' | 'insert' | 'update' | 'delete' = 'select';
   private updatePayload: Record<string, unknown> | null = null;
+  private insertedRows: Record<string, unknown>[] = [];
 
   constructor(table: string) {
     this.table = table;
-    this.rows = TABLES[table] ? [...TABLES[table]] : [];
+    this.isLive = LIVE_TABLES.has(table);
+    // Echo tables work off a copy; live tables resolve against the shared array.
+    this.rows = !this.isLive && TABLES[table] ? [...TABLES[table]] : [];
   }
 
   // Selectors / modifiers — accepted, return self for chaining.
@@ -44,33 +67,67 @@ class DemoQuery implements PromiseLike<Result> {
   maybeSingle() { this.singleMode = true; return this; }
   single() { this.singleMode = true; return this; }
 
-  // Mutations — echo the payload back as if written.
+  // Mutations.
   insert(payload: unknown) {
-    const arr = Array.isArray(payload) ? payload : [payload];
-    this.rows = arr.map((r, i) => ({ id: `demo-${Date.now()}-${i}`, ...(r as object) }));
+    this.op = 'insert';
+    if (this.isLive) {
+      this.insertedRows = insertDemoRows(this.table, payload);
+    } else {
+      const arr = Array.isArray(payload) ? payload : [payload];
+      this.rows = arr.map((r, i) => ({ id: `demo-${Date.now()}-${i}`, ...(r as object) }));
+    }
     return this;
   }
   // Deferred so the .eq() filter (which chains AFTER .update()) is known at resolve time.
   update(payload: unknown) {
+    this.op = 'update';
     this.updatePayload = payload as Record<string, unknown>;
     return this;
   }
   upsert(payload: unknown) { return this.insert(payload); }
-  delete() { this.rows = []; return this; }
+  delete() {
+    this.op = 'delete';
+    if (!this.isLive) this.rows = [];
+    return this;
+  }
 
-  then<T = Result>(onfulfilled?: ((value: Result) => T | PromiseLike<T>) | null): PromiseLike<T> {
-    if (this.updatePayload) {
-      const idFilter = this.eqFilters.find(([c]) => c === 'id');
-      // Order updates persist to the live demo data so kitchen/branch/driver
-      // cards actually move; everything else keeps the echo behaviour.
-      if (this.table === 'orders' && idFilter) {
-        const row = mutateOrderStatus(idFilter[1], this.updatePayload);
-        this.rows = row ? [row] : [{ ...this.updatePayload }];
-      } else {
-        this.rows = this.rows.map((r) => ({ ...r, ...this.updatePayload }));
+  // Resolve a live (stateful) table op against the shared demo arrays.
+  private resolveLive(): unknown {
+    switch (this.op) {
+      case 'insert':
+        return this.singleMode ? (this.insertedRows[0] ?? null) : this.insertedRows;
+      case 'delete':
+        deleteDemoRows(this.table, this.eqFilters);
+        return this.singleMode ? null : [];
+      case 'update': {
+        const updated = updateDemoRows(this.table, this.eqFilters, this.updatePayload ?? {});
+        return this.singleMode ? (updated[0] ?? null) : updated;
+      }
+      default: {
+        const rows = selectDemoRows(this.table, this.eqFilters);
+        return this.singleMode ? (rows[0] ?? null) : rows;
       }
     }
-    const data = this.singleMode ? (this.rows[0] ?? null) : this.rows;
+  }
+
+  then<T = Result>(onfulfilled?: ((value: Result) => T | PromiseLike<T>) | null): PromiseLike<T> {
+    let data: unknown;
+    if (this.isLive) {
+      data = this.resolveLive();
+    } else {
+      if (this.updatePayload) {
+        const idFilter = this.eqFilters.find(([c]) => c === 'id');
+        // Order updates persist to the live demo data so kitchen/branch/driver
+        // cards actually move; everything else keeps the echo behaviour.
+        if (this.table === 'orders' && idFilter) {
+          const row = mutateOrderStatus(idFilter[1], this.updatePayload);
+          this.rows = row ? [row] : [{ ...this.updatePayload }];
+        } else {
+          this.rows = this.rows.map((r) => ({ ...r, ...this.updatePayload }));
+        }
+      }
+      data = this.singleMode ? (this.rows[0] ?? null) : this.rows;
+    }
     return Promise.resolve({ data, error: null } as Result).then(onfulfilled);
   }
 }
@@ -110,7 +167,9 @@ export function createDemoClient() {
     getChannels: () => [],
 
     functions: {
-      invoke: async () => ({ data: { success: true }, error: null }),
+      // Dispatch by function name; user-management functions mutate demo state.
+      invoke: async (name: string, options?: { body?: Record<string, unknown> }) =>
+        resolveFunction(name, options?.body),
     },
 
     storage: {

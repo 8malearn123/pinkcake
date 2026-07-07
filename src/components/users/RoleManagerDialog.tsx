@@ -1,4 +1,4 @@
-import { UserWithRole, ROLE_LABELS, ROLE_COLORS, useAssignRole, useRemoveRole } from '@/hooks/useUsers';
+import { UserWithRole, ROLE_LABELS, ROLE_COLORS, useAssignRole, useRemoveRole, useUsers } from '@/hooks/useUsers';
 import { Enums } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,18 +28,22 @@ export function RoleManagerDialog({
 }: RoleManagerDialogProps) {
   const assignRole = useAssignRole();
   const removeRole = useRemoveRole();
+  // Re-derive from the live query so the dialog reflects its own add/remove
+  // immediately after refetch (the `user` prop is a snapshot from open time).
+  const { data: users } = useUsers();
+  const liveUser = users?.find((u) => u.id === user?.id) ?? user;
 
-  if (!user) return null;
+  if (!liveUser) return null;
 
-  const userRoles = user.user_roles.map((ur) => ur.role as AppRole);
+  const userRoles = liveUser.user_roles.map((ur) => ur.role as AppRole);
   const availableRoles = ALL_ROLES.filter((role) => !userRoles.includes(role));
 
   const handleAddRole = (role: AppRole) => {
-    assignRole.mutate({ userId: user.id, role });
+    assignRole.mutate({ userId: liveUser.id, role });
   };
 
   const handleRemoveRole = (role: AppRole) => {
-    removeRole.mutate({ userId: user.id, role });
+    removeRole.mutate({ userId: liveUser.id, role });
   };
 
   const isLoading = assignRole.isPending || removeRole.isPending;
@@ -50,7 +54,7 @@ export function RoleManagerDialog({
         <DialogHeader>
           <DialogTitle>إدارة أدوار المستخدم</DialogTitle>
           <DialogDescription>
-            {user.full_name || 'المستخدم'}
+            {liveUser.full_name || 'المستخدم'}
           </DialogDescription>
         </DialogHeader>
 
