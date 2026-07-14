@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePublicStoreBranches } from '@/hooks/usePublicStore';
-import { useCreateCustomerOrder, useCapturePayment, useCustomerProfile } from '@/hooks/useCustomerStore';
+import { useCreateCustomerOrder, useCapturePayment, useValidateCoupon, useCustomerProfile, type AppliedCoupon } from '@/hooks/useCustomerStore';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -22,7 +22,7 @@ import { toast } from '@/hooks/use-toast';
 import {
   ShoppingCart, Plus, Minus, Trash2, Cake, Loader2, Calendar, Clock, MapPin,
   Truck, Store, User, Phone, Gift, Check, Send, ChevronLeft, Sparkles,
-  CreditCard, Smartphone, Banknote,
+  CreditCard, Smartphone, Banknote, TicketPercent, X,
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -58,6 +58,7 @@ export function CartSheet() {
   const { data: profile } = useCustomerProfile();
   const createOrder = useCreateCustomerOrder();
   const capturePayment = useCapturePayment();
+  const validateCoupon = useValidateCoupon();
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [mode, setMode] = useState<Mode>('delivery');
@@ -74,6 +75,9 @@ export function CartSheet() {
   const [giftPhone, setGiftPhone] = useState('');
   const [notes, setNotes] = useState('');
   const [payment, setPayment] = useState<PayMethod | null>(null);
+  const [couponInput, setCouponInput] = useState('');
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponError, setCouponError] = useState('');
   const [placed, setPlaced] = useState<
     { orderId: string; orderNumber: string; paid: boolean; method: PayMethod; transactionId?: string } | null
   >(null);
@@ -114,10 +118,32 @@ export function CartSheet() {
   }, [openCartOnArrival, setOpen]);
 
   const deliveryFee = mode === 'pickup' || cartTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-  const grandTotal = cartTotal + deliveryFee;
+  const discount = coupon
+    ? Math.min(cartTotal, coupon.kind === 'percent' ? (cartTotal * coupon.value) / 100 : coupon.value)
+    : 0;
+  const grandTotal = Math.max(0, cartTotal + deliveryFee - discount);
   const toFree = Math.max(0, FREE_DELIVERY_THRESHOLD - cartTotal);
 
   const startCheckout = () => { setOpen(false); setPlaced(null); setCheckoutOpen(true); };
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code) return;
+    setCouponError('');
+    try {
+      const applied = await validateCoupon.mutateAsync(code);
+      setCoupon(applied);
+      toast({
+        title: 'تم تطبيق الكوبون',
+        description: applied.kind === 'percent' ? `خصم ${applied.value}%` : `خصم ${applied.value} ر.س`,
+      });
+    } catch (e) {
+      setCoupon(null);
+      setCouponError(e instanceof Error ? e.message : 'رمز غير صالح');
+    }
+  };
+
+  const removeCoupon = () => { setCoupon(null); setCouponInput(''); setCouponError(''); };
 
   const handleCheckout = async () => {
     if (!user) {
@@ -157,6 +183,8 @@ export function CartSheet() {
         notes: notes.trim() || null,
         deliveryFee,
         paymentMethod: payment,
+        couponCode: coupon?.code ?? null,
+        discount,
         items,
       });
       if (payment === 'cod') {
@@ -177,6 +205,7 @@ export function CartSheet() {
     close();
     setCardMessage(''); setNotes(''); setIsGift(false); setGiftToOther(false); setGiftName(''); setGiftPhone('');
     setPayment(null);
+    setCoupon(null); setCouponInput(''); setCouponError('');
   };
 
   const availableDates = Array.from({ length: 7 }, (_, i) => {
@@ -465,6 +494,46 @@ export function CartSheet() {
                   </div>
                 </Section>
 
+                {/* Coupon */}
+                <Section title="كوبون الخصم">
+                  {coupon ? (
+                    <div className="flex items-center justify-between gap-2 rounded-2xl border border-primary/40 bg-primary/[0.05] p-3">
+                      <span className="flex items-center gap-2 text-sm font-medium">
+                        <TicketPercent className="w-4 h-4 text-primary shrink-0" />
+                        <bdi dir="ltr" className="font-bold">{coupon.code}</bdi>
+                        <span className="text-muted-foreground">
+                          {coupon.kind === 'percent' ? `خصم ${coupon.value}%` : <>خصم {coupon.value} <RiyalSymbol /></>}
+                        </span>
+                      </span>
+                      <Button size="icon" variant="ghost" aria-label="إزالة الكوبون" className="h-7 w-7 text-destructive shrink-0" onClick={removeCoupon}>
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={couponInput}
+                          onChange={(e) => { setCouponInput(e.target.value); setCouponError(''); }}
+                          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } }}
+                          placeholder="أدخل رمز الكوبون"
+                          dir="ltr"
+                          className="h-11 rounded-xl text-start"
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={applyCoupon}
+                          disabled={!couponInput.trim() || validateCoupon.isPending}
+                          className="h-11 rounded-xl px-5 shrink-0"
+                        >
+                          {validateCoupon.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'تطبيق'}
+                        </Button>
+                      </div>
+                      {couponError && <p className="text-xs text-destructive mt-1.5">{couponError}</p>}
+                    </>
+                  )}
+                </Section>
+
                 {/* Summary */}
                 <div className="rounded-2xl border border-border bg-card p-4 space-y-2">
                   <div className="text-sm font-bold mb-1">ملخص الطلب</div>
@@ -474,6 +543,14 @@ export function CartSheet() {
                       <span className="font-medium"><bdi dir="ltr">{(item.product.price * item.quantity).toFixed(2)}</bdi> <RiyalSymbol /></span>
                     </div>
                   ))}
+                  {discount > 0 && (
+                    <div className="flex justify-between text-[13px] pt-1 text-green-700">
+                      <span className="flex items-center gap-1">
+                        <TicketPercent className="w-3.5 h-3.5" /> خصم الكوبون{coupon ? <> (<bdi dir="ltr">{coupon.code}</bdi>)</> : null}
+                      </span>
+                      <span className="font-medium">− <bdi dir="ltr">{discount.toFixed(2)}</bdi> <RiyalSymbol /></span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-[13px] pt-1">
                     <span className="text-muted-foreground">التوصيل</span>
                     <span className="font-medium">{deliveryFee === 0 ? <span className="text-green-700">مجاني</span> : <><bdi dir="ltr">{deliveryFee}</bdi> <RiyalSymbol /></>}</span>

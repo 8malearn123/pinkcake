@@ -146,6 +146,33 @@ export function useCapturePayment() {
   });
 }
 
+export interface AppliedCoupon {
+  code: string;
+  kind: 'percent' | 'fixed';
+  value: number;
+}
+
+// Validate a promo code against the (mock) validate_coupon RPC. Resolves with the
+// applied coupon on success; throws with an Arabic message on an invalid code.
+export function useValidateCoupon() {
+  return useMutation({
+    mutationFn: async (code: string): Promise<AppliedCoupon> => {
+      const client = supabase as unknown as {
+        rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+      };
+      const { data, error } = await client.rpc('validate_coupon', { _code: code });
+      if (error) throw error;
+      const res = (data ?? {}) as {
+        valid?: boolean; code?: string; kind?: 'percent' | 'fixed'; value?: number; message?: string;
+      };
+      if (!res.valid || !res.kind || typeof res.value !== 'number') {
+        throw new Error(res.message || 'رمز غير صالح');
+      }
+      return { code: res.code || code, kind: res.kind, value: res.value };
+    },
+  });
+}
+
 // Create customer order
 export function useCreateCustomerOrder() {
   const queryClient = useQueryClient();
@@ -166,6 +193,8 @@ export function useCreateCustomerOrder() {
       notes?: string | null;
       deliveryFee?: number;
       paymentMethod?: string | null;
+      couponCode?: string | null;
+      discount?: number;
       items: {
         product_id: string;
         product_name: string;
@@ -195,6 +224,8 @@ export function useCreateCustomerOrder() {
         _notes: payload.notes ?? null,
         _delivery_fee: payload.deliveryFee ?? 0,
         _payment_method: payload.paymentMethod ?? null,
+        _coupon_code: payload.couponCode ?? null,
+        _discount: payload.discount ?? 0,
         _items: payload.items,
       });
 
