@@ -64,7 +64,15 @@ const READ: Record<string, (args: Args) => unknown> = {
   get_order_by_pickup_code: () => d.ORDERS[4],
   get_order_logs_with_user: () => d.ORDER_LOGS,
   get_order_notes: () => [],
-  get_customer_phone_audited: () => '+966512345678',
+  get_customer_phone_audited: (a) => {
+    const order = d.ORDERS.find((o) => o.id === a?.['_order_id'] || o.customer_id === a?.['_customer_id']);
+    return (order?.customer_phone_full as string) ?? '+966512345678';
+  },
+  // Driver manual "mark delivered" fallback when the customer barcode can't be scanned.
+  driver_mark_delivered: (a) => {
+    d.mutateOrderStatus(a?.['_order_id'], { status: 'completed' });
+    return { success: true, message: 'تم تأكيد التسليم' };
+  },
   // Reveal-phone (audited) — return the target profile's real number.
   get_profile_phone_audited: (a) => {
     const id = a?.['_profile_id'];
@@ -80,6 +88,18 @@ const READ: Record<string, (args: Args) => unknown> = {
 
   // support / submissions
   get_contact_submissions_secure: () => d.SUBMISSIONS,
+  // Persist submission edits (status/notes/resolution/linked-order) in place so
+  // support changes survive a refetch in demo. Only patches keys that are sent.
+  update_contact_submission_secure: (a) => {
+    const row = d.SUBMISSIONS.find((s) => s.id === a?.['_submission_id']) as Record<string, unknown> | undefined;
+    if (row && a) {
+      if ('_status' in a) row.status = a['_status'];
+      if ('_internal_notes' in a) row.internal_notes = a['_internal_notes'];
+      if ('_resolution_type' in a) row.resolution_type = a['_resolution_type'];
+      if ('_linked_order_id' in a) row.linked_order_id = a['_linked_order_id'];
+    }
+    return { success: true };
+  },
 
   // barcodes
   // Real RPC returns the barcode CODE (a string) — the display renders it directly
@@ -92,6 +112,26 @@ const READ: Record<string, (args: Args) => unknown> = {
 
   // storefront checkout — returns an order id + number for the confirmation screen
   create_customer_order: () => ({ order_id: 'o1', order_number: `PC-${3000 + Math.floor(Math.random() * 900)}` }),
+  // mock payment capture — returns a "paid" envelope so checkout can show a
+  // processing → paid transition without a real gateway (see HANDOFF).
+  mock_capture_payment: () => ({
+    status: 'paid',
+    transaction_id: `TXN-${100000 + Math.floor(Math.random() * 900000)}`,
+    message: 'تم الدفع بنجاح',
+  }),
+  // coupon validation — fixed demo codes → % or SAR off. Real backend replaces
+  // this with a coupons table lookup (admin CRUD is task A2).
+  validate_coupon: (a) => {
+    const code = String(a?.['_code'] ?? '').trim().toUpperCase();
+    const coupons: Record<string, { kind: 'percent' | 'fixed'; value: number }> = {
+      WELCOME10: { kind: 'percent', value: 10 },
+      SWEET15: { kind: 'percent', value: 15 },
+      PINK25: { kind: 'fixed', value: 25 },
+    };
+    const match = coupons[code];
+    if (!match) return { valid: false, message: 'رمز غير صالح أو منتهي الصلاحية' };
+    return { valid: true, code, kind: match.kind, value: match.value, message: 'تم تطبيق الكوبون' };
+  },
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {

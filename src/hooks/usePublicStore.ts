@@ -8,6 +8,7 @@ export interface StoreProduct {
   price: number;
   category: string | null;
   image_url: string | null;
+  images?: string[] | null;
   occasions?: string[] | null;
   is_available?: boolean | null;
   stock?: number | null;

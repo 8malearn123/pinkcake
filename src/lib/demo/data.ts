@@ -33,13 +33,19 @@ export const demoSession = {
 // when the real catalogue is wired. Each cake gets a matching photo.
 const img = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=700&q=80`;
 
+// `images` powers the product-details gallery (C7). Backend go-live: add an
+// `images text[]` column to products and return it here; screens fall back to
+// `image_url` when it's empty. See HANDOFF.
+const c1 = '1563729784474-d77dbb933a9e', c2 = '1533134242443-d4fd215305ad', c3 = '1586788680434-30d324b2d46f';
+const c4 = '1426869981800-95ebf51ce900', c5 = '1535141192574-5d4897c12636', c6 = '1569864358642-9d1684040f43';
+
 export const PRODUCTS = [
-  { id: 'p1', name: 'كيكة الشوكولاتة الفاخرة', description: 'طبقات شوكولاتة بلجيكية مع كريمة الغاناش', price: 145, category: 'كيكات', image_url: img('1563729784474-d77dbb933a9e'), is_available: true, display_order: 1, stock: 12, occasions: ['أعياد الميلاد', 'أعراس وخطوبة', 'شكراً وامتنان'] },
-  { id: 'p2', name: 'تشيز كيك التوت', description: 'تشيز كيك كريمي بصوص التوت الطازج', price: 120, category: 'تشيز كيك', image_url: img('1533134242443-d4fd215305ad'), is_available: true, display_order: 2, stock: 8, occasions: ['أعياد الميلاد', 'شكراً وامتنان'] },
-  { id: 'p3', name: 'كيكة الريد فيلفت', description: 'الكلاسيكية الحمراء بكريمة الجبن', price: 135, category: 'كيكات', image_url: img('1586788680434-30d324b2d46f'), is_available: true, display_order: 3, stock: 5, occasions: ['أعراس وخطوبة', 'أعياد الميلاد'] },
-  { id: 'p4', name: 'كب كيك الفانيلا', description: 'علبة 6 قطع بنكهات متنوعة', price: 75, category: 'كب كيك', image_url: img('1426869981800-95ebf51ce900'), is_available: true, display_order: 4, stock: 20, occasions: ['أعياد الميلاد', 'تخرّج ونجاح'] },
-  { id: 'p5', name: 'كيكة اللوتس', description: 'بسكويت اللوتس مع كريمة الكراميل', price: 160, category: 'كيكات', image_url: img('1535141192574-5d4897c12636'), is_available: true, display_order: 5, stock: 0, occasions: ['أعياد الميلاد', 'شكراً وامتنان'] },
-  { id: 'p6', name: 'ماكرون فرنسي', description: 'تشكيلة 12 قطعة ماكرون', price: 95, category: 'حلويات', image_url: img('1569864358642-9d1684040f43'), is_available: true, display_order: 6, stock: 15, occasions: ['تخرّج ونجاح', 'شكراً وامتنان', 'أعراس وخطوبة'] },
+  { id: 'p1', name: 'كيكة الشوكولاتة الفاخرة', description: 'طبقات شوكولاتة بلجيكية مع كريمة الغاناش', price: 145, category: 'كيكات', image_url: img(c1), images: [img(c1), img(c2), img(c3)], is_available: true, display_order: 1, stock: 12, occasions: ['أعياد الميلاد', 'أعراس وخطوبة', 'شكراً وامتنان'] },
+  { id: 'p2', name: 'تشيز كيك التوت', description: 'تشيز كيك كريمي بصوص التوت الطازج', price: 120, category: 'تشيز كيك', image_url: img(c2), images: [img(c2), img(c3), img(c4)], is_available: true, display_order: 2, stock: 8, occasions: ['أعياد الميلاد', 'شكراً وامتنان'] },
+  { id: 'p3', name: 'كيكة الريد فيلفت', description: 'الكلاسيكية الحمراء بكريمة الجبن', price: 135, category: 'كيكات', image_url: img(c3), images: [img(c3), img(c4), img(c5)], is_available: true, display_order: 3, stock: 5, occasions: ['أعراس وخطوبة', 'أعياد الميلاد'] },
+  { id: 'p4', name: 'كب كيك الفانيلا', description: 'علبة 6 قطع بنكهات متنوعة', price: 75, category: 'كب كيك', image_url: img(c4), images: [img(c4), img(c5), img(c6)], is_available: true, display_order: 4, stock: 20, occasions: ['أعياد الميلاد', 'تخرّج ونجاح'] },
+  { id: 'p5', name: 'كيكة اللوتس', description: 'بسكويت اللوتس مع كريمة الكراميل', price: 160, category: 'كيكات', image_url: img(c5), images: [img(c5), img(c6), img(c1)], is_available: true, display_order: 5, stock: 0, occasions: ['أعياد الميلاد', 'شكراً وامتنان'] },
+  { id: 'p6', name: 'ماكرون فرنسي', description: 'تشكيلة 12 قطعة ماكرون', price: 95, category: 'حلويات', image_url: img(c6), images: [img(c6), img(c1), img(c2)], is_available: true, display_order: 6, stock: 15, occasions: ['تخرّج ونجاح', 'شكراً وامتنان', 'أعراس وخطوبة'] },
 ];
 
 export const BRANCHES = [
@@ -75,6 +81,8 @@ const order = (i: number, status: string, opts: Partial<Record<string, unknown>>
     customer_name: customerName,
     customers: { name: customerName },
     customer_phone: '+966••••6' + (10 + i),
+    customer_phone_full: '+96650111' + (6000 + i),
+    delivery_address: `حي ${['الياسمين', 'النرجس', 'الملقا', 'قرطبة', 'الروضة', 'العليا'][i % 6]}، شارع ${10 + i}، الرياض`,
     tracking_code: `TRK${1000 + i}`,
     delivery_date: today,
     delivery_time: `${14 + (i % 6)}:00`,

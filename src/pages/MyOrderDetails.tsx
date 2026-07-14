@@ -1,5 +1,6 @@
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useMyOrderDetails, useMyOrderRealtime } from '@/hooks/useCustomerStore';
+import { useReorder } from '@/hooks/useReorder';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +26,7 @@ import {
   Store,
   LogOut,
   Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
 import { RiyalSymbol } from '@/components/ui/riyal';
@@ -34,6 +36,7 @@ export default function MyOrderDetails() {
   const navigate = useNavigate();
   const { user, isLoading: authLoading, signOut } = useAuth();
   const { data: order, isLoading, error } = useMyOrderDetails(id);
+  const reorder = useReorder();
 
   // Enable realtime updates
   useMyOrderRealtime(id);
@@ -241,8 +244,14 @@ export default function MyOrderDetails() {
           </CardContent>
         </Card>
 
-        {/* Back to Store */}
-        <div className="text-center pt-2">
+        {/* Reorder + back to store */}
+        <div className="flex flex-wrap justify-center gap-3 pt-2">
+          {order.items && order.items.length > 0 && (
+            <Button onClick={() => reorder(order.items)} className="rounded-full px-6 h-11 gap-2 bg-foreground text-background hover:bg-foreground/90">
+              <RefreshCw className="w-4 h-4" />
+              أعد الطلب
+            </Button>
+          )}
           <Button variant="outline" onClick={() => navigate('/store')} className="rounded-full px-6 h-11">
             <Store className="w-4 h-4 me-2" />
             العودة للمتجر

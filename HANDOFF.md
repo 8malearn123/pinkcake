@@ -106,6 +106,14 @@ stays the same.
 - [ ] **CC1 payment link** — `useSendPaymentLink` builds a `/track?code=…` URL and
       writes `orders.payment_link`. Replace with a real gateway checkout URL
       (Moyasar/Tap/HyperPay) and confirm the customer can pay from it.
+- [ ] **C1 checkout payment** — the checkout has a payment-method step and a
+      `mock_capture_payment` RPC (`useCapturePayment`) that fakes a processing →
+      paid transition. Wire a real gateway (Moyasar/Tap/HyperPay) to replace
+      `mock_capture_payment`, and have `create_customer_order` persist the chosen
+      `_payment_method` + resulting payment status.
+- [ ] **C7 product gallery** — add an `images text[]` column to `products` and
+      return it from the product RPCs. ProductDetails renders a thumbnail gallery
+      from `images` and falls back to `image_url` when it's empty.
 - [ ] **A4 impersonation** — the banner now says "عرض فقط" because admin
       impersonation is view-only: RLS still runs as the admin. For true
       role-scoped impersonation, add server-side session/role switching so RLS
