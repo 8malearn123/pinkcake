@@ -9,9 +9,10 @@ import { ColorPicker } from '@/components/settings/ColorPicker';
 import { PresetColors } from '@/components/settings/PresetColors';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
 import { CouponsSettings } from '@/components/settings/CouponsSettings';
+import { OperationsSettings } from '@/components/settings/OperationsSettings';
 import { useSettings } from '@/contexts/SettingsContext';
 import { NOTIFICATIONS_UI_ENABLED } from '@/lib/featureFlags';
-import { Settings as SettingsIcon, Store, Palette, RotateCcw, Save, Check, Bell, TicketPercent } from 'lucide-react';
+import { Settings as SettingsIcon, Store, Palette, RotateCcw, Save, Check, Bell, TicketPercent, SlidersHorizontal } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 export default function Settings() {
@@ -59,7 +60,7 @@ export default function Settings() {
         />
 
         <Tabs defaultValue="store" dir="rtl" className="w-full">
-          <TabsList className={NOTIFICATIONS_UI_ENABLED ? 'grid w-full max-w-2xl grid-cols-4' : 'grid w-full max-w-xl grid-cols-3'}>
+          <TabsList className={NOTIFICATIONS_UI_ENABLED ? 'grid w-full max-w-3xl grid-cols-5' : 'grid w-full max-w-2xl grid-cols-4'}>
             <TabsTrigger value="store" className="gap-2">
               <Store className="w-4 h-4" />
               المتجر
@@ -71,6 +72,10 @@ export default function Settings() {
             <TabsTrigger value="coupons" className="gap-2">
               <TicketPercent className="w-4 h-4" />
               الخصومات
+            </TabsTrigger>
+            <TabsTrigger value="operations" className="gap-2">
+              <SlidersHorizontal className="w-4 h-4" />
+              التشغيل
             </TabsTrigger>
             {NOTIFICATIONS_UI_ENABLED && (
               <TabsTrigger value="notifications" className="gap-2">
@@ -210,6 +215,10 @@ export default function Settings() {
 
           <TabsContent value="coupons" className="mt-6">
             <CouponsSettings />
+          </TabsContent>
+
+          <TabsContent value="operations" className="mt-6">
+            <OperationsSettings />
           </TabsContent>
 
           {NOTIFICATIONS_UI_ENABLED && (
