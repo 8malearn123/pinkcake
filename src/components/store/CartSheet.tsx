@@ -4,6 +4,7 @@ import { usePublicStoreBranches } from '@/hooks/usePublicStore';
 import { useCreateCustomerOrder, useCapturePayment, useValidateCoupon, useCustomerProfile, type AppliedCoupon } from '@/hooks/useCustomerStore';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -26,9 +27,6 @@ import {
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { ar } from 'date-fns/locale';
-
-const FREE_DELIVERY_THRESHOLD = 200;
-const DELIVERY_FEE = 25;
 
 type Mode = 'delivery' | 'pickup';
 type PayMethod = 'mada' | 'applepay' | 'card' | 'cod';
@@ -59,6 +57,7 @@ export function CartSheet() {
   const createOrder = useCreateCustomerOrder();
   const capturePayment = useCapturePayment();
   const validateCoupon = useValidateCoupon();
+  const { settings } = useSettings();
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [mode, setMode] = useState<Mode>('delivery');
@@ -117,12 +116,13 @@ export function CartSheet() {
     }
   }, [openCartOnArrival, setOpen]);
 
-  const deliveryFee = mode === 'pickup' || cartTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+  const { freeThreshold, fee: baseDeliveryFee } = settings.delivery;
+  const deliveryFee = mode === 'pickup' || cartTotal >= freeThreshold ? 0 : baseDeliveryFee;
   const discount = coupon
     ? Math.min(cartTotal, coupon.kind === 'percent' ? (cartTotal * coupon.value) / 100 : coupon.value)
     : 0;
   const grandTotal = Math.max(0, cartTotal + deliveryFee - discount);
-  const toFree = Math.max(0, FREE_DELIVERY_THRESHOLD - cartTotal);
+  const toFree = Math.max(0, freeThreshold - cartTotal);
 
   const startCheckout = () => { setOpen(false); setPlaced(null); setCheckoutOpen(true); };
 
