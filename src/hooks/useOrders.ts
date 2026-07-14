@@ -278,6 +278,50 @@ export function useUpdateOrder() {
   });
 }
 
+/**
+ * Generate a tracking-based payment link for an order and copy it to the
+ * clipboard. Frontend-only: the link points at the customer tracking page
+ * (`/track?code=…`) and the `payment_link` column is set so the record
+ * carries it. HANDOFF: replace with a real gateway URL (Moyasar/Tap/HyperPay)
+ * once the payment backend exists.
+ */
+export function useSendPaymentLink() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ orderId, trackingCode }: { orderId: string; trackingCode: string }) => {
+      const link = `${window.location.origin}/track?code=${encodeURIComponent(trackingCode)}`;
+      const { error } = await supabase
+        .from('orders')
+        .update({ payment_link: link })
+        .eq('id', orderId);
+      if (error) throw error;
+      return link;
+    },
+    onSuccess: async (link) => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      let copied = false;
+      try {
+        await navigator.clipboard?.writeText(link);
+        copied = true;
+      } catch {
+        /* clipboard blocked (perms/insecure context) — link is still shown below */
+      }
+      toast({
+        title: copied ? 'تم إنشاء رابط الدفع ونسخه' : 'تم إنشاء رابط الدفع',
+        description: link,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'خطأ',
+        description: 'تعذّر إنشاء رابط الدفع: ' + error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();
 
