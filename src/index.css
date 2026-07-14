@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=DM+Serif+Display&display=swap');
 
+/* ── Brand font: Alexandria (self-hosted, Arabic + Latin, 9 weights) ──────────
+   Browsers lazy-load @font-face, so only the weights actually rendered download. */
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 100; font-display: swap; src: url('./assets/fonts/Alexandria-Thin.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 200; font-display: swap; src: url('./assets/fonts/Alexandria-ExtraLight.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 300; font-display: swap; src: url('./assets/fonts/Alexandria-Light.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 400; font-display: swap; src: url('./assets/fonts/Alexandria-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 500; font-display: swap; src: url('./assets/fonts/Alexandria-Medium.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 600; font-display: swap; src: url('./assets/fonts/Alexandria-SemiBold.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 700; font-display: swap; src: url('./assets/fonts/Alexandria-Bold.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 800; font-display: swap; src: url('./assets/fonts/Alexandria-ExtraBold.ttf') format('truetype'); }
+@font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 900; font-display: swap; src: url('./assets/fonts/Alexandria-Black.ttf') format('truetype'); }
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -127,7 +139,7 @@
     --loza-brown: 25 38% 17%;
     --loza-brown-soft: 26 36% 30%;
 
-    font-family: 'Tajawal', 'Cairo', sans-serif;
+    font-family: 'Alexandria', 'Tajawal', 'Cairo', sans-serif;
   }
 }
 
@@ -207,17 +219,18 @@
     @apply bg-background text-foreground font-cairo antialiased;
   }
 
-  /* Arabic-first display font (this is an RTL app). Latin chars still render nicely in Cairo. */
+  /* Brand display font — Alexandria (Arabic + Latin). Medium reads light and airy
+     at large sizes; Alexandria's heavier metrics make 700–800 look chunky. */
   .font-display {
-    font-family: 'Cairo', 'Tajawal', 'Instrument Serif', serif;
-    font-weight: 800;
+    font-family: 'Alexandria', 'Cairo', 'Tajawal', sans-serif;
+    font-weight: 500;
     letter-spacing: 0;
   }
 
-  /* Opt-in for Latin serif display where needed */
+  /* Latin display — also the brand font (kept as a separate hook for tuning). */
   .font-display-latin {
-    font-family: 'Instrument Serif', 'DM Serif Display', serif;
-    font-weight: 400;
+    font-family: 'Alexandria', 'Instrument Serif', 'DM Serif Display', serif;
+    font-weight: 700;
     letter-spacing: -0.01em;
   }
 

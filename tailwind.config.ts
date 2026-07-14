@@ -14,12 +14,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        cairo: ['Cairo', 'sans-serif'],
-        tajawal: ['Tajawal', 'sans-serif'],
-        serif: ['"Instrument Serif"', '"DM Serif Display"', 'serif'],
-        display: ['"Instrument Serif"', '"DM Serif Display"', 'serif'],
-        sans: ['"Work Sans"', 'Cairo', 'Tajawal', 'sans-serif'],
-        body: ['"Work Sans"', 'Cairo', 'sans-serif'],
+        // Alexandria — the brand font (Arabic + Latin) — leads every stack; the old fonts stay as fallbacks.
+        alexandria: ['Alexandria', 'Cairo', 'sans-serif'],
+        cairo: ['Alexandria', 'Cairo', 'sans-serif'],
+        tajawal: ['Alexandria', 'Tajawal', 'sans-serif'],
+        serif: ['Alexandria', '"Instrument Serif"', '"DM Serif Display"', 'serif'],
+        display: ['Alexandria', '"Instrument Serif"', '"DM Serif Display"', 'serif'],
+        sans: ['Alexandria', '"Work Sans"', 'Cairo', 'Tajawal', 'sans-serif'],
+        body: ['Alexandria', '"Work Sans"', 'Cairo', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
