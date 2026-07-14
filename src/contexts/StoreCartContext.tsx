@@ -42,11 +42,11 @@ interface StoreCartContextValue {
 }
 
 const StoreCartContext = createContext<StoreCartContextValue | null>(null);
-const STORAGE_KEY = 'pinkcake:cart:v1';
+export const CART_STORAGE_KEY = 'pinkcake:cart:v1';
 
 function loadInitial(): CartItem[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as CartItem[]) : [];
   } catch {
     return [];
@@ -59,7 +59,7 @@ export function StoreCartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
     } catch {
       /* storage unavailable — keep in-memory only */
     }
