@@ -92,6 +92,13 @@ const READ: Record<string, (args: Args) => unknown> = {
 
   // storefront checkout — returns an order id + number for the confirmation screen
   create_customer_order: () => ({ order_id: 'o1', order_number: `PC-${3000 + Math.floor(Math.random() * 900)}` }),
+  // mock payment capture — returns a "paid" envelope so checkout can show a
+  // processing → paid transition without a real gateway (see HANDOFF).
+  mock_capture_payment: () => ({
+    status: 'paid',
+    transaction_id: `TXN-${100000 + Math.floor(Math.random() * 900000)}`,
+    message: 'تم الدفع بنجاح',
+  }),
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {

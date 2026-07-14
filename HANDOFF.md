@@ -103,4 +103,9 @@ stays the same.
 - [ ] Confirm `get_my_roles` returns each role; verify each role's screens load
 - [ ] Deploy Edge Functions (incl. `send-notification` — see `docs/notifications.md`)
 - [ ] Smoke-test create-order → kitchen → branch → pickup against real data
+- [ ] **C1 checkout payment** — the checkout has a payment-method step and a
+      `mock_capture_payment` RPC (`useCapturePayment`) that fakes a processing →
+      paid transition. Wire a real gateway (Moyasar/Tap/HyperPay) to replace
+      `mock_capture_payment`, and have `create_customer_order` persist the chosen
+      `_payment_method` + resulting payment status.
 - [ ] Remove `src/lib/demo/` + the two `DEMO_MODE` branches once green

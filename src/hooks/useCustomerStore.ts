@@ -116,6 +116,36 @@ export function useMyOrderRealtime(orderId: string | undefined) {
   }, [orderId, queryClient]);
 }
 
+// Mock payment capture (processing → paid). Frontend-only: simulates gateway
+// latency then resolves to a paid transaction via the mock_capture_payment RPC.
+// HANDOFF: replace with a real gateway (Moyasar/Tap/HyperPay) at go-live.
+export function useCapturePayment() {
+  return useMutation({
+    mutationFn: async (input: { orderId: string; method: string; amount: number }) => {
+      // Demo: give the "processing" state something to show before it resolves.
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      const client = supabase as unknown as {
+        rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+      };
+      const { data, error } = await client.rpc('mock_capture_payment', {
+        _order_id: input.orderId,
+        _method: input.method,
+        _amount: input.amount,
+      });
+      if (error) throw error;
+      const row = (data ?? {}) as { status?: string; transaction_id?: string };
+      return { status: row.status ?? 'paid', transactionId: row.transaction_id ?? '' };
+    },
+    onError: () => {
+      toast({
+        title: 'تعذّر إتمام الدفع',
+        description: 'حدث خطأ أثناء معالجة الدفع، يرجى المحاولة مرة أخرى.',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
 // Create customer order
 export function useCreateCustomerOrder() {
   const queryClient = useQueryClient();
@@ -135,6 +165,7 @@ export function useCreateCustomerOrder() {
       giftRecipientPhone?: string | null;
       notes?: string | null;
       deliveryFee?: number;
+      paymentMethod?: string | null;
       items: {
         product_id: string;
         product_name: string;
@@ -163,6 +194,7 @@ export function useCreateCustomerOrder() {
         _gift_recipient_phone: payload.giftRecipientPhone ?? null,
         _notes: payload.notes ?? null,
         _delivery_fee: payload.deliveryFee ?? 0,
+        _payment_method: payload.paymentMethod ?? null,
         _items: payload.items,
       });
 
