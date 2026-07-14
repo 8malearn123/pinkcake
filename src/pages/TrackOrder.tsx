@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useSettings } from '@/contexts/SettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -235,10 +235,12 @@ export default function TrackOrder() {
             {/* Support */}
             <div className="glass-card rounded-2xl p-6 text-center">
               <p className="text-muted-foreground mb-3">لديك استفسار؟</p>
-              <Button variant="outline" className="border-primary text-primary">
-                <Phone className="w-4 h-4 me-2" />
-                اتصل بنا
-              </Button>
+              <Link to="/contact">
+                <Button variant="outline" className="border-primary text-primary">
+                  <Phone className="w-4 h-4 me-2" />
+                  اتصل بنا
+                </Button>
+              </Link>
             </div>
           </div>
         ) : hasSearched ? (
