@@ -42,7 +42,7 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
 
   return (
     <section className="relative overflow-hidden bg-foreground">
-      <div className="relative h-[440px] sm:h-[480px] md:h-[520px]" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <div className="relative h-[72vh] min-h-[520px] max-h-[820px]" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {SLIDES.map((s, i) => (
           <div key={i} className={cn('hero-slide', i === index && 'hero-active')}>
             <img
@@ -60,7 +60,7 @@ export function HeroCarousel({ onShopClick, onCustomizeClick }: HeroCarouselProp
                     <Sparkles className="w-3.5 h-3.5 text-primary" />
                     <span>{s.badge}</span>
                   </div>
-                  <h2 className="font-display text-[2.6rem] leading-[1.08] sm:text-6xl md:text-7xl md:leading-[1.05] mt-4 md:mt-5 tracking-tight">{s.title}</h2>
+                  <h2 className="font-display text-4xl leading-[1.2] sm:text-5xl md:text-6xl md:leading-[1.12] mt-4 md:mt-5">{s.title}</h2>
                   <p className="mt-3 md:mt-5 text-[15px] md:text-lg text-white/80 leading-relaxed max-w-md">{s.text}</p>
                   <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-3">
                     <button

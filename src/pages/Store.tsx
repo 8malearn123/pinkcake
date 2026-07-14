@@ -13,7 +13,6 @@ import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
 import { AnnouncementBar } from '@/components/store/AnnouncementBar';
 import { HeroCarousel } from '@/components/store/HeroCarousel';
-import { PromoStrip } from '@/components/store/PromoStrip';
 import { CategoryChips } from '@/components/store/CategoryChips';
 import { StoreSearch } from '@/components/store/StoreSearch';
 import { AccountMenu } from '@/components/store/AccountMenu';
@@ -171,10 +170,6 @@ export default function Store() {
 
       {/* ── Main ── */}
       <main className="container mx-auto px-4 lg:px-6 py-6 lg:py-10 space-y-8 lg:space-y-12">
-        <Reveal>
-          <PromoStrip />
-        </Reveal>
-
         {/* Category & products */}
         <section ref={productsRef} className="space-y-5 scroll-mt-24">
           <Reveal>
