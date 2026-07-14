@@ -64,7 +64,15 @@ const READ: Record<string, (args: Args) => unknown> = {
   get_order_by_pickup_code: () => d.ORDERS[4],
   get_order_logs_with_user: () => d.ORDER_LOGS,
   get_order_notes: () => [],
-  get_customer_phone_audited: () => '+966512345678',
+  get_customer_phone_audited: (a) => {
+    const order = d.ORDERS.find((o) => o.id === a?.['_order_id'] || o.customer_id === a?.['_customer_id']);
+    return (order?.customer_phone_full as string) ?? '+966512345678';
+  },
+  // Driver manual "mark delivered" fallback when the customer barcode can't be scanned.
+  driver_mark_delivered: (a) => {
+    d.mutateOrderStatus(a?.['_order_id'], { status: 'completed' });
+    return { success: true, message: 'تم تأكيد التسليم' };
+  },
   // Reveal-phone (audited) — return the target profile's real number.
   get_profile_phone_audited: (a) => {
     const id = a?.['_profile_id'];
