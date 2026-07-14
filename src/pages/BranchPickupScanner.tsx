@@ -2,6 +2,8 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { PickupScanner } from '@/components/branch/PickupScanner';
 import { useMyBranch } from '@/hooks/useMyRoles';
 import { LoadingState, EmptyState } from '@/components/ds';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { AlertCircle, QrCode } from 'lucide-react';
 
 export default function BranchPickupScanner() {
@@ -21,7 +23,12 @@ export default function BranchPickupScanner() {
         <EmptyState
           icon={AlertCircle}
           title="لا يمكن الوصول"
-          description="لم يتم تعيين فرع لحسابك. يرجى التواصل مع الإدارة."
+          description="لم يتم تعيين فرع لحسابك. يرجى التواصل مع الإدارة لربط حسابك بفرع."
+          action={
+            <Link to="/contact">
+              <Button variant="outline">تواصل مع الإدارة</Button>
+            </Link>
+          }
         />
       </MainLayout>
     );
