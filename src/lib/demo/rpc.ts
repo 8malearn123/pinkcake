@@ -99,6 +99,19 @@ const READ: Record<string, (args: Args) => unknown> = {
     transaction_id: `TXN-${100000 + Math.floor(Math.random() * 900000)}`,
     message: 'تم الدفع بنجاح',
   }),
+  // coupon validation — fixed demo codes → % or SAR off. Real backend replaces
+  // this with a coupons table lookup (admin CRUD is task A2).
+  validate_coupon: (a) => {
+    const code = String(a?.['_code'] ?? '').trim().toUpperCase();
+    const coupons: Record<string, { kind: 'percent' | 'fixed'; value: number }> = {
+      WELCOME10: { kind: 'percent', value: 10 },
+      SWEET15: { kind: 'percent', value: 15 },
+      PINK25: { kind: 'fixed', value: 25 },
+    };
+    const match = coupons[code];
+    if (!match) return { valid: false, message: 'رمز غير صالح أو منتهي الصلاحية' };
+    return { valid: true, code, kind: match.kind, value: match.value, message: 'تم تطبيق الكوبون' };
+  },
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {
