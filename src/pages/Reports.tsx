@@ -75,7 +75,6 @@ import {
 import { cn } from '@/lib/utils';
 import { Price } from '@/components/ui/riyal';
 import { formatSARText } from '@/lib/currency';
-import * as XLSX from 'xlsx';
 import { Enums } from '@/integrations/supabase/types';
 
 type OrderStatus = Enums<'order_status'>;
@@ -175,8 +174,12 @@ export default function Reports() {
   // print HTML, and the BranchComparison prop. On-screen values use <Price /> (SVG symbol).
   const formatCurrency = (amount: number) => formatSARText(amount);
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (!reportData?.orders) return;
+
+    // Lazy-load xlsx so its ~400KB stays out of the eager Reports chunk and is
+    // only fetched when the user actually exports.
+    const XLSX = await import('xlsx');
 
     const data = reportData.orders.map((order) => ({
       'رقم الطلب': order.order_number,
