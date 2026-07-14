@@ -54,7 +54,14 @@ export function ImpersonationBanner() {
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 flex-shrink-0 animate-pulse" />
           <span className="font-medium text-sm md:text-base">
-            ⚠️ وضع التحكم الإداري — أنت تعمل كـ{' '}
+            ⚠️ وضع التحكم الإداري{' '}
+            <span
+              className="text-xs md:text-sm ms-1 bg-destructive-foreground/20 px-2 py-0.5 rounded font-semibold"
+              title="التحكم للعرض فقط — الصلاحيات على الخادم تبقى صلاحيات المدير، ولا تُطبَّق صلاحيات المستخدم"
+            >
+              عرض فقط
+            </span>
+            {' '}— أنت تعمل كـ{' '}
             <span className="font-bold underline">{impersonatedUser.fullName || 'مستخدم'}</span>
             {rolesDisplay && (
               <span className="opacity-90 text-xs md:text-sm ms-2 bg-destructive-foreground/20 px-2 py-0.5 rounded">

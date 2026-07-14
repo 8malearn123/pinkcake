@@ -103,4 +103,8 @@ stays the same.
 - [ ] Confirm `get_my_roles` returns each role; verify each role's screens load
 - [ ] Deploy Edge Functions (incl. `send-notification` — see `docs/notifications.md`)
 - [ ] Smoke-test create-order → kitchen → branch → pickup against real data
+- [ ] **A4 impersonation** — the banner now says "عرض فقط" because admin
+      impersonation is view-only: RLS still runs as the admin. For true
+      role-scoped impersonation, add server-side session/role switching so RLS
+      applies as the impersonated user, then relax the caveat.
 - [ ] Remove `src/lib/demo/` + the two `DEMO_MODE` branches once green
