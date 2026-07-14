@@ -114,4 +114,8 @@ stays the same.
 - [ ] **C7 product gallery** — add an `images text[]` column to `products` and
       return it from the product RPCs. ProductDetails renders a thumbnail gallery
       from `images` and falls back to `image_url` when it's empty.
+- [ ] **A4 impersonation** — the banner now says "عرض فقط" because admin
+      impersonation is view-only: RLS still runs as the admin. For true
+      role-scoped impersonation, add server-side session/role switching so RLS
+      applies as the impersonated user, then relax the caveat.
 - [ ] Remove `src/lib/demo/` + the two `DEMO_MODE` branches once green
