@@ -103,6 +103,9 @@ stays the same.
 - [ ] Confirm `get_my_roles` returns each role; verify each role's screens load
 - [ ] Deploy Edge Functions (incl. `send-notification` — see `docs/notifications.md`)
 - [ ] Smoke-test create-order → kitchen → branch → pickup against real data
+- [ ] **CC1 payment link** — `useSendPaymentLink` builds a `/track?code=…` URL and
+      writes `orders.payment_link`. Replace with a real gateway checkout URL
+      (Moyasar/Tap/HyperPay) and confirm the customer can pay from it.
 - [ ] **C1 checkout payment** — the checkout has a payment-method step and a
       `mock_capture_payment` RPC (`useCapturePayment`) that fakes a processing →
       paid transition. Wire a real gateway (Moyasar/Tap/HyperPay) to replace

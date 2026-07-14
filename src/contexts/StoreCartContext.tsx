@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type Dispatch,
@@ -19,6 +20,8 @@ import type { CartItem, StoreProduct } from '@/hooks/useCustomerStore';
  * `useCreateCustomerOrder` (the backend seam stays untouched).
  *
  * The API mirrors the original Store handlers 1:1 so consuming code is unchanged.
+ * The cart line-up is persisted to localStorage (same approach as the wishlist)
+ * so a refresh — common on mobile mid-checkout — no longer empties the cart.
  */
 interface StoreCartContextValue {
   cart: CartItem[];
@@ -39,10 +42,29 @@ interface StoreCartContextValue {
 }
 
 const StoreCartContext = createContext<StoreCartContextValue | null>(null);
+const STORAGE_KEY = 'pinkcake:cart:v1';
+
+function loadInitial(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as CartItem[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 export function StoreCartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(loadInitial);
   const [isOpen, setOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    } catch {
+      /* storage unavailable — keep in-memory only */
+    }
+  }, [cart]);
+
   const open = useCallback(() => setOpen(true), []);
   const close = useCallback(() => setOpen(false), []);
 

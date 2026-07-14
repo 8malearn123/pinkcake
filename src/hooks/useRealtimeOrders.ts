@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useOrders } from './useOrders';
 import { toast } from '@/hooks/use-toast';
 import { Enums } from '@/integrations/supabase/types';
+import { ORDER_STATUS_LABELS } from '@/types/order';
 
 type OrderStatus = Enums<'order_status'>;
 
@@ -29,25 +30,6 @@ export interface RealtimeEvent {
   previousStatus?: OrderStatus;
   timestamp: Date;
 }
-
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending_approval: 'بانتظار الموافقة',
-  awaiting_payment: 'بانتظار الدفع',
-  paid: 'تم الدفع',
-  preparing: 'قيد التحضير',
-  ready_to_ship: 'جاهز للشحن',
-  in_transit: 'في الطريق',
-  ready_for_pickup: 'جاهز للاستلام',
-  completed: 'مكتمل',
-  custom_pending_review: 'طلب مخصص - بانتظار المراجعة',
-  custom_chef_approved: 'طلب مخصص - تمت الموافقة',
-  custom_rejected: 'طلب مخصص - مرفوض',
-  sent_to_chef: 'طلب مخصص - أُرسل للشيف',
-  chef_priced: 'طلب مخصص - تم التسعير',
-  pricing_sent_to_customer: 'طلب مخصص - بانتظار رد العميل',
-  customer_accepted: 'طلب مخصص - قُبل السعر',
-  customer_rejected: 'طلب مخصص - رُفض السعر',
-};
 
 export function useRealtimeOrders() {
   const queryClient = useQueryClient();
@@ -136,7 +118,7 @@ export function useRealtimeOrders() {
             if (oldOrder && oldOrder.status !== newOrder.status) {
               toast({
                 title: '📦 تحديث حالة الطلب',
-                description: `${newOrder.order_number}: ${STATUS_LABELS[oldOrder.status]} → ${STATUS_LABELS[newOrder.status]}`,
+                description: `${newOrder.order_number}: ${ORDER_STATUS_LABELS[oldOrder.status]} → ${ORDER_STATUS_LABELS[newOrder.status]}`,
               });
             }
           } else if (payload.eventType === 'DELETE') {

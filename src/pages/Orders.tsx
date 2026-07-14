@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader, EmptyState, LoadingState, ErrorState } from '@/components/ds';
 import { OrderCardList } from '@/components/dashboard/OrderCardList';
-import { useOrders, useUpdateOrderStatus } from '@/hooks/useOrders';
+import { useOrders, useUpdateOrderStatus, useSendPaymentLink } from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,6 +19,7 @@ import { ORDER_STATUS_LABELS, OrderStatus } from '@/types/order';
 export default function Orders() {
   const { data: orders, isLoading, error, refetch } = useOrders();
   const updateStatus = useUpdateOrderStatus();
+  const sendPaymentLink = useSendPaymentLink();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
@@ -59,8 +60,8 @@ export default function Orders() {
   };
 
   const handleSendPaymentLink = (orderId: string) => {
-    // TODO: Implement payment link sending
-    console.log('Send payment link for order:', orderId);
+    const order = orders?.find((o) => o.id === orderId);
+    sendPaymentLink.mutate({ orderId, trackingCode: order?.tracking_code || '' });
   };
 
   return (
