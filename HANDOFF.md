@@ -111,4 +111,7 @@ stays the same.
       paid transition. Wire a real gateway (Moyasar/Tap/HyperPay) to replace
       `mock_capture_payment`, and have `create_customer_order` persist the chosen
       `_payment_method` + resulting payment status.
+- [ ] **C7 product gallery** — add an `images text[]` column to `products` and
+      return it from the product RPCs. ProductDetails renders a thumbnail gallery
+      from `images` and falls back to `image_url` when it's empty.
 - [ ] Remove `src/lib/demo/` + the two `DEMO_MODE` branches once green
