@@ -99,18 +99,31 @@ const READ: Record<string, (args: Args) => unknown> = {
     transaction_id: `TXN-${100000 + Math.floor(Math.random() * 900000)}`,
     message: 'تم الدفع بنجاح',
   }),
-  // coupon validation — fixed demo codes → % or SAR off. Real backend replaces
-  // this with a coupons table lookup (admin CRUD is task A2).
+  // coupon validation — reads the shared COUPONS source (also driven by the admin
+  // coupon screen, task A2). Real backend swaps this for a coupons-table lookup.
   validate_coupon: (a) => {
-    const code = String(a?.['_code'] ?? '').trim().toUpperCase();
-    const coupons: Record<string, { kind: 'percent' | 'fixed'; value: number }> = {
-      WELCOME10: { kind: 'percent', value: 10 },
-      SWEET15: { kind: 'percent', value: 15 },
-      PINK25: { kind: 'fixed', value: 25 },
-    };
-    const match = coupons[code];
-    if (!match) return { valid: false, message: 'رمز غير صالح أو منتهي الصلاحية' };
-    return { valid: true, code, kind: match.kind, value: match.value, message: 'تم تطبيق الكوبون' };
+    const match = d.findCoupon(a?.['_code']);
+    if (!match || !match.active) return { valid: false, message: 'رمز غير صالح أو منتهي الصلاحية' };
+    return { valid: true, code: match.code, kind: match.kind, value: match.value, message: 'تم تطبيق الكوبون' };
+  },
+
+  // admin coupon CRUD — mutate the shared COUPONS array so the customer checkout
+  // sees changes in demo (mirrors the mutate-in-place pattern used for orders).
+  get_coupons: () => d.COUPONS,
+  save_coupon: (a) => ({
+    success: true,
+    coupon: d.upsertCoupon({
+      id: (a?.['_id'] as string) || undefined,
+      code: String(a?.['_code'] ?? '').trim().toUpperCase(),
+      kind: a?.['_kind'],
+      value: Number(a?.['_value'] ?? 0),
+      active: a?.['_active'] ?? true,
+      description: a?.['_description'] ?? null,
+    }),
+  }),
+  delete_coupon: (a) => {
+    d.deleteCoupon(a?.['_id']);
+    return { success: true };
   },
 };
 

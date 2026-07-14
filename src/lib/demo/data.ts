@@ -114,6 +114,33 @@ export const SUBMISSIONS = [
   { id: 's3', submission_type: 'custom_order', customer_name: 'سعد', phone: '+966••••703', email: null, message: 'أريد كيكة مخصصة لتخرج', status: 'closed', internal_notes: 'تم التحويل لقسم المخصص', created_at: iso(600) },
 ];
 
+// Discount codes — the single source consumed by BOTH the customer checkout
+// (validate_coupon) and the admin coupon screen (get/save/delete_coupon).
+export const COUPONS: Record<string, unknown>[] = [
+  { id: 'cp1', code: 'WELCOME10', kind: 'percent', value: 10, active: true, description: 'خصم ترحيبي' },
+  { id: 'cp2', code: 'SWEET15', kind: 'percent', value: 15, active: true, description: 'خصم الحلويات' },
+  { id: 'cp3', code: 'PINK25', kind: 'fixed', value: 25, active: true, description: 'خصم بقيمة ٢٥ ريال' },
+];
+
+export function findCoupon(code: unknown): Record<string, unknown> | undefined {
+  const c = String(code ?? '').trim().toUpperCase();
+  return COUPONS.find((x) => String(x.code).toUpperCase() === c);
+}
+
+export function upsertCoupon(input: Record<string, unknown>): Record<string, unknown> {
+  const id = input.id as string | undefined;
+  const existing = id ? COUPONS.find((c) => c.id === id) : undefined;
+  if (existing) { Object.assign(existing, input); return existing; }
+  const row = { ...input, id: `cp-${Math.random().toString(36).slice(2, 8)}`, active: input.active ?? true };
+  COUPONS.push(row);
+  return row;
+}
+
+export function deleteCoupon(id: unknown): void {
+  const i = COUPONS.findIndex((c) => c.id === id);
+  if (i >= 0) COUPONS.splice(i, 1);
+}
+
 // `phone` is the masked value shown by default; `phone_full` is the real number
 // revealed via the audited get_profile_phone_audited flow on the Users screen.
 export const PROFILES: Record<string, unknown>[] = [

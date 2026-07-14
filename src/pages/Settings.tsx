@@ -8,9 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ColorPicker } from '@/components/settings/ColorPicker';
 import { PresetColors } from '@/components/settings/PresetColors';
 import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { CouponsSettings } from '@/components/settings/CouponsSettings';
 import { useSettings } from '@/contexts/SettingsContext';
 import { NOTIFICATIONS_UI_ENABLED } from '@/lib/featureFlags';
-import { Settings as SettingsIcon, Store, Palette, RotateCcw, Save, Check, Bell } from 'lucide-react';
+import { Settings as SettingsIcon, Store, Palette, RotateCcw, Save, Check, Bell, TicketPercent } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 export default function Settings() {
@@ -58,7 +59,7 @@ export default function Settings() {
         />
 
         <Tabs defaultValue="store" dir="rtl" className="w-full">
-          <TabsList className={NOTIFICATIONS_UI_ENABLED ? 'grid w-full max-w-xl grid-cols-3' : 'grid w-full max-w-md grid-cols-2'}>
+          <TabsList className={NOTIFICATIONS_UI_ENABLED ? 'grid w-full max-w-2xl grid-cols-4' : 'grid w-full max-w-xl grid-cols-3'}>
             <TabsTrigger value="store" className="gap-2">
               <Store className="w-4 h-4" />
               المتجر
@@ -66,6 +67,10 @@ export default function Settings() {
             <TabsTrigger value="colors" className="gap-2">
               <Palette className="w-4 h-4" />
               الألوان
+            </TabsTrigger>
+            <TabsTrigger value="coupons" className="gap-2">
+              <TicketPercent className="w-4 h-4" />
+              الخصومات
             </TabsTrigger>
             {NOTIFICATIONS_UI_ENABLED && (
               <TabsTrigger value="notifications" className="gap-2">
@@ -201,6 +206,10 @@ export default function Settings() {
                   <p className="text-sm opacity-90">هذا مثال على التدرج اللوني</p>
                 </div>
             </SectionCard>
+          </TabsContent>
+
+          <TabsContent value="coupons" className="mt-6">
+            <CouponsSettings />
           </TabsContent>
 
           {NOTIFICATIONS_UI_ENABLED && (
