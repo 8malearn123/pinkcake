@@ -1,5 +1,6 @@
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useMyOrders } from '@/hooks/useCustomerStore';
+import { useReorder } from '@/hooks/useReorder';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ import {
   LogOut,
   ArrowRight,
   Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
 import { RiyalSymbol } from '@/components/ui/riyal';
@@ -28,6 +30,7 @@ export default function MyOrders() {
   const { user, isLoading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const { data: orders, isLoading } = useMyOrders();
+  const reorder = useReorder();
 
   if (authLoading) {
     return (
@@ -148,17 +151,30 @@ export default function MyOrders() {
                     </div>
                   )}
 
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-2">
                     <div>
                       <div className="text-[10px] text-muted-foreground tracking-widest uppercase">المجموع</div>
                       <div className="font-display text-2xl text-primary leading-none mt-0.5">
                         {order.total_amount} <RiyalSymbol className="text-xs text-muted-foreground" />
                       </div>
                     </div>
-                    <Button variant="ghost" size="sm" className="rounded-full text-primary hover:text-primary hover:bg-primary/10">
-                      التفاصيل
-                      <ChevronLeft className="w-4 h-4 ms-1" />
-                    </Button>
+                    <div className="flex items-center gap-1.5">
+                      {order.items && order.items.length > 0 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full gap-1.5"
+                          onClick={(e) => { e.stopPropagation(); reorder(order.items); }}
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          أعد الطلب
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="sm" className="rounded-full text-primary hover:text-primary hover:bg-primary/10">
+                        التفاصيل
+                        <ChevronLeft className="w-4 h-4 ms-1" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
