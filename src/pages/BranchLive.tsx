@@ -6,6 +6,7 @@ import { useBranchOrders } from '@/hooks/useBranchOrders';
 import { HandoverBarcodeScanner } from '@/components/orders/HandoverBarcodeScanner';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -142,7 +143,12 @@ export default function BranchLive() {
         <EmptyState
           icon={AlertCircle}
           title="لا يمكن الوصول"
-          description="لم يتم تعيين فرع لحسابك. يرجى التواصل مع الإدارة."
+          description="لم يتم تعيين فرع لحسابك. يرجى التواصل مع الإدارة لربط حسابك بفرع."
+          action={
+            <Link to="/contact">
+              <Button variant="outline">تواصل مع الإدارة</Button>
+            </Link>
+          }
         />
       </MainLayout>
     );
