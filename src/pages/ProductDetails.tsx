@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
@@ -43,6 +43,20 @@ export default function ProductDetails() {
   const product = useMemo(() => products?.find((p) => p.id === id), [products, id]);
   const { data: ratingsMap } = useProductRatings(product ? [product.id] : []);
   const rating = product ? ratingsMap?.[product.id] : undefined;
+
+  // Gallery: use images[] when present, else fall back to the single image_url.
+  const galleryImages = useMemo(
+    () =>
+      product?.images && product.images.length > 0
+        ? product.images
+        : product?.image_url
+          ? [product.image_url]
+          : [],
+    [product],
+  );
+  const [activeImage, setActiveImage] = useState(0);
+  useEffect(() => { setActiveImage(0); }, [product?.id]);
+  const mainImage = galleryImages[Math.min(activeImage, Math.max(0, galleryImages.length - 1))] ?? null;
 
   const related = useMemo(
     () =>
@@ -208,9 +222,9 @@ export default function ProductDetails() {
                 className="relative aspect-[4/5] rounded-[2rem] overflow-hidden border border-border/60 shadow-soft-lift"
                 style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--secondary)))' }}
               >
-                {product.image_url ? (
+                {mainImage ? (
                   <img
-                    src={product.image_url}
+                    src={mainImage}
                     alt={product.name}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -238,6 +252,25 @@ export default function ProductDetails() {
                   <Heart className={cn('w-5 h-5', wishlist.has(product.id) ? 'fill-primary text-primary' : 'text-foreground/70')} />
                 </button>
               </div>
+
+              {galleryImages.length > 1 && (
+                <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1">
+                  {galleryImages.map((src, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImage(i)}
+                      aria-label={`عرض الصورة ${i + 1}`}
+                      aria-current={i === activeImage}
+                      className={cn(
+                        'relative aspect-square w-16 shrink-0 overflow-hidden rounded-xl border-2 transition-colors',
+                        i === activeImage ? 'border-primary' : 'border-border/60 hover:border-primary/40',
+                      )}
+                    >
+                      <img src={src} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </Reveal>
 
