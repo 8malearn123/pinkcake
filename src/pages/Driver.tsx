@@ -1,13 +1,18 @@
 import { useState, Fragment } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader, LoadingState, ErrorState, EmptyState } from '@/components/ds';
-import { useDriverOrders } from '@/hooks/useHandoverBarcodes';
+import { useDriverOrders, useMarkDelivered } from '@/hooks/useHandoverBarcodes';
 import { HandoverBarcodeScanner } from '@/components/orders/HandoverBarcodeScanner';
 import { HandoverBarcodeDisplay } from '@/components/orders/HandoverBarcodeDisplay';
+import { RevealCustomerPhoneButton } from '@/components/orders/RevealCustomerPhoneButton';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import {
   Truck,
@@ -17,6 +22,10 @@ import {
   ScanLine,
   QrCode,
   ChevronLeft,
+  Phone,
+  StickyNote,
+  Navigation,
+  CheckCircle2,
 } from 'lucide-react';
 import { OrderStatus } from '@/types/order';
 
@@ -24,6 +33,7 @@ type DriverFilter = 'all' | 'kitchen' | 'transit' | 'delivery';
 
 export default function Driver() {
   const { data: orders = [], isLoading, error, refetch } = useDriverOrders();
+  const markDelivered = useMarkDelivered();
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('orders');
   const [filter, setFilter] = useState<DriverFilter>('all');
@@ -201,16 +211,87 @@ export default function Driver() {
                         </div>
                       </div>
 
-                      {/* Expandable handover barcode (kept from selection) */}
-                      {selected && order.status === 'in_transit' && (
-                        <div className="mt-4 border-t pt-4" onClick={(e) => e.stopPropagation()}>
-                          <HandoverBarcodeDisplay
-                            orderId={order.id}
-                            barcodeType="branch_handover"
-                            title="باركود تسليم الفرع"
-                            description="اعرض هذا الباركود لمدير الفرع ليقوم بمسحه"
-                            canGenerate
-                          />
+                      {/* Expanded: delivery details (D1), actions (D2/D3), barcode */}
+                      {selected && (
+                        <div className="mt-4 space-y-4 border-t pt-4" onClick={(e) => e.stopPropagation()}>
+                          {/* Delivery info */}
+                          <div className="space-y-2 text-sm">
+                            {order.delivery_address && (
+                              <div className="flex items-start gap-2">
+                                <MapPin className="mt-0.5 w-4 h-4 text-primary shrink-0" />
+                                <span>{order.delivery_address}</span>
+                              </div>
+                            )}
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Phone className="w-4 h-4 text-primary shrink-0" />
+                              <span dir="ltr" className="text-muted-foreground">{order.customer_phone || '—'}</span>
+                              {order.customer_id && (
+                                <RevealCustomerPhoneButton
+                                  customerId={order.customer_id}
+                                  orderId={order.id}
+                                  customerName={order.customer_name ?? undefined}
+                                />
+                              )}
+                            </div>
+                            {order.notes && (
+                              <div className="flex items-start gap-2">
+                                <StickyNote className="mt-0.5 w-4 h-4 text-primary shrink-0" />
+                                <span className="text-muted-foreground">{order.notes}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex flex-wrap gap-2">
+                            {order.delivery_address && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1.5"
+                                onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(order.delivery_address ?? '')}`, '_blank', 'noopener')}
+                              >
+                                <Navigation className="w-3.5 h-3.5" />
+                                الاتجاهات
+                              </Button>
+                            )}
+                            {order.status === 'in_transit' && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="outline" size="sm" className="gap-1.5">
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    تم التسليم يدويًا
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>تأكيد التسليم اليدوي</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      سيتم تحديث حالة الطلب {order.order_number} إلى «مكتمل» دون مسح باركود العميل. استخدم هذا الخيار فقط عند تعذّر المسح.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => markDelivered.mutate(order.id)}>
+                                      تأكيد التسليم
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                          </div>
+
+                          {/* Handover barcode — for in-transit orders */}
+                          {order.status === 'in_transit' && (
+                            <div className="border-t pt-4">
+                              <HandoverBarcodeDisplay
+                                orderId={order.id}
+                                barcodeType="branch_handover"
+                                title="باركود تسليم الفرع"
+                                description="اعرض هذا الباركود لمدير الفرع ليقوم بمسحه"
+                                canGenerate
+                              />
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

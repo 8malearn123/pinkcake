@@ -81,6 +81,8 @@ const order = (i: number, status: string, opts: Partial<Record<string, unknown>>
     customer_name: customerName,
     customers: { name: customerName },
     customer_phone: '+966••••6' + (10 + i),
+    customer_phone_full: '+96650111' + (6000 + i),
+    delivery_address: `حي ${['الياسمين', 'النرجس', 'الملقا', 'قرطبة', 'الروضة', 'العليا'][i % 6]}، شارع ${10 + i}، الرياض`,
     tracking_code: `TRK${1000 + i}`,
     delivery_date: today,
     delivery_time: `${14 + (i % 6)}:00`,

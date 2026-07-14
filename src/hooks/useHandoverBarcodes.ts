@@ -90,18 +90,62 @@ export function useScanHandoverBarcode() {
   });
 }
 
+// Shape the driver board reads. The demo RPC returns richer rows than the
+// generated get_driver_orders type (which omits customer/address/notes), so we
+// widen it here rather than sprinkling casts across the screen.
+export interface DriverOrder {
+  id: string;
+  order_number: string;
+  status: string;
+  branch_name?: string | null;
+  delivery_date?: string | null;
+  delivery_time?: string | null;
+  customer_name?: string | null;
+  customer_id?: string | null;
+  customer_phone?: string | null;
+  delivery_address?: string | null;
+  notes?: string | null;
+  order_type?: string | null;
+  handover_from_kitchen?: boolean | null;
+  handover_to_branch?: boolean | null;
+}
+
 // Hook for driver orders
 export function useDriverOrders() {
   return useQuery({
     queryKey: ['driver-orders'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_driver_orders');
-      
+
       if (error) throw error;
-      return data || [];
+      return (data || []) as unknown as DriverOrder[];
     },
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
+  });
+}
+
+// Driver manual "mark delivered" fallback — advances the order to completed when
+// the customer-delivery barcode can't be scanned. (untyped rpc: not in gen types)
+export function useMarkDelivered() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const client = supabase as unknown as {
+        rpc: (fn: string, a?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+      };
+      const { error } = await client.rpc('driver_mark_delivered', { _order_id: orderId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: 'تم تأكيد التسليم', description: 'تم تحديث حالة الطلب إلى مكتمل.' });
+      queryClient.invalidateQueries({ queryKey: ['driver-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
+    },
   });
 }
 
