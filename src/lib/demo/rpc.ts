@@ -80,6 +80,18 @@ const READ: Record<string, (args: Args) => unknown> = {
 
   // support / submissions
   get_contact_submissions_secure: () => d.SUBMISSIONS,
+  // Persist submission edits (status/notes/resolution/linked-order) in place so
+  // support changes survive a refetch in demo. Only patches keys that are sent.
+  update_contact_submission_secure: (a) => {
+    const row = d.SUBMISSIONS.find((s) => s.id === a?.['_submission_id']) as Record<string, unknown> | undefined;
+    if (row && a) {
+      if ('_status' in a) row.status = a['_status'];
+      if ('_internal_notes' in a) row.internal_notes = a['_internal_notes'];
+      if ('_resolution_type' in a) row.resolution_type = a['_resolution_type'];
+      if ('_linked_order_id' in a) row.linked_order_id = a['_linked_order_id'];
+    }
+    return { success: true };
+  },
 
   // barcodes
   // Real RPC returns the barcode CODE (a string) — the display renders it directly
