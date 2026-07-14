@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react';
 import { useContactSubmissions, useUpdateSubmission, ContactSubmission, SubmissionStatus } from '@/hooks/useContactSubmissions';
+import { useOrders } from '@/hooks/useOrders';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader, EmptyState, SkeletonList } from '@/components/ds';
 import { Button } from '@/components/ui/button';
@@ -113,14 +114,25 @@ function SubmissionCard({ submission, onView }: { submission: ContactSubmission;
   );
 }
 
+const RESOLUTION_LABELS: Record<string, string> = {
+  refund: 'استرداد المبلغ',
+  replacement: 'استبدال المنتج',
+  discount: 'خصم تعويضي',
+  apology: 'اعتذار',
+  no_action: 'لا إجراء',
+};
+
 export default function ContactSubmissions() {
   const [selectedTab, setSelectedTab] = useState<string>('all');
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [internalNotes, setInternalNotes] = useState('');
+  const [resolutionType, setResolutionType] = useState('');
+  const [linkedOrderId, setLinkedOrderId] = useState('');
 
   // Fetch all submissions once; filter + count client-side for instant tab switching.
   const { data: all = [], isLoading, isFetching, refetch } = useContactSubmissions();
+  const { data: orders = [] } = useOrders();
   const updateSubmission = useUpdateSubmission();
 
   const submissions = selectedTab === 'all' ? all : all.filter((s) => s.submission_type === selectedTab);
@@ -128,6 +140,8 @@ export default function ContactSubmissions() {
   const handleViewDetails = (submission: ContactSubmission) => {
     setSelectedSubmission(submission);
     setInternalNotes(submission.internal_notes || '');
+    setResolutionType(submission.resolution_type || '');
+    setLinkedOrderId(submission.linked_order_id || '');
     setDetailsOpen(true);
   };
 
@@ -144,7 +158,10 @@ export default function ContactSubmissions() {
     if (!selectedSubmission) return;
     updateSubmission.mutate({
       id: selectedSubmission.id,
-      internal_notes: internalNotes
+      internal_notes: internalNotes,
+      ...(selectedSubmission.submission_type === 'complaint'
+        ? { resolution_type: resolutionType || null, linked_order_id: linkedOrderId || null }
+        : {}),
     });
   };
 
@@ -335,6 +352,36 @@ export default function ContactSubmissions() {
                 </Select>
               </div>
 
+              {/* Complaint resolution — resolution type + linked order */}
+              {selectedSubmission.submission_type === 'complaint' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-xl border border-border bg-muted/30 p-3">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">نوع المعالجة</label>
+                    <Select value={resolutionType || 'none'} onValueChange={(v) => setResolutionType(v === 'none' ? '' : v)}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="اختر المعالجة" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">غير محددة</SelectItem>
+                        {Object.entries(RESOLUTION_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">الطلب المرتبط</label>
+                    <Select value={linkedOrderId || 'none'} onValueChange={(v) => setLinkedOrderId(v === 'none' ? '' : v)}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="اربط بطلب" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">بدون</SelectItem>
+                        {orders.map((o) => (
+                          <SelectItem key={o.id} value={o.id}>{o.order_number}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
               {/* Internal Notes */}
               <div>
                 <label className="text-sm font-medium text-muted-foreground">ملاحظات داخلية</label>
@@ -355,7 +402,7 @@ export default function ContactSubmissions() {
             </Button>
             <Button onClick={handleSaveNotes} disabled={updateSubmission.isPending}>
               {updateSubmission.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
-              حفظ الملاحظات
+              حفظ التغييرات
             </Button>
           </DialogFooter>
         </DialogContent>
