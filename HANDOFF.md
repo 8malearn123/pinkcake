@@ -103,4 +103,7 @@ stays the same.
 - [ ] Confirm `get_my_roles` returns each role; verify each role's screens load
 - [ ] Deploy Edge Functions (incl. `send-notification` — see `docs/notifications.md`)
 - [ ] Smoke-test create-order → kitchen → branch → pickup against real data
+- [ ] **CC1 payment link** — `useSendPaymentLink` builds a `/track?code=…` URL and
+      writes `orders.payment_link`. Replace with a real gateway checkout URL
+      (Moyasar/Tap/HyperPay) and confirm the customer can pay from it.
 - [ ] Remove `src/lib/demo/` + the two `DEMO_MODE` branches once green
