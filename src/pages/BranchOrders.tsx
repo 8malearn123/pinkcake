@@ -50,8 +50,9 @@ interface BranchOrder {
   items: { product_name: string; quantity: number }[] | null;
 }
 
-// Row shape returned by get_orders_for_admin (superset — carries branch_id).
-type AdminOrderRow = Omit<BranchOrder, 'items'> & { branch_id: string | null };
+// Row shape returned by get_orders_for_admin (superset — carries branch_id; the
+// generated RPC type omits items, but the payload carries them, so keep it optional).
+type AdminOrderRow = Omit<BranchOrder, 'items'> & { branch_id: string | null; items?: BranchOrder['items'] };
 
 const BRANCH_STATUS_LABELS: Record<string, string> = {
   in_transit: 'في الطريق',
@@ -135,7 +136,7 @@ export default function BranchOrders() {
             notes: o.notes,
             created_at: o.created_at,
             tracking_code: o.tracking_code,
-            items: null, // Will need to fetch separately if needed
+            items: o.items ?? null, // get_orders_for_admin already carries order items
           })) as BranchOrder[];
       } else {
         // For branch users, use the secure function
