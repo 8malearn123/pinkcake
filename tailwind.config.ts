@@ -20,6 +20,7 @@ export default {
         tajawal: ['Alexandria', 'Tajawal', 'sans-serif'],
         serif: ['Alexandria', '"Instrument Serif"', '"DM Serif Display"', 'serif'],
         display: ['Alexandria', '"Instrument Serif"', '"DM Serif Display"', 'serif'],
+        wedding: ['Amiri', 'Alexandria', 'serif'],
         sans: ['Alexandria', '"Work Sans"', 'Cairo', 'Tajawal', 'sans-serif'],
         body: ['Alexandria', '"Work Sans"', 'Cairo', 'sans-serif'],
       },
@@ -64,6 +65,11 @@ export default {
         },
         rose: "hsl(var(--rose))",
         blush: "hsl(var(--blush))",
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          soft: "hsl(var(--gold-soft))",
+        },
+        seasonal: "hsl(var(--seasonal))",
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",

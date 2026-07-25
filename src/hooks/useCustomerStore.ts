@@ -14,6 +14,10 @@ export interface StoreProduct {
   occasions?: string[] | null;
   is_available?: boolean | null;
   stock?: number | null;
+  /** Original ("was") price for a discount — strike-through when > price. */
+  compare_at_price?: number | null;
+  /** Seasonal collection tag (e.g. "صيف"); groups a limited-time collection. */
+  season?: string | null;
 }
 
 export interface CustomerOrder {

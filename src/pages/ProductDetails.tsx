@@ -144,7 +144,7 @@ export default function ProductDetails() {
   // ── Loading ──
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="storefront-theme min-h-screen bg-background">
         {header}
         <main className="container mx-auto px-4 lg:px-6 py-8">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -165,7 +165,7 @@ export default function ProductDetails() {
   // ── Not found ──
   if (!product) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="storefront-theme min-h-screen bg-background">
         {header}
         <main className="container mx-auto px-4 lg:px-6 py-20">
           <div className="max-w-md mx-auto text-center rounded-3xl border border-dashed border-border/60 bg-secondary/30 p-10">
@@ -197,7 +197,7 @@ export default function ProductDetails() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
+    <div className="storefront-theme min-h-screen bg-background pb-24 md:pb-0">
       {header}
 
       <main className="container mx-auto px-4 lg:px-6 py-5 lg:py-8">

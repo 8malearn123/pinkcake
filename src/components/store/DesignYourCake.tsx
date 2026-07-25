@@ -91,7 +91,7 @@ export function DesignYourCake({ onAddCustom, onCustomizeMore }: DesignYourCakeP
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs tracking-widest uppercase font-medium">
               <Wand2 className="w-3.5 h-3.5" /> صمّم بنفسك
             </div>
-            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 leading-tight">صمّم كيكتك المثالية</h2>
+            <h2 className="font-wedding text-2xl sm:text-3xl md:text-4xl lg:text-5xl mt-4 leading-[1.3]">صمّم كيكتك المثالية</h2>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-md">
               اختر الشكل والنكهة واللون، وشاهد كيكتك تتشكّل أمامك لحظة بلحظة — ثم خصّصها أكثر بكل التفاصيل.
             </p>

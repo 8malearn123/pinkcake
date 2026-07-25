@@ -1,15 +1,15 @@
 import { cn } from '@/lib/utils';
 import { Cake, Flame, ConciergeBell, ArrowLeft } from 'lucide-react';
 
-const GOLD = 'hsl(43 74% 70%)';
+const ROSE = 'hsl(var(--primary))';
 
-// Warm, candlelit luxury backdrop — golden light + depth instead of flat, gloomy brown.
+// Warm cocoa backdrop with a rose glow + depth (no gold — rose-only system).
 const CARD_BG =
-  'radial-gradient(82% 100% at 84% -4%, hsl(38 68% 46% / .55), transparent 56%), ' +
-  'radial-gradient(72% 92% at 4% 108%, hsl(352 52% 42% / .32), transparent 60%), ' +
-  'linear-gradient(150deg, hsl(28 48% 23%) 0%, hsl(22 40% 15%) 50%, hsl(17 34% 10%) 100%)';
+  'radial-gradient(82% 100% at 84% -4%, hsl(359 31% 55% / .45), transparent 56%), ' +
+  'radial-gradient(72% 92% at 4% 108%, hsl(340 45% 42% / .32), transparent 60%), ' +
+  'linear-gradient(150deg, hsl(25 30% 22%) 0%, hsl(22 32% 15%) 50%, hsl(20 34% 10%) 100%)';
 
-// One editorial cake photograph — warm caramel tones that pair with the gold accents.
+// One editorial cake photograph — warm rose/cocoa tones that pair with the rose accents.
 const CAKE_PHOTO =
   'https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=1400&q=85';
 
@@ -28,10 +28,10 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
     >
       {/* subtle grain */}
       <div className="absolute inset-0 noise-overlay opacity-20 pointer-events-none" />
-      {/* thin gold hairline frame */}
+      {/* thin rose/blush hairline frame */}
       <div
         className="absolute inset-0 rounded-[2.5rem] pointer-events-none"
-        style={{ boxShadow: 'inset 0 0 0 1px hsl(43 60% 72% / .18)' }}
+        style={{ boxShadow: 'inset 0 0 0 1px hsl(var(--blush) / .16)' }}
       />
 
       <div className="relative z-10 grid items-center gap-10 lg:gap-16 p-8 sm:p-12 lg:p-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
@@ -41,7 +41,7 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
             {/* soft, expensive shadow bloom */}
             <div
               className="absolute -inset-4 rounded-[2.25rem] blur-2xl pointer-events-none"
-              style={{ background: 'radial-gradient(58% 52% at 50% 42%, hsl(36 50% 40% / .38), transparent 75%)' }}
+              style={{ background: 'radial-gradient(58% 52% at 50% 42%, hsl(var(--primary) / .34), transparent 75%)' }}
             />
             <div
               className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem]"
@@ -49,7 +49,7 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
             >
               <img
                 src={CAKE_PHOTO}
-                alt="كيكة مناسبات فاخرة بلمسات ذهبية"
+                alt="كيكة مناسبات فاخرة بلمسات وردية"
                 loading="lazy"
                 className="w-full h-full object-cover max-w-full"
                 style={{ objectPosition: '50% 38%' }}
@@ -59,10 +59,10 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
                 className="absolute inset-0 pointer-events-none"
                 style={{ background: 'linear-gradient(180deg, transparent 52%, hsl(20 28% 11% / .55))' }}
               />
-              {/* 1px gold hairline on the frame */}
+              {/* 1px rose/blush hairline on the frame */}
               <div
                 className="absolute inset-0 rounded-[1.75rem] pointer-events-none"
-                style={{ boxShadow: 'inset 0 0 0 1px hsl(43 74% 74% / .5)' }}
+                style={{ boxShadow: 'inset 0 0 0 1px hsl(var(--blush) / .5)' }}
               />
             </div>
           </figure>
@@ -70,18 +70,18 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
 
         {/* Content — sparse, gallery-like */}
         <div className="order-2 lg:order-1 text-center lg:text-start">
-          {/* gold rule + eyebrow */}
+          {/* rose rule + eyebrow */}
           <div className="flex items-center gap-3 justify-center lg:justify-start">
             <span
               className="h-px w-10"
-              style={{ background: 'linear-gradient(90deg, transparent, hsl(43 74% 70%))' }}
+              style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / .7))' }}
             />
-            <span className="text-[11px] tracking-[0.35em] uppercase" style={{ color: GOLD }}>
+            <span className="text-[11px] tracking-[0.35em] uppercase" style={{ color: ROSE }}>
               ضيافة المناسبات والأعراس
             </span>
           </div>
 
-          <h3 className="font-display text-3xl sm:text-4xl lg:text-[2.9rem] mt-6 leading-[1.5]">
+          <h3 className="font-wedding text-3xl sm:text-4xl lg:text-[2.9rem] mt-6 leading-[1.5]">
             لحظات الفرح تستحق ضيافة تليق بها
           </h3>
 
@@ -93,7 +93,7 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
           {/* hairline divider */}
           <div
             className="mt-8 h-px w-full max-w-md mx-auto lg:mx-0"
-            style={{ background: 'linear-gradient(90deg, hsl(43 60% 72% / .28), transparent)' }}
+            style={{ background: 'linear-gradient(90deg, hsl(var(--primary) / .35), transparent)' }}
           />
 
           {/* three quietly-elegant service labels, hairline-separated */}
@@ -103,7 +103,7 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
                 key={s.label}
                 className={cn('flex items-center gap-2.5 px-4 sm:px-5', i > 0 && 'border-s border-white/15')}
               >
-                <s.Icon className="w-4 h-4 shrink-0" strokeWidth={1.5} style={{ color: GOLD }} />
+                <s.Icon className="w-4 h-4 shrink-0" strokeWidth={1.5} style={{ color: ROSE }} />
                 <span className="text-sm text-white/75 whitespace-nowrap">{s.label}</span>
               </div>
             ))}

@@ -1,282 +1,318 @@
-import { useState, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePublicStoreProducts } from '@/hooks/usePublicStore';
+import { ChevronDown, Clock, Heart, Instagram, MapPin, Menu, MessageCircle, Phone, ShoppingBag, X } from 'lucide-react';
+import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useSettings } from '@/contexts/SettingsContext';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Reveal } from '@/components/Reveal';
-import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
-import { FloatingContactButton } from '@/components/store/FloatingContactButton';
-import { AnnouncementBar } from '@/components/store/AnnouncementBar';
-import { HeroCarousel } from '@/components/store/HeroCarousel';
-import { CategoryChips } from '@/components/store/CategoryChips';
+import { sortProducts } from '@/lib/shopSort';
+import { toArabicDigits } from '@/lib/arabicNumerals';
+import { Marquee, GoldDivider, WhatsAppButton } from '@/components/store/StorefrontDecor';
+import { StoreHero } from '@/components/store/StoreHero';
+import { TrustBadges } from '@/components/store/TrustBadges';
+import { SeasonalSection } from '@/components/store/SeasonalSection';
+import { OfferBanner, ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
+import { StoreProductCard } from '@/components/store/StoreProductCard';
+import { CombosSection } from '@/components/store/CombosSection';
+import { Reviews } from '@/components/store/Reviews';
+import { EventsSection } from '@/components/store/EventsSection';
+import { BranchesSection } from '@/components/store/BranchesSection';
+import { GiftBox } from '@/components/store/GiftBox';
+import { StickyCartBar } from '@/components/store/StickyCartBar';
 import { StoreSearch } from '@/components/store/StoreSearch';
-import { AccountMenu } from '@/components/store/AccountMenu';
-import { ProductCardRefined } from '@/components/store/ProductCardRefined';
-import { DesignYourCake } from '@/components/store/DesignYourCake';
-import { type CakeConfig } from '@/lib/cakeBuilder';
-import { ShopByOccasion } from '@/components/store/ShopByOccasion';
-import { OccasionsCallout } from '@/components/store/OccasionsCallout';
-import { HowItWorks } from '@/components/store/HowItWorks';
-import { Testimonials } from '@/components/store/Testimonials';
-import { StoreFooter } from '@/components/store/StoreFooter';
-import { BackToTop } from '@/components/store/BackToTop';
-import {
-  ShoppingCart,
-  Cake,
-  Search,
-  Sparkles,
-  ArrowLeft,
-} from 'lucide-react';
+import { Reveal } from '@/components/Reveal';
+
+const SORT_MAP: Record<string, string> = {
+  'الأكثر رواجاً': 'featured',
+  'السعر: من الأقل للأعلى': 'price-asc',
+  'السعر: من الأعلى للأقل': 'price-desc',
+};
 
 export default function Store() {
   const { settings } = useSettings();
   const navigate = useNavigate();
 
-  const { data: products, isLoading: productsLoading } = usePublicStoreProducts();
-
-  const { addToCart, count: cartCount, open: openCart } = useStoreCart();
+  const { data: products } = usePublicStoreProducts();
+  const { addToCart, updateQuantity, count: cartCount, open: openCart, cart } = useStoreCart();
   const wishlist = useStoreWishlist();
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const [selectedProductForReview, setSelectedProductForReview] = useState<StoreProduct | null>(null);
+  const [category, setCategory] = useState('الكل');
+  const [sort, setSort] = useState('الأكثر رواجاً');
+  const [query, setQuery] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Mobile: collapse the search band while scrolling down (reclaim viewport),
+  // reveal it near the top or when scrolling back up.
+  const [showMobileSearch, setShowMobileSearch] = useState(true);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setShowMobileSearch(y < 100 || y < lastY);
+      lastY = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  const productsRef = useRef<HTMLDivElement>(null);
-
-  const productIds = useMemo(() => products?.map((p) => p.id) || [], [products]);
+  const productIds = useMemo(() => products?.map((p) => p.id) ?? [], [products]);
   const { data: ratingsMap } = useProductRatings(productIds);
 
-  const categories = useMemo(() => {
-    if (!products) return [];
-    const cats = [...new Set(products.map((p) => p.category).filter(Boolean))];
-    return cats as string[];
-  }, [products]);
+  const categories = useMemo(
+    () => ['الكل', ...new Set((products ?? []).map((p) => p.category).filter(Boolean) as string[])],
+    [products],
+  );
 
-  const filteredProducts = useMemo(() => {
-    if (!products) return [];
-    return products.filter((p) => {
-      const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-      const matchesSearch =
-        !searchQuery ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesCategory && matchesSearch;
-    });
-  }, [products, selectedCategory, searchQuery]);
+  const listed = useMemo(() => {
+    const q = query.trim();
+    const filtered = (products ?? []).filter(
+      (p) =>
+        (category === 'الكل' || p.category === category) &&
+        (q === '' || p.name.includes(q) || (p.description ?? '').includes(q) || (p.category ?? '').includes(q)),
+    );
+    return sortProducts(filtered, SORT_MAP[sort] ?? 'featured', ratingsMap);
+  }, [products, category, sort, query, ratingsMap]);
 
-  const scrollToProducts = () => {
-    productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
+  const qtyOf = (id: string) => cart.find((i) => i.product.id === id)?.quantity ?? 0;
+  const scrollToId = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  const goToShop = (q?: string) =>
-    navigate(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop');
+  const renderCard = (product: StoreProduct) => (
+    <StoreProductCard
+      key={product.id}
+      product={product}
+      rating={ratingsMap?.[product.id]}
+      inCart={qtyOf(product.id)}
+      isFavorite={wishlist.has(product.id)}
+      onAdd={() => addToCart(product)}
+      onRemoveOne={() => updateQuantity(product.id, -1)}
+      onToggleFavorite={() => wishlist.toggle(product)}
+      onView={() => navigate(`/product/${product.id}`)}
+    />
+  );
 
-  // Quick-add the on-page design as a custom cake line.
-  const handleDesignAdd = (total: number, summary: string) => {
-    addToCart({
-      id: `custom-${Date.now()}`,
-      name: 'كيكة مخصّصة حسب التصميم',
-      description: summary,
-      price: total,
-      category: 'تصميم خاص',
-      image_url: null,
-    });
-  };
-
-  // "خصّصها أكثر" — carry the current design into the full studio.
-  const handleCustomizeMore = (cfg: CakeConfig) => navigate('/customize', { state: { initial: cfg } });
+  const NAV = [
+    { label: 'كل المنتجات', action: () => scrollToId('shop') },
+    { label: 'تشكيلة الصيف 🥭', action: () => scrollToId('seasonal'), season: true },
+    { label: 'الكومبوهات', action: () => scrollToId('combos') },
+    { label: 'تجهيز المناسبات', action: () => navigate('/events') },
+    { label: 'فروعنا', action: () => scrollToId('branches') },
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <AnnouncementBar />
+    <div className={`storefront-theme min-h-screen bg-[#fffdfa] text-[#2c2226] ${cartCount > 0 ? 'pb-20 md:pb-0' : ''}`}>
+      <WhatsAppButton />
+      <StickyCartBar />
+      <Marquee />
 
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
-        <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center gap-4">
+      <header className="sticky top-0 z-40 border-b border-[#9e3a5c]/10 bg-[#fffdfa]/95 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-4 px-5 sm:px-8 md:h-[84px] lg:px-12">
           {/* Brand */}
-          <button onClick={() => navigate('/')} className="flex items-center gap-2.5 shrink-0 press group">
-            <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105">
-              <Cake className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div className="text-start leading-tight">
-              <div className="font-display text-base sm:text-lg">{settings.storeName}</div>
-              <div className="hidden sm:block text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
-            </div>
+          <button onClick={() => scrollToId('top')} className="shrink-0 text-start leading-none">
+            <span className="block text-xl font-black tracking-[-.06em] text-[#9e3a5c] sm:text-2xl">{settings.storeName}</span>
+            <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-[#86736c]">حلويات جازان الفاخرة</span>
           </button>
-
-          {/* Search */}
+          {/* Inline nav */}
+          <nav className="ms-6 hidden shrink-0 items-center gap-6 text-sm font-bold lg:flex">
+            {NAV.map((n) => (
+              <button key={n.label} onClick={n.action} className={n.season ? 'text-[#e8942f] hover:text-[#c97a1f]' : 'hover:text-[#b0506e]'}>
+                {n.label}
+              </button>
+            ))}
+          </nav>
+          {/* Center search pill */}
           <StoreSearch
-            products={products || []}
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onSubmit={() => goToShop(searchQuery)}
-            className="flex-1 max-w-md mx-auto hidden md:block"
+            products={products ?? []}
+            value={query}
+            onChange={setQuery}
+            onSubmit={() => scrollToId('shop')}
+            className="mx-auto hidden max-w-xl flex-1 md:block"
           />
-
           {/* Actions */}
-          <div className="flex items-center gap-1.5 ms-auto">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/customize')}
-              className="hidden sm:inline-flex gap-1.5 text-primary hover:text-primary hover:bg-primary/10 rounded-full press"
-            >
-              <Sparkles className="w-4 h-4" />
-              صمّم كيكتك
-            </Button>
-
-            <AccountMenu />
-
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="عربة التسوق"
-              onClick={openCart}
-              className="relative rounded-full border-border h-10 w-10 press hover:border-primary/50 hover:bg-primary/5"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span
-                  key={cartCount}
-                  className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow"
-                >
-                  {cartCount}
-                </span>
-              )}
-            </Button>
+          <div className="ms-auto flex shrink-0 items-center gap-2">
+            <button onClick={() => navigate('/wishlist')} aria-label="المفضلة" className="hidden size-10 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2] sm:grid">
+              <Heart size={18} />
+            </button>
+            <button onClick={openCart} aria-label={`السلة تحتوي ${toArabicDigits(cartCount)} منتجات`} className="relative grid size-10 place-items-center rounded-full bg-[#9e3a5c] text-white transition-colors hover:bg-[#b0506e]">
+              <ShoppingBag size={18} />
+              {cartCount > 0 && <span key={cartCount} className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-[#ddbd75] text-[10px] font-bold text-[#9e3a5c]">{toArabicDigits(cartCount)}</span>}
+            </button>
+            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 lg:hidden" aria-label="القائمة">{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
           </div>
         </div>
-
-        {/* Mobile search */}
-        <div className="md:hidden px-4 pb-3">
+        {/* Mobile search row — collapses on scroll-down to reclaim viewport */}
+        <div className={`overflow-hidden border-t border-[#9e3a5c]/10 px-5 sm:px-8 md:hidden ${showMobileSearch ? 'max-h-24 border-t py-3 opacity-100' : 'max-h-0 border-t-0 py-0 opacity-0'} transition-all duration-300`}>
           <StoreSearch
-            products={products || []}
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onSubmit={() => goToShop(searchQuery)}
-            placeholder="ابحث عن كيكة..."
+            products={products ?? []}
+            value={query}
+            onChange={setQuery}
+            onSubmit={() => scrollToId('shop')}
+            placeholder="ابحث عن تورتة، نكهة، أو مناسبة…"
           />
         </div>
+        {menuOpen && (
+          <nav className="absolute inset-x-0 top-full grid gap-4 border-b border-[#9e3a5c]/10 bg-[#fffdfa] px-6 py-5 text-sm font-bold shadow-lg lg:hidden">
+            {NAV.map((n) => (
+              <button key={n.label} onClick={() => { setMenuOpen(false); n.action(); }} className={`text-start ${n.season ? 'text-[#e8942f]' : ''}`}>
+                {n.label}
+              </button>
+            ))}
+          </nav>
+        )}
       </header>
 
-      {/* ── Full-bleed hero — edge to edge, flush under the nav ── */}
-      <HeroCarousel onShopClick={() => goToShop()} onCustomizeClick={() => navigate('/customize')} />
+      <StoreHero onShop={() => scrollToId('shop')} onCustomize={() => navigate('/customize')} />
 
-      {/* ── Main ── */}
-      <main className="container mx-auto px-4 lg:px-6 py-6 lg:py-10 space-y-8 lg:space-y-12">
-        {/* Category & products */}
-        <section ref={productsRef} className="space-y-5 scroll-mt-24">
-          <Reveal>
-            <div className="flex items-end justify-between flex-wrap gap-3">
-              <div>
-                <div className="text-xs text-primary tracking-widest uppercase font-medium">مجموعتنا</div>
-                <h2 className="font-display text-3xl md:text-5xl mt-1 leading-none">كيكات مختارة بعناية</h2>
-              </div>
-              <div className="flex items-center gap-4">
-                <p className="hidden sm:block text-sm text-muted-foreground max-w-[16rem]">
-                  تشكيلة محدثة من أكثر من {products?.length || 0} منتج فاخر.
-                </p>
-                <button onClick={() => goToShop()} className="group shrink-0 text-sm text-primary font-medium inline-flex items-center gap-1.5 press">
-                  تسوّق الكل <ArrowLeft className="cta-arrow w-4 h-4" />
-                </button>
-              </div>
-            </div>
+      <TrustBadges />
+
+      <SeasonalSection products={seasonal} renderCard={renderCard} />
+
+      <ShopByOccasion />
+
+      <OfferBanner />
+
+      <GoldDivider />
+
+      <section id="shop" className="mx-auto max-w-[1500px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
+        <Reveal className="flex flex-col justify-between gap-5 border-b border-[#9e3a5c]/15 pb-6 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-bold tracking-[.08em] text-[#b0506e]">اختر ما يناسب مناسبتك</p>
+            <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-[#2c2226] sm:text-4xl">تسوق التورتات</h2>
+          </div>
+          <p className="text-xs leading-6 text-[#7d6870]">جميع التورتات تكفي من ٨ إلى ١٢ شخصاً<br />مع إمكانية إضافة بطاقة تهنئة</p>
+        </Reveal>
+        <div className="flex flex-col justify-between gap-4 border-b border-[#9e3a5c]/10 py-5 md:flex-row md:items-center">
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+            {categories.map((item) => (
+              <button
+                key={item}
+                onClick={() => setCategory(item)}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-colors ${category === item ? 'bg-[#9e3a5c] text-white' : 'bg-[#f6ecef] text-[#8a6570] hover:bg-[#f2dbe2]'}`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          <label className="flex items-center gap-2 self-start text-xs font-bold md:self-auto">
+            ترتيب حسب
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="appearance-none bg-transparent font-bold outline-none">
+              <option>الأكثر رواجاً</option>
+              <option>السعر: من الأقل للأعلى</option>
+              <option>السعر: من الأعلى للأقل</option>
+            </select>
+            <ChevronDown size={15} />
+          </label>
+        </div>
+
+        {listed.length === 0 ? (
+          <p className="py-20 text-center text-sm text-[#857077]">لا توجد نتائج لـ «{query}». جرّب كلمة أخرى.</p>
+        ) : (
+          <Reveal className="reveal-grid mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:mt-9 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
+            {listed.map((product) => renderCard(product))}
           </Reveal>
+        )}
+      </section>
 
-          <CategoryChips categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
+      <CombosSection
+        products={products}
+        onAddCombo={(combo) =>
+          // Add the bundle as ONE line at its real discounted price, so the
+          // advertised "وفّر" saving is actually charged (not the members' full sum).
+          addToCart({
+            id: `combo-${combo.id}`,
+            name: combo.name,
+            description: `باقة موفّرة · ${combo.members.map((m) => m.name).join(' + ')}`,
+            price: combo.price,
+            category: 'كومبو',
+            image_url: combo.heroImage,
+            is_available: true,
+          })
+        }
+      />
 
-          {productsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="rounded-3xl overflow-hidden border border-border/60 bg-card">
-                  <Skeleton className="aspect-[4/5]" />
-                  <div className="p-4 space-y-2">
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                    <Skeleton className="h-8 w-full mt-3" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-20 rounded-3xl border border-dashed border-border/60 bg-secondary/30">
-              <div className="w-16 h-16 mx-auto rounded-full bg-card flex items-center justify-center mb-4">
-                <Search className="w-7 h-7 text-muted-foreground" />
-              </div>
-              <h3 className="font-display text-2xl">لا توجد نتائج</h3>
-              <p className="text-muted-foreground text-sm mt-1">
-                {searchQuery ? `لم نجد منتجات تطابق "${searchQuery}"` : 'لم تتم إضافة منتجات بعد'}
+      <Reviews />
+
+      <EventsSection onStart={() => navigate('/events')} />
+
+      <BranchesSection />
+
+      <FAQ />
+
+      <GiftBox storeName={settings.storeName} />
+
+      <footer className="mt-2 bg-gradient-to-b from-[#7d2f49] to-[#5f2338] text-white">
+        <div className="mx-auto max-w-[1500px] px-5 py-14 sm:px-8 lg:px-12 lg:py-16">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr] lg:gap-8">
+            {/* Brand + social */}
+            <div>
+              <p className="text-2xl font-black tracking-[-.04em]">{settings.storeName}</p>
+              <p className="mt-1 text-[10px] font-bold tracking-[.16em] text-[#ddbd75]">حلويات جازان الفاخرة</p>
+              <p className="mt-4 max-w-xs text-sm leading-7 text-white/70">
+                تورتات وحلويات طازجة تُخبز يومياً في جازان بأجود المكوّنات — لكل مناسبة كيكتها المميزة.
               </p>
+              <div className="mt-5 flex gap-2.5">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="انستغرام" className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-[#ddbd75] hover:text-[#9e3a5c]">
+                  <Instagram size={18} />
+                </a>
+                <a href="https://wa.me/966500000000" target="_blank" rel="noopener noreferrer" aria-label="واتساب" className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-[#ddbd75] hover:text-[#9e3a5c]">
+                  <MessageCircle size={18} />
+                </a>
+              </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-              {filteredProducts.map((product) => (
-                <ProductCardRefined
-                  key={product.id}
-                  product={product}
-                  rating={ratingsMap?.[product.id]}
-                  onAddToCart={() => addToCart(product)}
-                  isFav={wishlist.has(product.id)}
-                  onToggleFav={() => wishlist.toggle(product)}
-                  onViewDetails={() => navigate(`/product/${product.id}`)}
-                  onOpenReviews={() => {
-                    setSelectedProductForReview(product);
-                    setReviewDialogOpen(true);
-                  }}
-                />
+
+            {/* Shop */}
+            <nav aria-label="تسوّق">
+              <p className="text-sm font-black text-[#ddbd75]">تسوّق</p>
+              <ul className="mt-4 space-y-2.5 text-sm text-white/75">
+                <li><button onClick={() => scrollToId('shop')} className="transition-colors hover:text-white">كل المنتجات</button></li>
+                <li><button onClick={() => scrollToId('seasonal')} className="transition-colors hover:text-white">تشكيلة الصيف 🥭</button></li>
+                <li><button onClick={() => scrollToId('combos')} className="transition-colors hover:text-white">الكومبوهات</button></li>
+                <li><button onClick={() => navigate('/customize')} className="transition-colors hover:text-white">صمّم تورتة خاصة</button></li>
+              </ul>
+            </nav>
+
+            {/* Help */}
+            <nav aria-label="المساعدة">
+              <p className="text-sm font-black text-[#ddbd75]">المساعدة</p>
+              <ul className="mt-4 space-y-2.5 text-sm text-white/75">
+                <li><button onClick={() => scrollToId('faq')} className="transition-colors hover:text-white">الأسئلة الشائعة</button></li>
+                <li><button onClick={() => navigate('/events')} className="transition-colors hover:text-white">تجهيز المناسبات</button></li>
+                <li><button onClick={() => scrollToId('branches')} className="transition-colors hover:text-white">فروعنا</button></li>
+                <li><button onClick={() => navigate('/contact')} className="transition-colors hover:text-white">تواصل معنا</button></li>
+              </ul>
+            </nav>
+
+            {/* Contact */}
+            <div>
+              <p className="text-sm font-black text-[#ddbd75]">تواصل معنا</p>
+              <ul className="mt-4 space-y-3 text-sm text-white/75">
+                <li className="flex items-center gap-2.5">
+                  <MapPin size={16} className="shrink-0 text-[#ddbd75]" /> صبيا · أبو عريش، جازان
+                </li>
+                <li>
+                  <a href="tel:+966173600000" dir="ltr" className="flex items-center gap-2.5 transition-colors hover:text-white">
+                    <Phone size={16} className="shrink-0 text-[#ddbd75]" /> ٠١٧ ٣٦٠ ٠٠٠٠
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Clock size={16} className="shrink-0 text-[#ddbd75]" /> يومياً ٩ص – ١٢م
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar — copyright + payment trust */}
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/15 pt-6 sm:flex-row">
+            <p className="text-xs text-white/60">© ٢٠٢٥ {settings.storeName} · جازان، المملكة العربية السعودية</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {['مدى', 'فيزا', 'ماستركارد', 'Apple Pay', 'تابي'].map((m) => (
+                <span key={m} className="rounded-md bg-white/10 px-2.5 py-1 text-[10px] font-bold text-white/80">{m}</span>
               ))}
             </div>
-          )}
-        </section>
-
-        {/* Design your cake */}
-        <Reveal>
-          <DesignYourCake onAddCustom={handleDesignAdd} onCustomizeMore={handleCustomizeMore} />
-        </Reveal>
-
-        {/* Shop by occasion */}
-        <Reveal>
-          <ShopByOccasion
-            onShop={() => goToShop()}
-            onOccasion={(occ) => navigate(`/shop?occasion=${encodeURIComponent(occ)}`)}
-          />
-        </Reveal>
-
-        {/* How it works */}
-        <Reveal>
-          <HowItWorks />
-        </Reveal>
-
-        {/* Testimonials */}
-        <Reveal>
-          <Testimonials />
-        </Reveal>
-
-        {/* Occasions & hospitality builder — dedicated, creative callout */}
-        <Reveal>
-          <OccasionsCallout onStart={() => navigate('/events')} />
-        </Reveal>
-      </main>
-
-      <StoreFooter storeName={settings.storeName} onNavigate={navigate} onShop={scrollToProducts} />
-
-      {selectedProductForReview && (
-        <ProductReviewDialog
-          open={reviewDialogOpen}
-          onOpenChange={setReviewDialogOpen}
-          productId={selectedProductForReview.id}
-          productName={selectedProductForReview.name}
-        />
-      )}
-
-      <FloatingContactButton />
-      <BackToTop />
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

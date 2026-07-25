@@ -35,7 +35,13 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
   ];
 
   return (
-    <footer className="mt-12 lg:mt-16 bg-card border-t border-border/60">
+    <footer className="relative mt-12 lg:mt-16 bg-card border-t border-border/60">
+      {/* refined rose/blush hairline riding the top border */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / .45), hsl(var(--blush) / .6), hsl(var(--primary) / .45), transparent)' }}
+      />
       <div className="container mx-auto px-4 lg:px-6 py-12 lg:py-16">
         <div className="grid gap-10 md:gap-8 md:grid-cols-12">
           {/* Brand */}
@@ -45,7 +51,7 @@ export function StoreFooter({ storeName, onNavigate, onShop }: StoreFooterProps)
                 <Cake className="w-5 h-5" />
               </div>
               <div className="leading-tight text-start">
-                <div className="font-display text-xl">{storeName}</div>
+                <div className="font-wedding text-2xl">{storeName}</div>
                 <div className="text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
               </div>
             </button>
