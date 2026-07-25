@@ -192,7 +192,18 @@ export function CartSheet() {
       }
       setCart([]);
     } catch {
-      /* surfaced via the mutation's onError toast */
+      // Guest checkout is attempted first, but the backend RPC still resolves the
+      // customer from auth.uid() and raises 'Customer account not found' for an
+      // anonymous session. Rather than dead-end the shopper on a generic error,
+      // fall back to the login flow with the filled-in order preserved.
+      if (!user) {
+        setCheckoutOpen(false);
+        navigate('/login', {
+          state: { from: { pathname: '/store' }, pendingOrder: { cart, mode, name, phone, address, branchId, date, time } },
+        });
+        toast({ title: 'أكمل تسجيل الدخول', description: 'احتفظنا بتفاصيل طلبك — سجّل الدخول لتأكيده.' });
+      }
+      /* otherwise surfaced via the mutation's onError toast */
     }
   };
 
