@@ -16,27 +16,29 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { RiyalSymbol } from '@/components/ui/riyal';
+import { CartCrossSell } from '@/components/store/CartCrossSell';
+import { FreeDeliveryMeter } from '@/components/store/FreeDeliveryMeter';
+import { FREE_DELIVERY_THRESHOLD, DELIVERY_FEE } from '@/lib/delivery';
+import { toArabicDigits } from '@/lib/arabicNumerals';
 import { toast } from '@/hooks/use-toast';
 import {
   ShoppingCart, Plus, Minus, Trash2, Cake, Loader2, Calendar, Clock, MapPin,
   Truck, Store, User, Phone, Gift, Check, Send, ChevronLeft, Sparkles,
-  CreditCard, Smartphone, Banknote, TicketPercent, X,
+  CreditCard, Smartphone, Banknote, TicketPercent, X, Wallet,
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
-const FREE_DELIVERY_THRESHOLD = 200;
-const DELIVERY_FEE = 25;
-
 type Mode = 'delivery' | 'pickup';
-type PayMethod = 'mada' | 'applepay' | 'card' | 'cod';
+type PayMethod = 'mada' | 'applepay' | 'card' | 'tabby' | 'cod';
 
 const PAY_LABELS: Record<PayMethod, string> = {
   mada: 'مدى',
   applepay: 'Apple Pay',
   card: 'بطاقة ائتمانية',
+  tabby: 'تابي',
   cod: 'الدفع عند الاستلام',
 };
 
@@ -122,7 +124,6 @@ export function CartSheet() {
     ? Math.min(cartTotal, coupon.kind === 'percent' ? (cartTotal * coupon.value) / 100 : coupon.value)
     : 0;
   const grandTotal = Math.max(0, cartTotal + deliveryFee - discount);
-  const toFree = Math.max(0, FREE_DELIVERY_THRESHOLD - cartTotal);
 
   const startCheckout = () => { setOpen(false); setPlaced(null); setCheckoutOpen(true); };
 
@@ -146,13 +147,9 @@ export function CartSheet() {
   const removeCoupon = () => { setCoupon(null); setCouponInput(''); setCouponError(''); };
 
   const handleCheckout = async () => {
-    if (!user) {
-      const data = { cart, mode, name, phone, address, branchId, date, time };
-      setCheckoutOpen(false);
-      navigate('/login', { state: { from: { pathname: '/store' }, pendingOrder: data } });
-      toast({ title: 'مطلوب تسجيل الدخول', description: 'سجّل الدخول أو أنشئ حساباً لإتمام الطلب.' });
-      return;
-    }
+    // Guest checkout: name + phone are collected below, so a logged-out shopper
+    // can place the order without a forced-login wall (top abandonment cause);
+    // account creation is offered after confirmation instead.
     const miss = (m: string) => toast({ title: 'بيانات ناقصة', description: m, variant: 'destructive' });
     if (!name.trim() || !phone.trim()) return miss('أدخل اسم المستلم ورقم الجوال.');
     if (mode === 'delivery' && !address.trim()) return miss('أدخل عنوان التوصيل.');
@@ -195,7 +192,18 @@ export function CartSheet() {
       }
       setCart([]);
     } catch {
-      /* surfaced via the mutation's onError toast */
+      // Guest checkout is attempted first, but the backend RPC still resolves the
+      // customer from auth.uid() and raises 'Customer account not found' for an
+      // anonymous session. Rather than dead-end the shopper on a generic error,
+      // fall back to the login flow with the filled-in order preserved.
+      if (!user) {
+        setCheckoutOpen(false);
+        navigate('/login', {
+          state: { from: { pathname: '/store' }, pendingOrder: { cart, mode, name, phone, address, branchId, date, time } },
+        });
+        toast({ title: 'أكمل تسجيل الدخول', description: 'احتفظنا بتفاصيل طلبك — سجّل الدخول لتأكيده.' });
+      }
+      /* otherwise surfaced via the mutation's onError toast */
     }
   };
 
@@ -210,7 +218,7 @@ export function CartSheet() {
 
   const availableDates = Array.from({ length: 7 }, (_, i) => {
     const d = addDays(new Date(), i + 1);
-    return { value: format(d, 'yyyy-MM-dd'), label: format(d, 'EEEE، d MMMM', { locale: ar }) };
+    return { value: format(d, 'yyyy-MM-dd'), label: toArabicDigits(format(d, 'EEEE، d MMMM', { locale: ar })) };
   });
   const timeSlots = [
     '09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
@@ -218,19 +226,19 @@ export function CartSheet() {
   ].map((v) => {
     const h = parseInt(v, 10);
     const label = h < 12 ? `${h}:00 صباحاً` : h === 12 ? '12:00 ظهراً' : `${h - 12}:00 ${h < 16 ? 'ظهراً' : h < 18 ? 'عصراً' : 'مساءً'}`;
-    return { value: v, label };
+    return { value: v, label: toArabicDigits(label) };
   });
 
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-full sm:max-w-md flex flex-col">
+        <SheetContent side="left" className="storefront-theme w-full sm:max-w-md flex flex-col">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 font-display text-2xl">
               <ShoppingCart className="w-5 h-5 text-primary" /> سلة المشتريات
             </SheetTitle>
             <SheetDescription>
-              {cart.length === 0 ? 'سلتك فارغة حالياً' : `${cartCount} منتج جاهز للطلب`}
+              {cart.length === 0 ? 'سلتك فارغة حالياً' : `${toArabicDigits(cartCount)} منتج جاهز للطلب`}
             </SheetDescription>
           </SheetHeader>
 
@@ -259,17 +267,17 @@ export function CartSheet() {
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-sm line-clamp-1">{item.product.name}</h4>
                       <p className="text-primary font-display text-base mt-0.5">
-                        {item.product.price} <RiyalSymbol className="text-xs text-muted-foreground" />
+                        {toArabicDigits(item.product.price)} <RiyalSymbol className="text-xs text-muted-foreground" />
                       </p>
                       <div className="flex items-center gap-2 mt-2">
-                        <Button size="icon" variant="outline" aria-label="إنقاص الكمية" className="h-7 w-7 rounded-full" onClick={() => updateQuantity(item.product.id, -1)}>
-                          <Minus className="w-3 h-3" />
+                        <Button size="icon" variant="outline" aria-label="إنقاص الكمية" className="h-11 w-11 rounded-full" onClick={() => updateQuantity(item.product.id, -1)}>
+                          <Minus className="w-3.5 h-3.5" />
                         </Button>
-                        <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
-                        <Button size="icon" variant="outline" aria-label="زيادة الكمية" className="h-7 w-7 rounded-full" onClick={() => updateQuantity(item.product.id, 1)}>
-                          <Plus className="w-3 h-3" />
+                        <span className="w-8 text-center font-medium text-sm">{toArabicDigits(item.quantity)}</span>
+                        <Button size="icon" variant="outline" aria-label="زيادة الكمية" className="h-11 w-11 rounded-full" onClick={() => updateQuantity(item.product.id, 1)}>
+                          <Plus className="w-3.5 h-3.5" />
                         </Button>
-                        <Button size="icon" variant="ghost" aria-label="إزالة المنتج" className="h-7 w-7 text-destructive ms-auto" onClick={() => removeFromCart(item.product.id)}>
+                        <Button size="icon" variant="ghost" aria-label="إزالة المنتج" className="h-10 w-10 text-destructive ms-auto" onClick={() => removeFromCart(item.product.id)}>
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
@@ -278,28 +286,25 @@ export function CartSheet() {
                 </Card>
               ))
             )}
+            <CartCrossSell />
           </div>
 
           {cart.length > 0 && (
             <SheetFooter className="border-t pt-4">
               <div className="w-full space-y-3">
-                {/* Free-delivery nudge */}
-                {toFree > 0 ? (
-                  <div className="text-[12px] text-muted-foreground bg-secondary/50 rounded-xl px-3 py-2 flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-primary shrink-0" />
-                    أضف <b className="text-foreground">{toFree.toFixed(0)} <RiyalSymbol /></b> للحصول على توصيل مجاني
-                  </div>
-                ) : (
-                  <div className="text-[12px] text-green-700 bg-green-600/10 rounded-xl px-3 py-2 flex items-center gap-2">
-                    <Check className="w-4 h-4 shrink-0" /> حصلت على التوصيل المجاني!
-                  </div>
-                )}
+                {/* Free-delivery progress toward the real threshold */}
+                <FreeDeliveryMeter className="bg-secondary/50 rounded-xl px-3 py-2.5" />
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm text-muted-foreground">المجموع</span>
                   <span className="font-display text-3xl text-primary">
-                    {cartTotal.toFixed(2)} <RiyalSymbol className="text-sm text-muted-foreground" />
+                    {toArabicDigits(cartTotal.toFixed(2))} <RiyalSymbol className="text-sm text-muted-foreground" />
                   </span>
                 </div>
+                {/* Tabby BNPL — the on-page installment math is where BNPL lifts AOV */}
+                <p className="flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
+                  <Wallet className="w-3.5 h-3.5 text-primary shrink-0" />
+                  أو ٤ دفعات من {toArabicDigits(Math.ceil(cartTotal / 4))} <RiyalSymbol className="text-[10px]" /> بدون فوائد عبر تابي
+                </p>
                 <Button className="w-full h-12 rounded-full bg-foreground text-background hover:bg-foreground/90" onClick={startCheckout}>
                   إتمام الطلب
                 </Button>
@@ -319,7 +324,9 @@ export function CartSheet() {
 
       {/* ── Checkout ── */}
       <Dialog open={checkoutOpen} onOpenChange={(o) => { if (!o && placed) finishAndClose(); else setCheckoutOpen(o); }}>
-        <DialogContent className="sm:max-w-lg max-h-[92vh] overflow-y-auto p-0 gap-0">
+        <DialogContent className="storefront-theme sm:max-w-lg max-h-[92vh] overflow-y-auto p-0 gap-0">
+          {/* Accessible title for screen readers; the visible heading below is styled separately. */}
+          <DialogTitle className="sr-only">{placed ? 'تم تأكيد طلبك' : 'إتمام الطلب'}</DialogTitle>
           {placed ? (
             <div className="text-center px-6 py-10">
               <div className="w-20 h-20 mx-auto rounded-full gradient-pink grid place-items-center text-primary-foreground shadow-rose-glow mb-5">
@@ -384,7 +391,7 @@ export function CartSheet() {
                     <Field icon={Phone} label="رقم الجوال">
                       <div className="flex items-center rounded-xl border border-input bg-background h-11 focus-within:ring-1 focus-within:ring-ring overflow-hidden">
                         <span className="px-3 text-sm text-muted-foreground border-e border-input shrink-0"><bdi dir="ltr">+966</bdi></span>
-                        <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="5XXXXXXXX" dir="ltr" className="flex-1 bg-transparent outline-none px-3 text-sm text-start" />
+                        <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="5XXXXXXXX" dir="ltr" className="flex-1 bg-transparent outline-none px-3 text-base text-start" />
                       </div>
                     </Field>
                   </div>
@@ -471,7 +478,7 @@ export function CartSheet() {
                           <Input value={giftName} onChange={(e) => setGiftName(e.target.value)} placeholder="اسم المستلم" className="h-11 rounded-xl bg-background" />
                           <div className="flex items-center rounded-xl border border-input bg-background h-11 overflow-hidden">
                             <span className="px-2.5 text-xs text-muted-foreground border-e border-input shrink-0"><bdi dir="ltr">+966</bdi></span>
-                            <input value={giftPhone} onChange={(e) => setGiftPhone(e.target.value)} inputMode="tel" placeholder="جوال المستلم" dir="ltr" className="flex-1 bg-transparent outline-none px-2.5 text-sm text-start" />
+                            <input value={giftPhone} onChange={(e) => setGiftPhone(e.target.value)} inputMode="tel" placeholder="جوال المستلم" dir="ltr" className="flex-1 bg-transparent outline-none px-2.5 text-base text-start" />
                           </div>
                         </div>
                       )}
@@ -490,6 +497,7 @@ export function CartSheet() {
                     <Toggle active={payment === 'mada'} onClick={() => setPayment('mada')} icon={CreditCard} label="مدى" sub="بطاقة مدى" />
                     <Toggle active={payment === 'applepay'} onClick={() => setPayment('applepay')} icon={Smartphone} label="Apple Pay" sub="دفع سريع" />
                     <Toggle active={payment === 'card'} onClick={() => setPayment('card')} icon={CreditCard} label="بطاقة ائتمانية" sub="فيزا / ماستركارد" />
+                    <Toggle active={payment === 'tabby'} onClick={() => setPayment('tabby')} icon={Wallet} label="تابي" sub="قسّمها على ٤ دفعات" />
                     <Toggle active={payment === 'cod'} onClick={() => setPayment('cod')} icon={Banknote} label="الدفع عند الاستلام" sub="نقداً أو شبكة" />
                   </div>
                 </Section>
@@ -502,7 +510,7 @@ export function CartSheet() {
                         <TicketPercent className="w-4 h-4 text-primary shrink-0" />
                         <bdi dir="ltr" className="font-bold">{coupon.code}</bdi>
                         <span className="text-muted-foreground">
-                          {coupon.kind === 'percent' ? `خصم ${coupon.value}%` : <>خصم {coupon.value} <RiyalSymbol /></>}
+                          {coupon.kind === 'percent' ? `خصم ${toArabicDigits(coupon.value)}%` : <>خصم {toArabicDigits(coupon.value)} <RiyalSymbol /></>}
                         </span>
                       </span>
                       <Button size="icon" variant="ghost" aria-label="إزالة الكوبون" className="h-7 w-7 text-destructive shrink-0" onClick={removeCoupon}>
@@ -539,8 +547,8 @@ export function CartSheet() {
                   <div className="text-sm font-bold mb-1">ملخص الطلب</div>
                   {cart.map((item) => (
                     <div key={item.product.id} className="flex justify-between text-[13px]">
-                      <span className="text-muted-foreground">{item.product.name} × <bdi dir="ltr">{item.quantity}</bdi></span>
-                      <span className="font-medium"><bdi dir="ltr">{(item.product.price * item.quantity).toFixed(2)}</bdi> <RiyalSymbol /></span>
+                      <span className="text-muted-foreground">{item.product.name} × <bdi dir="ltr">{toArabicDigits(item.quantity)}</bdi></span>
+                      <span className="font-medium"><bdi dir="ltr">{toArabicDigits((item.product.price * item.quantity).toFixed(2))}</bdi> <RiyalSymbol /></span>
                     </div>
                   ))}
                   {discount > 0 && (
@@ -548,16 +556,16 @@ export function CartSheet() {
                       <span className="flex items-center gap-1">
                         <TicketPercent className="w-3.5 h-3.5" /> خصم الكوبون{coupon ? <> (<bdi dir="ltr">{coupon.code}</bdi>)</> : null}
                       </span>
-                      <span className="font-medium">− <bdi dir="ltr">{discount.toFixed(2)}</bdi> <RiyalSymbol /></span>
+                      <span className="font-medium">− <bdi dir="ltr">{toArabicDigits(discount.toFixed(2))}</bdi> <RiyalSymbol /></span>
                     </div>
                   )}
                   <div className="flex justify-between text-[13px] pt-1">
                     <span className="text-muted-foreground">التوصيل</span>
-                    <span className="font-medium">{deliveryFee === 0 ? <span className="text-green-700">مجاني</span> : <><bdi dir="ltr">{deliveryFee}</bdi> <RiyalSymbol /></>}</span>
+                    <span className="font-medium">{deliveryFee === 0 ? <span className="text-green-700">مجاني</span> : <><bdi dir="ltr">{toArabicDigits(deliveryFee)}</bdi> <RiyalSymbol /></>}</span>
                   </div>
                   <div className="border-t border-border/60 pt-2 mt-1 flex justify-between items-baseline">
                     <span className="font-bold">الإجمالي</span>
-                    <span className="font-display text-2xl text-primary"><bdi dir="ltr">{grandTotal.toFixed(2)}</bdi> <RiyalSymbol className="text-xs text-muted-foreground" /></span>
+                    <span className="font-display text-2xl text-primary"><bdi dir="ltr">{toArabicDigits(grandTotal.toFixed(2))}</bdi> <RiyalSymbol className="text-xs text-muted-foreground" /></span>
                   </div>
                 </div>
               </div>
@@ -565,15 +573,13 @@ export function CartSheet() {
               <div className="sticky bottom-0 bg-background/95 backdrop-blur border-t border-border/60 px-6 py-4 flex gap-3">
                 <Button variant="outline" onClick={() => setCheckoutOpen(false)} disabled={createOrder.isPending || capturePayment.isPending} className="rounded-full h-12 px-5">إلغاء</Button>
                 <Button onClick={handleCheckout} disabled={createOrder.isPending || capturePayment.isPending} className="flex-1 rounded-full h-12 bg-foreground text-background hover:bg-foreground/90 gap-2">
-                  {createOrder.isPending || capturePayment.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : user ? <Sparkles className="w-4 h-4" /> : null}
-                  {!user
-                    ? 'تسجيل الدخول للمتابعة'
-                    : capturePayment.isPending
-                      ? 'جاري معالجة الدفع…'
-                      : createOrder.isPending
-                        ? 'جاري إنشاء الطلب…'
-                        : <>{payment === 'cod' ? 'أكّد الطلب' : 'ادفع وأكّد'} · <bdi dir="ltr">{grandTotal.toFixed(0)}</bdi> <RiyalSymbol /></>}
-                  {user && !createOrder.isPending && !capturePayment.isPending && <ChevronLeft className="w-4 h-4" />}
+                  {createOrder.isPending || capturePayment.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  {capturePayment.isPending
+                    ? 'جاري معالجة الدفع…'
+                    : createOrder.isPending
+                      ? 'جاري إنشاء الطلب…'
+                      : <>{payment === 'cod' ? 'أكّد الطلب' : 'ادفع وأكّد'} · <bdi dir="ltr">{toArabicDigits(grandTotal.toFixed(0))}</bdi> <RiyalSymbol /></>}
+                  {!createOrder.isPending && !capturePayment.isPending && <ChevronLeft className="w-4 h-4" />}
                 </Button>
               </div>
             </>

@@ -34,8 +34,12 @@ export function Testimonials() {
     <section className="space-y-8">
       {/* Centered heading */}
       <div className="text-center">
-        <div className="text-xs text-primary tracking-widest uppercase font-medium">آراء عملائنا</div>
-        <h2 className="font-display text-3xl sm:text-4xl md:text-5xl mt-2 leading-tight">كلماتٌ حلوة من عملائنا</h2>
+        <div className="inline-flex items-center gap-3">
+          <span className="h-px w-8" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / .6))' }} />
+          <span className="text-xs text-primary tracking-[0.3em] uppercase font-medium">آراء عملائنا</span>
+          <span className="h-px w-8" style={{ background: 'linear-gradient(90deg, hsl(var(--primary) / .6), transparent)' }} />
+        </div>
+        <h2 className="font-wedding text-3xl sm:text-4xl md:text-5xl mt-2 leading-[1.3]">كلماتٌ حلوة من عملائنا</h2>
         <div className="mt-4 inline-flex items-center gap-2 text-sm text-muted-foreground">
           <Stars size="w-4 h-4" />
           <span className="font-semibold text-foreground">4.9</span>
@@ -65,7 +69,15 @@ export function Testimonials() {
                     {t.initial}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold leading-tight truncate">{t.name}</div>
+                    <div
+                      className={
+                        t.role === 'كيكة زفاف'
+                          ? 'font-wedding text-lg leading-tight truncate'
+                          : 'text-sm font-semibold leading-tight truncate'
+                      }
+                    >
+                      {t.name}
+                    </div>
                     <div className="text-xs text-muted-foreground truncate">{t.role}</div>
                   </div>
                 </div>

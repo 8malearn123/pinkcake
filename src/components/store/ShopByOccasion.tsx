@@ -2,9 +2,10 @@ import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Placeholder occasion imagery (design phase). Swap for owned/CDN assets later.
+// Weddings lead (index 0) → gets the large 2×2 bento tile + bigger type.
 const OCCASIONS = [
+  { title: 'أعراس وخطوبة', img: 'https://images.unsplash.com/photo-1519657337289-077653f724ed?auto=format&fit=crop&w=900&q=85' },
   { title: 'أعياد الميلاد', img: 'https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=600&q=80' },
-  { title: 'أعراس وخطوبة', img: 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&w=600&q=80' },
   { title: 'تخرّج ونجاح', img: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=600&q=80' },
   { title: 'شكراً وامتنان', img: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80' },
 ];
@@ -27,8 +28,14 @@ export function ShopByOccasion({ onShop, onOccasion }: ShopByOccasionProps) {
     <section className="space-y-5">
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
-          <div className="text-xs text-primary tracking-widest uppercase font-medium">تسوّق حسب المناسبة</div>
-          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl mt-1 leading-none">لكلِّ لحظة كيكتها</h2>
+          <div className="flex items-center gap-3">
+            <span
+              className="h-px w-10"
+              style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / .6))' }}
+            />
+            <span className="text-xs text-primary tracking-[0.3em] uppercase font-medium">تسوّق حسب المناسبة</span>
+          </div>
+          <h2 className="font-wedding text-2xl sm:text-3xl md:text-4xl mt-2 leading-[1.3]">لكلِّ لحظة كيكتها</h2>
         </div>
         <button onClick={onShop} className="group text-sm text-primary font-medium inline-flex items-center gap-1.5">
           كل المناسبات <ArrowLeft className="cta-arrow w-4 h-4" />

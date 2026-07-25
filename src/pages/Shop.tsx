@@ -19,15 +19,9 @@ import { CategoryChips } from '@/components/store/CategoryChips';
 import { ProductCardRefined } from '@/components/store/ProductCardRefined';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
 import { BackToTop } from '@/components/store/BackToTop';
+import { SORTS, sortProducts } from '@/lib/shopSort';
+import { toArabicDigits } from '@/lib/arabicNumerals';
 import { Cake, ShoppingCart, Search, ArrowUpDown, Sparkles, ArrowLeft } from 'lucide-react';
-
-const SORTS = [
-  { value: 'featured', label: 'المميّزة' },
-  { value: 'price-asc', label: 'السعر: من الأقل' },
-  { value: 'price-desc', label: 'السعر: من الأعلى' },
-  { value: 'rating', label: 'الأعلى تقييماً' },
-  { value: 'name', label: 'الاسم (أ–ي)' },
-];
 
 export default function Shop() {
   const navigate = useNavigate();
@@ -66,7 +60,7 @@ export default function Shop() {
 
   const results = useMemo(() => {
     const ql = q.trim().toLowerCase();
-    let list = (products ?? []).filter((p) => {
+    const list = (products ?? []).filter((p) => {
       const matchCat = category === 'all' || p.category === category;
       const matchOcc = !occasionTagged || !!p.occasions?.includes(occasion);
       const matchQ =
@@ -76,31 +70,14 @@ export default function Shop() {
         !!p.category?.toLowerCase().includes(ql);
       return matchCat && matchOcc && matchQ;
     });
-    const rate = (id: string) => ratingsMap?.[id]?.average_rating ?? 0;
-    switch (sort) {
-      case 'price-asc':
-        list = [...list].sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        list = [...list].sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        list = [...list].sort((a, b) => rate(b.id) - rate(a.id));
-        break;
-      case 'name':
-        list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'ar'));
-        break;
-      default:
-        break;
-    }
-    return list;
+    return sortProducts(list, sort, ratingsMap);
   }, [products, q, category, sort, ratingsMap, occasion, occasionTagged]);
 
   const isNarrowed = !!q || category !== 'all';
   const isFiltered = isNarrowed || !!occasion;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="storefront-theme min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
         <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center gap-3 lg:gap-4">
@@ -132,7 +109,7 @@ export default function Shop() {
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
                 <span className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow">
-                  {cartCount}
+                  {toArabicDigits(cartCount)}
                 </span>
               )}
             </button>
@@ -182,14 +159,14 @@ export default function Shop() {
           </div>
           {!isLoading && (
             <div className="text-sm text-muted-foreground">
-              {results.length} منتج{isNarrowed ? ' مطابق' : ''}
+              {toArabicDigits(results.length)} منتج{isNarrowed ? ' مطابق' : ''}
             </div>
           )}
         </div>
 
         {/* Grid / states */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="rounded-3xl overflow-hidden border border-border/60 bg-card">
                 <Skeleton className="aspect-[4/5]" />
@@ -220,7 +197,7 @@ export default function Shop() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
             {results.map((p) => (
               <ProductCardRefined
                 key={p.id}

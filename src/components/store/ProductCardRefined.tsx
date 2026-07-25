@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Cake, Plus, Check, Star, Heart } from 'lucide-react';
+import { Cake, Plus, Minus, Check, Star, Heart, Sparkles } from 'lucide-react';
 import { RiyalSymbol } from '@/components/ui/riyal';
+import { toArabicDigits } from '@/lib/arabicNumerals';
+import { LowStockBadge } from '@/components/store/LowStockBadge';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { isSoldOut } from '@/hooks/usePublicStore';
 import { cn } from '@/lib/utils';
@@ -8,12 +10,14 @@ import { cn } from '@/lib/utils';
 interface ProductCardRefinedProps {
   product: StoreProduct;
   rating?: { average_rating: number; review_count: number };
-  onAddToCart: () => void;
+  onAddToCart: (quantity?: number) => void;
   onViewDetails?: () => void;
   onOpenReviews?: () => void;
   /** Controlled wishlist state. When omitted the heart falls back to local state. */
   isFav?: boolean;
   onToggleFav?: () => void;
+  /** Marks the card as a curated "signature" pick — adds a rose توقيع pill + subtle ring. */
+  featured?: boolean;
 }
 
 export function ProductCardRefined({
@@ -24,22 +28,34 @@ export function ProductCardRefined({
   onOpenReviews,
   isFav,
   onToggleFav,
+  featured = false,
 }: ProductCardRefinedProps) {
   const [favLocal, setFavLocal] = useState(false);
   const fav = isFav ?? favLocal;
   const toggleFav = onToggleFav ?? (() => setFavLocal((f) => !f));
   const [added, setAdded] = useState(false);
+  const [qty, setQty] = useState(1);
   const soldOut = isSoldOut(product);
+  const hasDiscount = !!product.compare_at_price && product.compare_at_price > product.price;
+  const discountPct = hasDiscount
+    ? Math.round((1 - product.price / (product.compare_at_price as number)) * 100)
+    : 0;
 
   const handleAdd = () => {
     if (soldOut) return;
-    onAddToCart();
+    onAddToCart(qty);
     setAdded(true);
+    setQty(1);
     window.setTimeout(() => setAdded(false), 1300);
   };
 
   return (
-    <article className="product-card group relative bg-card rounded-3xl overflow-hidden border border-border/60 hover:border-primary/40 shadow-soft-lift">
+    <article
+      className={cn(
+        'product-card group relative bg-card rounded-xl overflow-hidden border border-border/60 hover:border-primary/40 shadow-soft-lift',
+        featured && 'ring-1 ring-primary/20'
+      )}
+    >
       {/* Image */}
       <div
         className="block aspect-[4/5] relative overflow-hidden"
@@ -58,11 +74,24 @@ export function ProductCardRefined({
           </div>
         )}
 
-        {product.category && (
-          <span className="absolute top-3 start-3 px-2.5 py-1 rounded-full bg-background/85 backdrop-blur text-[10px] font-medium text-foreground tracking-wide">
-            {product.category}
-          </span>
-        )}
+        <div className="absolute top-3 start-3 z-[2] flex flex-col items-start gap-1.5">
+          {hasDiscount && (
+            <span className="px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold tracking-wide">
+              خصم {toArabicDigits(discountPct)}٪
+            </span>
+          )}
+          {product.season && (
+            <span className="px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[10px] font-bold tracking-wide">
+              ☀︎ {product.season}
+            </span>
+          )}
+          {product.category && (
+            <span className="px-2.5 py-1 rounded-full bg-background/85 backdrop-blur text-[10px] font-medium text-foreground tracking-wide">
+              {product.category}
+            </span>
+          )}
+          {!soldOut && <LowStockBadge stock={product.stock} />}
+        </div>
 
         {soldOut && (
           <div className="absolute inset-0 z-[2] bg-background/45 flex items-center justify-center pointer-events-none">
@@ -98,12 +127,11 @@ export function ProductCardRefined({
 
       {/* Content */}
       <div className="p-4 -mt-6 relative z-10">
-        {rating && rating.review_count > 0 && (
-          <button onClick={onOpenReviews} className="flex items-center gap-1 text-[11px] text-muted-foreground mb-1">
-            <Star className="w-3 h-3 fill-warning text-warning" />
-            <span className="font-medium text-foreground">{rating.average_rating}</span>
-            <span>· تقييم</span>
-          </button>
+        {featured && (
+          <span className="inline-flex items-center gap-1 mb-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-[10px] font-medium tracking-wide">
+            <Sparkles className="w-3 h-3" />
+            توقيع
+          </span>
         )}
 
         {onViewDetails ? (
@@ -117,27 +145,63 @@ export function ProductCardRefined({
           <p className="text-xs text-muted-foreground line-clamp-2 mt-1.5 leading-relaxed">{product.description}</p>
         )}
 
-        <div className="flex items-end justify-between mt-4 gap-2">
+        {/* Social proof placed at the add-to-cart decision point (real ratings only). */}
+        {rating && rating.review_count > 0 && (
+          <button onClick={onOpenReviews} className="flex items-center gap-1 text-[11px] text-muted-foreground mt-3">
+            <Star className="w-3 h-3 fill-warning text-warning" />
+            <span className="font-medium text-foreground">{toArabicDigits(rating.average_rating)}</span>
+            <span>· {toArabicDigits(rating.review_count)} تقييم</span>
+          </button>
+        )}
+
+        <div className="flex items-end justify-between mt-2 gap-2">
           <div className="min-w-0">
             <div className="text-[10px] text-muted-foreground uppercase tracking-widest">السعر</div>
-            <div className="font-display text-2xl text-primary leading-none mt-1">
-              {product.price} <RiyalSymbol className="text-lg text-muted-foreground" />
+            <div className="flex items-baseline gap-2 mt-1">
+              <div className="font-display text-2xl text-primary leading-none">
+                {toArabicDigits(product.price)} <RiyalSymbol className="text-lg text-muted-foreground" />
+              </div>
+              {hasDiscount && (
+                <span className="text-xs text-muted-foreground line-through">{toArabicDigits(product.compare_at_price ?? 0)}</span>
+              )}
             </div>
           </div>
-          <button
-            onClick={handleAdd}
-            disabled={soldOut}
-            aria-label={soldOut ? 'نفد المخزون' : 'أضف إلى العربة'}
-            className={cn(
-              'add-btn press relative rounded-full h-11 w-11 shrink-0 shadow-rose-glow bg-foreground text-background',
-              'hover:bg-foreground/90 hover:scale-105 transition-transform flex items-center justify-center overflow-hidden',
-              added && 'added',
-              soldOut && 'opacity-40 cursor-not-allowed hover:scale-100 shadow-none'
+          <div className="flex items-center gap-1.5 shrink-0">
+            {!soldOut && (
+              <div className="flex items-center rounded-full border border-border h-9 bg-card">
+                <button
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  disabled={qty <= 1}
+                  aria-label="إنقاص الكمية"
+                  className="w-7 h-9 flex items-center justify-center text-foreground/70 disabled:opacity-40"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className="w-5 text-center text-sm font-medium tabular-nums">{toArabicDigits(qty)}</span>
+                <button
+                  onClick={() => setQty((q) => q + 1)}
+                  aria-label="زيادة الكمية"
+                  className="w-7 h-9 flex items-center justify-center text-foreground/70"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
             )}
-          >
-            <Plus className="icon-plus w-5 h-5" />
-            <Check className="icon-check w-5 h-5" />
-          </button>
+            <button
+              onClick={handleAdd}
+              disabled={soldOut}
+              aria-label={soldOut ? 'نفد المخزون' : 'أضف إلى العربة'}
+              className={cn(
+                'add-btn press relative rounded-full h-11 w-11 shadow-rose-glow bg-foreground text-background',
+                'hover:bg-foreground/90 hover:scale-105 transition-transform flex items-center justify-center overflow-hidden',
+                added && 'added',
+                soldOut && 'opacity-40 cursor-not-allowed hover:scale-100 shadow-none'
+              )}
+            >
+              <Plus className="icon-plus w-5 h-5" />
+              <Check className="icon-check w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </article>

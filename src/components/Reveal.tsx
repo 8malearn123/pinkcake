@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
  * so a section can never stay permanently hidden. Respects prefers-reduced-motion
  * (handled in CSS).
  */
-export function Reveal({ children, className }: { children: ReactNode; className?: string }) {
+export function Reveal({ children, className, style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
 
@@ -35,7 +35,7 @@ export function Reveal({ children, className }: { children: ReactNode; className
   }, []);
 
   return (
-    <div ref={ref} className={cn('reveal', shown && 'reveal-in', className)}>
+    <div ref={ref} style={style} className={cn('reveal', shown && 'reveal-in', className)}>
       {children}
     </div>
   );

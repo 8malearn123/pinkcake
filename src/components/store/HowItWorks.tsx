@@ -10,8 +10,12 @@ export function HowItWorks() {
   return (
     <section className="rounded-[2rem] bg-card border border-border/60 p-7 md:p-12 shadow-soft-lift">
       <div className="text-center max-w-xl mx-auto">
-        <div className="text-xs text-primary tracking-widest uppercase font-medium">بكلِّ بساطة</div>
-        <h2 className="font-display text-2xl sm:text-3xl md:text-4xl mt-1 leading-tight">من الفكرة إلى بابك في 3 خطوات</h2>
+        <div className="inline-flex items-center gap-3">
+          <span className="h-px w-8" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / .6))' }} />
+          <span className="text-xs text-primary tracking-[0.3em] uppercase font-medium">بكلِّ بساطة</span>
+          <span className="h-px w-8" style={{ background: 'linear-gradient(90deg, hsl(var(--primary) / .6), transparent)' }} />
+        </div>
+        <h2 className="font-wedding text-2xl sm:text-3xl md:text-4xl mt-2 leading-[1.3]">من الفكرة إلى بابك في 3 خطوات</h2>
         <p className="text-muted-foreground text-sm mt-3 leading-relaxed">
           تجربة سلسة من أوّل نقرة حتى تصل كيكتك طازجةً إلى بابك.
         </p>
@@ -28,7 +32,7 @@ export function HowItWorks() {
                 <div className="group flex h-[72px] w-[72px] items-center justify-center rounded-2xl gradient-pink text-white shadow-rose-glow ring-4 ring-card transition-transform duration-300 hover:-translate-y-1">
                   <Icon className="w-7 h-7" />
                 </div>
-                <span className="absolute -top-2 -end-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-primary/30 bg-card text-sm font-bold text-primary shadow-sm">
+                <span className="font-display-latin absolute -top-2 -end-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-primary/30 bg-card text-base text-primary shadow-sm">
                   {num}
                 </span>
               </div>

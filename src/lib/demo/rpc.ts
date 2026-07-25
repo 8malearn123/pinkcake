@@ -124,6 +124,7 @@ const READ: Record<string, (args: Args) => unknown> = {
   validate_coupon: (a) => {
     const code = String(a?.['_code'] ?? '').trim().toUpperCase();
     const coupons: Record<string, { kind: 'percent' | 'fixed'; value: number }> = {
+      CAKE15: { kind: 'percent', value: 15 }, // the storefront's single headline first-order welcome code
       WELCOME10: { kind: 'percent', value: 10 },
       SWEET15: { kind: 'percent', value: 15 },
       PINK25: { kind: 'fixed', value: 25 },
