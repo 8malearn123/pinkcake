@@ -16,7 +16,7 @@ import {
 import { StoreSearch } from '@/components/store/StoreSearch';
 import { AccountMenu } from '@/components/store/AccountMenu';
 import { CategoryChips } from '@/components/store/CategoryChips';
-import { ProductCardRefined } from '@/components/store/ProductCardRefined';
+import { StoreProductCard } from '@/components/store/StoreProductCard';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
 import { BackToTop } from '@/components/store/BackToTop';
 import { SORTS, sortProducts } from '@/lib/shopSort';
@@ -34,8 +34,9 @@ export default function Shop() {
   const occasion = params.get('occasion') ?? '';
 
   const { data: products, isLoading } = usePublicStoreProducts();
-  const { addToCart, count: cartCount, open: openCart } = useStoreCart();
+  const { addToCart, updateQuantity, cart, count: cartCount, open: openCart } = useStoreCart();
   const wishlist = useStoreWishlist();
+  const qtyOf = (id: string) => cart.find((i) => i.product.id === id)?.quantity ?? 0;
 
   const productIds = useMemo(() => products?.map((p) => p.id) ?? [], [products]);
   const { data: ratingsMap } = useProductRatings(productIds);
@@ -197,16 +198,18 @@ export default function Shop() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
             {results.map((p) => (
-              <ProductCardRefined
+              <StoreProductCard
                 key={p.id}
                 product={p}
                 rating={ratingsMap?.[p.id]}
-                onAddToCart={() => addToCart(p)}
-                isFav={wishlist.has(p.id)}
-                onToggleFav={() => wishlist.toggle(p)}
-                onViewDetails={() => navigate(`/product/${p.id}`)}
+                inCart={qtyOf(p.id)}
+                isFavorite={wishlist.has(p.id)}
+                onAdd={() => addToCart(p)}
+                onRemoveOne={() => updateQuantity(p.id, -1)}
+                onToggleFavorite={() => wishlist.toggle(p)}
+                onView={() => navigate(`/product/${p.id}`)}
               />
             ))}
           </div>
