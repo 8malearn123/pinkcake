@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, Clock, Instagram, MapPin, Menu, MessageCircle, Phone, ShoppingBag, User, X } from 'lucide-react';
+import { ArrowLeft, Clock, Instagram, MapPin, Menu, MessageCircle, Phone, ShoppingBag, User, X } from 'lucide-react';
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
@@ -24,12 +24,6 @@ import { StickyCartBar } from '@/components/store/StickyCartBar';
 import { StoreSearch } from '@/components/store/StoreSearch';
 import { Reveal } from '@/components/Reveal';
 
-const SORT_MAP: Record<string, string> = {
-  'الأكثر رواجاً': 'featured',
-  'السعر: من الأقل للأعلى': 'price-asc',
-  'السعر: من الأعلى للأقل': 'price-desc',
-};
-
 export default function Store() {
   const { settings } = useSettings();
   const navigate = useNavigate();
@@ -40,7 +34,6 @@ export default function Store() {
   const wishlist = useStoreWishlist();
 
   const [category, setCategory] = useState('الكل');
-  const [sort, setSort] = useState('الأكثر رواجاً');
   const [query, setQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   // Header: transparent while it overlays the full-bleed hero, solid once scrolled.
@@ -78,8 +71,8 @@ export default function Store() {
         (category === 'الكل' || p.category === category) &&
         (q === '' || p.name.includes(q) || (p.description ?? '').includes(q) || (p.category ?? '').includes(q)),
     );
-    return sortProducts(filtered, SORT_MAP[sort] ?? 'featured', ratingsMap);
-  }, [products, category, sort, query, ratingsMap]);
+    return sortProducts(filtered, 'featured', ratingsMap);
+  }, [products, category, query, ratingsMap]);
 
   const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
   const qtyOf = (id: string) => cart.find((i) => i.product.id === id)?.quantity ?? 0;
@@ -237,15 +230,14 @@ export default function Store() {
               </button>
             ))}
           </div>
-          <label className="flex items-center gap-2 self-start text-xs font-bold md:self-auto">
-            ترتيب حسب
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="appearance-none bg-transparent font-bold outline-none">
-              <option>الأكثر رواجاً</option>
-              <option>السعر: من الأقل للأعلى</option>
-              <option>السعر: من الأعلى للأقل</option>
-            </select>
-            <ChevronDown size={15} />
-          </label>
+          {/* Hands off to the full catalogue, where sorting and filtering live */}
+          <button
+            onClick={() => navigate('/shop')}
+            className="group/more flex shrink-0 items-center gap-2 self-start rounded-full border border-[#9e3a5c]/25 px-5 py-2 text-xs font-bold text-[#9e3a5c] transition-colors hover:border-[#9e3a5c] hover:bg-[#fbeef2] md:self-auto"
+          >
+            عرض كل المنتجات
+            <ArrowLeft size={15} className="transition-transform duration-300 group-hover/more:-translate-x-1" />
+          </button>
         </div>
 
         {listed.length === 0 ? (
