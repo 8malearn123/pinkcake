@@ -13,7 +13,7 @@ import { toArabicDigits } from '@/lib/arabicNumerals';
 import { Marquee, GoldDivider, WhatsAppButton } from '@/components/store/StorefrontDecor';
 import { StoreHero } from '@/components/store/StoreHero';
 import { SeasonalSection } from '@/components/store/SeasonalSection';
-import { OfferBanner, ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
+import { ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
 import { StoreProductCard } from '@/components/store/StoreProductCard';
 import { CombosSection } from '@/components/store/CombosSection';
 import { Reviews } from '@/components/store/Reviews';
@@ -205,8 +205,6 @@ export default function Store() {
       <SeasonalSection products={seasonal} renderCard={renderCard} />
 
       <ShopByOccasion />
-
-      <OfferBanner />
 
       <GoldDivider />
 
