@@ -4,7 +4,7 @@ import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useProductRatings } from '@/hooks/useProductRatings';
 import { useSettings } from '@/contexts/SettingsContext';
-import { ProductCardRefined } from '@/components/store/ProductCardRefined';
+import { StoreProductCard } from '@/components/store/StoreProductCard';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
 import { BackToTop } from '@/components/store/BackToTop';
 import { Cake, ArrowRight, ShoppingCart, Heart, ShoppingBag, Trash2 } from 'lucide-react';
@@ -13,7 +13,8 @@ export default function Wishlist() {
   const navigate = useNavigate();
   const { settings } = useSettings();
   const { items, count, clear, has, toggle } = useStoreWishlist();
-  const { addToCart, count: cartCount, open: openCart } = useStoreCart();
+  const { addToCart, updateQuantity, cart, count: cartCount, open: openCart } = useStoreCart();
+  const qtyOf = (id: string) => cart.find((i) => i.product.id === id)?.quantity ?? 0;
 
   const ids = useMemo(() => items.map((p) => p.id), [items]);
   const { data: ratingsMap } = useProductRatings(ids);
@@ -104,16 +105,18 @@ export default function Wishlist() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
             {items.map((p) => (
-              <ProductCardRefined
+              <StoreProductCard
                 key={p.id}
                 product={p}
                 rating={ratingsMap?.[p.id]}
-                onAddToCart={() => addToCart(p)}
-                isFav={has(p.id)}
-                onToggleFav={() => toggle(p)}
-                onViewDetails={() => navigate(`/product/${p.id}`)}
+                inCart={qtyOf(p.id)}
+                isFavorite={has(p.id)}
+                onAdd={() => addToCart(p)}
+                onRemoveOne={() => updateQuantity(p.id, -1)}
+                onToggleFavorite={() => toggle(p)}
+                onView={() => navigate(`/product/${p.id}`)}
               />
             ))}
           </div>

@@ -7,7 +7,7 @@ import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
-import { ProductCardRefined } from '@/components/store/ProductCardRefined';
+import { StoreProductCard } from '@/components/store/StoreProductCard';
 import { FloatingContactButton } from '@/components/store/FloatingContactButton';
 import { BackToTop } from '@/components/store/BackToTop';
 import { Reveal } from '@/components/Reveal';
@@ -37,8 +37,9 @@ export default function ProductDetails() {
   const { settings } = useSettings();
 
   const { data: products, isLoading } = usePublicStoreProducts();
-  const { addToCart, count: cartCount, open: openCart } = useStoreCart();
+  const { addToCart, updateQuantity, cart, count: cartCount, open: openCart } = useStoreCart();
   const wishlist = useStoreWishlist();
+  const qtyOf = (pid: string) => cart.find((i) => i.product.id === pid)?.quantity ?? 0;
 
   const product = useMemo(() => products?.find((p) => p.id === id), [products, id]);
   const { data: ratingsMap } = useProductRatings(product ? [product.id] : []);
@@ -431,14 +432,16 @@ export default function ProductDetails() {
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
               {related.map((p) => (
-                <ProductCardRefined
+                <StoreProductCard
                   key={p.id}
                   product={p}
                   rating={ratingsMap?.[p.id]}
-                  onAddToCart={() => addToCart(p)}
-                  isFav={wishlist.has(p.id)}
-                  onToggleFav={() => wishlist.toggle(p)}
-                  onViewDetails={() => {
+                  inCart={qtyOf(p.id)}
+                  isFavorite={wishlist.has(p.id)}
+                  onAdd={() => addToCart(p)}
+                  onRemoveOne={() => updateQuantity(p.id, -1)}
+                  onToggleFavorite={() => wishlist.toggle(p)}
+                  onView={() => {
                     navigate(`/product/${p.id}`);
                     window.scrollTo({ top: 0 });
                     setQty(1);
