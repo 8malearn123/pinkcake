@@ -35,7 +35,7 @@ export function GiftBox({ storeName }: { storeName: string }) {
           </p>
           <h2 className="mt-2 max-w-[36rem] text-[32px] font-black leading-[1.35] text-[#2c2226]">لديك هديّة بانتظارك!</h2>
           <p className="max-w-[30rem] text-[15px] leading-[1.9] text-[#6f5b62]">
-            اضغط على الصندوق لتكشف مفاجأتك — خصم خاص على أول طلب 🎉
+            اضغط على الصندوق لتكشف مفاجأتك 🎉
           </p>
 
           {open ? (
