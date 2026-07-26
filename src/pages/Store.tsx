@@ -11,7 +11,6 @@ import { sortProducts } from '@/lib/shopSort';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import { Marquee, GoldDivider, WhatsAppButton } from '@/components/store/StorefrontDecor';
 import { StoreHero } from '@/components/store/StoreHero';
-import { TrustBadges } from '@/components/store/TrustBadges';
 import { SeasonalSection } from '@/components/store/SeasonalSection';
 import { OfferBanner, ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
 import { StoreProductCard } from '@/components/store/StoreProductCard';
@@ -163,8 +162,6 @@ export default function Store() {
       </header>
 
       <StoreHero onShop={() => scrollToId('shop')} onCustomize={() => navigate('/customize')} />
-
-      <TrustBadges />
 
       <SeasonalSection products={seasonal} renderCard={renderCard} />
 
