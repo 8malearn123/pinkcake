@@ -30,12 +30,12 @@ export function StoreHero({ onShop, onCustomize }: StoreHeroProps) {
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#2c2226]/90 via-[#2c2226]/25 to-[#2c2226]/60" />
 
       {/* Gold seal */}
-      <div className="absolute end-6 top-6 z-10 hidden size-20 -rotate-[8deg] place-items-center rounded-full bg-[#ddbd75] text-center text-[#9e3a5c] shadow-[0_14px_30px_-10px_rgba(0,0,0,0.55)] ring-4 ring-white/25 sm:end-10 sm:top-10 sm:grid">
+      <div className="absolute end-6 top-[calc(84px+1.5rem)] z-10 hidden size-20 -rotate-[8deg] place-items-center rounded-full bg-[#ddbd75] text-center text-[#9e3a5c] shadow-[0_14px_30px_-10px_rgba(0,0,0,0.55)] ring-4 ring-white/25 sm:end-10 sm:grid">
         <span className="text-[10px] font-bold leading-tight">صُنع<br />بحُب في<br />جازان</span>
       </div>
 
       {/* Copy */}
-      <div className="relative z-10 mx-auto flex min-h-[590px] max-w-[1500px] flex-col justify-center px-6 py-20 sm:px-12 lg:min-h-[730px] lg:px-20">
+      <div className="relative z-10 mx-auto flex min-h-[590px] max-w-[1500px] flex-col justify-center px-6 pb-20 pt-[calc(4rem+5rem)] sm:px-12 md:pt-[calc(84px+5rem)] lg:min-h-[730px] lg:px-20">
         <div className="store-hero-stagger max-w-2xl">
           <p className="flex items-center gap-2.5 text-xs font-bold tracking-[.14em] text-[#ddbd75]">
             <span className="h-px w-9 bg-[#ddbd75]/60" /> حلويات تُخبز يومياً في جازان

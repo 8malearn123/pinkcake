@@ -41,16 +41,22 @@ export default function Store() {
   const [sort, setSort] = useState('الأكثر رواجاً');
   const [query, setQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  // Mobile: collapse the search band while scrolling down (reclaim viewport),
-  // reveal it near the top or when scrolling back up.
-  const [showMobileSearch, setShowMobileSearch] = useState(true);
+  // Header: transparent while it overlays the full-bleed hero, solid once scrolled.
+  // Mobile also collapses the search band while scrolling down to reclaim viewport.
+  const [scrolled, setScrolled] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   useEffect(() => {
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
-      setShowMobileSearch(y < 100 || y < lastY);
+      setScrolled(y > 24);
+      // Ignore sub-threshold jitter: a settle event at the same offset would
+      // otherwise read as "not scrolling up" and collapse the bar immediately.
+      if (Math.abs(y - lastY) < 6) return;
+      setShowMobileSearch(y < lastY);
       lastY = y;
     };
+    onScroll(); // sync when the page loads already scrolled
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -105,43 +111,66 @@ export default function Store() {
       <StickyCartBar />
       <Marquee />
 
-      <header className="sticky top-0 z-40 border-b border-[#9e3a5c]/10 bg-[#fffdfa]/95 backdrop-blur">
+      <header
+        className={`sticky top-0 z-40 transition-colors duration-300 ${
+          scrolled ? 'border-b border-[#9e3a5c]/10 bg-[#fffdfa]/95 backdrop-blur' : 'border-b border-transparent bg-transparent'
+        }`}
+      >
         <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-4 px-5 sm:px-8 md:h-[84px] lg:px-12">
           {/* Brand */}
           <button onClick={() => scrollToId('top')} className="shrink-0 text-start leading-none">
-            <span className="block text-xl font-black tracking-[-.06em] text-[#9e3a5c] sm:text-2xl">{settings.storeName}</span>
-            <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-[#86736c]">حلويات جازان الفاخرة</span>
+            <span className={`block text-xl font-black tracking-[-.06em] transition-colors sm:text-2xl ${scrolled ? 'text-[#9e3a5c]' : 'text-white [text-shadow:0_2px_12px_rgba(0,0,0,.45)]'}`}>{settings.storeName}</span>
+            <span className={`mt-1 block text-[9px] font-bold tracking-[.14em] transition-colors ${scrolled ? 'text-[#86736c]' : 'text-white/75'}`}>حلويات جازان الفاخرة</span>
           </button>
           {/* Inline nav */}
           <nav className="ms-6 hidden shrink-0 items-center gap-6 text-sm font-bold lg:flex">
             {NAV.map((n) => (
-              <button key={n.label} onClick={n.action} className={n.season ? 'text-[#e8942f] hover:text-[#c97a1f]' : 'hover:text-[#b0506e]'}>
+              <button
+                key={n.label}
+                onClick={n.action}
+                className={`transition-colors ${
+                  n.season
+                    ? scrolled ? 'text-[#e8942f] hover:text-[#c97a1f]' : 'text-[#ddbd75] hover:text-white'
+                    : scrolled ? 'hover:text-[#b0506e]' : 'text-white hover:text-[#ddbd75]'
+                }`}
+              >
                 {n.label}
               </button>
             ))}
           </nav>
-          {/* Center search pill */}
+          {/* Center search pill — glassy while the header floats over the hero.
+              Scoped to the pill itself ([&>svg] is the leading icon, not the dropdown's). */}
           <StoreSearch
             products={products ?? []}
             value={query}
             onChange={setQuery}
             onSubmit={() => scrollToId('shop')}
-            className="mx-auto hidden max-w-xl flex-1 md:block"
+            className={`mx-auto hidden max-w-xl flex-1 md:block ${
+              scrolled
+                ? ''
+                : '[&>svg]:text-white/70 [&_input]:border-white/25 [&_input]:bg-white/15 [&_input]:text-white [&_input]:backdrop-blur-sm [&_input]:placeholder:text-white/65'
+            }`}
           />
           {/* Actions */}
           <div className="ms-auto flex shrink-0 items-center gap-2">
-            <button onClick={() => navigate('/wishlist')} aria-label="المفضلة" className="hidden size-10 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2] sm:grid">
+            <button
+              onClick={() => navigate('/wishlist')}
+              aria-label="المفضلة"
+              className={`hidden size-10 place-items-center rounded-full border transition-colors sm:grid ${
+                scrolled ? 'border-[#9e3a5c]/15 text-[#9e3a5c] hover:bg-[#fbeef2]' : 'border-white/40 text-white hover:bg-white/15'
+              }`}
+            >
               <Heart size={18} />
             </button>
             <button onClick={openCart} aria-label={`السلة تحتوي ${toArabicDigits(cartCount)} منتجات`} className="relative grid size-10 place-items-center rounded-full bg-[#9e3a5c] text-white transition-colors hover:bg-[#b0506e]">
               <ShoppingBag size={18} />
               {cartCount > 0 && <span key={cartCount} className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-[#ddbd75] text-[10px] font-bold text-[#9e3a5c]">{toArabicDigits(cartCount)}</span>}
             </button>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 lg:hidden" aria-label="القائمة">{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
+            <button onClick={() => setMenuOpen(!menuOpen)} className={`p-2 transition-colors lg:hidden ${scrolled ? '' : 'text-white'}`} aria-label="القائمة">{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
           </div>
         </div>
         {/* Mobile search row — collapses on scroll-down to reclaim viewport */}
-        <div className={`overflow-hidden border-t border-[#9e3a5c]/10 px-5 sm:px-8 md:hidden ${showMobileSearch ? 'max-h-24 border-t py-3 opacity-100' : 'max-h-0 border-t-0 py-0 opacity-0'} transition-all duration-300`}>
+        <div className={`overflow-hidden border-[#9e3a5c]/10 px-5 sm:px-8 md:hidden ${scrolled && showMobileSearch ? 'max-h-24 border-t py-3 opacity-100' : 'max-h-0 border-t-0 py-0 opacity-0'} transition-all duration-300`}>
           <StoreSearch
             products={products ?? []}
             value={query}
@@ -161,7 +190,10 @@ export default function Store() {
         )}
       </header>
 
-      <StoreHero onShop={() => scrollToId('shop')} onCustomize={() => navigate('/customize')} />
+      {/* Pulled up by the header's height so the hero image bleeds behind it */}
+      <div className="-mt-16 md:-mt-[84px]">
+        <StoreHero onShop={() => scrollToId('shop')} onCustomize={() => navigate('/customize')} />
+      </div>
 
       <SeasonalSection products={seasonal} renderCard={renderCard} />
 
