@@ -139,7 +139,9 @@ export default function Store() {
             ))}
           </nav>
           {/* Center search pill — glassy while the header floats over the hero.
-              Scoped to the pill itself ([&>svg] is the leading icon, not the dropdown's). */}
+              Scoped to the pill itself ([&>svg] is the leading icon, not the dropdown's).
+              On focus the input's own `focus-visible:bg-card` makes it light, so the
+              text/icon must flip back to ink or they'd be white-on-white. */}
           <StoreSearch
             products={products ?? []}
             value={query}
@@ -148,7 +150,7 @@ export default function Store() {
             className={`mx-auto hidden max-w-xl flex-1 md:block ${
               scrolled
                 ? ''
-                : '[&>svg]:text-white/70 [&_input]:border-white/25 [&_input]:bg-white/15 [&_input]:text-white [&_input]:backdrop-blur-sm [&_input]:placeholder:text-white/65'
+                : '[&>svg]:text-white/70 [&_input]:border-white/25 [&_input]:bg-white/15 [&_input]:text-white [&_input]:backdrop-blur-sm [&_input]:placeholder:text-white/65 [&:focus-within>svg]:text-[#857077] [&:focus-within_input]:border-[#9e3a5c]/20 [&:focus-within_input]:text-[#2c2226] [&:focus-within_input]:placeholder:text-[#857077]'
             }`}
           />
           {/* Actions */}
