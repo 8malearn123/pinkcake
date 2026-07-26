@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, Clock, Heart, Instagram, MapPin, Menu, MessageCircle, Phone, ShoppingBag, X } from 'lucide-react';
+import { ChevronDown, Clock, Instagram, MapPin, Menu, MessageCircle, Phone, ShoppingBag, User, X } from 'lucide-react';
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useSettings } from '@/contexts/SettingsContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { sortProducts } from '@/lib/shopSort';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import { Marquee, GoldDivider, WhatsAppButton } from '@/components/store/StorefrontDecor';
@@ -32,6 +33,7 @@ const SORT_MAP: Record<string, string> = {
 export default function Store() {
   const { settings } = useSettings();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { data: products } = usePublicStoreProducts();
   const { addToCart, updateQuantity, count: cartCount, open: openCart, cart } = useStoreCart();
@@ -155,14 +157,17 @@ export default function Store() {
           />
           {/* Actions */}
           <div className="ms-auto flex shrink-0 items-center gap-2">
+            {/* Account — signed out goes to login/registration, signed in to the
+                profile hub (which links orders, wishlist and tracking). */}
             <button
-              onClick={() => navigate('/wishlist')}
-              aria-label="المفضلة"
+              onClick={() => navigate(user ? '/my-profile' : '/login')}
+              aria-label={user ? 'حسابي' : 'تسجيل الدخول أو إنشاء حساب'}
+              title={user ? 'حسابي' : 'تسجيل الدخول'}
               className={`hidden size-10 place-items-center rounded-full border transition-colors sm:grid ${
                 scrolled ? 'border-[#9e3a5c]/15 text-[#9e3a5c] hover:bg-[#fbeef2]' : 'border-white/40 text-white hover:bg-white/15'
               }`}
             >
-              <Heart size={18} />
+              <User size={18} />
             </button>
             <button onClick={openCart} aria-label={`السلة تحتوي ${toArabicDigits(cartCount)} منتجات`} className="relative grid size-10 place-items-center rounded-full bg-[#9e3a5c] text-white transition-colors hover:bg-[#b0506e]">
               <ShoppingBag size={18} />
@@ -188,6 +193,13 @@ export default function Store() {
                 {n.label}
               </button>
             ))}
+            {/* The account button is sm+ only, so keep sign-in reachable on phones */}
+            <button
+              onClick={() => { setMenuOpen(false); navigate(user ? '/my-profile' : '/login'); }}
+              className="flex items-center gap-2 border-t border-[#9e3a5c]/10 pt-4 text-start text-[#9e3a5c]"
+            >
+              <User size={16} /> {user ? 'حسابي' : 'تسجيل الدخول / إنشاء حساب'}
+            </button>
           </nav>
         )}
       </header>
