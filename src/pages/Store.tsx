@@ -10,7 +10,7 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { sortProducts } from '@/lib/shopSort';
 import { toArabicDigits } from '@/lib/arabicNumerals';
-import { Marquee, GoldDivider, WhatsAppButton } from '@/components/store/StorefrontDecor';
+import { Marquee, GoldDivider } from '@/components/store/StorefrontDecor';
 import { StoreHero } from '@/components/store/StoreHero';
 import { SeasonalSection } from '@/components/store/SeasonalSection';
 import { ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
@@ -102,7 +102,6 @@ export default function Store() {
 
   return (
     <div className={`storefront-theme min-h-screen bg-[#fffdfa] text-[#2c2226] ${cartCount > 0 ? 'pb-20 md:pb-0' : ''}`}>
-      <WhatsAppButton />
       <StickyCartBar />
       <Marquee />
 
