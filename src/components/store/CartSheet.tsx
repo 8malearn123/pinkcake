@@ -21,6 +21,8 @@ import { RiyalSymbol } from '@/components/ui/riyal';
 import { CartCrossSell } from '@/components/store/CartCrossSell';
 import { FreeDeliveryMeter } from '@/components/store/FreeDeliveryMeter';
 import { FREE_DELIVERY_THRESHOLD, DELIVERY_FEE } from '@/lib/delivery';
+import { toOrderItems } from '@/lib/orderItems';
+import { useCatalogSession } from '@/hooks/useCatalogSession';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -58,6 +60,9 @@ export function CartSheet() {
 
   const { data: branches } = usePublicStoreBranches();
   const { data: profile } = useCustomerProfile();
+  // Resolves a designed cake's variant photo for the cart thumbnail. Read-only;
+  // the id only resolves in the browser the design was made in — icon otherwise.
+  const { urlFor: designPhotoUrl } = useCatalogSession();
   const createOrder = useCreateCustomerOrder();
   const capturePayment = useCapturePayment();
   const validateCoupon = useValidateCoupon();
@@ -158,12 +163,7 @@ export function CartSheet() {
     if (isGift && giftToOther && (!giftName.trim() || !giftPhone.trim())) return miss('أدخل اسم وجوال من سيستلم الهدية.');
     if (!payment) return miss('اختر طريقة الدفع.');
 
-    const items = cart.map((item) => ({
-      product_id: item.product.id,
-      product_name: item.product.name,
-      quantity: item.quantity,
-      unit_price: item.product.price,
-    }));
+    const items = toOrderItems(cart);
     try {
       const res = await createOrder.mutateAsync({
         fulfillmentMode: mode,
@@ -259,6 +259,13 @@ export function CartSheet() {
                   <div className="flex gap-3">
                     {item.product.image_url ? (
                       <img src={item.product.image_url} alt={item.product.name} loading="lazy" className="w-16 h-16 rounded-xl object-cover" />
+                    ) : designPhotoUrl(item.product.cake_design?.photoImageId) ? (
+                      <img
+                        src={designPhotoUrl(item.product.cake_design?.photoImageId)}
+                        alt={item.product.name}
+                        loading="lazy"
+                        className="w-16 h-16 rounded-xl object-cover"
+                      />
                     ) : (
                       <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center">
                         <Cake className="w-6 h-6 text-muted-foreground" />
@@ -546,9 +553,18 @@ export function CartSheet() {
                 <div className="rounded-2xl border border-border bg-card p-4 space-y-2">
                   <div className="text-sm font-bold mb-1">ملخص الطلب</div>
                   {cart.map((item) => (
-                    <div key={item.product.id} className="flex justify-between text-[13px]">
-                      <span className="text-muted-foreground">{item.product.name} × <bdi dir="ltr">{toArabicDigits(item.quantity)}</bdi></span>
-                      <span className="font-medium"><bdi dir="ltr">{toArabicDigits((item.product.price * item.quantity).toFixed(2))}</bdi> <RiyalSymbol /></span>
+                    <div key={item.product.id} className="text-[13px]">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{item.product.name} × <bdi dir="ltr">{toArabicDigits(item.quantity)}</bdi></span>
+                        <span className="font-medium"><bdi dir="ltr">{toArabicDigits((item.product.price * item.quantity).toFixed(2))}</bdi> <RiyalSymbol /></span>
+                      </div>
+                      {/* The customer should see what they designed at the moment of payment. */}
+                      {item.product.cake_design && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          {item.product.cake_design.pathLabels?.join(' · ')}
+                          {item.product.cake_design.text ? ` · «${item.product.cake_design.text}»` : ''}
+                        </p>
+                      )}
                     </div>
                   ))}
                   {discount > 0 && (

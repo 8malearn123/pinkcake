@@ -95,6 +95,54 @@ range, since products carry no occasion metadata yet. When the catalogue gains
 occasion tags, filter `results` by `occasion` in `Shop.tsx` — the URL contract
 stays the same.
 
+## Cake design catalog (browser-local)
+
+The admin section **«تصميم الكيك»** (`/cake-design`, `src/pages/CakeDesign.tsx`) does
+**not** talk to Supabase at all yet. It is the only feature in the app with its own
+private storage:
+
+| What | Where |
+|---|---|
+| Metadata (levels, values, cakes, image records) | `localStorage` key `pinkcake:cake-catalog:v1`, one JSON document |
+| Image bytes | IndexedDB database `pinkcake-cake-catalog`, object store `images`, key = image id → `Blob` |
+| Displayable URLs | `URL.createObjectURL`, minted and revoked by the store |
+
+Consequences to be honest about: the catalog is **per-browser and per-profile**.
+Two staff on two laptops have two unrelated catalogs, "clear browsing data" destroys
+it, incognito loses it on close, and Safari evicts IndexedDB after ~7 idle days. The
+page says so under its header.
+
+The storefront studio `/customize` (`src/pages/CakeCustomizer.tsx`) reads this same
+catalog read-only via `src/hooks/useCatalogSession.ts`: the gallery shows only cakes
+with a preview + photographed first step, an option is offered **only when its
+combination has a photo**, and the stage shows the deepest photographed match. The
+old CSS-art builder (`cakeBuilder.ts`) is deleted; `src/test/no-cake-art.test.ts`
+gates its return. The kitchen brief (`src/components/cake/CakeDesignPreview.tsx`)
+renders new designs from their Arabic labels (photos are per-browser and don't
+travel), and orders placed under the old catalog render a frozen-label text brief
+via `LEGACY_OPTION_LABELS` in `src/lib/cakeStudio.ts` — do not delete that map;
+paid orders reference those ids forever.
+
+**The seam** is `CakeCatalogStore` in `src/lib/cakeCatalog/store.ts` — six methods
+(`load`, `saveCatalog`, `putImage`, `deleteImages`, `reset`, `dispose`). It hands
+back *URLs*, never Blobs, which is what makes a Supabase adapter a drop-in:
+
+- `load()` → select `cake_levels` / `cake_level_values` / `cakes` / `cake_images`,
+  then `storage.from('cake-variants').getPublicUrl()` per image
+- `putImage()` → `storage.upload()` under the key from `imageStorageKey(cakeId, path)`
+  (`cake-<cakeId>--<valueId>--<valueId>`, derived and traceable)
+- `deleteImages()` → `storage.remove()`; `dispose()` → a no-op
+
+Swap the implementation in `CakeCatalogProvider`
+(`src/contexts/CakeCatalogContext.tsx`, `getStore()`) and nothing else changes: every
+mutation in `src/lib/cakeCatalog/catalog.ts` is pure and already returns
+`{ catalog, deadImageIds, clearedPreviewCakeIds }`, so a SQL adapter has the exact
+deltas it needs instead of a whole-document write.
+
+Bump `SCHEMA_VERSION` in `src/lib/cakeCatalog/types.ts` (and push the old key onto
+`LEGACY_META_KEYS`) whenever the shape or the seed changes — the store then wipes,
+reseeds, and clears the stale blobs.
+
 ## Quick checklist
 
 - [ ] Add real Supabase env, set `VITE_DEMO_MODE="false"`
@@ -114,6 +162,21 @@ stays the same.
 - [ ] **C7 product gallery** — add an `images text[]` column to `products` and
       return it from the product RPCs. ProductDetails renders a thumbnail gallery
       from `images` and falls back to `image_url` when it's empty.
+- [ ] **Cake design catalog** — move `/cake-design` off browser-local storage:
+      tables mirroring `src/lib/cakeCatalog/types.ts` plus a `cake-variants`
+      storage bucket, then a Supabase implementation of `CakeCatalogStore`. Until
+      then the catalog does not leave the browser it was authored in.
+- [ ] **Designed-cake order payload** — the client now sends each `_items` line
+      with `cake_design` (see `src/lib/orderItems.ts` and `CartCakeDesign` in
+      `src/lib/cakeStudio.ts`) and `product_id: null` for designed cakes
+      (`custom-…` ids fail the RPC's `::uuid` cast). The backend must:
+      `ALTER TABLE order_items ADD COLUMN cake_design jsonb` + make `product_id`
+      nullable + persist both in `create_customer_order`; select `cake_design`
+      from `get_custom_orders_for_review`; and route storefront design lines
+      into the chef's queue — today they land in `orders`/`order_items`, which
+      the kitchen's custom tab never reads. `pushCustomerOrder` in
+      `src/lib/demo/data.ts` is the demo-only model of that routing (it also
+      persists to sessionStorage because the demo role switcher reloads).
 - [ ] **A4 impersonation** — the banner now says "عرض فقط" because admin
       impersonation is view-only: RLS still runs as the admin. For true
       role-scoped impersonation, add server-side session/role switching so RLS

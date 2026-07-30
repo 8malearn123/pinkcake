@@ -110,8 +110,10 @@ const READ: Record<string, (args: Args) => unknown> = {
   // event/ضيافة builder — returns a tracking code so the success screen has one
   create_event_order: () => ({ tracking_code: `EVT-${2000 + Math.floor(Math.random() * 900)}`, order_id: 'evt-demo' }),
 
-  // storefront checkout — returns an order id + number for the confirmation screen
-  create_customer_order: () => ({ order_id: 'o1', order_number: `PC-${3000 + Math.floor(Math.random() * 900)}` }),
+  // storefront checkout — appends to the demo orders (and, when a line carries a
+  // cake_design, to the chef's custom queue) so the session's own checkout is
+  // visible downstream, then returns the confirmation envelope.
+  create_customer_order: (a) => d.pushCustomerOrder(a),
   // mock payment capture — returns a "paid" envelope so checkout can show a
   // processing → paid transition without a real gateway (see HANDOFF).
   mock_capture_payment: () => ({
