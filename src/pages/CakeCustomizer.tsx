@@ -5,64 +5,129 @@ import { useStoreCart } from '@/contexts/StoreCartContext';
 import { cn } from '@/lib/utils';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import '@/components/cake/cakeStudio.css';
+import { ADDONS, QUICK_MESSAGES, PHOTO_PRINT_PRICE, type CartCakeDesign } from '@/lib/cakeStudio';
+import { imageStorageKey } from '@/lib/cakeCatalog/catalog';
+import { priceStudio } from '@/lib/cakePricing';
 import {
-  STEPS, SHAPES, FLAVORS, COLORS, DESIGNS, ADDONS, QUICK_MESSAGES, PHOTO_PRINT_PRICE,
-  buildCake, miniCakeHTML, price, makeCustomColor, type CakeConfig,
-} from '@/lib/cakeBuilder';
+  applyPick, availableValues, contiguousPath, deepestMatch, galleryCakes, nodeKey,
+  pathLabels, seedPicks, stageCaption,
+} from '@/lib/cakeSelect';
+import { useCatalogSession } from '@/hooks/useCatalogSession';
+import { CakeGallery } from '@/components/cake/CakeGallery';
+import { CakeStage } from '@/components/cake/CakeStage';
+import { LevelStep } from '@/components/cake/LevelStep';
 import {
-  ArrowRight, ChevronLeft, ChevronRight, Users, Clock, Wand2, Minus, Droplet,
-  Sparkles, Leaf, Flower2, Flame, PenLine, Cake, Paintbrush, Check, BadgeCheck,
-  ShieldCheck, ShoppingBag, PartyPopper, Star, Pipette, ImagePlus, X, type LucideIcon,
+  ArrowRight, ChevronLeft, ChevronRight, Clock, Wand2, Flame, PenLine, Cake,
+  Check, BadgeCheck, ShieldCheck, ShoppingBag, PartyPopper, ImagePlus, X, type LucideIcon,
 } from 'lucide-react';
 
-const DESIGN_ICON: Record<string, LucideIcon> = {
-  minus: Minus, droplet: Droplet, sparkle2: Sparkles, leaf2: Leaf, flower: Flower2, flame: Flame,
-};
 const ADDON_ICON: Record<string, LucideIcon> = { flame: Flame, topper: PartyPopper };
-
-const initial: CakeConfig = {
-  shape: null, flavor: null, color: COLORS[0], design: DESIGNS[0], text: '', addons: { candle: false, topper: false },
-};
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 
+/** The photo-driven studio: gallery → one step per catalog level → the finish step. */
 export default function CakeCustomizer() {
   const navigate = useNavigate();
   const location = useLocation();
   const { addToCart } = useStoreCart();
-  // Continue a design started in the home "design your cake" section.
-  const incoming = (location.state as { initial?: CakeConfig } | null)?.initial;
-  const [step, setStep] = useState(incoming?.shape ? 3 : 0);
-  const [cfg, setCfg] = useState<CakeConfig>(
-    incoming
-      ? { ...initial, ...incoming, addons: { ...initial.addons, ...incoming.addons } }
-      : initial,
-  );
+  const { status, catalog, urlFor, byKey } = useCatalogSession();
+  const levels = catalog.levels;
+
+  const [screen, setScreen] = useState<'gallery' | 'design'>('gallery');
+  const [cakeId, setCakeId] = useState<string | null>(null);
+  const [rawPicks, setRawPicks] = useState<(string | null)[]>([]);
+  const [step, setStep] = useState(0);
+  const [text, setText] = useState('');
+  const [addons, setAddons] = useState<Record<string, boolean>>({});
   const [done, setDone] = useState(false);
-  // Edible photo print. Held client-side for live preview + pricing only; the actual
-  // file upload/storage is wired on the backend later (kept out of the cart type).
+  // Edible photo print. Held client-side for pricing only; the actual upload is
+  // wired on the backend later (kept out of the cart type).
   const [photo, setPhoto] = useState<string | null>(null);
 
-  const wrapRef = useRef<HTMLDivElement>(null);
   const confettiRef = useRef<HTMLCanvasElement>(null);
 
-  const total = price(cfg) + (photo ? PHOTO_PRINT_PRICE : 0);
-  const art = useMemo(() => buildCake(cfg), [cfg]);
-  const s = STEPS[step];
-  const last = step === STEPS.length - 1;
-  const canProceed = step === 0 ? !!cfg.shape : step === 1 ? !!cfg.flavor : true;
-
-  // Settle bounce whenever the cake changes.
+  // Continue a design started elsewhere ({initial: {cakeId, path}}). Consumed
+  // once the catalog is ready; a stale deep-link (deleted cake, unphotographed
+  // path) falls back to the gallery instead of rendering a dead studio.
+  const consumedInitial = useRef(false);
   useEffect(() => {
-    const w = wrapRef.current;
-    if (!w) return;
-    w.classList.remove('settle');
-    void w.offsetWidth;
-    w.classList.add('settle');
-  }, [art]);
+    if (status !== 'ready' || consumedInitial.current) return;
+    consumedInitial.current = true;
+    const incoming = (location.state as { initial?: { cakeId?: string; path?: string[] } } | null)
+      ?.initial;
+    if (!incoming?.cakeId) return;
+    const cake = catalog.cakes.find((c) => c.id === incoming.cakeId);
+    if (!cake) return;
+    const path = incoming.path ?? [];
+    const photoBacked = path.every((_, i) => byKey.has(nodeKey(cake.id, path.slice(0, i + 1))));
+    const usable = photoBacked ? path : [];
+    setCakeId(cake.id);
+    setRawPicks(seedPicks(catalog.levels, usable));
+    setStep(usable.length);
+    setScreen('design');
+  }, [status, catalog, byKey, location.state]);
 
-  const go = (n: number) => setStep(Math.max(0, Math.min(STEPS.length - 1, n)));
-  const back = () => (step > 0 ? go(step - 1) : navigate('/store'));
-  const set = (patch: Partial<CakeConfig>) => setCfg((c) => ({ ...c, ...patch }));
+  const cake = cakeId ? catalog.cakes.find((c) => c.id === cakeId) ?? null : null;
+  const inDesign = screen === 'design' && !!cake;
+
+  // The catalog can change under us (admin edits in another tab); a stale-length
+  // picks array must never index into the wrong level.
+  const picks = rawPicks.length === levels.length ? rawPicks : seedPicks(levels);
+  const path = contiguousPath(picks);
+  const labels = pathLabels(levels, path);
+  const stepCount = levels.length + 1;
+  const last = step === levels.length;
+  const level = !last ? levels[step] : null;
+
+  // Options for this step exist only when every earlier level was picked; a gap
+  // means the whole deeper subtree is unphotographed anyway.
+  const stepPrefix = useMemo(() => {
+    const prefix = picks.slice(0, step);
+    return prefix.every(Boolean) ? (prefix as string[]) : null;
+  }, [picks, step]);
+
+  const values = useMemo(
+    () => (inDesign && level && stepPrefix ? availableValues(catalog, byKey, urlFor, cake!.id, stepPrefix) : []),
+    [inDesign, level, stepPrefix, catalog, byKey, urlFor, cake],
+  );
+
+  const gallery = useMemo(() => galleryCakes(catalog, urlFor), [catalog, urlFor]);
+
+  const match = useMemo(
+    () =>
+      inDesign
+        ? deepestMatch(catalog, byKey, urlFor, cake!, path)
+        : { url: null, imageId: null, depth: -1 },
+    [inDesign, catalog, byKey, urlFor, cake, path],
+  );
+  const caption = inDesign ? stageCaption(cake!, labels, match) : null;
+
+  const pricing = useMemo(
+    () => priceStudio({ cake, levels, path, addons, hasPhoto: !!photo }),
+    [cake, levels, path, addons, photo],
+  );
+  const total = pricing.total;
+
+  const canProceed = last || values.length === 0 || picks[step] != null;
+
+  const go = (n: number) => setStep(Math.max(0, Math.min(stepCount - 1, n)));
+  const backToGallery = () => {
+    setScreen('gallery');
+    setCakeId(null);
+    setRawPicks([]);
+    setStep(0);
+  };
+  const back = () => {
+    if (!inDesign) return navigate('/store');
+    if (step > 0) return go(step - 1);
+    backToGallery();
+  };
+  const pick = (valueId: string) => setRawPicks(applyPick(picks, step, valueId));
+  const openCake = (id: string) => {
+    setCakeId(id);
+    setRawPicks(seedPicks(levels));
+    setStep(0);
+    setScreen('design');
+  };
 
   const onPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,16 +177,36 @@ export default function CakeCustomizer() {
       return;
     }
     if (last) {
-      const summary = [cfg.shape?.name, cfg.flavor?.name, cfg.color.name, cfg.design.name]
-        .filter(Boolean)
-        .join(' · ');
+      if (!cake || path.length === 0) {
+        toast({ title: 'الرجاء الإكمال', description: 'اختر خياراً للمتابعة', variant: 'destructive' });
+        return;
+      }
+      // Ids AND Arabic labels: photos are per-browser, so labels are what the
+      // kitchen can always read. Object URLs never enter this payload.
+      const design: CartCakeDesign = {
+        v: 2,
+        cakeId: cake.id,
+        cakeName: cake.name,
+        path,
+        pathLabels: labels,
+        levelLabels: levels.slice(0, path.length).map((l) => l.name),
+        photoKey: imageStorageKey(cake.id, path),
+        photoImageId: match.imageId ?? undefined,
+        text: text.trim() || undefined,
+        addons: ADDONS.filter((a) => addons[a.id]).map((a) => a.id),
+        photoPrint: !!photo,
+      };
       addToCart({
         id: `custom-${Date.now()}`,
-        name: `كيكة مخصّصة${cfg.shape ? ` — ${cfg.shape.name}` : ''}`,
-        description: summary + (cfg.text.trim() ? ` · «${cfg.text.trim()}»` : '') + (photo ? ' · مع صورة مطبوعة' : ''),
+        name: `كيكة مخصّصة — ${cake.name}`,
+        description:
+          [cake.name, ...labels].join(' · ') +
+          (text.trim() ? ` · «${text.trim()}»` : '') +
+          (photo ? ' · مع صورة مطبوعة' : ''),
         price: total,
         category: 'تصميم خاص',
         image_url: null,
+        cake_design: design,
       });
       runConfetti();
       setDone(true);
@@ -130,9 +215,16 @@ export default function CakeCustomizer() {
     }
   };
 
-  const reset = () => { setDone(false); setCfg(initial); setStep(0); setPhoto(null); };
+  const reset = () => {
+    setDone(false);
+    setText('');
+    setAddons({});
+    setPhoto(null);
+    backToGallery();
+  };
 
-  const addonNames = ADDONS.filter((a) => cfg.addons[a.id as 'candle' | 'topper']).map((a) => a.name).join(' • ');
+  const addonNames = ADDONS.filter((a) => addons[a.id]).map((a) => a.name).join(' • ');
+  const prevLevelName = step > 0 ? levels[step - 1]?.name : undefined;
 
   return (
     <div className="cake-studio" dir="rtl">
@@ -150,208 +242,155 @@ export default function CakeCustomizer() {
               <div className="val"><span className="num">{total}</span><RiyalSymbol className="cur" /></div>
             </div>
           </div>
-          <div className="rail">
-            <div className="count">
-              <span className="num seq" dir="ltr"><span>{String(step + 1).padStart(2, '0')}</span> <span className="tot">/ 05</span></span>
-              <span className="cap">{s.cap}</span>
+          {inDesign && (
+            <div className="rail">
+              <div className="count">
+                <span className="num seq" dir="ltr">
+                  <span>{String(step + 1).padStart(2, '0')}</span>{' '}
+                  <span className="tot">/ {String(stepCount).padStart(2, '0')}</span>
+                </span>
+                <span className="cap">{level ? level.name : 'الإهداء'}</span>
+              </div>
+              <div className="segs">
+                {Array.from({ length: stepCount }, (_, i) => (
+                  <div
+                    key={i}
+                    className={cn('seg', i < step && 'fill', i === step && 'active')}
+                    onClick={() => { if (i < step || (i === step + 1 && canProceed)) go(i); }}
+                  ><i /></div>
+                ))}
+              </div>
             </div>
-            <div className="segs">
-              {STEPS.map((_, i) => (
-                <div
-                  key={i}
-                  className={cn('seg', i < step && 'fill', i === step && 'active')}
-                  onClick={() => { if (i < step || (i === step + 1 && canProceed)) go(i); }}
-                ><i /></div>
-              ))}
-            </div>
-          </div>
+          )}
         </header>
 
         {/* Live preview stage */}
-        <div className="stage">
-          <div className="spot" />
-          <div className="live-pill"><span className="ld" /> معاينة حيّة</div>
-          <div className="scene">
-            <div className="cake-wrap" ref={wrapRef}>
-              <div className="cake" dangerouslySetInnerHTML={{ __html: art.cake }} />
-              <div className="stand" dangerouslySetInnerHTML={{ __html: art.stand }} />
-            </div>
+        {inDesign && (
+          <div className="stage">
+            <div className="spot" />
+            <CakeStage
+              url={match.url}
+              alt={[cake!.name, ...labels].join(' · ')}
+              caption={caption}
+              serves={cake!.serves}
+              leadTime={cake!.leadTime}
+              empty={match.url == null}
+            />
           </div>
-          {cfg.shape ? (
-            <div className="stage-cap">
-              <div className="pill">
-                <Users size={14} /><span>تكفي <b><bdi dir="ltr">{cfg.shape.serves}</bdi></b></span>
-                <span className="dot" /><span>جاهزة خلال <b>{cfg.shape.lead}</b></span>
+        )}
+
+        {/* Options panel */}
+        <div className="panel">
+          {!inDesign ? (
+            status === 'loading' ? (
+              <div className="ph-hint" style={{ position: 'relative', minHeight: 220 }}>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>جارٍ تحضير الاستوديو…</div>
               </div>
-            </div>
+            ) : (
+              <CakeGallery items={gallery} onPick={openCake} onBrowse={() => navigate('/shop')} />
+            )
           ) : (
-            <div className="ph-hint">
-              <div>
-                <div className="serif" style={{ fontSize: 34, color: 'hsl(var(--primary)/.5)', marginBottom: 6 }}>✲</div>
-                <div style={{ fontSize: 13, fontWeight: 500 }}>اختر شكل البداية لتظهر كيكتك هنا</div>
+            <div key={step}>
+              <div className="shead sect">
+                <div className="kick"><Wand2 size={13} /> {level ? 'اختيارك' : 'اللمسة الأخيرة'}</div>
+                <h2>{level ? `اختر ${level.name}` : 'رسالتك وإضافاتك'}</h2>
+                <p>{level ? 'كل ما تراه متوفر فعلاً — مصوّر في مطبخنا.' : 'كلمة من القلب وإضافات الاحتفال.'}</p>
               </div>
+
+              {level && (
+                <LevelStep
+                  level={level}
+                  values={values}
+                  selectedId={picks[step]}
+                  onPick={pick}
+                  onBack={step > 0 ? () => go(step - 1) : undefined}
+                  prevLevelName={prevLevelName}
+                />
+              )}
+
+              {last && (
+                <div className="sect">
+                  <div className="flabel" style={{ marginTop: 2 }}><PenLine size={16} /> الرسالة على الكيكة <span className="opt">— اختياري</span></div>
+                  <input
+                    className="msg-input" maxLength={28} placeholder="اكتب رسالتك هنا…"
+                    value={text} onChange={(e) => setText(e.target.value)}
+                  />
+                  <div className="cc"><span>{text.length}</span>/28</div>
+                  <div className="chips">
+                    {QUICK_MESSAGES.map((m) => (
+                      <button key={m} className={cn('chip', text === m && 'sel')} onClick={() => setText(m)}>{m}</button>
+                    ))}
+                  </div>
+
+                  <div className="flabel"><ImagePlus size={16} /> اطبع صورتك على الكيكة <span className="opt">— اختياري</span></div>
+                  {photo ? (
+                    <div className="photo-prev">
+                      <img src={photo} alt="الصورة المرفقة" />
+                      <button className="rm" onClick={() => setPhoto(null)} aria-label="إزالة الصورة"><X size={15} /></button>
+                    </div>
+                  ) : (
+                    <label className="photo-drop">
+                      <div className="pic"><ImagePlus size={20} /></div>
+                      <div className="t">أرفقي صورة للطباعة</div>
+                      <div className="h">صورة بصيغة JPG أو PNG — نضعها على كيكتك بأفضل شكل</div>
+                      <input type="file" accept="image/*" hidden onChange={onPhoto} />
+                    </label>
+                  )}
+                  <div className="photo-note"><BadgeCheck size={14} /> طباعة صالحة للأكل <span className="add">+{PHOTO_PRINT_PRICE} <RiyalSymbol /></span></div>
+
+                  <div className="flabel"><Flame size={16} /> إضافات الاحتفال <span className="opt">— اختياري</span></div>
+                  <div className="addons">
+                    {ADDONS.map((a) => {
+                      const Ic = ADDON_ICON[a.icon] ?? Flame;
+                      const on = !!addons[a.id];
+                      return (
+                        <button key={a.id} className={cn('addon', on && 'on')} onClick={() => setAddons((prev) => ({ ...prev, [a.id]: !prev[a.id] }))}>
+                          <div className="ac"><Ic size={19} /></div>
+                          <div className="am"><div className="nm">{a.name}</div><div className="ds">{a.ds}</div></div>
+                          <div className="ap">+{a.add} <RiyalSymbol /></div>
+                          <div className="check"><Check size={13} /></div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Summary — anxiety-first, pre-CTA */}
+                  <div className="flabel" style={{ marginTop: 24 }}><Check size={16} /> ملخّص الطلب</div>
+                  <div className="summary">
+                    <div className="srow"><div className="k"><Cake size={15} /> الكيكة</div><div className="v">{cake!.name} <span style={{ color: 'hsl(var(--muted-foreground))', fontWeight: 500 }}>· تكفي <bdi dir="ltr">{cake!.serves}</bdi></span></div></div>
+                    {path.map((valueId, i) => (
+                      <div className="srow" key={valueId}>
+                        <div className="k"><Check size={15} /> {levels[i]?.name}</div>
+                        <div className="v">{labels[i]}</div>
+                      </div>
+                    ))}
+                    {text.trim() && <div className="srow"><div className="k"><PenLine size={15} /> الرسالة</div><div className="v">«{text.trim()}»</div></div>}
+                    {addonNames && <div className="srow"><div className="k"><Flame size={15} /> إضافات</div><div className="v">{addonNames}</div></div>}
+                    {photo && <div className="srow"><div className="k"><ImagePlus size={15} /> صورة</div><div className="v">مطبوعة على الكيكة</div></div>}
+                    <div className="srow"><div className="k"><Clock size={15} /> الجاهزية</div><div className="v muted">خلال {cake!.leadTime}</div></div>
+                    <div className="stotal"><div className="k">الإجمالي</div><div className="v"><span className="big num">{total}</span><RiyalSymbol className="cur" /></div></div>
+                  </div>
+                  <div className="assure"><BadgeCheck size={14} /> تعديلات مجانية غير محدودة قبل التأكيد.</div>
+                  <div className="assure"><ShieldCheck size={14} /> تُحضّر طازجة في فرعك الأقرب — تفاصيل التوصيل في الخطوة التالية.</div>
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        {/* Options panel */}
-        <div className="panel">
-          <div key={step}>
-            <div className="shead sect">
-              <div className="kick"><Wand2 size={13} /> {s.kick}</div>
-              <h2>{s.title}</h2>
-              <p>{s.sub}</p>
-            </div>
-
-            {s.key === 'shape' && (
-              <div className="grid cols-2 sect">
-                {SHAPES.map((sh) => (
-                  <button key={sh.id} className={cn('card', cfg.shape?.id === sh.id && 'sel')} onClick={() => set({ shape: sh })}>
-                    <div className="tick"><Check size={12} /></div>
-                    {sh.popular && <div className="pop"><Star size={11} /> الأكثر طلباً</div>}
-                    <div className="thumb" dangerouslySetInnerHTML={{ __html: miniCakeHTML(sh) }} />
-                    <div className="nm">{sh.name}</div>
-                    <div className="meta"><Users size={13} /><bdi dir="ltr">{sh.serves}</bdi><span className="d" /><span>{sh.lead}</span></div>
-                    <div className="pr">من <span className="v num">{sh.price}</span> <RiyalSymbol /></div>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {s.key === 'flavor' && (
-              <div className="sect" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {FLAVORS.map((f) => (
-                  <button key={f.id} className={cn('frow', cfg.flavor?.id === f.id && 'sel')} onClick={() => set({ flavor: f })}>
-                    <div className="fdot" style={{ background: f.dot }} />
-                    <div className="fmeta">
-                      <div className="nm">{f.name}</div>
-                      <div className="ds">{f.ds}</div>
-                      {f.popular && <div className="pop inline"><Star size={11} /> الأكثر طلباً</div>}
-                    </div>
-                    <div className="pr">{f.add ? <>+{f.add} <RiyalSymbol /></> : 'مشمولة'}</div>
-                    <div className="fradio"><i /></div>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {s.key === 'color' && (
-              <div className="swatches sect">
-                {COLORS.map((col) => (
-                  <button key={col.id} className={cn('sw', cfg.color.id === col.id && !cfg.color.custom && 'sel')} onClick={() => set({ color: col })}>
-                    <div className="dot" style={{ background: col.c }} />
-                    <div className="nm">{col.name}</div>
-                  </button>
-                ))}
-                <label className={cn('sw', 'custom', cfg.color.custom && 'sel')}>
-                  <div className="dot" style={cfg.color.custom ? { background: cfg.color.c } : undefined}>
-                    {!cfg.color.custom && <Pipette size={18} />}
-                  </div>
-                  <div className="nm">مخصّص</div>
-                  <input
-                    type="color"
-                    value={cfg.color.custom ? cfg.color.c : '#eccfd6'}
-                    onChange={(e) => set({ color: makeCustomColor(e.target.value) })}
-                    aria-label="لون مخصّص"
-                  />
-                </label>
-              </div>
-            )}
-
-            {s.key === 'design' && (
-              <div className="grid cols-3 sect">
-                {DESIGNS.map((d) => {
-                  const Ic = DESIGN_ICON[d.icon] ?? Sparkles;
-                  return (
-                    <button key={d.id} className={cn('design', cfg.design.id === d.id && 'sel')} onClick={() => set({ design: d })}>
-                      <div className="tick"><Check size={12} /></div>
-                      {d.popular && <div className="pop"><Star size={11} /></div>}
-                      <div className="ic"><Ic size={22} /></div>
-                      <div className="nm">{d.name}</div>
-                      <div className="pr">{d.add ? `+${d.add}` : 'مشمول'}</div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {s.key === 'finish' && (
-              <div className="sect">
-                <div className="flabel" style={{ marginTop: 2 }}><PenLine size={16} /> الرسالة على الكيكة <span className="opt">— اختياري</span></div>
-                <input
-                  className="msg-input" maxLength={28} placeholder="اكتب رسالتك هنا…"
-                  value={cfg.text} onChange={(e) => set({ text: e.target.value })}
-                />
-                <div className="cc"><span>{cfg.text.length}</span>/28</div>
-                <div className="chips">
-                  {QUICK_MESSAGES.map((m) => (
-                    <button key={m} className={cn('chip', cfg.text === m && 'sel')} onClick={() => set({ text: m })}>{m}</button>
-                  ))}
-                </div>
-
-                <div className="flabel"><ImagePlus size={16} /> اطبع صورتك على الكيكة <span className="opt">— اختياري</span></div>
-                {photo ? (
-                  <div className="photo-prev">
-                    <img src={photo} alt="الصورة المرفقة" />
-                    <button className="rm" onClick={() => setPhoto(null)} aria-label="إزالة الصورة"><X size={15} /></button>
-                  </div>
-                ) : (
-                  <label className="photo-drop">
-                    <div className="pic"><ImagePlus size={20} /></div>
-                    <div className="t">أرفقي صورة للطباعة</div>
-                    <div className="h">صورة بصيغة JPG أو PNG — نضعها على كيكتك بأفضل شكل</div>
-                    <input type="file" accept="image/*" hidden onChange={onPhoto} />
-                  </label>
-                )}
-                <div className="photo-note"><BadgeCheck size={14} /> طباعة صالحة للأكل <span className="add">+{PHOTO_PRINT_PRICE} <RiyalSymbol /></span></div>
-
-                <div className="flabel"><Flame size={16} /> إضافات الاحتفال <span className="opt">— اختياري</span></div>
-                <div className="addons">
-                  {ADDONS.map((a) => {
-                    const Ic = ADDON_ICON[a.icon] ?? Flame;
-                    const on = cfg.addons[a.id as 'candle' | 'topper'];
-                    return (
-                      <button key={a.id} className={cn('addon', on && 'on')} onClick={() => set({ addons: { ...cfg.addons, [a.id]: !on } })}>
-                        <div className="ac"><Ic size={19} /></div>
-                        <div className="am"><div className="nm">{a.name}</div><div className="ds">{a.ds}</div></div>
-                        <div className="ap">+{a.add} <RiyalSymbol /></div>
-                        <div className="check"><Check size={13} /></div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Summary — anxiety-first, pre-CTA */}
-                <div className="flabel" style={{ marginTop: 24 }}><Check size={16} /> ملخّص الطلب</div>
-                <div className="summary">
-                  <div className="srow"><div className="k"><Cake size={15} /> الشكل</div><div className="v">{cfg.shape ? <>{cfg.shape.name} <span style={{ color: 'hsl(var(--muted-foreground))', fontWeight: 500 }}>· {cfg.shape.serves}</span></> : '—'}</div></div>
-                  <div className="srow"><div className="k"><Sparkles size={15} /> النكهة</div><div className={cn('v', !cfg.flavor && 'muted')}>{cfg.flavor ? cfg.flavor.name : '—'}</div></div>
-                  <div className="srow"><div className="k"><Droplet size={15} /> اللون</div><div className="v">{cfg.color.name}</div></div>
-                  <div className="srow"><div className="k"><Paintbrush size={15} /> التزيين</div><div className="v">{cfg.design.name}</div></div>
-                  {cfg.text.trim() && <div className="srow"><div className="k"><PenLine size={15} /> الرسالة</div><div className="v">«{cfg.text.trim()}»</div></div>}
-                  {addonNames && <div className="srow"><div className="k"><Flame size={15} /> إضافات</div><div className="v">{addonNames}</div></div>}
-                  {photo && <div className="srow"><div className="k"><ImagePlus size={15} /> صورة</div><div className="v">مطبوعة على الكيكة</div></div>}
-                  {cfg.shape && <div className="srow"><div className="k"><Clock size={15} /> الجاهزية</div><div className="v muted">خلال {cfg.shape.lead}</div></div>}
-                  <div className="stotal"><div className="k">الإجمالي</div><div className="v"><span className="big num">{total}</span><RiyalSymbol className="cur" /></div></div>
-                </div>
-                <div className="assure"><BadgeCheck size={14} /> تعديلات مجانية غير محدودة قبل التأكيد.</div>
-                <div className="assure"><ShieldCheck size={14} /> تُحضّر طازجة في فرعك الأقرب — تفاصيل التوصيل في الخطوة التالية.</div>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Bottom nav */}
-        <div className="botnav">
-          <button className={cn('btn', 'btn-prev', step === 0 && 'hide')} onClick={back} aria-label="السابق"><ChevronRight size={18} /></button>
-          <button className={cn('btn', 'btn-next', last && 'commit')} disabled={!canProceed} onClick={onNext}>
-            {last ? (
-              <><ShoppingBag size={18} /> <span>أضِف تصميمك إلى العربة</span></>
-            ) : (
-              <><span>التالي <span className="pp"><span className="num">{total}</span> <RiyalSymbol className="cur" /></span></span> <ChevronLeft size={18} /></>
-            )}
-          </button>
-        </div>
+        {inDesign && (
+          <div className="botnav">
+            <button className="btn btn-prev" onClick={back} aria-label="السابق"><ChevronRight size={18} /></button>
+            <button className={cn('btn', 'btn-next', last && 'commit')} disabled={!canProceed} onClick={onNext}>
+              {last ? (
+                <><ShoppingBag size={18} /> <span>أضِف تصميمك إلى العربة</span></>
+              ) : (
+                <><span>التالي <span className="pp"><span className="num">{total}</span> <RiyalSymbol className="cur" /></span></span> <ChevronLeft size={18} /></>
+              )}
+            </button>
+          </div>
+        )}
 
         <canvas id="confetti" ref={confettiRef} />
 
@@ -360,9 +399,9 @@ export default function CakeCustomizer() {
             <div className="badge"><Check size={42} /></div>
             <h3>أُضيفت كيكتك إلى العربة</h3>
             <p>
-              {cfg.shape?.name} · {cfg.flavor?.name} · {cfg.color.name}{cfg.text.trim() ? ` · «${cfg.text.trim()}»` : ''}
+              {cake ? [cake.name, ...labels].join(' · ') : ''}{text.trim() ? ` · «${text.trim()}»` : ''}
               <br /><b style={{ color: 'hsl(var(--foreground))' }}>الإجمالي {total} <RiyalSymbol /></b>
-              {cfg.shape ? ` — تكفي ${cfg.shape.serves}، جاهزة خلال ${cfg.shape.lead}.` : ''}
+              {cake ? ` — تكفي ${cake.serves}، جاهزة خلال ${cake.leadTime}.` : ''}
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
