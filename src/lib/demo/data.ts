@@ -112,9 +112,133 @@ export const MY_ORDERS = [order(1, 'preparing'), order(2, 'ready_for_pickup'), o
 // just prepares them from the attached brief (no pricing / no customer approval).
 export const CUSTOM_ORDERS = [
   { id: 'co1', order_number: 'CUS-2001', customer_name: 'لمياء', customer_phone: '+966••••601', branch_name: 'فرع العليا', status: 'paid', payment_status: 'paid', total_amount: 850, order_kind: 'custom', product_type: 'كيكة زفاف', occasion: 'زواج', number_of_people: 60, flavor: 'فانيليا بوربون', filling: 'كريمة الزبدة', sugar_level: 'وسط', design_description: 'ثلاث طوابق باللونين الأبيض والذهبي مع ورود سكرية وأوراق ذهب', writing_text: 'مبارك الزواج', reference_image_url: null, pickup_date: today, pickup_time: '18:00', notes: null, created_at: iso(120), cake_design: { shape: 'tier3', flavor: 'vanilla', color: 'ivory', design: 'floral', text: 'مبارك الزواج', addons: { candle: false, topper: true } } },
-  { id: 'co2', order_number: 'CUS-2002', customer_name: 'خالد', customer_phone: '+966••••602', branch_name: 'فرع النخيل', status: 'preparing', payment_status: 'paid', total_amount: 320, order_kind: 'custom', product_type: 'كيكة عيد ميلاد', occasion: 'عيد ميلاد', number_of_people: 12, flavor: 'شوكولاتة بلجيكية', filling: 'نوتيلا', sugar_level: 'وسط', design_description: 'شخصية كرتونية ثلاثية الأبعاد للأطفال', writing_text: 'كل عام وأنت بخير', reference_image_url: null, pickup_date: today, pickup_time: '16:00', notes: 'بدون مكسرات', created_at: iso(300), cake_design: { shape: 'classic', flavor: 'chocolate', color: 'blush', design: 'drip', text: 'كل عام وأنت بخير', addons: { candle: true, topper: false } } },
+  { id: 'co2', order_number: 'CUS-2002', customer_name: 'خالد', customer_phone: '+966••••602', branch_name: 'فرع النخيل', status: 'preparing', payment_status: 'paid', total_amount: 320, order_kind: 'custom', product_type: 'كيكة عيد ميلاد', occasion: 'عيد ميلاد', number_of_people: 12, flavor: 'شوكولاتة بلجيكية', filling: 'نوتيلا', sugar_level: 'وسط', design_description: 'شخصية كرتونية ثلاثية الأبعاد للأطفال', writing_text: 'كل عام وأنت بخير', reference_image_url: null, pickup_date: today, pickup_time: '16:00', notes: 'بدون مكسرات', created_at: iso(300), cake_design: { v: 2, cakeId: 'demo-cake', cakeName: 'احتفال كلاسيكي', path: ['v-shape', 'v-flavor', 'v-color'], pathLabels: ['دائرية', 'شوكولاتة', 'وردي'], levelLabels: ['الشكل', 'النكهة', 'لون الكريمة'], photoKey: 'cake-demo-cake--v-shape--v-flavor--v-color', text: 'كل عام وأنت بخير', addons: ['candle'] } },
   { id: 'co3', order_number: 'EVT-3001', customer_name: 'فاطمة', customer_phone: '+966••••603', branch_name: 'فرع العليا', status: 'paid', payment_status: 'paid', total_amount: 4500, order_kind: 'event', product_type: 'ضيافة مناسبة', occasion: 'حفل زفاف', number_of_people: 150, flavor: null, filling: null, sugar_level: null, design_description: null, writing_text: null, reference_image_url: null, pickup_date: today, pickup_time: '20:00', notes: 'القاعة شمال الرياض — يُفضّل التجهيز قبل الموعد بساعة', created_at: iso(60), guest_count: 150, serve_styles: ['centerpiece_cake', 'assorted_mini'], station_type: 'live', servers_needed: true, servers_count: 3, service_hours: 4, event_date: today, fulfillment_mode: 'onsite_setup' },
 ];
+
+/**
+ * Demo-only stand-in for the real `create_customer_order` RPC: appends the order
+ * so the session's own checkout is visible downstream — and routes any line that
+ * carries a `cake_design` into CUSTOM_ORDERS as `paid`, which is where the chef's
+ * queue reads. On the REAL backend that routing does not exist yet (storefront
+ * orders land in `orders`/`order_items` only) — see HANDOFF.md.
+ *
+ * Persisted to sessionStorage because the demo role switcher navigates with
+ * `window.location.href` — a full reload that would otherwise wipe the order
+ * before the "chef" ever sees it. Per-tab and gone when the tab closes, which
+ * is the right lifetime for demo scaffolding.
+ */
+const PUSHED_ORDERS_KEY = 'pinkcake:demo-pushed-orders:v1';
+
+interface PushedOrders {
+  orders: Record<string, unknown>[];
+  customOrders: Record<string, unknown>[];
+}
+
+function readPushedOrders(): PushedOrders {
+  try {
+    const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(PUSHED_ORDERS_KEY) : null;
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    const p = parsed as PushedOrders | null;
+    if (p && Array.isArray(p.orders) && Array.isArray(p.customOrders)) return p;
+  } catch {
+    // corrupt or unavailable — start clean
+  }
+  return { orders: [], customOrders: [] };
+}
+
+const pushedOrders = readPushedOrders();
+(ORDERS as Record<string, unknown>[]).push(...pushedOrders.orders);
+(MY_ORDERS as Record<string, unknown>[]).push(...pushedOrders.orders);
+(CUSTOM_ORDERS as Record<string, unknown>[]).push(...pushedOrders.customOrders);
+
+function savePushedOrders() {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(PUSHED_ORDERS_KEY, JSON.stringify(pushedOrders));
+    }
+  } catch {
+    // quota/unavailable — the order still lives until the next reload
+  }
+}
+
+let demoOrderSeq = pushedOrders.orders.length;
+export function pushCustomerOrder(args: Record<string, unknown> | undefined) {
+  demoOrderSeq += 1;
+  const orderId = `o-demo-${demoOrderSeq}`;
+  const orderNumber = `PC-${3000 + demoOrderSeq}`;
+  const a = args ?? {};
+  const items = Array.isArray(a['_items']) ? (a['_items'] as Record<string, unknown>[]) : [];
+  const branch =
+    BRANCHES.find((b) => b.id === a['_branch_id']) ?? BRANCHES[0];
+
+  const orderRow: Record<string, unknown> = {
+    id: orderId,
+    order_number: orderNumber,
+    status: 'paid',
+    payment_status: 'paid',
+    total_amount: items.reduce(
+      (sum, it) => sum + Number(it.unit_price ?? 0) * Number(it.quantity ?? 1),
+      0,
+    ),
+    branch_id: branch.id,
+    branch_name: branch.name,
+    branches: { id: branch.id, name: branch.name },
+    customer_id: 'c-demo',
+    customer_name: String(a['_recipient_name'] ?? 'عميل تجريبي'),
+    customers: { name: String(a['_recipient_name'] ?? 'عميل تجريبي') },
+    customer_phone: '+966••••000',
+    customer_phone_full: String(a['_recipient_phone'] ?? ''),
+    delivery_address: (a['_address'] as string | null) ?? null,
+    tracking_code: `TRK-${orderNumber}`,
+    delivery_date: String(a['_delivery_date'] ?? today),
+    delivery_time: String(a['_delivery_time'] ?? '16:00'),
+    created_at: iso(0),
+    notes: (a['_notes'] as string | null) ?? null,
+    items: items.map((it) =>
+      item(String(it.product_name ?? ''), Number(it.quantity ?? 1), Number(it.unit_price ?? 0)),
+    ),
+  };
+  (ORDERS as Record<string, unknown>[]).push(orderRow);
+  (MY_ORDERS as Record<string, unknown>[]).push(orderRow);
+  pushedOrders.orders.push(orderRow);
+
+  for (const it of items) {
+    const design = it.cake_design as Record<string, unknown> | null | undefined;
+    if (!design) continue;
+    const pathLabels = Array.isArray(design.pathLabels) ? (design.pathLabels as string[]) : [];
+    const customRow: Record<string, unknown> = {
+      id: `${orderId}-design-${CUSTOM_ORDERS.length}`,
+      order_number: orderNumber,
+      customer_name: String(a['_recipient_name'] ?? 'عميل تجريبي'),
+      customer_phone: '+966••••000',
+      branch_name: branch.name,
+      status: 'paid',
+      payment_status: 'paid',
+      total_amount: Number(it.unit_price ?? 0) * Number(it.quantity ?? 1),
+      order_kind: 'custom',
+      product_type: String(design.cakeName ?? 'كيكة مخصّصة'),
+      occasion: null,
+      number_of_people: null,
+      flavor: null,
+      filling: null,
+      sugar_level: null,
+      design_description: [design.cakeName, ...pathLabels].filter(Boolean).join(' · '),
+      writing_text: (design.text as string | undefined) ?? null,
+      reference_image_url: null,
+      pickup_date: String(a['_delivery_date'] ?? today),
+      pickup_time: String(a['_delivery_time'] ?? '16:00'),
+      notes: (it.notes as string | null) ?? null,
+      created_at: iso(0),
+      cake_design: design,
+    };
+    (CUSTOM_ORDERS as Record<string, unknown>[]).push(customRow);
+    pushedOrders.customOrders.push(customRow);
+  }
+
+  savePushedOrders();
+  return { order_id: orderId, order_number: orderNumber };
+}
 
 export const SUBMISSIONS = [
   { id: 's1', submission_type: 'contact', customer_name: 'أحمد', phone: '+966••••701', email: 'a@test.co', message: 'هل تتوفر كيكات خالية من الجلوتين؟', status: 'new', internal_notes: null, created_at: iso(45) },

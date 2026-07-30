@@ -7,8 +7,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CustomOrderForReview } from '@/hooks/useCustomOrders';
-import { CakePreview } from '@/components/cake/CakePreview';
-import { resolveCakeConfig } from '@/lib/cakeBuilder';
+import { CakeDesignPreview } from '@/components/cake/CakeDesignPreview';
 import {
   Users, Cake, PartyPopper, CheckCircle2, User, MapPin, Calendar,
   Sparkles, Image as ImageIcon, StickyNote, ChefHat, Grid2x2, ConciergeBell, MapPinned,
@@ -89,7 +88,7 @@ export function OrderBriefDialog({ order, open, onOpenChange }: OrderBriefDialog
   if (!order) return null;
   const isEvent = order.order_kind === 'event';
   const peopleValue = isEvent ? order.guest_count : order.number_of_people;
-  const cakeCfg = !isEvent && order.cake_design ? resolveCakeConfig(order.cake_design) : null;
+  const design = !isEvent ? order.cake_design ?? null : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -180,14 +179,14 @@ export function OrderBriefDialog({ order, open, onOpenChange }: OrderBriefDialog
           )}
 
           {/* Design brief (custom cakes) */}
-          {(cakeCfg || order.design_description || order.writing_text || order.reference_image_url) && (
+          {(design || order.design_description || order.writing_text || order.reference_image_url) && (
             <div className="rounded-2xl border border-border/60 bg-card p-5 space-y-4">
               <SectionHead icon={Sparkles} title="التصميم" />
 
-              {cakeCfg && (
+              {design && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-1.5">الشكل الذي صمّمه العميل</p>
-                  <CakePreview config={cakeCfg} />
+                  <CakeDesignPreview design={design} />
                 </div>
               )}
 

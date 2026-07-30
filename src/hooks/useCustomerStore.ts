@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
+import type { CartCakeDesign } from '@/lib/cakeStudio';
 
 export interface StoreProduct {
   id: string;
@@ -18,6 +19,12 @@ export interface StoreProduct {
   compare_at_price?: number | null;
   /** Seasonal collection tag (e.g. "صيف"); groups a limited-time collection. */
   season?: string | null;
+  /**
+   * Present on lines built by /customize. Riding on the product (like the
+   * other storefront-only optionals above) means the cart context, its
+   * localStorage persistence and the after-login restore need no changes.
+   */
+  cake_design?: CartCakeDesign | null;
 }
 
 export interface CustomerOrder {
@@ -201,10 +208,12 @@ export function useCreateCustomerOrder() {
       couponCode?: string | null;
       discount?: number;
       items: {
-        product_id: string;
+        product_id: string | null;
         product_name: string;
         quantity: number;
         unit_price: number;
+        cake_design?: CartCakeDesign | null;
+        notes?: string | null;
       }[];
     }) => {
       // The order RPC gains the richer checkout fields on the backend (recipient,
