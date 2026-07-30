@@ -53,6 +53,7 @@ const About = lazy(() => import("./pages/About"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const DesignSystem = lazy(() => import("./pages/DesignSystem"));
+const CakeDesign = lazy(() => import("./pages/CakeDesign"));
 const LozaHome = lazy(() => import("./pages/loza/LozaHome"));
 const LozaCustomizer = lazy(() => import("./pages/loza/LozaCustomizer"));
 const LozaCakeDetails = lazy(() => import("./pages/loza/LozaCakeDetails"));
@@ -313,6 +314,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRoles={['admin']}>
                     <DesignSystem />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cake-design"
+                element={
+                  <ProtectedRoute requiredRoles={['admin']}>
+                    <CakeDesign />
                   </ProtectedRoute>
                 }
               />

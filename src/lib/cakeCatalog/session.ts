@@ -1,0 +1,235 @@
+/**
+ * Cake catalog — the live session: one module-scoped owner of the loaded
+ * catalog, its object URLs, and the order in which writes happen.
+ *
+ * Two things forced this out of the React layer:
+ *
+ * 1. **Remount must not rewind.** The provider is mounted by a lazily-routed
+ *    page, so navigating away from /cake-design and back unmounts it. Caching
+ *    the boot `LoadResult` in a module variable meant the remount restored the
+ *    boot-time catalog and the next write persisted that snapshot over the
+ *    session's work. State lives here instead, and React subscribes to it.
+ *
+ * 2. **Writes must not interleave.** A mutation built from a render's
+ *    closed-over `catalog` is stale the moment anything else commits, and image
+ *    saves await a decode + re-encode + IndexedDB write first — hundreds of
+ *    milliseconds during which a second edit is entirely realistic. So every
+ *    mutation is a *function of the current catalog*, and they run one at a
+ *    time through `queue`.
+ *
+ * No React and no toasts in here: outcomes are returned, the provider renders
+ * them. That also makes the whole write path testable without a component.
+ */
+
+import { emptyCatalog } from './catalog';
+import {
+  createLocalCakeCatalogStore,
+  type CakeCatalogStore,
+  type SavedImage,
+} from './store';
+import { CatalogStorageError } from './store';
+import { BlobQuotaError } from './blobStore';
+import { META_STORAGE_KEY, type Catalog, type CascadeResult } from './types';
+
+export interface SessionState {
+  status: 'loading' | 'ready' | 'error';
+  error: string | null;
+  catalog: Catalog;
+  urls: Record<string, string>;
+  /** Set once when a boot repaired dangling references, so the UI can say so. */
+  repaired: boolean;
+}
+
+/**
+ * Deliberately a flat interface rather than a discriminated union: this repo
+ * compiles with `strict: false`, under which TS does not narrow a union on a
+ * boolean literal discriminant.
+ */
+export interface MutationOutcome {
+  ok: boolean;
+  reason?: 'storage' | 'failed';
+  error?: unknown;
+}
+
+const OK: MutationOutcome = { ok: true };
+
+let state: SessionState = {
+  status: 'loading',
+  error: null,
+  catalog: emptyCatalog(),
+  urls: {},
+  repaired: false,
+};
+
+const listeners = new Set<() => void>();
+let store: CakeCatalogStore | null = null;
+let booting: Promise<void> | null = null;
+/** Serialises every write; a rejection must not poison the chain. */
+let queue: Promise<unknown> = Promise.resolve();
+
+function publish(patch: Partial<SessionState>) {
+  state = { ...state, ...patch };
+  for (const listener of listeners) listener();
+}
+
+export function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+/** Stable between publishes — safe for useSyncExternalStore. */
+export function getSnapshot(): SessionState {
+  return state;
+}
+
+function getStore(): CakeCatalogStore {
+  if (!store) store = createLocalCakeCatalogStore();
+  return store;
+}
+
+function enqueue<T>(task: () => Promise<T>): Promise<T> {
+  const run = () => task();
+  const next = queue.then(run, run);
+  queue = next.then(
+    () => undefined,
+    () => undefined,
+  );
+  return next;
+}
+
+function toOutcome(error: unknown): MutationOutcome {
+  const storage = error instanceof CatalogStorageError || error instanceof BlobQuotaError;
+  return { ok: false, reason: storage ? 'storage' : 'failed', error };
+}
+
+/**
+ * Persist a cascade and publish it. Metadata is the source of truth, so it is
+ * written first; freeing the blobs it orphaned is best-effort, because boot GC
+ * reaps anything left behind. Failing the whole mutation on a cleanup error
+ * would leave the UI showing state that localStorage already holds.
+ */
+async function commit(result: CascadeResult): Promise<MutationOutcome> {
+  const active = getStore();
+  try {
+    await active.saveCatalog(result.catalog);
+  } catch (error) {
+    return toOutcome(error);
+  }
+
+  const urls = { ...state.urls };
+  for (const id of result.deadImageIds) delete urls[id];
+  publish({ catalog: result.catalog, urls });
+
+  if (result.deadImageIds.length > 0) {
+    try {
+      await active.deleteImages(result.deadImageIds);
+    } catch {
+      // Orphaned bytes only — the next boot's GC removes them.
+    }
+  }
+  return OK;
+}
+
+let crossTabWired = false;
+
+/**
+ * A dashboard write in another tab fires a `storage` event here (never in the
+ * writing tab), so the storefront picks up catalog changes live — the
+ * prototype's sync mechanism, kept.
+ */
+function wireCrossTabSync() {
+  if (crossTabWired || typeof window === 'undefined') return;
+  crossTabWired = true;
+  window.addEventListener('storage', (event) => {
+    if (event.key === META_STORAGE_KEY) void reloadSession();
+  });
+}
+
+export function ensureLoaded(): Promise<void> {
+  wireCrossTabSync();
+  if (booting) return booting;
+  booting = (async () => {
+    publish({ status: 'loading', error: null });
+    try {
+      const result = await getStore().load();
+      publish({
+        status: 'ready',
+        error: null,
+        catalog: result.catalog,
+        urls: result.urls,
+        repaired: result.repaired,
+      });
+    } catch (error) {
+      booting = null; // let a retry actually retry
+      publish({
+        status: 'error',
+        error: error instanceof Error ? error.message : 'خطأ غير متوقع',
+      });
+    }
+  })();
+  return booting;
+}
+
+export function reloadSession(): Promise<void> {
+  booting = null;
+  return ensureLoaded();
+}
+
+/** The catalog is read INSIDE the queue, so `build` always sees the latest. */
+export function mutate(build: (catalog: Catalog) => CascadeResult): Promise<MutationOutcome> {
+  return enqueue(async () => {
+    try {
+      return await commit(build(state.catalog));
+    } catch (error) {
+      return toOutcome(error);
+    }
+  });
+}
+
+/**
+ * Store the bytes first, then build the cascade from whatever the catalog looks
+ * like once that has finished — the whole thing inside one queue slot, so a
+ * slow image save can never be overtaken by a later edit.
+ */
+export function mutateWithImage(
+  file: File,
+  build: (catalog: Catalog, saved: SavedImage) => CascadeResult,
+): Promise<MutationOutcome> {
+  return enqueue(async () => {
+    try {
+      const saved = await getStore().putImage(file, file.name);
+      publish({ urls: { ...state.urls, [saved.id]: saved.url } });
+      return await commit(build(state.catalog, saved));
+    } catch (error) {
+      return toOutcome(error);
+    }
+  });
+}
+
+export function resetSession(): Promise<MutationOutcome> {
+  return enqueue(async () => {
+    try {
+      const result = await getStore().reset();
+      booting = Promise.resolve();
+      publish({
+        status: 'ready',
+        error: null,
+        catalog: result.catalog,
+        urls: result.urls,
+        repaired: false,
+      });
+      return OK;
+    } catch (error) {
+      return toOutcome(error);
+    }
+  });
+}
+
+/** Test seam — swaps the store and clears all session state. */
+export function __resetSessionForTests(next?: CakeCatalogStore) {
+  store = next ?? null;
+  booting = null;
+  queue = Promise.resolve();
+  listeners.clear();
+  state = { status: 'loading', error: null, catalog: emptyCatalog(), urls: {}, repaired: false };
+}

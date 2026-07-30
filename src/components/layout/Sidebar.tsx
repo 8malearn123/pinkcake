@@ -17,6 +17,7 @@ import {
   QrCode,
   Truck,
   Cake,
+  CakeSlice,
   Palette,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,7 @@ const menuGroups: MenuGroup[] = [
     label: 'الإدارة',
     items: [
       { icon: Package, label: 'المنتجات', path: '/products', allowedRoles: ['admin'] },
+      { icon: CakeSlice, label: 'تصميم الكيك', path: '/cake-design', allowedRoles: ['admin'] },
       { icon: Store, label: 'إدارة الفروع', path: '/branches', allowedRoles: ['admin'] },
       { icon: Users, label: 'المستخدمين', path: '/users', allowedRoles: ['admin'] },
       { icon: BarChart3, label: 'التقارير', path: '/reports', allowedRoles: ['admin'] },
