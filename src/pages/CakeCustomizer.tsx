@@ -228,7 +228,7 @@ export default function CakeCustomizer() {
 
   return (
     <div className="cake-studio" dir="rtl">
-      <div className="cz-frame">
+      <div className={cn('cz-frame', !inDesign && 'no-stage')}>
         {/* Header */}
         <header className="app">
           <div className="hrow">

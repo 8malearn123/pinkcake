@@ -19,12 +19,10 @@
 .cake-studio .cairo {font-family: 'Cairo', sans-serif; }
 .cake-studio .serif {font-family: 'DM Serif Display', serif; font-weight: 400; }
 .cake-studio .num {font-family: 'DM Serif Display', serif; font-feature-settings: 'lnum'; }
-.cake-studio .cz-frame {position: relative; width: 100%; max-width: 432px; height: 100dvh; max-height: 936px;
-      background: hsl(var(--background)); overflow: hidden; display: flex; flex-direction: column;
-      box-shadow: 0 50px 130px -50px hsl(350 40% 25% / 0.5), 0 0 0 1px hsl(var(--border) / 0.5); }
-@media (min-width: 452px) {
-.cake-studio .cz-frame {border-radius: 32px; }
-}
+/* Full-bleed at every size: the studio IS the page, not a phone mock floating
+   on one. No max-width, no radius, no drop shadow. */
+.cake-studio .cz-frame {position: relative; width: 100%; max-width: none; height: 100dvh; max-height: none;
+      background: hsl(var(--background)); overflow: hidden; display: flex; flex-direction: column; }
 .cake-studio header.app {position: relative; z-index: 30; flex: none; background: hsl(var(--background));
       border-bottom: 1px solid hsl(var(--line) / 0.7); padding: env(safe-area-inset-top) 0 0; }
 .cake-studio .hrow {display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 12px; }
@@ -245,12 +243,23 @@
 .cake-studio * {animation-duration: .001s !important; }
 }
 @media (min-width: 880px) {
-.cake-studio {padding: 28px; }
-.cake-studio .cz-frame {max-width: 1080px; width: 100%; height: 88vh; max-height: 800px; border-radius: 30px;
-        display: grid;
+.cake-studio {padding: 0; }
+.cake-studio .cz-frame {display: grid;
         grid-template-columns: minmax(400px, 0.92fr) 1.1fr;
         grid-template-rows: auto minmax(0, 1fr) auto;
         grid-template-areas: "header stage" "panel stage" "botnav stage"; }
+/* The gallery has no stage and no bottom nav, so the split would leave half the
+   screen blank — collapse to one column and let the cards span it. */
+.cake-studio .cz-frame.no-stage {grid-template-columns: 1fr; grid-template-areas: "header" "panel"; }
+.cake-studio .cz-frame.no-stage header.app > * ,
+.cake-studio .cz-frame.no-stage .panel {max-width: 1440px; margin-inline: auto; width: 100%; }
+/* Flex-wrap rather than an auto-fill grid: a grid leaves empty tracks when the
+   bakery has 2 cakes, which is the dead space this layout exists to remove.
+   Wrapping keeps the row centred at any count and fills the width as it grows. */
+.cake-studio .cz-frame.no-stage .shead {text-align: center; }
+.cake-studio .cz-frame.no-stage .shead p {margin-inline: auto; }
+.cake-studio .cz-frame.no-stage .gallery {display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+.cake-studio .cz-frame.no-stage .gcard {flex: 0 1 300px; }
 .cake-studio header.app {grid-area: header; }
 .cake-studio .panel {grid-area: panel; padding: 26px 30px 30px; }
 .cake-studio .botnav {grid-area: botnav; position: static; padding: 16px 30px; }
@@ -262,7 +271,4 @@
 .cake-studio .hrow {padding: 20px 30px 14px; }
 .cake-studio .rail {padding: 0 30px 18px; }
 .cake-studio .shead h2 {font-size: 27px; }
-}
-@media (min-width: 1180px) {
-.cake-studio .cz-frame {max-width: 1180px; }
 }
