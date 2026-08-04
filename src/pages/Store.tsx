@@ -75,6 +75,9 @@ export default function Store() {
   }, [products, category, query, ratingsMap]);
 
   const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
+  // Hero's "اختيار هذا الأسبوع": the first in-stock product in featured order, so
+  // merchandisers steer it with display_order and the card always opens a real item.
+  const featured = useMemo(() => (products ?? []).find((p) => !isSoldOut(p)), [products]);
   const qtyOf = (id: string) => cart.find((i) => i.product.id === id)?.quantity ?? 0;
   const scrollToId = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -198,7 +201,12 @@ export default function Store() {
 
       {/* Pulled up by the header's height so the hero image bleeds behind it */}
       <div className="-mt-16 md:-mt-[84px]">
-        <StoreHero onShop={() => scrollToId('shop')} onCustomize={() => navigate('/customize')} />
+        <StoreHero
+          onShop={() => scrollToId('shop')}
+          onCustomize={() => navigate('/customize')}
+          featured={featured}
+          onViewFeatured={() => featured && navigate(`/product/${featured.id}`)}
+        />
       </div>
 
       <SeasonalSection products={seasonal} renderCard={renderCard} />
