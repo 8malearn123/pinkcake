@@ -12,8 +12,15 @@ const READ: Record<string, (args: Args) => unknown> = {
   get_products_for_public_store: () => d.PRODUCTS,
   get_products_for_authenticated_store: () => d.PRODUCTS,
   get_product_with_options: (a) => [{ ...(d.PRODUCTS.find((p) => p.id === a?.['_product_id']) ?? d.PRODUCTS[0]), options: [] }],
-  get_product_rating: () => [{ average_rating: 4.6, review_count: d.REVIEWS.length }],
-  get_product_reviews: () => d.REVIEWS,
+  // Both keyed off _product_id so the aggregate and the rows can't disagree —
+  // the product page now renders the reviews themselves next to the average.
+  get_product_rating: (a) => {
+    const rows = d.REVIEWS.filter((r) => r.product_id === a?.['_product_id']);
+    if (rows.length === 0) return [{ average_rating: 0, review_count: 0 }];
+    const avg = rows.reduce((s, r) => s + r.rating, 0) / rows.length;
+    return [{ average_rating: Math.round(avg * 10) / 10, review_count: rows.length }];
+  },
+  get_product_reviews: (a) => d.REVIEWS.filter((r) => r.product_id === a?.['_product_id']),
   get_my_product_review: () => null,
   get_branches_for_public_store: () => d.BRANCHES,
   get_branches_for_authenticated_store: () => d.BRANCHES,
