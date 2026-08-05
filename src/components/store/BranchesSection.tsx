@@ -10,21 +10,21 @@ const branches: Branch[] = [
 
 export function BranchesSection() {
   return (
-    <section id="branches" className="bg-[#fffdfa] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+    <section id="branches" className="bg-background px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
       <div className="mx-auto max-w-[1400px]">
         {/* الترويسة */}
         <Reveal className="grid gap-8 lg:grid-cols-[1fr_20rem] lg:items-end lg:gap-12">
           <div>
-            <span className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[.22em] text-[#b0506e]">
-              <span className="h-px w-10 bg-[#9e3a5c]/25" /> قريبون منك في جازان
+            <span className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[.22em] text-rose">
+              <span className="h-px w-10 bg-primary/25" /> قريبون منك في جازان
             </span>
-            <h2 className="mt-5 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-[#2c2226] sm:text-[3.25rem]">
+            <h2 className="mt-5 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
               فرعان.
-              <span className="block text-[#b0506e]">نفس النكهة الأصيلة.</span>
+              <span className="block text-rose">نفس النكهة الأصيلة.</span>
             </h2>
           </div>
-          <p className="text-[15px] leading-8 text-[#7d6870] lg:pb-2">
-            زُرنا في صبيا أو أبو عريش، أو اختر <span className="font-bold text-[#9e3a5c]">الاستلام من الفرع</span> عند إتمام طلبك ووفّر رسوم التوصيل.
+          <p className="text-[15px] leading-8 text-muted-foreground lg:pb-2">
+            زُرنا في صبيا أو أبو عريش، أو اختر <span className="font-bold text-primary">الاستلام من الفرع</span> عند إتمام طلبك ووفّر رسوم التوصيل.
           </p>
         </Reveal>
 
@@ -33,7 +33,7 @@ export function BranchesSection() {
           {branches.map((b) => (
             <article
               key={b.id}
-              className="group grid overflow-hidden rounded-3xl border border-[#9e3a5c]/10 bg-white shadow-berry-soft transition duration-300 hover:-translate-y-1 hover:shadow-berry-soft-lg sm:grid-cols-[13rem_1fr]"
+              className="group grid overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-berry-soft transition duration-300 hover:-translate-y-1 hover:shadow-berry-soft-lg sm:grid-cols-[13rem_1fr]"
             >
               {/* الصورة */}
               <div className="relative aspect-[4/3] overflow-hidden sm:aspect-auto sm:h-full">
@@ -43,11 +43,11 @@ export function BranchesSection() {
                   loading="lazy"
                   className="absolute inset-0 size-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.08]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#4a1f2e]/55 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-berry-ink/55 via-transparent to-transparent" />
                 <span className="pointer-events-none absolute end-5 top-4 select-none text-[3.5rem] font-black leading-none text-transparent" style={{ WebkitTextStroke: '1.5px rgba(255,255,255,.7)' }}>
                   {b.num}
                 </span>
-                <span className="absolute bottom-4 end-4 flex items-center gap-1.5 rounded-full bg-[#2c7a5f] px-3 py-1.5 text-[11px] font-bold text-white shadow-lg shadow-black/20">
+                <span className="absolute bottom-4 end-4 flex items-center gap-1.5 rounded-full bg-success px-3 py-1.5 text-[11px] font-bold text-white shadow-lg shadow-black/20">
                   <ShoppingBag size={13} strokeWidth={2.5} /> استلام متاح
                 </span>
               </div>
@@ -55,21 +55,21 @@ export function BranchesSection() {
               {/* التفاصيل */}
               <div className="flex flex-col p-6 sm:p-7">
                 <header>
-                  <p className="text-[11px] font-bold uppercase tracking-[.18em] text-[#b0506e]">فرع</p>
-                  <h3 className="mt-1 text-2xl font-black leading-tight text-[#2c2226]">{b.city}</h3>
-                  <p className="mt-2 flex items-start gap-2 text-sm leading-6 text-[#7d6870]">
-                    <MapPin size={16} className="mt-0.5 shrink-0 text-[#b0506e]" /> {b.area}
+                  <p className="text-[11px] font-bold uppercase tracking-[.18em] text-rose">فرع</p>
+                  <h3 className="mt-1 text-2xl font-black leading-tight text-foreground">{b.city}</h3>
+                  <p className="mt-2 flex items-start gap-2 text-sm leading-6 text-muted-foreground">
+                    <MapPin size={16} className="mt-0.5 shrink-0 text-rose" /> {b.area}
                   </p>
                 </header>
 
-                <dl className="mt-5 grid gap-2.5 border-t border-[#9e3a5c]/10 pt-5 text-sm">
+                <dl className="mt-5 grid gap-2.5 border-t border-primary/10 pt-5 text-sm">
                   <div className="flex items-center gap-3">
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#fbeef2] text-[#9e3a5c]"><Clock size={15} /></span>
-                    <dd className="text-[#6f5b62]">{b.hours}</dd>
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-blush text-primary"><Clock size={15} /></span>
+                    <dd className="text-muted-foreground">{b.hours}</dd>
                   </div>
-                  <a href={b.phoneHref} className="flex items-center gap-3 rounded-lg outline-none transition-colors hover:text-[#9e3a5c] focus-visible:ring-2 focus-visible:ring-[#9e3a5c]/30" dir="ltr">
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#fbeef2] text-[#9e3a5c]"><Phone size={15} /></span>
-                    <dd className="me-auto text-[#6f5b62]">{b.phone}</dd>
+                  <a href={b.phoneHref} className="flex items-center gap-3 rounded-lg outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/30" dir="ltr">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-blush text-primary"><Phone size={15} /></span>
+                    <dd className="me-auto text-muted-foreground">{b.phone}</dd>
                   </a>
                 </dl>
 
@@ -77,7 +77,7 @@ export function BranchesSection() {
                   href={b.mapUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group/btn mt-6 flex items-center justify-between gap-2 rounded-xl bg-[#9e3a5c] px-5 py-3.5 text-sm font-bold text-white outline-none transition duration-300 hover:bg-[#b0506e] focus-visible:ring-2 focus-visible:ring-[#9e3a5c]/40 focus-visible:ring-offset-2"
+                  className="group/btn mt-6 flex items-center justify-between gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-bold text-white outline-none transition duration-300 hover:bg-rose focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
                 >
                   <span className="flex items-center gap-2"><MapPin size={16} strokeWidth={2.5} /> الاتجاهات على الخريطة</span>
                   <ArrowUpLeft size={18} className="transition-transform duration-300 group-hover/btn:-translate-x-0.5 group-hover/btn:-translate-y-0.5" />

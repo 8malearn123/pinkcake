@@ -41,11 +41,11 @@ interface TokenSwatch {
 }
 
 const CORE_TOKENS: TokenSwatch[] = [
-  { token: 'primary', cssVar: '--primary', usage: 'اللون الأساسي: أزرار، روابط، تركيز' },
-  { token: 'accent', cssVar: '--accent', usage: 'لمسة وردية أغمق: تدرّجات وتمييز' },
-  { token: 'secondary', cssVar: '--secondary', usage: 'خلفيات أزرار ثانوية' },
+  { token: 'primary', cssVar: '--primary', usage: 'التوتي: أزرار، روابط، تركيز' },
+  { token: 'accent', cssVar: '--accent', usage: 'خلفية التمرير الهادئة (hover) — ليست الذهبي' },
+  { token: 'secondary', cssVar: '--secondary', usage: 'خلفيات أزرار ثانوية ورقائق' },
   { token: 'muted', cssVar: '--muted', usage: 'خلفيات خافتة وفواصل' },
-  { token: 'background', cssVar: '--background', usage: 'خلفية الصفحات' },
+  { token: 'background', cssVar: '--background', usage: 'كريمي — خلفية الصفحات' },
   { token: 'card', cssVar: '--card', usage: 'خلفية البطاقات' },
   { token: 'border', cssVar: '--border', usage: 'الحدود والفواصل' },
   { token: 'destructive', cssVar: '--destructive', usage: 'حذف وأخطاء فقط' },
@@ -59,11 +59,14 @@ const FEEDBACK_TOKENS: TokenSwatch[] = [
 ];
 
 const BRAND_TOKENS: TokenSwatch[] = [
-  { token: 'pink', cssVar: '--pink', usage: 'وردي العلامة' },
-  { token: 'pink-light', cssVar: '--pink-light', usage: 'وردي فاتح' },
-  { token: 'pink-dark', cssVar: '--pink-dark', usage: 'وردي غامق' },
-  { token: 'rose', cssVar: '--rose', usage: 'وردة' },
+  { token: 'primary', cssVar: '--primary', usage: 'التوتي — لون العلامة الأساسي' },
+  { token: 'rose', cssVar: '--rose', usage: 'وردي أفتح: العناوين التمهيدية والسطر الثاني' },
+  { token: 'gold', cssVar: '--gold', usage: 'الذهبي — الخيوط والشارات واللمسات الفاخرة' },
+  { token: 'gold-deep', cssVar: '--gold-deep', usage: 'ذهبي غامق: نص الذهبي على الكريمي' },
   { token: 'blush', cssVar: '--blush', usage: 'خدّي (خلفيات ناعمة)' },
+  { token: 'seasonal', cssVar: '--seasonal', usage: 'كهرماني موسمي (تشكيلة الصيف)' },
+  { token: 'berry-deep', cssVar: '--berry-deep', usage: 'توتي داكن: نطاقات الآراء والتذييل' },
+  { token: 'berry-ink', cssVar: '--berry-ink', usage: 'حبر توتي: تظليل الصور' },
 ];
 
 const ALL_STATUSES = Object.keys(ORDER_STATUS_LABELS) as OrderStatus[];
@@ -101,7 +104,7 @@ export default function DesignSystem() {
         <PageHeader
           icon={Palette}
           title="دليل التصميم"
-          description="المرجع الحي لهوية Pink Cake — نفس الإحساس والنبرة في كل شاشة. التفاصيل الكاملة في DESIGN_SYSTEM.md"
+          description="المرجع الحي لهوية Cake & Bloom — نفس الإحساس والنبرة في كل شاشة (المتجر ولوحة الموظفين). التفاصيل الكاملة في DESIGN_SYSTEM.md"
         />
 
         {/* ─────────── الألوان ─────────── */}

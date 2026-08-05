@@ -150,32 +150,32 @@ export default function ProductDetails() {
 
   // ── Shared shell ──────────────────────────────────────────────────────────
   const header = (
-    <header className="sticky top-0 z-40 border-b border-[#9e3a5c]/10 bg-[#fffdfa]/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-3 px-5 sm:px-8 md:h-[76px] lg:px-12">
         <button
           onClick={() => navigate(-1)}
           aria-label="رجوع"
-          className="grid size-10 shrink-0 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2]"
+          className="grid size-10 shrink-0 place-items-center rounded-full border border-primary/15 text-primary transition-colors hover:bg-blush"
         >
           <ArrowRight size={18} />
         </button>
 
         <button onClick={() => navigate('/store')} className="shrink-0 text-start leading-none">
-          <span className="block text-xl font-black tracking-[-.06em] text-[#9e3a5c] sm:text-2xl">
+          <span className="block text-xl font-black tracking-[-.06em] text-primary sm:text-2xl">
             {settings.storeName}
           </span>
-          <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-[#86736c]">حلويات جازان الفاخرة</span>
+          <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-muted-foreground">حلويات جازان الفاخرة</span>
         </button>
 
         <div className="ms-auto flex shrink-0 items-center gap-2">
           <button
             onClick={() => navigate('/wishlist')}
             aria-label="المفضلة"
-            className="relative grid size-10 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2]"
+            className="relative grid size-10 place-items-center rounded-full border border-primary/15 text-primary transition-colors hover:bg-blush"
           >
             <Heart size={18} />
             {wishlist.count > 0 && (
-              <span className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-[#ddbd75] text-[10px] font-bold text-[#9e3a5c]">
+              <span className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-gold text-[10px] font-bold text-primary">
                 {toArabicDigits(wishlist.count)}
               </span>
             )}
@@ -183,20 +183,20 @@ export default function ProductDetails() {
           <button
             onClick={() => navigate(user ? '/my-profile' : '/login')}
             aria-label={user ? 'حسابي' : 'تسجيل الدخول أو إنشاء حساب'}
-            className="hidden size-10 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2] sm:grid"
+            className="hidden size-10 place-items-center rounded-full border border-primary/15 text-primary transition-colors hover:bg-blush sm:grid"
           >
             <User size={18} />
           </button>
           <button
             onClick={openCart}
             aria-label={`السلة تحتوي ${toArabicDigits(cartCount)} منتجات`}
-            className="relative grid size-10 place-items-center rounded-full bg-[#9e3a5c] text-white transition-colors hover:bg-[#b0506e]"
+            className="relative grid size-10 place-items-center rounded-full bg-primary text-white transition-colors hover:bg-rose"
           >
             <ShoppingBag size={18} />
             {cartCount > 0 && (
               <span
                 key={cartCount}
-                className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-[#ddbd75] text-[10px] font-bold text-[#9e3a5c]"
+                className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-gold text-[10px] font-bold text-primary"
               >
                 {toArabicDigits(cartCount)}
               </span>
@@ -210,7 +210,7 @@ export default function ProductDetails() {
   // ── Loading ───────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="storefront-theme min-h-screen bg-[#fffdfa] text-[#2c2226]">
+      <div className="store-surface min-h-screen bg-background text-foreground">
         {header}
         <main className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:px-12">
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -232,20 +232,20 @@ export default function ProductDetails() {
   // ── Not found ─────────────────────────────────────────────────────────────
   if (!product) {
     return (
-      <div className="storefront-theme min-h-screen bg-[#fffdfa] text-[#2c2226]">
+      <div className="store-surface min-h-screen bg-background text-foreground">
         {header}
         <main className="mx-auto max-w-[1500px] px-5 py-24 sm:px-8 lg:px-12">
-          <div className="mx-auto max-w-md rounded-3xl border border-dashed border-[#9e3a5c]/25 bg-[#fffdfa] px-6 py-14 text-center">
-            <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#fbeef2]">
-              <Cake size={28} className="text-[#b0506e]" />
+          <div className="mx-auto max-w-md rounded-3xl border border-dashed border-primary/25 bg-background px-6 py-14 text-center">
+            <div className="mx-auto grid size-16 place-items-center rounded-full bg-blush">
+              <Cake size={28} className="text-rose" />
             </div>
             <h1 className="mt-5 text-2xl font-black tracking-[-.02em]">ما لقينا هذي الكيكة</h1>
-            <p className="mt-2 text-sm leading-7 text-[#7d6870]">
+            <p className="mt-2 text-sm leading-7 text-muted-foreground">
               يمكن انسحبت من التشكيلة أو الرابط ناقص — تشكيلتنا الكاملة بانتظارك.
             </p>
             <button
               onClick={() => navigate('/shop')}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-[#8a3251] to-[#9e3a5c] px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_rgba(158,58,92,0.8)] transition-transform active:scale-95"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
             >
               تصفّح كل المنتجات <ChevronLeft size={16} />
             </button>
@@ -262,27 +262,27 @@ export default function ProductDetails() {
   const lowStock = stock != null && stock > 0 && stock <= 8 ? stock : null;
 
   return (
-    <div className="storefront-theme min-h-screen bg-[#fffdfa] pb-24 text-[#2c2226] lg:pb-0">
+    <div className="store-surface min-h-screen bg-background pb-24 text-foreground lg:pb-0">
       <Marquee />
       {header}
 
       <main className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-12">
         {/* Breadcrumb */}
-        <nav aria-label="مسار التنقل" className="flex items-center gap-1.5 py-5 text-[11px] font-bold text-[#8a6570]">
-          <button onClick={() => navigate('/store')} className="transition-colors hover:text-[#9e3a5c]">الرئيسية</button>
-          <ChevronLeft size={13} className="text-[#ddbd75]" />
+        <nav aria-label="مسار التنقل" className="flex items-center gap-1.5 py-5 text-[11px] font-bold text-muted-foreground">
+          <button onClick={() => navigate('/store')} className="transition-colors hover:text-primary">الرئيسية</button>
+          <ChevronLeft size={13} className="text-gold" />
           {product.category && (
             <>
               <button
                 onClick={() => navigate(`/shop?category=${encodeURIComponent(product.category as string)}`)}
-                className="transition-colors hover:text-[#9e3a5c]"
+                className="transition-colors hover:text-primary"
               >
                 {product.category}
               </button>
-              <ChevronLeft size={13} className="text-[#ddbd75]" />
+              <ChevronLeft size={13} className="text-gold" />
             </>
           )}
-          <span className="line-clamp-1 text-[#2c2226]">{product.name}</span>
+          <span className="line-clamp-1 text-foreground">{product.name}</span>
         </nav>
 
         {/* Hero */}
@@ -341,15 +341,15 @@ export default function ProductDetails() {
       </main>
 
       {/* Craft band — why this cake is worth its price */}
-      <section className="relative overflow-hidden border-y border-[#ddbd75]/30 bg-gradient-to-b from-[#7d2f49] via-[#9e3a5c] to-[#7d2f49] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
+      <section className="relative overflow-hidden border-y border-gold/30 bg-gradient-to-b from-berry-deep via-primary to-berry-deep px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(221,189,117,0.18),transparent)]"
         />
         <div className="relative mx-auto max-w-[1500px]">
           <Reveal className="flex flex-col items-center text-center">
-            <p className="flex items-center gap-2 text-xs font-bold tracking-[.14em] text-[#ddbd75]">
-              <span className="h-px w-8 bg-[#ddbd75]/50" /> من مطبخنا إليك <span className="h-px w-8 bg-[#ddbd75]/50" />
+            <p className="flex items-center gap-2 text-xs font-bold tracking-[.14em] text-gold">
+              <span className="h-px w-8 bg-gold/50" /> من مطبخنا إليك <span className="h-px w-8 bg-gold/50" />
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-[-.01em] text-white sm:text-4xl">
               ليش تختلف عن أي كيكة ثانية
@@ -361,7 +361,7 @@ export default function ProductDetails() {
                 key={item.n}
                 className="rounded-2xl bg-white/[0.07] p-7 ring-1 ring-white/10 transition-colors duration-300 hover:bg-white/[0.12]"
               >
-                <span className="text-2xl font-black text-[#ddbd75]">{item.n}</span>
+                <span className="text-2xl font-black text-gold">{item.n}</span>
                 <h3 className="mt-3 text-lg font-black text-white">{item.title}</h3>
                 <p className="mt-2 text-sm leading-7 text-white/70">{item.body}</p>
               </article>
@@ -387,14 +387,14 @@ export default function ProductDetails() {
 
         {related.length > 0 && (
           <section>
-            <div className="flex flex-col justify-between gap-4 border-b border-[#9e3a5c]/15 pb-6 sm:flex-row sm:items-end">
+            <div className="flex flex-col justify-between gap-4 border-b border-primary/15 pb-6 sm:flex-row sm:items-end">
               <div>
-                <p className="text-xs font-bold tracking-[.08em] text-[#b0506e]">من نفس التشكيلة</p>
-                <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-[#2c2226] sm:text-4xl">قد يعجبك أيضاً</h2>
+                <p className="text-xs font-bold tracking-[.08em] text-rose">من نفس التشكيلة</p>
+                <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">قد يعجبك أيضاً</h2>
               </div>
               <button
                 onClick={() => navigate('/shop')}
-                className="group/more flex shrink-0 items-center gap-2 self-start rounded-full border border-[#9e3a5c]/25 px-5 py-2.5 text-xs font-bold text-[#9e3a5c] transition-colors hover:border-[#9e3a5c] hover:bg-[#fbeef2] sm:self-auto"
+                className="group/more flex shrink-0 items-center gap-2 self-start rounded-full border border-primary/25 px-5 py-2.5 text-xs font-bold text-primary transition-colors hover:border-primary hover:bg-blush sm:self-auto"
               >
                 عرض كل المنتجات
                 <ChevronLeft size={15} className="transition-transform duration-300 group-hover/more:-translate-x-1" />

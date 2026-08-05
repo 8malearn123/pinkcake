@@ -95,11 +95,11 @@ export function ProductGallery({
   return (
     <div className="lg:sticky lg:top-24">
       {/* Hero frame — cream mat + gold hairline, the way a boutique frames a cake */}
-      <div className="rounded-[28px] border border-[#ddbd75]/35 bg-[#fffdfa] p-2 shadow-[0_34px_80px_-46px_rgba(158,58,92,0.75)] sm:p-2.5">
+      <div className="rounded-[28px] border border-gold/35 bg-background p-2 shadow-[0_34px_80px_-46px_hsl(var(--primary)/0.75)] sm:p-2.5">
         {/* Portrait on phones; on desktop the frame is capped to the viewport so the
             hero can't push the CTA below the fold on a laptop screen. */}
         <div
-          className="group/frame relative aspect-[4/5] overflow-hidden rounded-[22px] bg-[#fbeef2] lg:aspect-auto lg:h-[min(74vh,780px)]"
+          className="group/frame relative aspect-[4/5] overflow-hidden rounded-[22px] bg-blush lg:aspect-auto lg:h-[min(74vh,780px)]"
           onMouseMove={trackPointer}
           onMouseEnter={() => setZoom(true)}
           onMouseLeave={() => setZoom(false)}
@@ -116,29 +116,29 @@ export function ProductGallery({
               style={{ transform: zoom ? 'scale(1.75)' : 'scale(1)', transformOrigin: origin }}
             />
           ) : (
-            <div className="grid size-full place-items-center bg-gradient-to-b from-[#fbeef2] to-[#f3e8ec]">
-              <Cake size={96} strokeWidth={1} className="text-[#b0506e]/35" />
+            <div className="grid size-full place-items-center bg-gradient-to-b from-blush to-border">
+              <Cake size={96} strokeWidth={1} className="text-rose/35" />
             </div>
           )}
 
           {/* Depth scrim — keeps the chips legible over a bright frosting shot */}
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#2c2226]/35 to-transparent" />
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-foreground/35 to-transparent" />
 
           {/* Deal / season / urgency badges */}
           <div className="pointer-events-none absolute end-4 top-4 z-10 flex flex-col items-end gap-1.5">
             {discount > 0 && (
-              <span className="rounded-full bg-[#9e3a5c] px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+              <span className="rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-white shadow-lg">
                 خصم {toArabicDigits(discount)}٪
               </span>
             )}
             {season && (
-              <span className="rounded-full bg-[#e8942f] px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+              <span className="rounded-full bg-seasonal px-3 py-1.5 text-xs font-bold text-white shadow-lg">
                 🥭 تشكيلة {season}
               </span>
             )}
             {lowStock !== null && (
-              <span className="flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#e8942f] shadow-lg backdrop-blur">
-                <Flame size={13} className="fill-[#e8942f]" /> بقي {toArabicDigits(lowStock)} فقط
+              <span className="flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-seasonal shadow-lg backdrop-blur">
+                <Flame size={13} className="fill-seasonal" /> بقي {toArabicDigits(lowStock)} فقط
               </span>
             )}
           </div>
@@ -153,14 +153,14 @@ export function ProductGallery({
           >
             <Heart
               size={19}
-              className={`transition-all duration-300 ${isFavorite ? 'scale-110 fill-[#9e3a5c] text-[#9e3a5c]' : 'text-[#857077]'}`}
+              className={`transition-all duration-300 ${isFavorite ? 'scale-110 fill-primary text-primary' : 'text-muted-foreground'}`}
             />
           </button>
 
           {/* Sold-out veil — honest, and it stops the CTA reading as available */}
           {soldOut && (
-            <div className="absolute inset-0 z-10 grid place-items-center bg-[#2c2226]/45 backdrop-blur-[2px]">
-              <span className="rounded-full bg-[#fffdfa] px-6 py-2.5 text-sm font-black text-[#9e3a5c] shadow-xl">
+            <div className="absolute inset-0 z-10 grid place-items-center bg-foreground/45 backdrop-blur-[2px]">
+              <span className="rounded-full bg-background px-6 py-2.5 text-sm font-black text-primary shadow-xl">
                 نفدت الكمية حالياً
               </span>
             </div>
@@ -173,7 +173,7 @@ export function ProductGallery({
                 type="button"
                 onClick={() => go(-1)}
                 aria-label="الصورة السابقة"
-                className="absolute start-3 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white/90 p-2.5 text-[#9e3a5c] opacity-0 shadow-lg backdrop-blur transition-all duration-300 hover:bg-white group-hover/frame:opacity-100 lg:grid"
+                className="absolute start-3 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white/90 p-2.5 text-primary opacity-0 shadow-lg backdrop-blur transition-all duration-300 hover:bg-white group-hover/frame:opacity-100 lg:grid"
               >
                 <ChevronRight size={18} />
               </button>
@@ -181,7 +181,7 @@ export function ProductGallery({
                 type="button"
                 onClick={() => go(1)}
                 aria-label="الصورة التالية"
-                className="absolute end-3 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white/90 p-2.5 text-[#9e3a5c] opacity-0 shadow-lg backdrop-blur transition-all duration-300 hover:bg-white group-hover/frame:opacity-100 lg:grid"
+                className="absolute end-3 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full bg-white/90 p-2.5 text-primary opacity-0 shadow-lg backdrop-blur transition-all duration-300 hover:bg-white group-hover/frame:opacity-100 lg:grid"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -191,7 +191,7 @@ export function ProductGallery({
           {/* Counter + enlarge */}
           <div className="absolute inset-x-4 bottom-4 z-10 flex items-center justify-between">
             {count > 1 ? (
-              <span className="rounded-full bg-[#2c2226]/55 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+              <span className="rounded-full bg-foreground/55 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
                 {toArabicDigits(index + 1)} / {toArabicDigits(count)}
               </span>
             ) : (
@@ -201,7 +201,7 @@ export function ProductGallery({
               <button
                 type="button"
                 onClick={() => setLightbox(true)}
-                className="flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-1.5 text-[11px] font-bold text-[#9e3a5c] shadow-md backdrop-blur transition-transform duration-200 hover:scale-105 active:scale-95"
+                className="flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-1.5 text-[11px] font-bold text-primary shadow-md backdrop-blur transition-transform duration-200 hover:scale-105 active:scale-95"
               >
                 <Expand size={13} /> تكبير الصورة
               </button>
@@ -222,7 +222,7 @@ export function ProductGallery({
               aria-current={i === index}
               className={`relative aspect-square w-[72px] shrink-0 overflow-hidden rounded-2xl transition-all duration-300 ${
                 i === index
-                  ? 'ring-2 ring-[#9e3a5c] ring-offset-2 ring-offset-[#fffdfa]'
+                  ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
                   : 'opacity-60 hover:opacity-100'
               }`}
             >
@@ -240,7 +240,7 @@ export function ProductGallery({
           role="dialog"
           aria-modal="true"
           aria-label={`صور ${name}`}
-          className="fixed inset-0 z-[70] flex flex-col bg-[#2c2226]/95 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] flex flex-col bg-foreground/95 backdrop-blur-sm"
           onClick={() => setLightbox(false)}
         >
           <div className="flex items-center justify-between px-5 py-4 sm:px-8">
@@ -302,7 +302,7 @@ export function ProductGallery({
                   aria-label={`عرض الصورة ${toArabicDigits(i + 1)}`}
                   aria-current={i === index}
                   className={`size-14 overflow-hidden rounded-xl transition-all duration-300 ${
-                    i === index ? 'ring-2 ring-[#ddbd75]' : 'opacity-45 hover:opacity-80'
+                    i === index ? 'ring-2 ring-gold' : 'opacity-45 hover:opacity-80'
                   }`}
                 >
                   <img src={src} alt="" className="size-full object-cover" />

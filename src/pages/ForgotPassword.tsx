@@ -62,14 +62,14 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blush to-background p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-2xl gradient-pink flex items-center justify-center shadow-warm mx-auto mb-4">
+          <div className="gradient-pink shadow-berry-soft mx-auto mb-4 grid size-20 place-items-center rounded-2xl ring-1 ring-gold/40">
             <Cake className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-2xl font-bold">{settings.storeName}</h1>
+          <h1 className="text-2xl font-black tracking-[-.02em]">{settings.storeName}</h1>
         </div>
 
         <Card>

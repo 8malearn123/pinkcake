@@ -11,16 +11,17 @@ interface BranchEmployeeStatsProps {
   employeeCounts: Record<string, number>;
 }
 
-// Colors for the pie chart - using a professional palette
+// Pie palette — token-driven so it re-tints with the brand, same as
+// CHART_COLORS in Reports.tsx. Half of this list used to be raw rose HSL.
 const COLORS = [
   'hsl(var(--primary))',
-  'hsl(346, 77%, 50%)',
-  'hsl(346, 60%, 60%)',
-  'hsl(346, 45%, 70%)',
-  'hsl(200, 70%, 50%)',
-  'hsl(160, 60%, 45%)',
-  'hsl(45, 80%, 55%)',
-  'hsl(280, 60%, 55%)',
+  'hsl(var(--gold))',
+  'hsl(var(--info))',
+  'hsl(var(--success))',
+  'hsl(var(--rose))',
+  'hsl(var(--seasonal))',
+  'hsl(var(--primary) / 0.55)',
+  'hsl(var(--info) / 0.55)',
 ];
 
 export function BranchEmployeeStats({ branches, employeeCounts }: BranchEmployeeStatsProps) {

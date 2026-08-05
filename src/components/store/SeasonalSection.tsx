@@ -13,21 +13,21 @@ export function SeasonalSection({
 }) {
   if (products.length === 0) return null;
   return (
-    <section id="seasonal" className="bg-gradient-to-b from-[#fff4e6] to-[#fffdfa] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
+    <section id="seasonal" className="bg-gradient-to-b from-seasonal-wash to-background px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
       <div className="mx-auto max-w-[1500px]">
-        <Reveal className="flex flex-col justify-between gap-5 border-b border-[#e8942f]/30 pb-6 sm:flex-row sm:items-end">
+        <Reveal className="flex flex-col justify-between gap-5 border-b border-seasonal/30 pb-6 sm:flex-row sm:items-end">
           <div>
-            <p className="flex items-center gap-1.5 text-xs font-bold tracking-[.08em] text-[#e8942f]">
+            <p className="flex items-center gap-1.5 text-xs font-bold tracking-[.08em] text-seasonal">
               <Sun size={15} /> تشكيلة الصيف · لفترة محدودة
             </p>
-            <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-[#2c2226] sm:text-4xl">
+            <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">
               موسم المنجا الجازانية 🥭
             </h2>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-[#6a5b4a]">
+            <p className="mt-3 max-w-lg text-sm leading-7 text-muted-foreground">
               من مزارع جازان مباشرةً — منجا طبيعية طازجة في تورتات وتشيز كيك بنكهة الصيف. متوفرة ما دام الموسم مستمر.
             </p>
           </div>
-          <span className="self-start rounded-full bg-[#e8942f] px-4 py-2 text-xs font-bold text-white sm:self-auto">
+          <span className="self-start rounded-full bg-seasonal px-4 py-2 text-xs font-bold text-white sm:self-auto">
             نفاد سريع — احجز الآن
           </span>
         </Reveal>

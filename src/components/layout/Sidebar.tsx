@@ -114,7 +114,7 @@ export function Sidebar() {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-foreground/50 z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -151,7 +151,7 @@ export function Sidebar() {
                       className={cn(
                         'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
                         isActive
-                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-warm'
+                          ? 'bg-sidebar-primary text-sidebar-primary-foreground font-bold'
                           : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                       )}
                     >

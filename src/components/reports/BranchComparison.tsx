@@ -106,7 +106,14 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
     },
   ];
 
-  const RADAR_COLORS = ['#be7b7c', '#7cb87c', '#7c7cb8', '#b87c7c', '#7cb8b8'];
+  // Token-driven so the chart re-tints with the brand (was a raw rose palette).
+  const RADAR_COLORS = [
+    'hsl(var(--primary))',
+    'hsl(var(--success))',
+    'hsl(var(--info))',
+    'hsl(var(--gold-deep))',
+    'hsl(var(--rose))',
+  ];
 
   const getPerformanceIndicator = (value: number, average: number) => {
     const diff = ((value - average) / average) * 100;
@@ -136,7 +143,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
     <div className="space-y-6">
       {/* Top Performers */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-2 border-warning/30 bg-gradient-to-br from-yellow-50 to-amber-50">
+        <Card className="border border-warning/30 bg-warning/[0.06]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
@@ -153,7 +160,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-info/30 bg-gradient-to-br from-blue-50 to-cyan-50">
+        <Card className="border border-info/30 bg-info/[0.06]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center">
@@ -170,7 +177,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-success/30 bg-gradient-to-br from-green-50 to-emerald-50">
+        <Card className="border border-success/30 bg-success/[0.06]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
@@ -187,7 +194,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-primary/30 bg-gradient-to-br from-purple-50 to-violet-50">
+        <Card className="border border-primary/30 bg-primary/[0.06]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -228,7 +235,7 @@ export function BranchComparison({ revenueByBranch, orders, formatCurrency }: Br
                   ]}
                 />
                 <Legend />
-                <Bar dataKey="revenue" name="الإيرادات" fill="#be7b7c" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="revenue" name="الإيرادات" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

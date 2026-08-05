@@ -36,27 +36,27 @@ export function CustomCakeSection({ cakes, loading, onPick, onViewAll }: CustomC
   return (
     <section
       id="custom"
-      className="bg-gradient-to-b from-[#fbeef2] to-[#fffdfa] px-5 py-14 sm:px-8 lg:px-12 lg:py-20"
+      className="bg-gradient-to-b from-blush to-background px-5 py-14 sm:px-8 lg:px-12 lg:py-20"
     >
       <div className="mx-auto grid max-w-[1500px] gap-9 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-14">
         {/* Copy panel */}
         <Reveal>
-          <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-[#b0506e]">
-            <span className="h-px w-10 bg-[#9e3a5c]/25" /> استوديو التصميم
+          <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-rose">
+            <span className="h-px w-10 bg-primary/25" /> استوديو التصميم
           </p>
-          <h2 className="mt-4 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-[#2c2226] sm:text-[3.25rem]">
+          <h2 className="mt-4 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
             صمّم كيكتك
-            <span className="block text-[#b0506e]">بالضبط كما تتخيّلها.</span>
+            <span className="block text-rose">بالضبط كما تتخيّلها.</span>
           </h2>
-          <p className="mt-5 max-w-lg text-sm leading-8 text-[#7d6870]">
+          <p className="mt-5 max-w-lg text-sm leading-8 text-muted-foreground">
             اختر كيكة، ثم خصّص شكلها ونكهتها ولونها خطوة بخطوة. كل خيار تراه هو صورة كيكة خبزناها
             فعلاً — لا رسومات ولا تخمين، تشوف كيكتك قبل ما تطلبها.
           </p>
 
           <ul className="mt-6 grid gap-3">
             {TRUST.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-2.5 text-sm font-bold text-[#6a5560]">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-[#b0506e] shadow-sm">
+              <li key={text} className="flex items-center gap-2.5 text-sm font-bold text-muted-foreground">
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-rose shadow-sm">
                   <Icon size={14} />
                 </span>
                 {text}
@@ -67,7 +67,7 @@ export function CustomCakeSection({ cakes, loading, onPick, onViewAll }: CustomC
           <button
             type="button"
             onClick={onViewAll}
-            className="group/cta mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-t from-[#8a3251] to-[#9e3a5c] px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_rgba(158,58,92,0.8)] transition-all duration-200 hover:from-[#9e3a5c] hover:to-[#b0506e] active:scale-[.98]"
+            className="group/cta mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-all duration-200 hover:from-primary hover:to-rose active:scale-[.98]"
           >
             <Wand2 size={17} />
             شاهد كل التصاميم

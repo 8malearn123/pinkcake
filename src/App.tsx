@@ -124,7 +124,9 @@ const App = () => (
             <ScrollToTop />
             <Suspense fallback={<RouteFallback />}>
             <Routes>
-              {/* Public storefront — shares a cart context across landing, details + customizer */}
+              {/* Public storefront — every customer-facing screen shares one cart
+                  context and one masthead, so the cart follows you from the
+                  landing page through tracking, orders and the info pages. */}
               <Route element={<StorefrontLayout />}>
                 <Route path="/" element={<Store />} />
                 <Route path="/store" element={<Store />} />
@@ -133,17 +135,23 @@ const App = () => (
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/customize" element={<CakeCustomizer />} />
                 <Route path="/custom-cakes" element={<CustomCakes />} />
+
+                {/* Event & hospitality package builder (ضيافة المناسبات) */}
+                <Route path="/events" element={<EventBuilder />} />
+
+                {/* Customer info pages */}
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+
+                {/* Public order tracking + the signed-in customer account */}
+                <Route path="/track" element={<TrackOrder />} />
+                <Route path="/my-orders" element={<MyOrders />} />
+                <Route path="/my-orders/:id" element={<MyOrderDetails />} />
+                <Route path="/my-profile" element={<CustomerProfile />} />
               </Route>
-
-              {/* Event & hospitality package builder (ضيافة المناسبات) */}
-              <Route path="/events" element={<EventBuilder />} />
-
-              {/* Customer info pages */}
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
 
               {/* Loza — Dessert Marketplace (flag-gated; off in prod by default) */}
               {LOZA_ENABLED && (
@@ -172,15 +180,7 @@ const App = () => (
               {/* Password Recovery */}
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              
-              {/* Public Order Tracking */}
-              <Route path="/track" element={<TrackOrder />} />
-              
-              {/* Customer Pages (require login) */}
-              <Route path="/my-orders" element={<MyOrders />} />
-              <Route path="/my-orders/:id" element={<MyOrderDetails />} />
-              <Route path="/my-profile" element={<CustomerProfile />} />
-              
+
               {/* Dashboard consolidated into the live board (المتابعة المباشرة) */}
               <Route path="/dashboard" element={<Navigate to="/live" replace />} />
               <Route

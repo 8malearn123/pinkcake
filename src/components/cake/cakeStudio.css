@@ -4,21 +4,21 @@
    what remains is the studio chrome plus the gallery/photo/chip additions. */
 
 .cake-studio {
-  --gold: 36 44% 56%; --gold-deep: 33 40% 42%; --line: 345 14% 88%;
+  --gold: 42 60% 66%; --gold-deep: 40 45% 38%; --line: 340 28% 90%;
   --ease: cubic-bezier(0.22, 1, 0.36, 1); --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
 }
 .cake-studio * {box-sizing: border-box; }
 .cake-studio {margin: 0; height: 100%; }
-.cake-studio {font-family: 'Tajawal', 'Cairo', sans-serif;
+.cake-studio {font-family: 'Noto Kufi Arabic', sans-serif;
       background:
         radial-gradient(120% 70% at 50% 0%, hsl(28 40% 96%), transparent 55%),
         hsl(28 22% 90%);
       color: hsl(var(--foreground));
       -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
       display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-.cake-studio .cairo {font-family: 'Cairo', sans-serif; }
-.cake-studio .serif {font-family: 'DM Serif Display', serif; font-weight: 400; }
-.cake-studio .num {font-family: 'DM Serif Display', serif; font-feature-settings: 'lnum'; }
+.cake-studio .cairo {font-family: 'Noto Kufi Arabic', sans-serif; }
+.cake-studio .serif {font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+.cake-studio .num {font-family: 'Noto Kufi Arabic', sans-serif; font-feature-settings: 'lnum'; }
 .cake-studio .cz-frame {position: relative; width: 100%; max-width: 432px; height: 100dvh; max-height: 936px;
       background: hsl(var(--background)); overflow: hidden; display: flex; flex-direction: column;
       box-shadow: 0 50px 130px -50px hsl(350 40% 25% / 0.5), 0 0 0 1px hsl(var(--border) / 0.5); }
@@ -35,15 +35,15 @@
 .cake-studio .ghost-btn:active {transform: scale(.92); }
 .cake-studio .hmid {text-align: center; line-height: 1; }
 .cake-studio .hmid .wm {font-size: 11px; letter-spacing: .04em; color: hsl(var(--muted-foreground)); font-weight: 500; }
-.cake-studio .hmid .ttl {font-family: 'Cairo'; font-size: 16px; font-weight: 800; margin-top: 3px; }
+.cake-studio .hmid .ttl {font-family: 'Noto Kufi Arabic'; font-size: 16px; font-weight: 800; margin-top: 3px; }
 .cake-studio .htotal {text-align: end; min-width: 84px; }
 .cake-studio .htotal .lbl {font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
 .cake-studio .htotal .val {font-size: 22px; color: hsl(var(--primary)); line-height: 1; margin-top: 2px; }
-.cake-studio .htotal .val .cur {font-family: 'Tajawal'; font-size: 11px; font-weight: 600; color: hsl(var(--muted-foreground)); margin-inline-start: 3px; }
+.cake-studio .htotal .val .cur {font-family: 'Noto Kufi Arabic'; font-size: 11px; font-weight: 600; color: hsl(var(--muted-foreground)); margin-inline-start: 3px; }
 .cake-studio .rail {padding: 0 18px 13px; display: flex; align-items: center; gap: 12px; }
 .cake-studio .rail .count {font-size: 15px; color: hsl(var(--foreground)); letter-spacing: .02em; flex: none; }
 .cake-studio .rail .count .tot {color: hsl(var(--muted-foreground)); font-size: 12px; }
-.cake-studio .rail .count .cap {font-family: 'Cairo'; font-size: 11px; font-weight: 700; color: hsl(var(--primary)); display: block; margin-top: 1px; }
+.cake-studio .rail .count .cap {font-family: 'Noto Kufi Arabic'; font-size: 11px; font-weight: 700; color: hsl(var(--primary)); display: block; margin-top: 1px; }
 .cake-studio .segs {display: flex; gap: 5px; flex: 1; }
 .cake-studio .seg {height: 4px; border-radius: 999px; background: hsl(var(--line)); flex: 1; overflow: hidden; position: relative; }
 .cake-studio .seg i {position: absolute; inset: 0; inset-inline-end: 100%; background: linear-gradient(90deg, hsl(var(--pink)), hsl(var(--rose)));
@@ -91,9 +91,9 @@
 .cake-studio .panel {flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px 18px 124px; }
 .cake-studio .panel::-webkit-scrollbar {width: 0; }
 .cake-studio .shead {margin-bottom: 17px; }
-.cake-studio .shead .kick {display: inline-flex; align-items: center; gap: 6px; font-family: 'Cairo'; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: hsl(var(--primary)); background: hsl(var(--primary) / .1); padding: 6px 12px; border-radius: 999px; }
+.cake-studio .shead .kick {display: inline-flex; align-items: center; gap: 6px; font-family: 'Noto Kufi Arabic'; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: hsl(var(--primary)); background: hsl(var(--primary) / .1); padding: 6px 12px; border-radius: 999px; }
 .cake-studio .shead .kick svg {width: 13px; height: 13px; }
-.cake-studio .shead h2 {font-family: 'Cairo'; margin: 6px 0 4px; font-size: 24px; font-weight: 800; letter-spacing: -.01em; }
+.cake-studio .shead h2 {font-family: 'Noto Kufi Arabic'; margin: 6px 0 4px; font-size: 24px; font-weight: 800; letter-spacing: -.01em; }
 .cake-studio .shead p {margin: 0; font-size: 13.5px; color: hsl(var(--muted-foreground)); line-height: 1.5; }
 .cake-studio .sect {animation: none; }
 .cake-studio .sect {animation: cz_rise .5s var(--ease); }
@@ -112,53 +112,53 @@
 .cake-studio .gcard .ph {aspect-ratio: 4 / 3; border-radius: 13px; overflow: hidden; margin-bottom: 10px;
       background: radial-gradient(80% 70% at 50% 36%, hsl(28 38% 97%), hsl(28 22% 93%)); }
 .cake-studio .gcard .ph img {display: block; width: 100%; height: 100%; object-fit: cover; }
-.cake-studio .gcard .nm {font-family: 'Cairo'; font-size: 14px; font-weight: 800; line-height: 1.2; padding: 0 3px; }
+.cake-studio .gcard .nm {font-family: 'Noto Kufi Arabic'; font-size: 14px; font-weight: 800; line-height: 1.2; padding: 0 3px; }
 .cake-studio .gcard .pr {font-size: 12px; color: hsl(var(--secondary-foreground)); margin-top: 6px; font-weight: 500; padding: 0 3px; }
-.cake-studio .gcard .pr .v {font-family: 'DM Serif Display', serif; color: hsl(var(--foreground)); font-size: 15px; }
+.cake-studio .gcard .pr .v {font-family: 'Noto Kufi Arabic', sans-serif; color: hsl(var(--foreground)); font-size: 15px; }
 .cake-studio .gcard .meta {font-size: 11px; color: hsl(var(--muted-foreground)); margin-top: 4px; display: flex; align-items: center; gap: 6px; white-space: nowrap; padding: 0 3px; }
 .cake-studio .gcard .meta svg {width: 12px; height: 12px; color: hsl(var(--primary)); flex: none; }
 .cake-studio .gcard .meta .d {width: 3px; height: 3px; border-radius: 50%; background: hsl(var(--muted-foreground) / .5); }
 .cake-studio .gempty {border: 1.5px dashed hsl(var(--line)); border-radius: 18px; padding: 40px 22px; text-align: center; color: hsl(var(--muted-foreground)); }
-.cake-studio .gempty p {margin: 0 0 14px; font-family: 'Cairo'; font-size: 14px; font-weight: 700; }
+.cake-studio .gempty p {margin: 0 0 14px; font-family: 'Noto Kufi Arabic'; font-size: 14px; font-weight: 700; }
 .cake-studio .gempty button {cursor: pointer; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); color: hsl(var(--foreground));
-      border-radius: 999px; padding: 10px 22px; font-family: 'Cairo'; font-weight: 800; font-size: 13px; transition: border-color .2s; }
+      border-radius: 999px; padding: 10px 22px; font-family: 'Noto Kufi Arabic'; font-weight: 800; font-size: 13px; transition: border-color .2s; }
 .cake-studio .gempty button:hover {border-color: hsl(var(--primary) / .4); }
 
 /* Photo-backed option chips — the only options a customer ever sees. */
 .cake-studio .vchips {display: flex; flex-wrap: wrap; gap: 9px; }
 .cake-studio .vchip {display: inline-flex; align-items: center; gap: 9px; padding-block: 6px; padding-inline: 6px 15px;
       border-radius: 999px; cursor: pointer; border: 1.5px solid hsl(var(--line)); background: hsl(var(--card));
-      font-family: 'Cairo'; font-size: 13px; font-weight: 700; color: hsl(var(--foreground));
+      font-family: 'Noto Kufi Arabic'; font-size: 13px; font-weight: 700; color: hsl(var(--foreground));
       transition: transform .14s var(--ease), border-color .2s, box-shadow .25s; }
 .cake-studio .vchip:hover {border-color: hsl(var(--primary) / .45); }
 .cake-studio .vchip:active {transform: scale(.96); }
 .cake-studio .vchip.sel {border-color: hsl(var(--primary)); box-shadow: 0 0 0 3px hsl(var(--primary) / .14); }
 .cake-studio .vchip .th {width: 34px; height: 34px; border-radius: 999px; object-fit: cover; flex: none;
       background: hsl(28 22% 93%); border: 1px solid hsl(var(--line) / .7); }
-.cake-studio .vchip .pd {font-family: 'Tajawal'; font-size: 11px; font-weight: 500; color: hsl(var(--muted-foreground)); }
+.cake-studio .vchip .pd {font-family: 'Noto Kufi Arabic'; font-size: 11px; font-weight: 500; color: hsl(var(--muted-foreground)); }
 .cake-studio .lvl-empty {border: 1.5px dashed hsl(var(--line)); border-radius: 16px; padding: 28px 18px; text-align: center;
       color: hsl(var(--muted-foreground)); font-size: 13px; }
 .cake-studio .lvl-empty p {margin: 0; }
 .cake-studio .lvl-empty button {margin-top: 12px; cursor: pointer; border: 1px solid hsl(var(--line)); background: hsl(var(--card));
-      color: hsl(var(--foreground)); border-radius: 999px; padding: 9px 20px; font-family: 'Cairo'; font-weight: 800; font-size: 12.5px; }
+      color: hsl(var(--foreground)); border-radius: 999px; padding: 9px 20px; font-family: 'Noto Kufi Arabic'; font-weight: 800; font-size: 12.5px; }
 .cake-studio .lvl-empty button:hover {border-color: hsl(var(--primary) / .4); }
 
 .cake-studio .msg-input {width: 100%; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); border-radius: 16px;
-      padding: 15px 16px; font-family: 'Cairo'; font-size: 16px; font-weight: 700; color: hsl(var(--foreground));
+      padding: 15px 16px; font-family: 'Noto Kufi Arabic'; font-size: 16px; font-weight: 700; color: hsl(var(--foreground));
       text-align: center; transition: border-color .25s, box-shadow .25s; outline: none; }
 .cake-studio .msg-input:focus {border-color: hsl(var(--primary)); box-shadow: 0 0 0 4px hsl(var(--primary) / .1); }
 .cake-studio .msg-input::placeholder {color: hsl(var(--muted-foreground)); font-weight: 400; }
 .cake-studio .cc {text-align: end; font-size: 11px; color: hsl(var(--muted-foreground)); margin-top: 7px; }
 .cake-studio .chips {display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
 .cake-studio .chip {cursor: pointer; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); border-radius: 999px;
-      padding: 8px 15px; font-family: 'Cairo'; font-size: 13px; font-weight: 600; color: hsl(var(--secondary-foreground));
+      padding: 8px 15px; font-family: 'Noto Kufi Arabic'; font-size: 13px; font-weight: 600; color: hsl(var(--secondary-foreground));
       transition: transform .14s var(--ease), border-color .2s, background .2s, color .2s; }
 .cake-studio .chip:active {transform: scale(.95); }
 .cake-studio .chip:hover {border-color: hsl(var(--primary) / .4); }
 .cake-studio .chip.sel {background: hsl(var(--primary)); color: #fff; border-color: hsl(var(--primary)); }
-.cake-studio .flabel {font-family: 'Cairo'; font-size: 13px; font-weight: 800; color: hsl(var(--secondary-foreground)); margin: 22px 0 11px; display: flex; align-items: center; gap: 8px; }
+.cake-studio .flabel {font-family: 'Noto Kufi Arabic'; font-size: 13px; font-weight: 800; color: hsl(var(--secondary-foreground)); margin: 22px 0 11px; display: flex; align-items: center; gap: 8px; }
 .cake-studio .flabel svg {width: 16px; height: 16px; color: hsl(var(--primary)); }
-.cake-studio .flabel .opt {font-weight: 500; font-size: 11px; color: hsl(var(--muted-foreground)); font-family: 'Tajawal'; }
+.cake-studio .flabel .opt {font-weight: 500; font-size: 11px; color: hsl(var(--muted-foreground)); font-family: 'Noto Kufi Arabic'; }
 .cake-studio .addons {display: flex; flex-direction: column; gap: 10px; }
 .cake-studio .addon {display: flex; align-items: center; gap: 13px; cursor: pointer; border: 1px solid hsl(var(--line));
       background: hsl(var(--card)); border-radius: 15px; padding: 12px 14px; transition: border-color .2s, box-shadow .3s, transform .14s var(--ease); }
@@ -168,7 +168,7 @@
       background: radial-gradient(70% 70% at 50% 35%, hsl(28 36% 97%), hsl(350 30% 94%)); color: hsl(var(--rose)); }
 .cake-studio .addon .ac svg {width: 19px; height: 19px; }
 .cake-studio .addon .am {flex: 1; }
-.cake-studio .addon .am .nm {font-family: 'Cairo'; font-size: 13.5px; font-weight: 800; }
+.cake-studio .addon .am .nm {font-family: 'Noto Kufi Arabic'; font-size: 13.5px; font-weight: 800; }
 .cake-studio .addon .am .ds {font-size: 11.5px; color: hsl(var(--muted-foreground)); }
 .cake-studio .addon .ap {font-size: 12px; color: hsl(var(--muted-foreground)); font-weight: 500; }
 .cake-studio .check {width: 24px; height: 24px; border-radius: 7px; border: 1.5px solid hsl(var(--line)); flex: none; display: grid; place-items: center; transition: all .2s; color: transparent; }
@@ -179,12 +179,12 @@
 .cake-studio .srow:first-child {border-top: none; }
 .cake-studio .srow .k {display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
 .cake-studio .srow .k svg {width: 15px; height: 15px; color: hsl(var(--primary)); }
-.cake-studio .srow .v {font-family: 'Cairo'; font-size: 13px; font-weight: 700; text-align: end; }
+.cake-studio .srow .v {font-family: 'Noto Kufi Arabic'; font-size: 13px; font-weight: 700; text-align: end; }
 .cake-studio .srow .v.muted {color: hsl(var(--muted-foreground)); font-weight: 500; }
 .cake-studio .stotal {display: flex; align-items: center; justify-content: space-between; padding: 15px 16px; background: hsl(var(--blush) / .5); }
-.cake-studio .stotal .k {font-family: 'Cairo'; font-weight: 800; }
+.cake-studio .stotal .k {font-family: 'Noto Kufi Arabic'; font-weight: 800; }
 .cake-studio .stotal .v {color: hsl(var(--primary)); }
-.cake-studio .stotal .v .big {font-family: 'DM Serif Display', serif; font-size: 25px; }
+.cake-studio .stotal .v .big {font-family: 'Noto Kufi Arabic', sans-serif; font-size: 25px; }
 .cake-studio .stotal .v .cur {font-size: 12px; color: hsl(var(--muted-foreground)); margin-inline-start: 3px; }
 .cake-studio .assure {display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: hsl(var(--muted-foreground)); margin-top: 12px; padding: 0 2px; }
 .cake-studio .assure svg {width: 14px; height: 14px; color: hsl(140 30% 45%); flex: none; }
@@ -192,7 +192,7 @@
       backdrop-filter: blur(14px); border-top: 1px solid hsl(var(--line)); padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
       display: flex; align-items: center; gap: 12px; }
 .cake-studio .btn {display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 999px;
-      font-family: 'Cairo'; font-size: 15px; font-weight: 800; cursor: pointer; border: none;
+      font-family: 'Noto Kufi Arabic'; font-size: 15px; font-weight: 800; cursor: pointer; border: none;
       transition: transform .14s var(--ease), box-shadow .3s, background .25s, opacity .25s; }
 .cake-studio .btn:active {transform: scale(.97); }
 .cake-studio .btn svg {width: 18px; height: 18px; }
@@ -203,8 +203,8 @@
       box-shadow: 0 14px 30px -12px hsl(var(--primary) / .6); }
 .cake-studio .btn-next.commit {background: hsl(var(--foreground)); color: hsl(var(--background)); box-shadow: 0 16px 32px -12px hsl(var(--foreground) / .55); }
 .cake-studio .btn-next:disabled {opacity: .42; box-shadow: none; cursor: not-allowed; }
-.cake-studio .btn-next .pp {font-family: 'DM Serif Display', serif; opacity: .92; font-size: 14px; }
-.cake-studio .btn-next .pp .cur {font-family: 'Tajawal'; font-size: 11px; }
+.cake-studio .btn-next .pp {font-family: 'Noto Kufi Arabic', sans-serif; opacity: .92; font-size: 14px; }
+.cake-studio .btn-next .pp .cur {font-family: 'Noto Kufi Arabic'; font-size: 11px; }
 .cake-studio #confetti {position: absolute; inset: 0; z-index: 80; pointer-events: none; }
 .cake-studio .success {position: absolute; inset: 0; z-index: 70; display: none; place-items: center; text-align: center;
       background: hsl(var(--background) / .82); backdrop-filter: blur(10px); padding: 30px; }
@@ -215,10 +215,10 @@
 .cake-studio .success .badge {animation: cz_pop .6s var(--spring); }
 .cake-studio .success .badge svg {width: 42px; height: 42px; }
 @keyframes cz_pop { 0% { transform: scale(0) rotate(-25deg); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
-.cake-studio .success h3 {font-family: 'Cairo'; font-size: 23px; font-weight: 900; margin: 0 0 9px; }
+.cake-studio .success h3 {font-family: 'Noto Kufi Arabic'; font-size: 23px; font-weight: 900; margin: 0 0 9px; }
 .cake-studio .success p {font-size: 13.5px; color: hsl(var(--muted-foreground)); margin: 0 0 24px; max-width: 290px; line-height: 1.6; }
 .cake-studio .success .again {cursor: pointer; border: 1px solid hsl(var(--line)); background: hsl(var(--card)); color: hsl(var(--foreground));
-      border-radius: 999px; padding: 13px 26px; font-family: 'Cairo'; font-weight: 800; font-size: 14px; }
+      border-radius: 999px; padding: 13px 26px; font-family: 'Noto Kufi Arabic'; font-weight: 800; font-size: 14px; }
 
 /* PhotoCake — edible photo-print upload (Lola's signature add-on). */
 .cake-studio .photo-drop {display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
@@ -229,7 +229,7 @@
 .cake-studio .photo-drop .pic {width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
       background: hsl(var(--card)); color: hsl(var(--primary)); box-shadow: 0 6px 16px -10px hsl(var(--primary) / .6); }
 .cake-studio .photo-drop .pic svg {width: 20px; height: 20px; }
-.cake-studio .photo-drop .t {font-family: 'Cairo'; font-weight: 800; font-size: 13.5px; color: hsl(var(--foreground)); }
+.cake-studio .photo-drop .t {font-family: 'Noto Kufi Arabic'; font-weight: 800; font-size: 13.5px; color: hsl(var(--foreground)); }
 .cake-studio .photo-drop .h {font-size: 11.5px; color: hsl(var(--muted-foreground)); }
 .cake-studio .photo-prev {position: relative; width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid hsl(var(--line)); }
 .cake-studio .photo-prev img {display: block; width: 100%; max-height: 210px; object-fit: cover; }
