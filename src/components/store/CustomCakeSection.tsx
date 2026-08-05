@@ -1,25 +1,99 @@
+import { ArrowLeft, Camera, Clock, Sparkles, Wand2 } from 'lucide-react';
+import { Reveal } from '@/components/Reveal';
+import { Skeleton } from '@/components/ui/skeleton';
+import { CustomCakeCard } from '@/components/store/CustomCakeCard';
+import type { GalleryCake } from '@/lib/cakeSelect';
+
 interface CustomCakeSectionProps {
-  /** Opens the design-your-cake studio (/customize). */
-  onDesign: () => void;
+  /** Already filtered to designable cakes (galleryCakes). */
+  cakes: GalleryCake[];
+  /** The catalog session is still hydrating from localStorage/IndexedDB. */
+  loading: boolean;
+  /** Opens /customize pre-seeded with this cake. */
+  onPick: (cakeId: string) => void;
+  /** Opens the full /custom-cakes listing. */
+  onViewAll: () => void;
 }
 
-// Faithful clone of the design's #custom section; primary CTA opens /customize.
-export function CustomCakeSection({ onDesign }: CustomCakeSectionProps) {
+const TRUST = [
+  { icon: Camera, text: 'كل خيار مصوّر فعلاً في مطبخنا' },
+  { icon: Sparkles, text: 'تعديلات مجانية قبل التأكيد' },
+  { icon: Clock, text: 'جاهزة خلال ٢٤ ساعة' },
+];
+
+/**
+ * The home page's design-studio doorway: copy panel beside three real designable
+ * cakes. A card opens /customize already on that cake's first step — the studio's
+ * own gallery is a fallback, not the entry point we advertise.
+ *
+ * Renders skeletons rather than nothing while the catalog hydrates: the section
+ * sits directly under the hero, so a late pop-in would shove the fold.
+ */
+export function CustomCakeSection({ cakes, loading, onPick, onViewAll }: CustomCakeSectionProps) {
+  if (!loading && cakes.length === 0) return null;
+  const shown = cakes.slice(0, 3);
+
   return (
-    <section id="custom" className="bg-[#fffdfa] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
-      <div className="mx-auto grid max-w-[1420px] gap-8 rounded-[2rem] border border-[#9e3a5c]/10 bg-white p-8 shadow-[0_30px_90px_-55px_rgba(158,58,92,0.45)] sm:p-12 lg:grid-cols-[1fr_.75fr] lg:items-center">
-        <div>
-          <p className="text-xs font-bold tracking-[.1em] text-[#b0506e]">للمناسبات الكبيرة</p>
-          <h2 className="mt-4 text-3xl font-black leading-[1.4] text-[#2c2226] sm:text-4xl">فكرة خاصة؟ نصنعها لكِ كما تتخيلينها.</h2>
-          <p className="mt-4 max-w-xl text-sm leading-8 text-[#7d6870]">أرسلي لنا تفاصيل مناسبتك، الألوان، وعدد الضيوف. فريقنا يتواصل معك لتأكيد التصميم والسعر.</p>
-        </div>
-        <div className="rounded-2xl border border-[#9e3a5c]/10 bg-[#fffdfa] p-6">
-          <p className="text-sm font-bold text-[#9e3a5c]">ابدئي طلبك الخاص</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <button onClick={onDesign} className="rounded-md bg-[#9e3a5c] px-4 py-3 text-xs font-bold text-white transition-colors hover:bg-[#b0506e]">اطلبي تورتة مخصصة</button>
-            <a href="https://wa.me/966500000000" target="_blank" rel="noopener noreferrer" className="rounded-md border border-[#9e3a5c]/30 px-4 py-3 text-center text-xs font-bold text-[#9e3a5c] transition-colors hover:bg-[#fbeef2]">تواصلي عبر واتساب</a>
-          </div>
-        </div>
+    <section
+      id="custom"
+      className="bg-gradient-to-b from-[#fbeef2] to-[#fffdfa] px-5 py-14 sm:px-8 lg:px-12 lg:py-20"
+    >
+      <div className="mx-auto grid max-w-[1500px] gap-9 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-14">
+        {/* Copy panel */}
+        <Reveal>
+          <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-[#b0506e]">
+            <span className="h-px w-10 bg-[#9e3a5c]/25" /> استوديو التصميم
+          </p>
+          <h2 className="mt-4 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-[#2c2226] sm:text-[3.25rem]">
+            صمّم كيكتك
+            <span className="block text-[#b0506e]">بالضبط كما تتخيّلها.</span>
+          </h2>
+          <p className="mt-5 max-w-lg text-sm leading-8 text-[#7d6870]">
+            اختر كيكة، ثم خصّص شكلها ونكهتها ولونها خطوة بخطوة. كل خيار تراه هو صورة كيكة خبزناها
+            فعلاً — لا رسومات ولا تخمين، تشوف كيكتك قبل ما تطلبها.
+          </p>
+
+          <ul className="mt-6 grid gap-3">
+            {TRUST.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-2.5 text-sm font-bold text-[#6a5560]">
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-[#b0506e] shadow-sm">
+                  <Icon size={14} />
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+
+          <button
+            type="button"
+            onClick={onViewAll}
+            className="group/cta mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-t from-[#8a3251] to-[#9e3a5c] px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_rgba(158,58,92,0.8)] transition-all duration-200 hover:from-[#9e3a5c] hover:to-[#b0506e] active:scale-[.98]"
+          >
+            <Wand2 size={17} />
+            شاهد كل التصاميم
+            <ArrowLeft
+              size={16}
+              className="transition-transform duration-300 group-hover/cta:-translate-x-1"
+            />
+          </button>
+        </Reveal>
+
+        {/* Cakes — snap rail on phones, 3-up grid from sm */}
+        <Reveal className="reveal-grid flex snap-x gap-3 overflow-x-auto pb-2 scrollbar-none sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:pb-0">
+          {loading
+            ? Array.from({ length: 3 }, (_, i) => (
+                <div key={i} className="w-[62%] shrink-0 snap-start sm:w-auto">
+                  <Skeleton className="aspect-[4/5] rounded-2xl" />
+                  <Skeleton className="mt-3 h-5 w-3/4" />
+                  <Skeleton className="mt-2 h-3 w-1/2" />
+                </div>
+              ))
+            : shown.map(({ cake, previewUrl }) => (
+                <div key={cake.id} className="w-[62%] shrink-0 snap-start sm:w-auto">
+                  <CustomCakeCard cake={cake} previewUrl={previewUrl} onPick={() => onPick(cake.id)} />
+                </div>
+              ))}
+        </Reveal>
       </div>
     </section>
   );

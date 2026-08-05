@@ -45,6 +45,7 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
               <li><button onClick={() => onJump('shop')} className="transition-colors hover:text-white">كل المنتجات</button></li>
               <li><button onClick={() => onJump('seasonal')} className="transition-colors hover:text-white">تشكيلة الصيف 🥭</button></li>
               <li><button onClick={() => onJump('combos')} className="transition-colors hover:text-white">الكومبوهات</button></li>
+              <li><button onClick={() => onNavigate('/custom-cakes')} className="transition-colors hover:text-white">كيكات التصميم الخاص</button></li>
               <li><button onClick={() => onNavigate('/customize')} className="transition-colors hover:text-white">صمّم تورتة خاصة</button></li>
             </ul>
           </nav>

@@ -12,6 +12,7 @@ import { sortProducts } from '@/lib/shopSort';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import { Marquee, GoldDivider } from '@/components/store/StorefrontDecor';
 import { StoreHero } from '@/components/store/StoreHero';
+import { CustomCakeSection } from '@/components/store/CustomCakeSection';
 import { SeasonalSection } from '@/components/store/SeasonalSection';
 import { ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
 import { StoreProductCard } from '@/components/store/StoreProductCard';
@@ -24,6 +25,8 @@ import { StickyCartBar } from '@/components/store/StickyCartBar';
 import { StorefrontFooter } from '@/components/store/StorefrontFooter';
 import { StoreSearch } from '@/components/store/StoreSearch';
 import { Reveal } from '@/components/Reveal';
+import { useCatalogSession } from '@/hooks/useCatalogSession';
+import { galleryCakes } from '@/lib/cakeSelect';
 
 export default function Store() {
   const { settings } = useSettings();
@@ -33,6 +36,9 @@ export default function Store() {
   const { data: products } = usePublicStoreProducts();
   const { addToCart, updateQuantity, count: cartCount, open: openCart, cart } = useStoreCart();
   const wishlist = useStoreWishlist();
+  // Designable cakes come from the photo catalog, not `products` — the two models
+  // are disjoint, and only a CatalogCake id can seed the studio.
+  const { status: catalogStatus, catalog, urlFor } = useCatalogSession();
 
   const [category, setCategory] = useState('الكل');
   const [query, setQuery] = useState('');
@@ -75,6 +81,8 @@ export default function Store() {
     return sortProducts(filtered, 'featured', ratingsMap);
   }, [products, category, query, ratingsMap]);
 
+  const designCakes = useMemo(() => galleryCakes(catalog, urlFor), [catalog, urlFor]);
+
   const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
   // Hero's "اختيار هذا الأسبوع": the first in-stock product in featured order, so
   // merchandisers steer it with display_order and the card always opens a real item.
@@ -98,6 +106,7 @@ export default function Store() {
 
   const NAV = [
     { label: 'كل المنتجات', action: () => scrollToId('shop') },
+    { label: 'صمّم كيكتك', action: () => scrollToId('custom') },
     { label: 'تشكيلة الصيف 🥭', action: () => scrollToId('seasonal'), season: true },
     { label: 'الكومبوهات', action: () => scrollToId('combos') },
     { label: 'تجهيز المناسبات', action: () => navigate('/events') },
@@ -209,6 +218,13 @@ export default function Store() {
           onViewFeatured={() => featured && navigate(`/product/${featured.id}`)}
         />
       </div>
+
+      <CustomCakeSection
+        cakes={designCakes}
+        loading={catalogStatus === 'loading'}
+        onPick={(cakeId) => navigate('/customize', { state: { initial: { cakeId } } })}
+        onViewAll={() => navigate('/custom-cakes')}
+      />
 
       <SeasonalSection products={seasonal} renderCard={renderCard} />
 
