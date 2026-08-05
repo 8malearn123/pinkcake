@@ -6,9 +6,20 @@
  * every node of a per-cake tree: an image belongs to a path `cake → value → value`
  * at ANY depth, so partial paths are first-class nodes with their own photo.
  *
- * This module has zero imports on purpose — it is the vocabulary every other
- * layer (pure logic, persistence, React) agrees on.
+ * This module has no *cake-specific* imports on purpose — it is the vocabulary
+ * every other layer (pure logic, persistence, React) agrees on. The one
+ * exception is the re-export below: the upload limits and downscale targets are
+ * shared verbatim with the combos catalog, so they live in a neutral module and
+ * are surfaced here so cake-side call sites need not change. `imageFiles` is
+ * constants + pure functions only — no canvas reaches the pure path.
  */
+
+export {
+  MAX_IMAGE_BYTES,
+  ALLOWED_IMAGE_TYPES,
+  DOWNSCALE_MAX_EDGE,
+  DOWNSCALE_QUALITY,
+} from '@/lib/imageFiles';
 
 /** Bump to invalidate persisted metadata; the store wipes + reseeds on mismatch. */
 export const SCHEMA_VERSION = 1;
@@ -19,14 +30,6 @@ export const LEGACY_META_KEYS: readonly string[] = [];
 export const META_STORAGE_KEY = 'pinkcake:cake-catalog:v1';
 export const IDB_NAME = 'pinkcake-cake-catalog';
 export const IDB_STORE = 'images';
-
-/** Mirrors the product image upload rules so staff hit one consistent limit. */
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const;
-
-/** Staff photos are downscaled before storage — IndexedDB quota is the binding constraint. */
-export const DOWNSCALE_MAX_EDGE = 1600;
-export const DOWNSCALE_QUALITY = 0.85;
 
 /** One option inside a level, e.g. «قلب» inside «الشكل». */
 export interface CatalogValue {

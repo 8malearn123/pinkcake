@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { ImagePlus, Loader2, Plus, Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { dragCarriesFiles } from '@/lib/cakeCatalog/validate';
+import { dragCarriesFiles } from '@/lib/imageFiles';
 
 type DropVariant = 'block' | 'row' | 'slot';
 
@@ -25,8 +25,9 @@ interface LocalImageDropProps {
  * The local-blob counterpart of products/ImageUpload: same Arabic copy and the
  * same limits, but the bytes go to IndexedDB instead of Supabase Storage.
  *
- * Unlike ImageUpload, the "drag it here" affordance is real — the tree needs
- * genuine drop targets, so the handlers live here and are reused by every slot.
+ * Unlike ImageUpload, the "drag it here" affordance is real — the cake variant
+ * tree needs genuine drop targets, so the handlers live here and are reused by
+ * every slot. Shared by «تصميم الكيك» and the combos hero picker.
  */
 export function LocalImageDrop({
   variant = 'block',

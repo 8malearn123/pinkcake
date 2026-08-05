@@ -4,6 +4,8 @@ import { ArrowLeft, Menu, ShoppingBag, User, X } from 'lucide-react';
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
+import { useCombos } from '@/hooks/useCombos';
+import { resolveCombos } from '@/lib/combos';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -39,6 +41,7 @@ export default function Store() {
   // Designable cakes come from the photo catalog, not `products` — the two models
   // are disjoint, and only a CatalogCake id can seed the studio.
   const { status: catalogStatus, catalog, urlFor } = useCatalogSession();
+  const { combos: comboDefs, urlFor: comboUrlFor } = useCombos();
 
   const [category, setCategory] = useState('الكل');
   const [query, setQuery] = useState('');
@@ -82,8 +85,18 @@ export default function Store() {
   }, [products, category, query, ratingsMap]);
 
   const designCakes = useMemo(() => galleryCakes(catalog, urlFor), [catalog, urlFor]);
+  // Mirrors CustomCakeSection's own render condition: it shows placeholders while
+  // the catalog hydrates, then hides itself entirely if nothing is designable.
+  const catalogLoading = catalogStatus === 'loading';
+  const showDesignSection = catalogLoading || designCakes.length > 0;
 
   const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
+  // Priced against the live catalogue, so hiding a combo in the dashboard or a
+  // member selling out removes the card here without a deploy.
+  const combos = useMemo(
+    () => resolveCombos(comboDefs, products, isSoldOut, comboUrlFor),
+    [comboDefs, products, comboUrlFor],
+  );
   // Hero's "اختيار هذا الأسبوع": the first in-stock product in featured order, so
   // merchandisers steer it with display_order and the card always opens a real item.
   const featured = useMemo(() => (products ?? []).find((p) => !isSoldOut(p)), [products]);
@@ -104,11 +117,14 @@ export default function Store() {
     />
   );
 
+  // The combos and design links are dropped when their sections resolve to
+  // nothing — both render null in that case, and a nav item that scrolls
+  // nowhere reads as broken.
   const NAV = [
     { label: 'كل المنتجات', action: () => scrollToId('shop') },
-    { label: 'صمّم كيكتك', action: () => scrollToId('custom') },
+    ...(showDesignSection ? [{ label: 'صمّم كيكتك', action: () => scrollToId('custom') }] : []),
     { label: 'تشكيلة الصيف 🥭', action: () => scrollToId('seasonal'), season: true },
-    { label: 'الكومبوهات', action: () => scrollToId('combos') },
+    ...(combos.length > 0 ? [{ label: 'الكومبوهات', action: () => scrollToId('combos') }] : []),
     { label: 'تجهيز المناسبات', action: () => navigate('/events') },
     { label: 'فروعنا', action: () => scrollToId('branches') },
   ];
@@ -221,7 +237,7 @@ export default function Store() {
 
       <CustomCakeSection
         cakes={designCakes}
-        loading={catalogStatus === 'loading'}
+        loading={catalogLoading}
         onPick={(cakeId) => navigate('/customize', { state: { initial: { cakeId } } })}
         onViewAll={() => navigate('/custom-cakes')}
       />
@@ -272,7 +288,7 @@ export default function Store() {
       </section>
 
       <CombosSection
-        products={products}
+        combos={combos}
         onAddCombo={(combo) =>
           // Add the bundle as ONE line at its real discounted price, so the
           // advertised "وفّر" saving is actually charged (not the members' full sum).

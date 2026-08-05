@@ -98,8 +98,8 @@ stays the same.
 ## Cake design catalog (browser-local)
 
 The admin section **«تصميم الكيك»** (`/cake-design`, `src/pages/CakeDesign.tsx`) does
-**not** talk to Supabase at all yet. It is the only feature in the app with its own
-private storage:
+**not** talk to Supabase at all yet. It is one of two features in the app with its
+own private storage (the other is combos, below):
 
 | What | Where |
 |---|---|
@@ -142,6 +142,52 @@ deltas it needs instead of a whole-document write.
 Bump `SCHEMA_VERSION` in `src/lib/cakeCatalog/types.ts` (and push the old key onto
 `LEGACY_META_KEYS`) whenever the shape or the seed changes — the store then wipes,
 reseeds, and clears the stale blobs.
+
+## Storefront combos (browser-local)
+
+The storefront's «الكومبوهات» band (`src/components/store/CombosSection.tsx` on the
+home page) is authored from the dashboard at **`/products?tab=combos`**
+(`src/components/combos/CombosTab.tsx`). It uses the same browser-local arrangement
+as the cake catalog, with its **own** database:
+
+| What | Where |
+|---|---|
+| The combo set (names, members, discounts, colours) | `localStorage` key `pinkcake:combos:v1`, one JSON document |
+| Hero photo bytes | IndexedDB database `pinkcake-combos`, object store `images`, key = image id → `Blob` |
+| Displayable URLs | `URL.createObjectURL`, minted and revoked by the store |
+
+⚠ **Never point the combos store at `pinkcake-cake-catalog`.** Each store's boot GC
+deletes blobs its own document doesn't reference, so a shared database would make a
+`/cake-design` boot silently wipe every combo hero photo.
+
+Same per-browser caveats as the cake catalog — the tab says so above its table.
+
+A combo stores **no price**. It holds product ids and a `discountPct`, and
+`resolveCombos` (`src/lib/combos.ts`) derives `original`/`price`/`save`/`pct` from
+the members' live catalogue prices at render time, so the «وفّر» badge can never
+drift from what the cart charges. A combo whose members are hidden, sold out, or
+fewer than two after resolution simply doesn't render — and the dashboard row flags
+that case as «لن يظهر في المتجر» so the disappearance is never silent to staff.
+
+Note the seeded combos reference the **demo** product ids (`p1`…`p6`). Against a
+real catalogue those resolve to nothing, so the three shipped combos will show the
+warning badge until someone repoints them at real products. That is the intended
+prompt on go-live, not a bug.
+
+**The seam** is `CombosStore` in `src/lib/combosCatalog/store.ts` — the same six
+methods, likewise handing back URLs rather than Blobs:
+
+- `load()` → select `combos` (+ their member ids), then
+  `storage.from('combo-heroes').getPublicUrl()` per hero
+- `saveDoc()` → upsert/delete rows; every mutation in `src/lib/combosCatalog/doc.ts`
+  is pure and already returns `{ doc, deadImageIds }`, so a SQL adapter has the exact
+  deltas instead of a whole-document write
+- `putImage()` → `storage.upload()`; `deleteImages()` → `storage.remove()`;
+  `dispose()` → a no-op
+
+Swap the implementation in `getStore()` (`src/lib/combosCatalog/session.ts`) and
+nothing else changes. Bump `COMBOS_SCHEMA_VERSION` in
+`src/lib/combosCatalog/types.ts` whenever the shape or the seed changes.
 
 ## Quick checklist
 

@@ -1,9 +1,13 @@
 /**
  * Cake catalog — canvas helpers. Browser-only; imported dynamically by the store
  * so nothing in the pure/test path ever touches a canvas.
+ *
+ * `decodeAndDownscale` moved to `@/lib/imageDownscale` (the combos catalog needs
+ * the same decode path); it is re-exported here so the store's dynamic import
+ * still resolves both helpers from one module.
  */
 
-import { DOWNSCALE_MAX_EDGE, DOWNSCALE_QUALITY } from './types';
+export { decodeAndDownscale, type DecodedImage } from '@/lib/imageDownscale';
 
 const PLACEHOLDER_WIDTH = 480;
 const PLACEHOLDER_HEIGHT = 360;
@@ -55,52 +59,4 @@ export async function makePlaceholderBlob(
   ctx.fillText(caption.slice(0, 64), PLACEHOLDER_WIDTH / 2, 210, PLACEHOLDER_WIDTH - 40);
 
   return toBlob(canvas, 0.82);
-}
-
-export interface DecodedImage {
-  blob: Blob;
-  width: number;
-  height: number;
-}
-
-/**
- * Decode a staff upload, capture its true dimensions, and downscale it before
- * storage. A phone photo is ~10× smaller after this, which is the difference
- * between a usable catalog and QuotaExceededError after 200 uploads.
- *
- * Returns the ORIGINAL blob when it is already small enough or when the canvas
- * path fails — never loses the image over an optimisation.
- */
-export async function decodeAndDownscale(file: Blob): Promise<DecodedImage> {
-  const objectUrl = URL.createObjectURL(file);
-  try {
-    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error('decode failed'));
-      el.src = objectUrl;
-    });
-
-    const { naturalWidth: width, naturalHeight: height } = image;
-    const longestEdge = Math.max(width, height);
-    if (longestEdge <= DOWNSCALE_MAX_EDGE) return { blob: file, width, height };
-
-    const scale = DOWNSCALE_MAX_EDGE / longestEdge;
-    const targetWidth = Math.round(width * scale);
-    const targetHeight = Math.round(height * scale);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return { blob: file, width, height };
-    ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-
-    const resized = await toBlob(canvas, DOWNSCALE_QUALITY);
-    return resized
-      ? { blob: resized, width: targetWidth, height: targetHeight }
-      : { blob: file, width, height };
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
 }

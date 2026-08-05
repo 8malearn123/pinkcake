@@ -1,4 +1,5 @@
 import { Clock, Instagram, MapPin, MessageCircle, Phone } from 'lucide-react';
+import { useCombos } from '@/hooks/useCombos';
 
 interface StorefrontFooterProps {
   storeName: string;
@@ -17,6 +18,12 @@ interface StorefrontFooterProps {
  * signature instead of stopping at the last section.
  */
 export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFooterProps) {
+  // Staff can hide every combo; the link would then point at a section that no
+  // longer renders. Gate on the doc rather than the priced result — the footer
+  // has no catalogue to resolve against, and "staff turned them all off" is the
+  // case worth reacting to.
+  const { activeCombos } = useCombos();
+
   return (
     <footer className="mt-2 bg-gradient-to-b from-[#7d2f49] to-[#5f2338] text-white">
       <div className="mx-auto max-w-[1500px] px-5 py-14 sm:px-8 lg:px-12 lg:py-16">
@@ -44,7 +51,9 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
             <ul className="mt-4 space-y-2.5 text-sm text-white/75">
               <li><button onClick={() => onJump('shop')} className="transition-colors hover:text-white">كل المنتجات</button></li>
               <li><button onClick={() => onJump('seasonal')} className="transition-colors hover:text-white">تشكيلة الصيف 🥭</button></li>
-              <li><button onClick={() => onJump('combos')} className="transition-colors hover:text-white">الكومبوهات</button></li>
+              {activeCombos.length > 0 && (
+                <li><button onClick={() => onJump('combos')} className="transition-colors hover:text-white">الكومبوهات</button></li>
+              )}
               <li><button onClick={() => onNavigate('/custom-cakes')} className="transition-colors hover:text-white">كيكات التصميم الخاص</button></li>
               <li><button onClick={() => onNavigate('/customize')} className="transition-colors hover:text-white">صمّم تورتة خاصة</button></li>
             </ul>

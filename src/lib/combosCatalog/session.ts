@@ -1,42 +1,35 @@
 /**
- * Cake catalog — the live session: one module-scoped owner of the loaded
- * catalog, its object URLs, and the order in which writes happen.
+ * Combos catalog — the live session: one module-scoped owner of the loaded doc,
+ * its object URLs, and the order in which writes happen.
  *
- * Two things forced this out of the React layer:
+ * Same two forces that pushed the cake catalog's state out of React apply here:
  *
- * 1. **Remount must not rewind.** The provider is mounted by a lazily-routed
- *    page, so navigating away from /cake-design and back unmounts it. Caching
- *    the boot `LoadResult` in a module variable meant the remount restored the
- *    boot-time catalog and the next write persisted that snapshot over the
- *    session's work. State lives here instead, and React subscribes to it.
+ * 1. **Remount must not rewind.** Both consumers are lazily-routed pages, so
+ *    navigating between the storefront and the dashboard unmounts them. State
+ *    lives here and React subscribes to it, so a remount rejoins the session
+ *    instead of restoring a boot-time snapshot over the session's work.
  *
  * 2. **Writes must not interleave.** A mutation built from a render's
- *    closed-over `catalog` is stale the moment anything else commits, and image
- *    saves await a decode + re-encode + IndexedDB write first — hundreds of
+ *    closed-over doc is stale the moment anything else commits, and a hero
+ *    upload awaits a decode + re-encode + IndexedDB write first — hundreds of
  *    milliseconds during which a second edit is entirely realistic. So every
- *    mutation is a *function of the current catalog*, and they run one at a
- *    time through `queue`.
+ *    mutation is a *function of the current doc*, and they run one at a time
+ *    through `queue`.
  *
- * No React and no toasts in here: outcomes are returned, the provider renders
- * them. That also makes the whole write path testable without a component.
+ * No React and no toasts in here: outcomes are returned, the hook renders them.
  */
 
-import { emptyCatalog } from './catalog';
-import {
-  createLocalCakeCatalogStore,
-  type CakeCatalogStore,
-  type SavedImage,
-} from './store';
-import { CatalogStorageError } from './store';
+import { emptyDoc } from './doc';
+import { createLocalCombosStore, CombosStorageError, type CombosStore, type SavedImage } from './store';
 import { BlobQuotaError } from '@/lib/blobStore';
-import { META_STORAGE_KEY, type Catalog, type CascadeResult } from './types';
+import { COMBOS_META_KEY, type ComboCascade, type CombosDoc } from './types';
 
 export interface SessionState {
   status: 'loading' | 'ready' | 'error';
   error: string | null;
-  catalog: Catalog;
+  doc: CombosDoc;
   urls: Record<string, string>;
-  /** Set once when a boot repaired dangling references, so the UI can say so. */
+  /** Set when a boot dropped hero references whose bytes were gone. */
   repaired: boolean;
 }
 
@@ -56,13 +49,13 @@ const OK: MutationOutcome = { ok: true };
 let state: SessionState = {
   status: 'loading',
   error: null,
-  catalog: emptyCatalog(),
+  doc: emptyDoc(),
   urls: {},
   repaired: false,
 };
 
 const listeners = new Set<() => void>();
-let store: CakeCatalogStore | null = null;
+let store: CombosStore | null = null;
 let booting: Promise<void> | null = null;
 /** Serialises every write; a rejection must not poison the chain. */
 let queue: Promise<unknown> = Promise.resolve();
@@ -82,8 +75,8 @@ export function getSnapshot(): SessionState {
   return state;
 }
 
-function getStore(): CakeCatalogStore {
-  if (!store) store = createLocalCakeCatalogStore();
+function getStore(): CombosStore {
+  if (!store) store = createLocalCombosStore();
   return store;
 }
 
@@ -98,27 +91,27 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
 }
 
 function toOutcome(error: unknown): MutationOutcome {
-  const storage = error instanceof CatalogStorageError || error instanceof BlobQuotaError;
+  const storage = error instanceof CombosStorageError || error instanceof BlobQuotaError;
   return { ok: false, reason: storage ? 'storage' : 'failed', error };
 }
 
 /**
- * Persist a cascade and publish it. Metadata is the source of truth, so it is
+ * Persist a cascade and publish it. The doc is the source of truth, so it is
  * written first; freeing the blobs it orphaned is best-effort, because boot GC
  * reaps anything left behind. Failing the whole mutation on a cleanup error
  * would leave the UI showing state that localStorage already holds.
  */
-async function commit(result: CascadeResult): Promise<MutationOutcome> {
+async function commit(result: ComboCascade): Promise<MutationOutcome> {
   const active = getStore();
   try {
-    await active.saveCatalog(result.catalog);
+    await active.saveDoc(result.doc);
   } catch (error) {
     return toOutcome(error);
   }
 
   const urls = { ...state.urls };
   for (const id of result.deadImageIds) delete urls[id];
-  publish({ catalog: result.catalog, urls });
+  publish({ doc: result.doc, urls });
 
   if (result.deadImageIds.length > 0) {
     try {
@@ -134,14 +127,13 @@ let crossTabWired = false;
 
 /**
  * A dashboard write in another tab fires a `storage` event here (never in the
- * writing tab), so the storefront picks up catalog changes live — the
- * prototype's sync mechanism, kept.
+ * writing tab), so a storefront left open picks up combo changes live.
  */
 function wireCrossTabSync() {
   if (crossTabWired || typeof window === 'undefined') return;
   crossTabWired = true;
   window.addEventListener('storage', (event) => {
-    if (event.key === META_STORAGE_KEY) void reloadSession();
+    if (event.key === COMBOS_META_KEY) void reloadSession();
   });
 }
 
@@ -155,7 +147,7 @@ export function ensureLoaded(): Promise<void> {
       publish({
         status: 'ready',
         error: null,
-        catalog: result.catalog,
+        doc: result.doc,
         urls: result.urls,
         repaired: result.repaired,
       });
@@ -175,11 +167,11 @@ export function reloadSession(): Promise<void> {
   return ensureLoaded();
 }
 
-/** The catalog is read INSIDE the queue, so `build` always sees the latest. */
-export function mutate(build: (catalog: Catalog) => CascadeResult): Promise<MutationOutcome> {
+/** The doc is read INSIDE the queue, so `build` always sees the latest. */
+export function mutate(build: (doc: CombosDoc) => ComboCascade): Promise<MutationOutcome> {
   return enqueue(async () => {
     try {
-      return await commit(build(state.catalog));
+      return await commit(build(state.doc));
     } catch (error) {
       return toOutcome(error);
     }
@@ -187,19 +179,19 @@ export function mutate(build: (catalog: Catalog) => CascadeResult): Promise<Muta
 }
 
 /**
- * Store the bytes first, then build the cascade from whatever the catalog looks
- * like once that has finished — the whole thing inside one queue slot, so a
- * slow image save can never be overtaken by a later edit.
+ * Store the bytes first, then build the cascade from whatever the doc looks like
+ * once that has finished — the whole thing inside one queue slot, so a slow hero
+ * upload can never be overtaken by a later edit.
  */
 export function mutateWithImage(
   file: File,
-  build: (catalog: Catalog, saved: SavedImage) => CascadeResult,
+  build: (doc: CombosDoc, saved: SavedImage) => ComboCascade,
 ): Promise<MutationOutcome> {
   return enqueue(async () => {
     try {
-      const saved = await getStore().putImage(file, file.name);
+      const saved = await getStore().putImage(file);
       publish({ urls: { ...state.urls, [saved.id]: saved.url } });
-      return await commit(build(state.catalog, saved));
+      return await commit(build(state.doc, saved));
     } catch (error) {
       return toOutcome(error);
     }
@@ -214,7 +206,7 @@ export function resetSession(): Promise<MutationOutcome> {
       publish({
         status: 'ready',
         error: null,
-        catalog: result.catalog,
+        doc: result.doc,
         urls: result.urls,
         repaired: false,
       });
@@ -226,10 +218,10 @@ export function resetSession(): Promise<MutationOutcome> {
 }
 
 /** Test seam — swaps the store and clears all session state. */
-export function __resetSessionForTests(next?: CakeCatalogStore) {
+export function __resetSessionForTests(next?: CombosStore) {
   store = next ?? null;
   booting = null;
   queue = Promise.resolve();
   listeners.clear();
-  state = { status: 'loading', error: null, catalog: emptyCatalog(), urls: {}, repaired: false };
+  state = { status: 'loading', error: null, doc: emptyDoc(), urls: {}, repaired: false };
 }

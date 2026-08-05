@@ -21,9 +21,11 @@ import {
   referencedBlobIds,
   repairCatalog,
 } from './catalog';
-import { createMemoryBlobStore, getDefaultBlobStore, type BlobStore } from './blobStore';
+import { createMemoryBlobStore, getDefaultBlobStore, type BlobStore } from '@/lib/blobStore';
 import { buildSeedCatalog, type PlaceholderPlan } from './seed';
 import {
+  IDB_NAME,
+  IDB_STORE,
   LEGACY_META_KEYS,
   META_STORAGE_KEY,
   type Catalog,
@@ -103,7 +105,7 @@ function defaultUrlFactory(): UrlFactory {
 
 export function createLocalCakeCatalogStore(options: LocalStoreOptions = {}): CakeCatalogStore {
   const meta = options.metaStorage ?? defaultMetaStorage();
-  const blobs = options.blobs ?? getDefaultBlobStore();
+  const blobs = options.blobs ?? getDefaultBlobStore(IDB_NAME, IDB_STORE);
   const urlFactory = options.urls ?? defaultUrlFactory();
   const makeId = options.newId ?? newId;
 
