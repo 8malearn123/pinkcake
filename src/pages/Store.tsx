@@ -4,6 +4,8 @@ import { ArrowLeft, Menu, ShoppingBag, User, X } from 'lucide-react';
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { StoreProduct } from '@/hooks/useCustomerStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
+import { useCombos } from '@/hooks/useCombos';
+import { resolveCombos } from '@/lib/combos';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -33,6 +35,7 @@ export default function Store() {
   const { data: products } = usePublicStoreProducts();
   const { addToCart, updateQuantity, count: cartCount, open: openCart, cart } = useStoreCart();
   const wishlist = useStoreWishlist();
+  const { combos: comboDefs, urlFor: comboUrlFor } = useCombos();
 
   const [category, setCategory] = useState('الكل');
   const [query, setQuery] = useState('');
@@ -76,6 +79,12 @@ export default function Store() {
   }, [products, category, query, ratingsMap]);
 
   const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
+  // Priced against the live catalogue, so hiding a combo in the dashboard or a
+  // member selling out removes the card here without a deploy.
+  const combos = useMemo(
+    () => resolveCombos(comboDefs, products, isSoldOut, comboUrlFor),
+    [comboDefs, products, comboUrlFor],
+  );
   // Hero's "اختيار هذا الأسبوع": the first in-stock product in featured order, so
   // merchandisers steer it with display_order and the card always opens a real item.
   const featured = useMemo(() => (products ?? []).find((p) => !isSoldOut(p)), [products]);
@@ -96,10 +105,12 @@ export default function Store() {
     />
   );
 
+  // The combos link is dropped when no combo resolves — CombosSection renders
+  // nothing in that case, and a nav item that scrolls nowhere reads as broken.
   const NAV = [
     { label: 'كل المنتجات', action: () => scrollToId('shop') },
     { label: 'تشكيلة الصيف 🥭', action: () => scrollToId('seasonal'), season: true },
-    { label: 'الكومبوهات', action: () => scrollToId('combos') },
+    ...(combos.length > 0 ? [{ label: 'الكومبوهات', action: () => scrollToId('combos') }] : []),
     { label: 'تجهيز المناسبات', action: () => navigate('/events') },
     { label: 'فروعنا', action: () => scrollToId('branches') },
   ];
@@ -256,7 +267,7 @@ export default function Store() {
       </section>
 
       <CombosSection
-        products={products}
+        combos={combos}
         onAddCombo={(combo) =>
           // Add the bundle as ONE line at its real discounted price, so the
           // advertised "وفّر" saving is actually charged (not the members' full sum).

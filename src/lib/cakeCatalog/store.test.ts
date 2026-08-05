@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import { createMemoryBlobStore, type BlobStore } from './blobStore';
+import { createMemoryBlobStore, type BlobStore } from '@/lib/blobStore';
 import { referencedBlobIds } from './catalog';
 import { createLocalCakeCatalogStore, type CakeCatalogStore } from './store';
 import { META_STORAGE_KEY, SCHEMA_VERSION, type Catalog } from './types';

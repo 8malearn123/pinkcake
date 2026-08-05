@@ -22,7 +22,7 @@ import {
   isValidNodePath,
 } from '@/lib/cakeCatalog/catalog';
 import { CatalogImg } from './CatalogImg';
-import { LocalImageDrop } from './LocalImageDrop';
+import { LocalImageDrop } from '@/components/ds';
 
 export interface NodeDetailPanelProps {
   cakeId: string;

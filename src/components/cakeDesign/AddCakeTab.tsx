@@ -14,10 +14,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { RiyalSymbol } from '@/components/ui/riyal';
-import { EmptyState, SectionCard } from '@/components/ds';
+import { EmptyState, LocalImageDrop, SectionCard } from '@/components/ds';
 import { useCakeCatalog } from '@/contexts/CakeCatalogContext';
 import { CakeWorkbench } from './CakeWorkbench';
-import { LocalImageDrop } from './LocalImageDrop';
 
 const cakeSchema = z.object({
   name: z.string().trim().min(2, 'اسم الكيكة مطلوب (حرفان على الأقل)').max(80, 'الاسم طويل جداً'),

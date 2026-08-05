@@ -1,21 +1,20 @@
 import { Gift, Sparkles, Truck } from 'lucide-react';
-import { isSoldOut } from '@/hooks/usePublicStore';
-import { resolveCombos, type ResolvedCombo } from '@/lib/combos';
+import { type ResolvedCombo } from '@/lib/combos';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
 import { Reveal } from '@/components/Reveal';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 
-// Faithful clone of the Cake & Bloom Combos section (featured big + two side),
-// resolved against real products. onAddCombo adds the members to the cart.
+// Faithful clone of the Cake & Bloom Combos section (featured big + two side).
+// Purely presentational: the caller resolves the admin-authored combos against
+// the live catalogue and passes the priced result in. onAddCombo carts one.
 export function CombosSection({
-  products,
+  combos,
   onAddCombo,
 }: {
-  products: StoreProduct[] | undefined;
+  combos: ResolvedCombo[];
   onAddCombo: (combo: ResolvedCombo) => void;
 }) {
-  const combos = resolveCombos(products, isSoldOut);
   if (combos.length === 0) return null;
   const featured = combos.find((c) => c.best) ?? combos[0];
   const others = combos.filter((c) => c !== featured);

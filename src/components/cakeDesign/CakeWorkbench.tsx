@@ -18,11 +18,10 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { RiyalSymbol } from '@/components/ui/riyal';
-import { SectionCard } from '@/components/ds';
+import { LocalImageDrop, SectionCard } from '@/components/ds';
 import { useCakeCatalog } from '@/contexts/CakeCatalogContext';
 import { buildTreeRows, cakeCoverage, isValidNodePath, nodeKey } from '@/lib/cakeCatalog/catalog';
 import { CatalogImg } from './CatalogImg';
-import { LocalImageDrop } from './LocalImageDrop';
 import { NodeDetailPanel } from './NodeDetailPanel';
 import { VariantTree } from './VariantTree';
 
