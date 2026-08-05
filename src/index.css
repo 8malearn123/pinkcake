@@ -1,7 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=DM+Serif+Display&family=Amiri:wght@400;700&family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&display=swap');
+/* Noto Kufi Arabic is the brand face; DM Serif Display + Tajawal/Cairo are kept
+   only as Loza's (scoped sub-brand) stack. Amiri went with `.font-wedding`. */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=DM+Serif+Display&family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&display=swap');
 
-/* ── Brand font: Alexandria (self-hosted, Arabic + Latin, 9 weights) ──────────
-   Browsers lazy-load @font-face, so only the weights actually rendered download. */
+/* ── Alexandria (self-hosted, 9 weights) — now used only by `.loza-theme`, so
+   these lazily download on /loza and nowhere else. ──────────────────────────── */
 @font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 100; font-display: swap; src: url('./assets/fonts/Alexandria-Thin.ttf') format('truetype'); }
 @font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 200; font-display: swap; src: url('./assets/fonts/Alexandria-ExtraLight.ttf') format('truetype'); }
 @font-face { font-family: 'Alexandria'; font-style: normal; font-weight: 300; font-display: swap; src: url('./assets/fonts/Alexandria-Light.ttf') format('truetype'); }
@@ -18,95 +20,123 @@
 
 @layer base {
   :root {
-    /* Pink Cake Theme - Rose & Blush */
-    --background: 350 25% 98%;
-    --foreground: 350 25% 15%;
+    /* ── CAKE & BLOOM — berry / gold / cream. The one brand theme, app-wide.
+       SettingsContext re-writes the customizable subset as inline styles on
+       <html> at boot, so its defaults must stay in sync with these values. */
+    --background: 40 60% 99%;        /* #fffdfa cream */
+    --foreground: 336 14% 15%;       /* #2c2226 ink */
 
-    --card: 350 30% 99%;
-    --card-foreground: 350 25% 15%;
+    --card: 40 50% 99%;
+    --card-foreground: 336 14% 15%;
 
-    --popover: 350 30% 99%;
-    --popover-foreground: 350 25% 15%;
+    --popover: 40 50% 99%;
+    --popover-foreground: 336 14% 15%;
 
-    --primary: 359 31% 61%;
+    --primary: 340 46% 42%;          /* #9e3a5c berry */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 350 20% 94%;
-    --secondary-foreground: 350 25% 25%;
+    --secondary: 335 42% 95%;        /* #f6ecef blush chip */
+    --secondary-foreground: 340 46% 42%;
 
-    --muted: 350 15% 95%;
-    --muted-foreground: 350 15% 45%;
+    --muted: 335 38% 96%;
+    --muted-foreground: 337 12% 45%; /* #7d6870 */
 
-    --accent: 340 45% 55%;
-    --accent-foreground: 0 0% 100%;
+    /* Quiet hover wash. shadcn's `hover:bg-accent` (every ghost/outline button,
+       dropdown row, select item) resolves here — so it must never be the gold,
+       or the whole console turns gold on hover. Decorative gold is `--gold`. */
+    --accent: 335 45% 96%;           /* #fbeef2 blush wash */
+    --accent-foreground: 340 46% 42%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 350 20% 90%;
-    --input: 350 20% 90%;
-    --ring: 359 31% 61%;
+    --border: 340 28% 90%;
+    --input: 340 28% 90%;
+    --ring: 340 46% 42%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;                /* squared, editorial */
 
-    /* Custom Colors */
-    --pink: 359 31% 61%;
-    --pink-light: 359 35% 75%;
-    --pink-dark: 359 31% 50%;
-    --rose: 340 45% 55%;
-    --blush: 350 30% 96%;
-    --success: 142 71% 45%;
+    /* Brand extras */
+    --pink: 340 46% 42%;             /* alias of primary — legacy class name */
+    --pink-light: 341 46% 62%;
+    --pink-dark: 340 46% 34%;        /* #8a3251 — gradient foot */
+    --rose: 341 40% 50%;             /* #b0506e — eyebrows, second lines */
+    --blush: 335 45% 96%;            /* #fbeef2 */
+    --blush-deep: 338 48% 90%;       /* #f2dbe2 */
+    --gold: 42 60% 66%;              /* #ddbd75 */
+    --gold-soft: 42 55% 82%;
+    --gold-deep: 40 45% 38%;         /* gold as text on cream, AA-safe */
+    --seasonal: 33 82% 55%;          /* #e8942f */
+    --seasonal-wash: 33 100% 95%;    /* #fff4e6 — seasonal band's warm top */
+
+    /* Dark berry ramp — the Reviews band, the footer, and photo scrims. Named
+       rather than inlined so the dark bands re-tint with the brand. */
+    --berry-deep: 337 45% 33%;       /* #7d2f49 */
+    --berry-dark: 337 47% 25%;       /* #5f2338 */
+    --berry-ink: 336 40% 20%;        /* #4a1f2e */
+    --berry-black: 337 46% 14%;      /* #34121f */
+
+    /* Feedback — tuned to sit on cream instead of glowing against it */
+    --success: 158 47% 33%;          /* #2c7a5f — the storefront's green */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 38 15% 15%;
-    --info: 199 89% 48%;
+    --warning: 33 82% 55%;           /* #e8942f — shared with seasonal */
+    --warning-foreground: 33 40% 15%;
+    --info: 200 42% 40%;
     --info-foreground: 0 0% 100%;
 
-    /* Status Colors */
-    --status-pending: 38 92% 50%;
-    --status-paid: 142 71% 45%;
-    --status-preparing: 199 89% 48%;
-    --status-ready: 262 83% 58%;
-    --status-delivered: 142 76% 36%;
+    /* Order status — each is the badge's TEXT color; the fill is the same hue
+       at 12%. One low-chroma family so 11 statuses read as one system on cream. */
+    --status-pending: 33 74% 36%;
+    --status-awaiting-payment: 24 70% 38%;
+    --status-paid: 158 47% 30%;
+    --status-preparing: 200 42% 36%;
+    --status-ready-to-ship: 226 34% 44%;
+    --status-in-transit: 271 30% 44%;
+    --status-ready-pickup: 183 44% 28%;
+    --status-completed: 152 46% 26%;
+    --status-custom-pending: 340 46% 42%;
+    --status-custom-approved: 192 44% 32%;
+    --status-custom-rejected: 0 58% 44%;
 
-    --sidebar-background: 350 30% 12%;
-    --sidebar-foreground: 350 20% 95%;
-    --sidebar-primary: 359 31% 61%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 350 25% 18%;
-    --sidebar-accent-foreground: 350 20% 95%;
-    --sidebar-border: 350 20% 20%;
-    --sidebar-ring: 359 31% 61%;
+    /* Console chrome — dark plum-ink, berry active row, gold label + hairline */
+    --sidebar-background: 336 14% 15%;        /* #2c2226 */
+    --sidebar-foreground: 40 30% 94%;
+    --sidebar-primary: 340 46% 42%;
+    --sidebar-primary-foreground: 42 60% 66%; /* gold on the active row */
+    --sidebar-accent: 336 14% 21%;
+    --sidebar-accent-foreground: 40 30% 94%;
+    --sidebar-border: 336 14% 24%;
+    --sidebar-ring: 42 60% 66%;
   }
 
   .dark {
-    --background: 350 25% 8%;
-    --foreground: 350 20% 95%;
+    --background: 336 14% 9%;
+    --foreground: 40 30% 94%;
 
-    --card: 350 25% 10%;
-    --card-foreground: 350 20% 95%;
+    --card: 336 14% 12%;
+    --card-foreground: 40 30% 94%;
 
-    --popover: 350 25% 10%;
-    --popover-foreground: 350 20% 95%;
+    --popover: 336 14% 12%;
+    --popover-foreground: 40 30% 94%;
 
-    --primary: 359 31% 61%;
+    --primary: 341 46% 56%;          /* lifted so berry holds on dark */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 350 20% 18%;
-    --secondary-foreground: 350 20% 90%;
+    --secondary: 337 16% 20%;
+    --secondary-foreground: 40 30% 92%;
 
-    --muted: 350 20% 15%;
-    --muted-foreground: 350 15% 60%;
+    --muted: 337 16% 17%;
+    --muted-foreground: 337 10% 62%;
 
-    --accent: 340 45% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 337 16% 20%;           /* hover wash, still not the gold */
+    --accent-foreground: 40 30% 94%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 62% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 350 20% 18%;
-    --input: 350 20% 18%;
-    --ring: 359 31% 61%;
+    --border: 337 16% 20%;
+    --input: 337 16% 20%;
+    --ring: 341 46% 56%;
   }
 
   /* ── LOZA THEME — gold / cream / brown (scoped via .loza-theme) ── */
@@ -139,65 +169,19 @@
     --loza-brown: 25 38% 17%;
     --loza-brown-soft: 26 36% 30%;
 
+    /* Pinned to their pre-Cake-&-Bloom values. Loza is a separate sub-brand and
+       must not drift when the global feedback tokens are retuned for cream —
+       it inherits these (LozaCart/LozaCheckout use `text-success`). */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 15% 15%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
     font-family: 'Alexandria', 'Tajawal', 'Cairo', sans-serif;
   }
 
-  /* ── CAKE & BLOOM STOREFRONT THEME — berry-rose + gold + cream (scoped) ──
-     Applied only on the storefront (Store / Shop / product / cart) so the admin
-     stays on the rose theme. Maps the design's exact hex to tokens, so the
-     runtime color customizer still re-tints it. */
-  .storefront-theme {
-    --background: 40 60% 99%;        /* #fffdfa cream */
-    --foreground: 336 14% 15%;       /* #2c2226 */
-    --card: 40 50% 99%;
-    --card-foreground: 336 14% 15%;
-    --popover: 40 50% 99%;
-    --popover-foreground: 336 14% 15%;
-    --primary: 340 46% 42%;          /* #9e3a5c berry */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 335 42% 95%;        /* #f6ecef blush chip */
-    --secondary-foreground: 340 46% 42%;
-    --muted: 335 38% 96%;
-    --muted-foreground: 337 12% 45%; /* #7d6870 */
-    --accent: 42 60% 66%;            /* #ddbd75 gold */
-    --accent-foreground: 336 14% 15%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 340 28% 90%;
-    --input: 340 28% 90%;
-    --ring: 340 46% 42%;
-    --radius: 0.5rem;                /* squared, editorial */
-
-    --pink: 340 46% 42%;
-    --pink-light: 341 46% 62%;
-    --pink-dark: 340 46% 34%;
-    --rose: 341 40% 50%;             /* #b0506e */
-    --blush: 338 48% 90%;            /* #f2dbe2 */
-    --gold: 42 60% 66%;              /* #ddbd75 */
-    --gold-soft: 42 55% 82%;
-    --seasonal: 33 82% 55%;          /* #e8942f summer accent */
-
-    font-family: 'Noto Kufi Arabic', 'Alexandria', 'Tajawal', sans-serif;
-  }
-
-  /* Fallback so `gold` utilities resolve outside the scoped theme too. */
-  :root { --gold: 42 60% 66%; --gold-soft: 42 55% 82%; --seasonal: 33 82% 55%; }
-}
-
-@layer utilities {
-  /* Storefront type: Noto Kufi with heavy weights (the design's black headings). */
-  .storefront-theme { font-family: 'Noto Kufi Arabic', 'Alexandria', 'Tajawal', sans-serif; }
-  .storefront-theme .font-display,
-  .storefront-theme .font-wedding,
-  .storefront-theme .font-display-latin {
-    font-family: 'Noto Kufi Arabic', 'Alexandria', sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-  }
-  /* Re-tint the dark/warm gradients to the berry palette inside the storefront. */
-  .storefront-theme .gradient-cocoa { background: linear-gradient(135deg, hsl(340 44% 32%) 0%, hsl(337 42% 20%) 100%); }
-  .storefront-theme .gradient-rose-deep { background: linear-gradient(135deg, hsl(340 46% 42%) 0%, hsl(337 44% 28%) 60%, hsl(336 40% 16%) 100%); }
-  .storefront-theme .gradient-blush-warm { background: linear-gradient(135deg, hsl(338 55% 96%) 0%, hsl(340 55% 90%) 50%, hsl(341 46% 82%) 100%); }
 }
 
 @layer utilities {
@@ -273,54 +257,58 @@
   }
 
   body {
-    @apply bg-background text-foreground font-cairo antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
-  /* Brand display font — Alexandria (Arabic + Latin). Medium reads light and airy
-     at large sizes; Alexandria's heavier metrics make 700–800 look chunky. */
-  .font-display {
-    font-family: 'Alexandria', 'Cairo', 'Tajawal', sans-serif;
-    font-weight: 500;
-    letter-spacing: 0;
-  }
-
-  /* Latin display — also the brand font (kept as a separate hook for tuning). */
-  .font-display-latin {
-    font-family: 'Alexandria', 'Instrument Serif', 'DM Serif Display', serif;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-
-  /* Ceremonial Arabic serif — Amiri (classic Naskh): elegant + readable for
-     wedding / headline "invitation" moments. Never body or long paragraphs.
-     Alexandria fallback keeps shaping graceful during display=swap (no FOIT). */
+  /* Brand display type — Noto Kufi Arabic at 800 with tight tracking. All three
+     display hooks resolve to the same face: Cake & Bloom has one voice, and the
+     size/weight ramp (not the family) carries the hierarchy. The hooks survive
+     as separate class names only so existing markup keeps working. */
+  .font-display,
+  .font-display-latin,
   .font-wedding {
-    font-family: 'Amiri', 'Alexandria', 'DM Serif Display', serif;
-    font-weight: 700;
-    letter-spacing: 0;
+    font-family: 'Noto Kufi Arabic', 'Alexandria', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
-
-
 }
 
 @layer utilities {
   .gradient-blush-warm {
-    background: linear-gradient(135deg, hsl(350 35% 96%) 0%, hsl(355 50% 88%) 50%, hsl(359 35% 78%) 100%);
+    background: linear-gradient(135deg, hsl(338 55% 96%) 0%, hsl(340 55% 90%) 50%, hsl(341 46% 82%) 100%);
   }
   .gradient-rose-deep {
-    background: linear-gradient(135deg, hsl(359 31% 61%) 0%, hsl(340 38% 42%) 60%, hsl(20 25% 18%) 100%);
+    background: linear-gradient(135deg, hsl(340 46% 42%) 0%, hsl(337 44% 28%) 60%, hsl(336 40% 16%) 100%);
   }
   .gradient-cocoa {
-    background: linear-gradient(135deg, hsl(25 30% 22%) 0%, hsl(20 28% 14%) 100%);
+    background: linear-gradient(135deg, hsl(340 44% 32%) 0%, hsl(337 42% 20%) 100%);
+  }
+  /* The two dark berry bands the storefront uses for its Reviews section and
+     footer — previously inlined as #7d2f49 → #5f2338 / #4a1f2e stops. */
+  .gradient-berry-deep {
+    background: linear-gradient(to bottom, hsl(337 45% 33%) 0%, hsl(340 46% 42%) 50%, hsl(337 45% 33%) 100%);
+  }
+  .gradient-footer-berry {
+    background: linear-gradient(to bottom, hsl(337 45% 33%) 0%, hsl(337 47% 25%) 100%);
   }
   .shadow-rose-glow {
-    box-shadow: 0 24px 60px -28px hsl(359 31% 50% / 0.55), 0 8px 24px -12px hsl(359 31% 61% / 0.25);
+    box-shadow: 0 24px 60px -28px hsl(340 46% 34% / 0.55), 0 8px 24px -12px hsl(340 46% 42% / 0.25);
   }
   .shadow-soft-lift {
-    box-shadow: 0 18px 40px -22px hsl(350 30% 20% / 0.20), 0 4px 12px -6px hsl(350 30% 20% / 0.10);
+    box-shadow: 0 18px 40px -22px hsl(336 20% 18% / 0.20), 0 4px 12px -6px hsl(336 20% 18% / 0.10);
   }
   .ring-blush {
-    box-shadow: inset 0 0 0 1px hsl(350 35% 90%);
+    box-shadow: inset 0 0 0 1px hsl(var(--border));
+  }
+  /* Fading-gold hairline — the storefront's browse-zone → buy-zone divider. */
+  .gold-rule {
+    height: 1px;
+    background: linear-gradient(to left, transparent, hsl(var(--gold) / 0.6), transparent);
+  }
+  /* Short solid hairline that leads an eyebrow/kicker. */
+  .eyebrow-rule {
+    height: 1px;
+    background: hsl(var(--primary) / 0.25);
   }
   .noise-overlay {
     background-image: radial-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1px);
@@ -336,27 +324,32 @@
 }
 
 @layer utilities {
+  /* The canonical card surface. Cake & Bloom is solid cream + a soft berry
+     lift, not frosted glass — redefining here re-skins every consumer at once
+     (the class name is kept so no sweep is needed). */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-md border border-border/50 shadow-lg;
+    @apply bg-card border border-border;
+    box-shadow: 0 24px 66px -42px hsl(var(--primary) / 0.42);
   }
 
+  /* The anchor-CTA fill: a vertical berry gradient, dark foot to primary. */
   .gradient-pink {
-    background: linear-gradient(135deg, hsl(var(--pink)) 0%, hsl(var(--rose)) 100%);
+    background: linear-gradient(to top, hsl(var(--pink-dark)) 0%, hsl(var(--primary)) 100%);
   }
 
   .gradient-warm {
-    background: linear-gradient(135deg, hsl(359 31% 61%) 0%, hsl(340 45% 55%) 100%);
+    background: linear-gradient(to top, hsl(var(--pink-dark)) 0%, hsl(var(--rose)) 100%);
   }
 
   .text-gradient-pink {
-    background: linear-gradient(135deg, hsl(var(--pink)) 0%, hsl(var(--rose)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--rose)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .shadow-warm {
-    box-shadow: 0 10px 40px -10px hsl(var(--primary) / 0.3);
+    box-shadow: 0 24px 66px -42px hsl(var(--primary) / 0.42);
   }
 
   .animate-float {
@@ -372,53 +365,26 @@
     50% { transform: translateY(-10px); }
   }
 
+  /* ── Order status chips ──────────────────────────────────────────────────
+     One tint recipe, eleven hues: the `--status-*` token is the text color and
+     its 12% wash is the fill. Low-chroma by design so the set reads as one
+     family on cream instead of eleven competing pastels. Consumed only through
+     <StatusBadge> — never hand-build a status chip. */
   .status-badge {
-    @apply px-3 py-1.5 rounded-full text-sm font-medium inline-flex items-center gap-2;
+    @apply px-3 py-1.5 rounded-full text-sm font-bold inline-flex items-center gap-2;
   }
 
-  .status-pending {
-    @apply bg-amber-100 text-amber-800;
-  }
-
-  .status-awaiting-payment {
-    @apply bg-orange-100 text-orange-800;
-  }
-
-  .status-paid {
-    @apply bg-green-100 text-green-800;
-  }
-
-  .status-preparing {
-    @apply bg-blue-100 text-blue-800;
-  }
-
-  .status-ready-to-ship {
-    @apply bg-indigo-100 text-indigo-800;
-  }
-
-  .status-in-transit {
-    @apply bg-purple-100 text-purple-800;
-  }
-
-  .status-ready-pickup {
-    @apply bg-teal-100 text-teal-800;
-  }
-
-  .status-completed {
-    @apply bg-emerald-100 text-emerald-800;
-  }
-
-  .status-custom-pending {
-    @apply bg-pink-100 text-pink-800;
-  }
-
-  .status-custom-approved {
-    @apply bg-cyan-100 text-cyan-800;
-  }
-
-  .status-custom-rejected {
-    @apply bg-red-100 text-red-800;
-  }
+  .status-pending           { background: hsl(var(--status-pending) / 0.12);           color: hsl(var(--status-pending)); }
+  .status-awaiting-payment  { background: hsl(var(--status-awaiting-payment) / 0.12);  color: hsl(var(--status-awaiting-payment)); }
+  .status-paid              { background: hsl(var(--status-paid) / 0.12);              color: hsl(var(--status-paid)); }
+  .status-preparing         { background: hsl(var(--status-preparing) / 0.12);         color: hsl(var(--status-preparing)); }
+  .status-ready-to-ship     { background: hsl(var(--status-ready-to-ship) / 0.12);     color: hsl(var(--status-ready-to-ship)); }
+  .status-in-transit        { background: hsl(var(--status-in-transit) / 0.12);        color: hsl(var(--status-in-transit)); }
+  .status-ready-pickup      { background: hsl(var(--status-ready-pickup) / 0.12);      color: hsl(var(--status-ready-pickup)); }
+  .status-completed         { background: hsl(var(--status-completed) / 0.12);         color: hsl(var(--status-completed)); }
+  .status-custom-pending    { background: hsl(var(--status-custom-pending) / 0.12);    color: hsl(var(--status-custom-pending)); }
+  .status-custom-approved   { background: hsl(var(--status-custom-approved) / 0.12);   color: hsl(var(--status-custom-approved)); }
+  .status-custom-rejected   { background: hsl(var(--status-custom-rejected) / 0.12);   color: hsl(var(--status-custom-rejected)); }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -453,8 +419,8 @@
   .press:active { transform: scale(0.94); }
 
   /* Canonical soft-berry elevation — one shadow vocabulary for feature panels */
-  .shadow-berry-soft { box-shadow: 0 24px 66px -42px rgba(158, 58, 92, 0.42); }
-  .shadow-berry-soft-lg { box-shadow: 0 34px 80px -44px rgba(158, 58, 92, 0.5); }
+  .shadow-berry-soft { box-shadow: 0 24px 66px -42px hsl(var(--primary)/0.42); }
+  .shadow-berry-soft-lg { box-shadow: 0 34px 80px -44px hsl(var(--primary)/0.5); }
 
   /* Hide scrollbar (horizontal chip rows etc.) */
   .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
@@ -557,18 +523,20 @@
 @keyframes ck-couponpop { 0% { opacity: 0; transform: scale(0.9) translateY(12px); } 100% { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .ck-bob, .ck-pulse, .ck-couponpop { animation: none !important; } }
 
-/* ── One warm boutique grade over all storefront photography ──
+/* ── One warm boutique grade over storefront photography ──
    Unifies the mixed-temperature stock set so imagery reads as one art-directed
-   shoot (subtle — saturation + contrast only, no hue shift to protect the cakes). */
-.storefront-theme img { filter: saturate(1.06) contrast(1.03); }
+   shoot (subtle — saturation + contrast only, no hue shift to protect the cakes).
+   Deliberately NOT global: it must not touch admin thumbnails, QR codes or
+   handover barcodes, where fidelity beats mood. Opt in with `.store-surface`. */
+.store-surface img { filter: saturate(1.06) contrast(1.03); }
 
-/* ── One scoped brand focus ring for the whole storefront (keyboard a11y) ── */
-.storefront-theme :is(a, button, select, input, textarea, [role="combobox"], [tabindex]):focus-visible {
-  outline: 2px solid #9e3a5c;
+/* ── One brand focus ring, app-wide (keyboard a11y) ── */
+:is(a, button, select, input, textarea, [role="combobox"], [tabindex]):focus-visible {
+  outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
   border-radius: inherit;
 }
-.storefront-theme :focus:not(:focus-visible) { outline: none; }
+:focus:not(:focus-visible) { outline: none; }
 
 /* ── StoreHero enhancements: Ken Burns drift + staggered entrance (reduced-motion gated) ── */
 .store-hero-img { animation: kenburns 16s ease-out forwards; will-change: transform; }

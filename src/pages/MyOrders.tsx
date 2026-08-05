@@ -2,16 +2,17 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useMyOrders } from '@/hooks/useCustomerStore';
 import { useReorder } from '@/hooks/useReorder';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
+import { Marquee } from '@/components/store/StorefrontDecor';
+import { Eyebrow, Title } from '@/components/ds';
 import {
   Cake,
-  Package,
   ShoppingCart,
   Store,
   ChevronLeft,
@@ -19,7 +20,6 @@ import {
   Clock,
   MapPin,
   LogOut,
-  ArrowRight,
   Loader2,
   RefreshCw,
 } from 'lucide-react';
@@ -42,61 +42,49 @@ export default function MyOrders() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
-        <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/store')}
-              className="rounded-full"
-              aria-label="رجوع"
-            >
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-            <div>
-              <div className="text-[10px] text-primary tracking-widest uppercase">حسابي</div>
-              <div className="font-display text-xl leading-none mt-0.5">طلباتي</div>
-            </div>
-          </div>
+    <div className="store-surface min-h-screen bg-background text-foreground">
+      <Marquee />
+      <StorefrontMasthead />
 
-          <div className="flex items-center gap-1.5">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/store')} className="rounded-full" aria-label="المتجر">
-              <Store className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => signOut()} className="rounded-full" aria-label="خروج">
-              <LogOut className="w-5 h-5" />
-            </Button>
+      <main className="mx-auto max-w-3xl px-5 py-10 sm:px-8 lg:py-14">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b border-primary/15 pb-6">
+          <div>
+            <Eyebrow>حسابي</Eyebrow>
+            <Title variant="h2" as="h1" className="mt-2">
+              طلباتي
+            </Title>
           </div>
+          <Button variant="outlineBrand" size="pill" onClick={() => signOut()}>
+            <LogOut className="size-4" /> تسجيل الخروج
+          </Button>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 lg:px-6 py-8 max-w-3xl">
         {isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="rounded-3xl border-border/60">
+              <Card key={i} className="rounded-2xl">
                 <CardContent className="p-5">
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="mb-3 flex items-start justify-between">
                     <Skeleton className="h-6 w-32" />
                     <Skeleton className="h-6 w-24 rounded-full" />
                   </div>
-                  <Skeleton className="h-4 w-48 mb-2" />
+                  <Skeleton className="mb-2 h-4 w-48" />
                   <Skeleton className="h-4 w-36" />
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : !orders || orders.length === 0 ? (
-          <div className="text-center py-20 rounded-3xl border border-dashed border-border/60 bg-secondary/30">
-            <div className="w-20 h-20 mx-auto rounded-full bg-card flex items-center justify-center mb-5 shadow-soft-lift">
-              <ShoppingCart className="w-9 h-9 text-primary" />
+          <div className="rounded-2xl border border-dashed border-border bg-blush/40 py-20 text-center">
+            <div className="shadow-berry-soft mx-auto mb-5 grid size-20 place-items-center rounded-full bg-background">
+              <ShoppingCart className="size-9 text-primary" />
             </div>
-            <h3 className="font-display text-3xl mb-2">لا توجد طلبات بعد</h3>
-            <p className="text-muted-foreground mb-6 text-sm">ابدأ رحلتك الحلوة معنا الآن</p>
-            <Button onClick={() => navigate('/store')} className="rounded-full px-6 h-11 bg-foreground text-background hover:bg-foreground/90">
-              <Store className="w-4 h-4 me-2" />
+            <Title variant="h3" as="h3" className="mb-2 text-2xl">
+              لا توجد طلبات بعد
+            </Title>
+            <p className="mb-6 text-sm text-muted-foreground">ابدأ رحلتك الحلوة معنا الآن</p>
+            <Button variant="brand" size="pill" onClick={() => navigate('/shop')}>
+              <Store className="size-4" />
               تصفّح المنتجات
             </Button>
           </div>
@@ -105,14 +93,14 @@ export default function MyOrders() {
             {orders.map((order) => (
               <Card
                 key={order.id}
-                className="rounded-3xl border-border/60 hover:border-primary/40 hover:shadow-soft-lift transition-all cursor-pointer overflow-hidden"
+                className="cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-berry-soft-lg"
                 onClick={() => navigate(`/my-orders/${order.id}`)}
               >
                 <CardContent className="p-5">
                   <div className="flex justify-between items-start mb-4 gap-3">
                     <div className="min-w-0">
                       <div className="text-[10px] text-muted-foreground tracking-widest uppercase">رقم الطلب</div>
-                      <h3 className="font-display text-2xl mt-0.5 leading-none">{order.order_number}</h3>
+                      <h3 className="mt-0.5 text-2xl font-black leading-none">{order.order_number}</h3>
                       <p className="text-xs text-muted-foreground mt-1.5">
                         {format(new Date(order.created_at), 'PPpp', { locale: ar })}
                       </p>
@@ -154,7 +142,7 @@ export default function MyOrders() {
                   <div className="flex justify-between items-center gap-2">
                     <div>
                       <div className="text-[10px] text-muted-foreground tracking-widest uppercase">المجموع</div>
-                      <div className="font-display text-2xl text-primary leading-none mt-0.5">
+                      <div className="mt-0.5 text-2xl font-black leading-none text-primary">
                         {order.total_amount} <RiyalSymbol className="text-xs text-muted-foreground" />
                       </div>
                     </div>

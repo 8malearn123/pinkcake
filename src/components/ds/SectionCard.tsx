@@ -14,7 +14,7 @@ interface SectionHeadingProps {
 export function SectionHeading({ title, icon: Icon, action, className }: SectionHeadingProps) {
   return (
     <div className={cn('flex items-center justify-between gap-4 mb-6', className)}>
-      <h2 className="text-xl font-bold flex items-center gap-2">
+      <h2 className="text-xl font-black tracking-[-.01em] flex items-center gap-2">
         {Icon && <Icon className="w-5 h-5 text-primary" />}
         {title}
       </h2>
@@ -39,7 +39,7 @@ export function SectionCard({ title, icon: Icon, action, children, className, co
   return (
     <section className={cn('glass-card rounded-2xl', className)}>
       <div className="flex items-center justify-between gap-4 p-6 pb-4">
-        <h2 className="text-xl font-bold flex items-center gap-2">
+        <h2 className="text-xl font-black tracking-[-.01em] flex items-center gap-2">
           {Icon && <Icon className="w-5 h-5 text-primary" />}
           {title}
         </h2>

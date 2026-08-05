@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useSettings } from '@/contexts/SettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { OrderStatusTimeline } from '@/components/orders/OrderStatusTimeline';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
+import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
+import { StorefrontFooter } from '@/components/store/StorefrontFooter';
+import { Marquee } from '@/components/store/StorefrontDecor';
+import { Eyebrow, Title } from '@/components/ds';
+import {
   Cookie,
-  MapPin, 
+  MapPin,
   Calendar, 
   Clock,
   Phone,
@@ -41,6 +45,7 @@ interface TrackedOrder {
 export default function TrackOrder() {
   const { settings } = useSettings();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const trackingCode = searchParams.get('code') || '';
   const [searchCode, setSearchCode] = useState(trackingCode);
   const [searching, setSearching] = useState(false);
@@ -119,32 +124,32 @@ export default function TrackOrder() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
-              <Cookie className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-xl font-bold">{settings.storeName}</h1>
-          </div>
-        </div>
-      </header>
+    <div className="store-surface min-h-screen bg-background text-foreground">
+      <Marquee />
+      <StorefrontMasthead />
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <main className="mx-auto max-w-2xl px-5 py-10 sm:px-8 lg:py-14">
+        <div className="mb-8 border-b border-primary/15 pb-6 text-center">
+          <Eyebrow rule="both" caps className="justify-center">
+            تتبّع الطلب
+          </Eyebrow>
+          <Title variant="h2" as="h1" className="mt-2">
+            أين وصل طلبك؟
+          </Title>
+        </div>
+
         {/* Search Form */}
-        <div className="glass-card rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4 text-center">تتبع طلبك</h2>
+        <div className="glass-card mb-8 rounded-2xl p-6">
           <form onSubmit={handleSearch} className="flex gap-3">
             <Input
               value={searchCode}
               onChange={(e) => setSearchCode(e.target.value)}
               placeholder="أدخل رقم التتبع..."
+              dir="ltr"
               className="text-center"
             />
-            <Button type="submit" aria-label="بحث" className="gradient-pink text-white" disabled={searching}>
-              {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+            <Button type="submit" variant="brand" aria-label="بحث" disabled={searching}>
+              {searching ? <Loader2 className="size-5 animate-spin" /> : <Search className="size-5" />}
             </Button>
           </form>
         </div>
@@ -265,6 +270,8 @@ export default function TrackOrder() {
           </div>
         )}
       </main>
+
+      <StorefrontFooter storeName={settings.storeName} onNavigate={navigate} />
     </div>
   );
 }

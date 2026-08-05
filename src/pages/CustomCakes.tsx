@@ -43,24 +43,24 @@ export default function CustomCakes() {
   };
 
   return (
-    <div className="storefront-theme min-h-screen bg-[#fffdfa] text-[#2c2226]">
+    <div className="store-surface min-h-screen bg-background text-foreground">
       <Marquee />
 
-      <header className="sticky top-0 z-40 border-b border-[#9e3a5c]/10 bg-[#fffdfa]/95 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-primary/10 bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-3 px-5 sm:px-8 md:h-[76px] lg:px-12">
           <button
             onClick={() => navigate(-1)}
             aria-label="رجوع"
-            className="grid size-10 shrink-0 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2]"
+            className="grid size-10 shrink-0 place-items-center rounded-full border border-primary/15 text-primary transition-colors hover:bg-blush"
           >
             <ArrowRight size={18} />
           </button>
 
           <button onClick={() => navigate('/store')} className="shrink-0 text-start leading-none">
-            <span className="block text-xl font-black tracking-[-.06em] text-[#9e3a5c] sm:text-2xl">
+            <span className="block text-xl font-black tracking-[-.06em] text-primary sm:text-2xl">
               {settings.storeName}
             </span>
-            <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-[#86736c]">
+            <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-muted-foreground">
               حلويات جازان الفاخرة
             </span>
           </button>
@@ -69,20 +69,20 @@ export default function CustomCakes() {
             <button
               onClick={() => navigate(user ? '/my-profile' : '/login')}
               aria-label={user ? 'حسابي' : 'تسجيل الدخول أو إنشاء حساب'}
-              className="hidden size-10 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2] sm:grid"
+              className="hidden size-10 place-items-center rounded-full border border-primary/15 text-primary transition-colors hover:bg-blush sm:grid"
             >
               <User size={18} />
             </button>
             <button
               onClick={openCart}
               aria-label={`السلة تحتوي ${toArabicDigits(cartCount)} منتجات`}
-              className="relative grid size-10 place-items-center rounded-full bg-[#9e3a5c] text-white transition-colors hover:bg-[#b0506e]"
+              className="relative grid size-10 place-items-center rounded-full bg-primary text-white transition-colors hover:bg-rose"
             >
               <ShoppingBag size={18} />
               {cartCount > 0 && (
                 <span
                   key={cartCount}
-                  className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-[#ddbd75] text-[10px] font-bold text-[#9e3a5c]"
+                  className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-gold text-[10px] font-bold text-primary"
                 >
                   {toArabicDigits(cartCount)}
                 </span>
@@ -93,10 +93,10 @@ export default function CustomCakes() {
       </header>
 
       {/* Hero band */}
-      <section className="bg-gradient-to-b from-[#7d2f49] to-[#9e3a5c] px-5 py-14 text-white sm:px-8 lg:px-12 lg:py-20">
+      <section className="bg-gradient-to-b from-berry-deep to-primary px-5 py-14 text-white sm:px-8 lg:px-12 lg:py-20">
         <div className="mx-auto max-w-[1500px]">
-          <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-[#ddbd75]">
-            <span className="h-px w-10 bg-[#ddbd75]/60" /> استوديو التصميم
+          <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-gold">
+            <span className="h-px w-10 bg-gold/60" /> استوديو التصميم
           </p>
           <h1 className="mt-4 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] sm:text-[3.25rem]">
             كيكات تُصمّم كما تحب
@@ -112,7 +112,7 @@ export default function CustomCakes() {
                 key={text}
                 className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white/85 backdrop-blur"
               >
-                <Icon size={14} className="text-[#ddbd75]" /> {text}
+                <Icon size={14} className="text-gold" /> {text}
               </li>
             ))}
           </ul>
@@ -131,29 +131,29 @@ export default function CustomCakes() {
             ))}
           </div>
         ) : cakes.length === 0 ? (
-          <div className="mx-auto max-w-md rounded-3xl border border-dashed border-[#9e3a5c]/25 bg-[#fffdfa] px-6 py-14 text-center">
-            <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#fbeef2]">
-              <Cake size={28} className="text-[#b0506e]" />
+          <div className="mx-auto max-w-md rounded-3xl border border-dashed border-primary/25 bg-background px-6 py-14 text-center">
+            <div className="mx-auto grid size-16 place-items-center rounded-full bg-blush">
+              <Cake size={28} className="text-rose" />
             </div>
             <h2 className="mt-5 text-2xl font-black tracking-[-.02em]">لا توجد تصاميم جاهزة بعد</h2>
-            <p className="mt-2 text-sm leading-7 text-[#7d6870]">
+            <p className="mt-2 text-sm leading-7 text-muted-foreground">
               نصوّر تشكيلة التصميم الآن — إلى أن تجهز، تشكيلتنا الكاملة بانتظارك.
             </p>
             <button
               onClick={() => navigate('/shop')}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-[#8a3251] to-[#9e3a5c] px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_rgba(158,58,92,0.8)] transition-transform active:scale-95"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
             >
               تصفّح كل المنتجات <ChevronLeft size={16} />
             </button>
           </div>
         ) : (
           <>
-            <div className="flex flex-col justify-between gap-3 border-b border-[#9e3a5c]/15 pb-6 sm:flex-row sm:items-end">
-              <h2 className="flex items-center gap-2 text-lg font-black text-[#2c2226]">
-                <Wand2 size={18} className="text-[#b0506e]" />
+            <div className="flex flex-col justify-between gap-3 border-b border-primary/15 pb-6 sm:flex-row sm:items-end">
+              <h2 className="flex items-center gap-2 text-lg font-black text-foreground">
+                <Wand2 size={18} className="text-rose" />
                 {toArabicDigits(cakes.length)} تصميم جاهز للتخصيص
               </h2>
-              <p className="text-xs leading-6 text-[#7d6870]">
+              <p className="text-xs leading-6 text-muted-foreground">
                 السعر يبدأ من القاعدة — الإضافات تظهر لك أولاً بأول داخل الاستوديو
               </p>
             </div>

@@ -12,6 +12,9 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { PickupQRCode } from '@/components/orders/PickupQRCode';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
+import { Marquee } from '@/components/store/StorefrontDecor';
+import { Eyebrow, Title } from '@/components/ds';
 import {
   ArrowRight,
   Calendar,
@@ -92,35 +95,30 @@ export default function MyOrderDetails() {
   const isPaid = order.payment_status === 'paid';
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
-        <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/my-orders')} className="rounded-full" aria-label="رجوع">
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-            <div className="min-w-0">
-              <div className="text-[10px] text-primary tracking-widest uppercase">طلب</div>
-              <h1 className="font-display text-xl leading-none mt-0.5 truncate">{order.order_number}</h1>
-            </div>
-          </div>
+    <div className="store-surface min-h-screen bg-background text-foreground">
+      <Marquee />
+      <StorefrontMasthead />
 
-          <div className="flex items-center gap-1.5">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/store')} className="rounded-full" aria-label="المتجر">
-              <Store className="w-5 h-5" />
+      <main className="mx-auto max-w-3xl space-y-5 px-5 py-10 sm:px-8 lg:py-14">
+        <div className="mb-2 flex flex-wrap items-end justify-between gap-3 border-b border-primary/15 pb-6">
+          <div className="min-w-0">
+            <Eyebrow>طلب</Eyebrow>
+            <Title variant="h2" as="h1" className="mt-2 truncate">
+              {order.order_number}
+            </Title>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outlineBrand" size="pill" onClick={() => navigate('/my-orders')}>
+              <ArrowRight className="size-4" /> كل طلباتي
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => signOut()} className="rounded-full" aria-label="خروج">
-              <LogOut className="w-5 h-5" />
+            <Button variant="ghost" size="icon" onClick={() => signOut()} className="rounded-full" aria-label="تسجيل الخروج">
+              <LogOut className="size-5" />
             </Button>
           </div>
         </div>
-      </header>
 
-
-      <main className="container mx-auto px-4 lg:px-6 py-8 max-w-3xl space-y-5">
         {/* Status Card */}
-        <Card className="rounded-3xl border-border/60 shadow-soft-lift">
+        <Card className="rounded-2xl shadow-berry-soft">
           <CardContent className="p-5">
 
             <div className="flex items-center justify-between mb-4">
@@ -145,7 +143,7 @@ export default function MyOrderDetails() {
         {id && <PickupQRCode orderId={id} orderStatus={order.status} />}
 
         {/* Payment Status */}
-        <Card className="rounded-3xl border-border/60">
+        <Card className="rounded-2xl">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -167,9 +165,9 @@ export default function MyOrderDetails() {
         </Card>
 
         {/* Delivery Info */}
-        <Card className="rounded-3xl border-border/60">
+        <Card className="rounded-2xl">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 font-display text-xl">
+            <CardTitle className="text-base flex items-center gap-2 text-xl font-black">
               <MapPin className="w-4 h-4 text-primary" />
               معلومات الاستلام
             </CardTitle>
@@ -207,9 +205,9 @@ export default function MyOrderDetails() {
         </Card>
 
         {/* Order Items */}
-        <Card className="rounded-3xl border-border/60">
+        <Card className="rounded-2xl">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 font-display text-xl">
+            <CardTitle className="text-base flex items-center gap-2 text-xl font-black">
               <Receipt className="w-4 h-4 text-primary" />
               تفاصيل الطلب
             </CardTitle>

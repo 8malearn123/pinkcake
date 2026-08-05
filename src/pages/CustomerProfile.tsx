@@ -5,6 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
+import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
+import { Marquee } from '@/components/store/StorefrontDecor';
+import { Eyebrow, Title } from '@/components/ds';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -135,35 +138,30 @@ export default function CustomerProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" aria-label="رجوع" onClick={() => navigate('/store')}>
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-pink flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="font-bold">حسابي</h1>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
+    <div className="store-surface min-h-screen bg-background text-foreground">
+      <Marquee />
+      <StorefrontMasthead />
+
+      <main className="mx-auto max-w-2xl space-y-5 px-5 py-10 sm:px-8 lg:py-14">
+        <div className="mb-2 flex items-center gap-4 border-b border-primary/15 pb-6">
+          <div className="gradient-pink grid size-14 shrink-0 place-items-center rounded-2xl text-primary-foreground">
+            <User className="size-7" />
+          </div>
+          <div className="min-w-0">
+            <Eyebrow>حسابي</Eyebrow>
+            <Title variant="h2" as="h1" className="mt-1 truncate text-2xl sm:text-3xl">
+              {user.email}
+            </Title>
           </div>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-2xl space-y-5">
         {/* Quick access — the items that moved out of the top nav */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {quickLinks.map((l) => (
             <button
               key={l.to}
               onClick={() => navigate(l.to)}
-              className="press group text-start rounded-2xl border border-border/60 bg-card p-4 hover:border-primary/40 hover:shadow-soft-lift transition-all"
+              className="press group text-start rounded-2xl border border-border bg-card p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-berry-soft"
             >
               <div className="flex items-center justify-between">
                 <span className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">

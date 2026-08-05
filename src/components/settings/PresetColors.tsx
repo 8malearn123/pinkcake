@@ -10,48 +10,52 @@ interface ColorPreset {
   accent: string;
 }
 
+/** The first entry is the Cake & Bloom default and must match `:root` in
+ *  index.css + `defaultSettings` in SettingsContext. The rest are deeper,
+ *  lower-chroma tones chosen to sit on the cream background — the old neon
+ *  presets (sky blue, emerald, orange) glowed against it. */
 const presets: ColorPreset[] = [
   {
-    name: 'وردي كلاسيكي',
-    primary: '359 31% 61%',
-    primaryLight: '359 35% 75%',
-    primaryDark: '359 31% 50%',
-    accent: '340 45% 55%',
+    name: 'توتي (الافتراضي)',
+    primary: '340 46% 42%',
+    primaryLight: '341 46% 62%',
+    primaryDark: '340 46% 34%',
+    accent: '341 40% 50%',
   },
   {
-    name: 'أزرق سماوي',
-    primary: '199 89% 48%',
-    primaryLight: '199 85% 65%',
-    primaryDark: '199 89% 38%',
-    accent: '210 80% 50%',
+    name: 'عنّابي داكن',
+    primary: '350 52% 34%',
+    primaryLight: '350 44% 54%',
+    primaryDark: '350 54% 26%',
+    accent: '352 40% 44%',
   },
   {
-    name: 'أخضر زمردي',
-    primary: '142 71% 45%',
-    primaryLight: '142 65% 60%',
-    primaryDark: '142 71% 35%',
-    accent: '160 60% 45%',
+    name: 'بنفسجي خزامى',
+    primary: '285 32% 42%',
+    primaryLight: '285 30% 62%',
+    primaryDark: '285 34% 33%',
+    accent: '295 28% 50%',
   },
   {
-    name: 'بنفسجي ملكي',
-    primary: '262 83% 58%',
-    primaryLight: '262 75% 70%',
-    primaryDark: '262 83% 45%',
-    accent: '280 70% 55%',
+    name: 'أخضر صنوبري',
+    primary: '158 47% 30%',
+    primaryLight: '158 36% 48%',
+    primaryDark: '158 50% 22%',
+    accent: '166 38% 38%',
   },
   {
-    name: 'برتقالي دافئ',
-    primary: '25 95% 53%',
-    primaryLight: '25 90% 65%',
-    primaryDark: '25 95% 43%',
-    accent: '38 92% 50%',
+    name: 'أزرق ليلي',
+    primary: '212 42% 38%',
+    primaryLight: '212 36% 56%',
+    primaryDark: '212 45% 28%',
+    accent: '200 42% 44%',
   },
   {
-    name: 'ذهبي فاخر',
-    primary: '45 93% 47%',
-    primaryLight: '45 88% 60%',
-    primaryDark: '45 93% 37%',
-    accent: '38 92% 50%',
+    name: 'كرملي دافئ',
+    primary: '24 52% 38%',
+    primaryLight: '28 48% 56%',
+    primaryDark: '24 55% 28%',
+    accent: '33 50% 46%',
   },
 ];
 

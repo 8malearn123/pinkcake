@@ -34,15 +34,15 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
       label: 'التفاصيل',
       body: (
         <div className="space-y-5">
-          <p className="text-[15px] leading-8 text-[#5f4d54]">
+          <p className="text-[15px] leading-8 text-muted-foreground">
             {product.description ||
               'قطعة من مخبزنا في جازان، تُخبز بمكوّنات طازجة تصل مطبخنا كل صباح وتُزيَّن يدوياً قبل خروجها إليك مباشرة.'}
           </p>
           <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
             {specs.map(([term, value]) => (
-              <div key={term} className="flex items-baseline justify-between gap-4 border-b border-[#f3e8ec] pb-2.5">
-                <dt className="shrink-0 text-xs font-bold text-[#b0506e]">{term}</dt>
-                <dd className="text-end text-[13px] font-bold text-[#2c2226]">{value}</dd>
+              <div key={term} className="flex items-baseline justify-between gap-4 border-b border-border pb-2.5">
+                <dt className="shrink-0 text-xs font-bold text-rose">{term}</dt>
+                <dd className="text-end text-[13px] font-bold text-foreground">{value}</dd>
               </div>
             ))}
           </dl>
@@ -52,16 +52,16 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
     {
       label: 'المكوّنات والحساسية',
       body: (
-        <div className="space-y-4 text-[15px] leading-8 text-[#5f4d54]">
+        <div className="space-y-4 text-[15px] leading-8 text-muted-foreground">
           <p>
             نعتمد على مكوّنات طازجة تصل مخبزنا يومياً: زبدة طبيعية، بيض طازج، وحليب كامل الدسم — بلا دهون مهدرجة ولا
             ألوان صناعية.
           </p>
           <p>
-            تحتوي وصفاتنا عادةً على <b className="text-[#2c2226]">القمح والبيض والحليب والسكر</b>، وقد تحتوي على آثار
+            تحتوي وصفاتنا عادةً على <b className="text-foreground">القمح والبيض والحليب والسكر</b>، وقد تحتوي على آثار
             مكسرات لأنها تُحضَّر في المطبخ نفسه.
           </p>
-          <p className="rounded-2xl bg-[#fbeef2] p-4 text-[14px] leading-7 text-[#8a3251]">
+          <p className="rounded-2xl bg-blush p-4 text-[14px] leading-7 text-pink-dark">
             عندك حساسية؟ نوفّر خياراتٍ خالية من المكسرات عند الطلب — اذكريها في ملاحظات الطلب عند إتمام الشراء ونجهّزها
             لك بعناية.
           </p>
@@ -71,7 +71,7 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
     {
       label: 'الحفظ والتقديم',
       body: (
-        <ul className="space-y-3.5 text-[15px] leading-8 text-[#5f4d54]">
+        <ul className="space-y-3.5 text-[15px] leading-8 text-muted-foreground">
           {[
             'احفظيها في الثلاجة فور الاستلام، وتُستهلك خلال ٤٨ ساعة لأفضل طعم.',
             'أخرجيها ١٥ دقيقة قبل التقديم حتى تعود الكريمة لقوامها الحريري.',
@@ -79,7 +79,7 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
             'لا تُعرَّض للشمس أو الحرارة المباشرة — الكريمة الطبيعية حسّاسة.',
           ].map((tip) => (
             <li key={tip} className="flex gap-3">
-              <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-[#ddbd75]" />
+              <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-gold" />
               <span>{tip}</span>
             </li>
           ))}
@@ -89,18 +89,18 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
     {
       label: 'التوصيل والاسترجاع',
       body: (
-        <div className="space-y-4 text-[15px] leading-8 text-[#5f4d54]">
+        <div className="space-y-4 text-[15px] leading-8 text-muted-foreground">
           <p>
             توصيل مبرّد داخل جازان — صبيا وأبو عريش والمناطق المجاورة. الطلبات الجاهزة تصل في اليوم نفسه إذا طلبتِ قبل
             ٣ عصراً، والتصاميم الخاصة تحتاج من ٢٤ إلى ٤٨ ساعة.
           </p>
           <p>
             رسوم التوصيل{' '}
-            <b className="inline-flex items-baseline gap-1 text-[#2c2226]">
+            <b className="inline-flex items-baseline gap-1 text-foreground">
               {toArabicDigits(DELIVERY_FEE)} <RiyalSymbol className="text-xs" />
             </b>
             ، ومجاناً لكل طلب يتجاوز{' '}
-            <b className="inline-flex items-baseline gap-1 text-[#2c2226]">
+            <b className="inline-flex items-baseline gap-1 text-foreground">
               {toArabicDigits(FREE_DELIVERY_THRESHOLD)} <RiyalSymbol className="text-xs" />
             </b>
             . متاح أيضاً الاستلام من الفرع
@@ -116,9 +116,9 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
   ];
 
   return (
-    <section className="rounded-3xl border border-[#f3e8ec] bg-[#fffdfa] p-5 shadow-[0_18px_50px_-38px_rgba(158,58,92,0.5)] sm:p-8">
+    <section className="rounded-3xl border border-border bg-background p-5 shadow-[0_18px_50px_-38px_hsl(var(--primary)/0.5)] sm:p-8">
       {/* Desktop: tabs */}
-      <div role="tablist" className="hidden border-b border-[#f3e8ec] sm:flex sm:gap-1">
+      <div role="tablist" className="hidden border-b border-border sm:flex sm:gap-1">
         {TABS.map((tab, i) => (
           <button
             key={tab.label}
@@ -128,8 +128,8 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
             role="tab"
             className={`-mb-px border-b-2 px-4 pb-3.5 pt-1 text-sm font-black transition-colors ${
               active === i
-                ? 'border-[#9e3a5c] text-[#9e3a5c]'
-                : 'border-transparent text-[#a08a92] hover:text-[#7d6870]'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-muted-foreground'
             }`}
           >
             {tab.label}
@@ -141,7 +141,7 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
       </div>
 
       {/* Mobile: accordion */}
-      <div className="divide-y divide-[#f3e8ec] sm:hidden">
+      <div className="divide-y divide-border sm:hidden">
         {TABS.map((tab, i) => (
           <div key={tab.label}>
             <button
@@ -150,10 +150,10 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
               aria-expanded={active === i}
               className="flex w-full items-center justify-between gap-4 py-4 text-start"
             >
-              <span className="text-sm font-black text-[#2c2226]">{tab.label}</span>
+              <span className="text-sm font-black text-foreground">{tab.label}</span>
               <ChevronDown
                 size={17}
-                className={`shrink-0 text-[#9e3a5c] transition-transform duration-300 ${active === i ? 'rotate-180' : ''}`}
+                className={`shrink-0 text-primary transition-transform duration-300 ${active === i ? 'rotate-180' : ''}`}
               />
             </button>
             {active === i && <div className="pb-5">{tab.body}</div>}

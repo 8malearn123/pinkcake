@@ -121,3 +121,13 @@ export function useStoreCart() {
   if (!ctx) throw new Error('useStoreCart must be used within a StoreCartProvider');
   return ctx;
 }
+
+/**
+ * Non-throwing accessor, for chrome that renders both inside and outside the
+ * storefront (the shared masthead on a 404, say). Returns null when there is no
+ * provider, and callers hide the cart affordance rather than crashing.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useStoreCartOptional() {
+  return useContext(StoreCartContext);
+}

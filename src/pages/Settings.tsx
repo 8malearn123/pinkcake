@@ -188,12 +188,17 @@ export default function Settings() {
                   <Button variant="outline">زر محدد</Button>
                   <Button variant="ghost">زر شفاف</Button>
                 </div>
-                <div className="mt-4 flex gap-3">
-                  <div className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm">
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <div className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-bold">
                     شارة رئيسية
                   </div>
-                  <div className="px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm">
+                  <div className="px-4 py-2 rounded-full bg-rose text-white text-sm font-bold">
                     شارة ثانوية
+                  </div>
+                  {/* Gold is fixed brand identity — shown so it's clear the
+                      picker above doesn't (and shouldn't) move it. */}
+                  <div className="px-4 py-2 rounded-full bg-gold text-primary text-sm font-bold">
+                    ذهبي (ثابت)
                   </div>
                 </div>
                 <div className="mt-4 p-4 rounded-lg gradient-pink text-white">

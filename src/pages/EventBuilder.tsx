@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
+import { Marquee } from '@/components/store/StorefrontDecor';
 import { useSettings } from '@/contexts/SettingsContext';
 import { usePublicStoreBranches } from '@/hooks/usePublicStore';
 import { useCreateEventOrder, payloadFromState } from '@/hooks/useEventOrder';
@@ -144,37 +146,31 @@ export default function EventBuilder() {
   const progress = phase === 'wizard' ? ((step + 1) / STEPS.length) * 100 : 100;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
-        <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center gap-3">
+    <div className="store-surface min-h-screen bg-background text-foreground">
+      <Marquee />
+      <StorefrontMasthead />
+
+      {/* Step progress — the one piece of chrome this flow adds on top of the
+          shared masthead, so you always know how far through you are. */}
+      <div className="sticky top-16 z-30 border-b border-primary/10 bg-background/95 backdrop-blur md:top-[84px]">
+        <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-5 py-2.5 sm:px-8 lg:px-12">
           <button
             onClick={back}
             aria-label="رجوع"
-            className="press w-10 h-10 rounded-full border border-border bg-card flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors shrink-0"
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-primary/15 text-primary transition-colors hover:bg-blush"
           >
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="size-4" />
           </button>
-          <button onClick={() => navigate('/')} className="flex items-center gap-2.5 press group">
-            <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow text-primary-foreground transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105">
-              <Cake className="w-5 h-5" />
-            </div>
-            <div className="hidden sm:block text-start leading-tight">
-              <div className="font-display text-lg">{settings.storeName}</div>
-              <div className="text-[10px] text-muted-foreground tracking-widest uppercase">ضيافة المناسبات</div>
-            </div>
-          </button>
-          <div className="ms-auto inline-flex items-center gap-2 text-xs text-primary font-medium">
-            <PartyPopper className="w-4 h-4" /> جهّز مناسبتك
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-rose">
+            <PartyPopper className="size-4" /> جهّز مناسبتك
           </div>
         </div>
-        {/* Progress */}
-        <div className="h-1 bg-border/60">
-          <div className="h-full gradient-pink transition-[width] duration-500" style={{ width: `${progress}%` }} />
+        <div className="h-1 bg-border">
+          <div className="gradient-pink h-full transition-[width] duration-500" style={{ width: `${progress}%` }} />
         </div>
-      </header>
+      </div>
 
-      <main className="container mx-auto px-4 lg:px-6 py-7 lg:py-10">
+      <main className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         {phase === 'done' && (
           <SuccessView tracking={tracking} onTrack={() => navigate('/track')} onHome={() => navigate('/')} />
         )}

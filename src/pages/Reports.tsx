@@ -215,16 +215,19 @@ export default function Reports() {
         <meta charset="UTF-8">
         <title>تقرير الطلبات</title>
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-          body { font-family: 'Cairo', sans-serif; direction: rtl; padding: 20px; }
-          h1 { color: #be7b7c; text-align: center; }
-          h2 { margin-top: 20px; border-bottom: 2px solid #be7b7c; padding-bottom: 5px; }
+          /* Standalone print document — it opens in its own window, so the app's
+             CSS variables don't reach it. Values are the Cake & Bloom palette
+             written out literally; keep them in sync with :root in index.css. */
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&display=swap');
+          body { font-family: 'Noto Kufi Arabic', sans-serif; direction: rtl; padding: 20px; color: #2c2226; background: #fffdfa; }
+          h1 { color: #9e3a5c; text-align: center; font-weight: 800; letter-spacing: -0.02em; }
+          h2 { margin-top: 20px; border-bottom: 2px solid #ddbd75; padding-bottom: 5px; font-weight: 800; }
           table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-          th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
-          th { background: #f5f5f5; }
+          th, td { border: 1px solid #e6d5db; padding: 10px; text-align: right; }
+          th { background: #f6ecef; color: #9e3a5c; font-weight: 700; }
           .summary { display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
-          .stat { padding: 15px; background: #f9f9f9; border-radius: 8px; }
-          .stat-value { font-size: 24px; font-weight: bold; color: #be7b7c; }
+          .stat { padding: 15px; background: #fbeef2; border-radius: 8px; }
+          .stat-value { font-size: 24px; font-weight: 800; color: #9e3a5c; }
         </style>
       </head>
       <body>

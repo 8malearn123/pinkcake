@@ -14,15 +14,19 @@ export default {
     },
     extend: {
       fontFamily: {
-        // Alexandria — the brand font (Arabic + Latin) — leads every stack; the old fonts stay as fallbacks.
-        alexandria: ['Alexandria', 'Cairo', 'sans-serif'],
-        cairo: ['Alexandria', 'Cairo', 'sans-serif'],
-        tajawal: ['Alexandria', 'Tajawal', 'sans-serif'],
-        serif: ['Alexandria', '"Instrument Serif"', '"DM Serif Display"', 'serif'],
-        display: ['Alexandria', '"Instrument Serif"', '"DM Serif Display"', 'serif'],
-        wedding: ['Amiri', 'Alexandria', 'serif'],
-        sans: ['Alexandria', '"Work Sans"', 'Cairo', 'Tajawal', 'sans-serif'],
-        body: ['Alexandria', '"Work Sans"', 'Cairo', 'sans-serif'],
+        // Noto Kufi Arabic is the Cake & Bloom face and leads every stack — one
+        // voice app-wide, with the size/weight ramp carrying hierarchy. The old
+        // family names survive as aliases so existing markup keeps working;
+        // Alexandria is now only reached through `.loza-theme`.
+        notokufi: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
+        alexandria: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
+        cairo: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
+        tajawal: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
+        serif: ['"Noto Kufi Arabic"', 'Alexandria', 'serif'],
+        display: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
+        wedding: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
+        sans: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
+        body: ['"Noto Kufi Arabic"', 'Alexandria', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -64,12 +68,26 @@ export default {
           dark: "hsl(var(--pink-dark))",
         },
         rose: "hsl(var(--rose))",
-        blush: "hsl(var(--blush))",
+        blush: {
+          DEFAULT: "hsl(var(--blush))",
+          deep: "hsl(var(--blush-deep))",
+        },
         gold: {
           DEFAULT: "hsl(var(--gold))",
           soft: "hsl(var(--gold-soft))",
+          deep: "hsl(var(--gold-deep))",
         },
-        seasonal: "hsl(var(--seasonal))",
+        seasonal: {
+          DEFAULT: "hsl(var(--seasonal))",
+          wash: "hsl(var(--seasonal-wash))",
+        },
+        // Dark berry ramp — dark bands and photo scrims.
+        berry: {
+          deep: "hsl(var(--berry-deep))",
+          dark: "hsl(var(--berry-dark))",
+          ink: "hsl(var(--berry-ink))",
+          black: "hsl(var(--berry-black))",
+        },
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",

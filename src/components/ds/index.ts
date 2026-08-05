@@ -1,7 +1,18 @@
 /**
- * Pink Cake Design System — المكوّنات الأساسية الموحّدة.
+ * Cake & Bloom Design System — المكوّنات الأساسية الموحّدة.
  * الدليل المكتوب: DESIGN_SYSTEM.md — الدليل الحي: /design-system (للمدير).
  */
+export {
+  Section,
+  Eyebrow,
+  Title,
+  TitleAccent,
+  Lede,
+  GoldRule,
+  GoldDivider,
+  Chip,
+  PhotoTile,
+} from './Editorial';
 export { PageHeader } from './PageHeader';
 export { StatTile, type StatTone } from './StatTile';
 export { EmptyState } from './EmptyState';

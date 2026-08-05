@@ -13,7 +13,7 @@ export function GiftBox({ storeName }: { storeName: string }) {
 
   const S: Record<string, CSSProperties> = {
     circle: { position: 'absolute', width: 130, height: 130, borderRadius: 9999, background: 'rgba(221,189,117,.4)', pointerEvents: 'none' },
-    wrap: { position: 'relative', width: 124, height: 120, display: 'block', animation: 'ck-bob 3s ease-in-out infinite', filter: 'drop-shadow(0 14px 18px rgba(158,58,92,.35))' },
+    wrap: { position: 'relative', width: 124, height: 120, display: 'block', animation: 'ck-bob 3s ease-in-out infinite', filter: 'drop-shadow(0 14px 18px hsl(var(--primary)/.35))' },
     bow: { position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)', zIndex: 3, width: 64, height: 28 },
     bowL: { position: 'absolute', left: 2, top: 2, width: 28, height: 24, background: '#ddbd75', borderRadius: '70% 70% 45% 45%', transform: 'rotate(-26deg)' },
     bowR: { position: 'absolute', right: 2, top: 2, width: 28, height: 24, background: '#ddbd75', borderRadius: '70% 70% 45% 45%', transform: 'rotate(26deg)' },
@@ -26,25 +26,25 @@ export function GiftBox({ storeName }: { storeName: string }) {
   return (
     <section style={{ padding: '56px 48px' }}>
       <Reveal
-        className="mx-auto max-w-[1500px] overflow-hidden rounded-3xl border border-[#9e3a5c]/[.12] text-center"
-        style={{ background: 'linear-gradient(160deg,#ffffff 0%,#fdf3f6 100%)', padding: '56px 48px', boxShadow: '0 24px 80px -50px rgba(158,58,92,.5)' }}
+        className="mx-auto max-w-[1500px] overflow-hidden rounded-3xl border border-primary/[.12] text-center"
+        style={{ background: 'linear-gradient(160deg,#ffffff 0%,#fdf3f6 100%)', padding: '56px 48px', boxShadow: '0 24px 80px -50px hsl(var(--primary)/.5)' }}
       >
         <div className="flex flex-col items-center gap-4">
-          <p className="inline-flex items-center gap-2 rounded-full bg-[#fbeef2] px-4 py-1.5 text-xs font-bold tracking-[.05em] text-[#b0506e]">
+          <p className="inline-flex items-center gap-2 rounded-full bg-blush px-4 py-1.5 text-xs font-bold tracking-[.05em] text-rose">
             🎁 هدية ترحيبية · لزوّار {storeName} لأول مرة
           </p>
-          <h2 className="mt-2 max-w-[36rem] text-[32px] font-black leading-[1.35] text-[#2c2226]">لديك هديّة بانتظارك!</h2>
-          <p className="max-w-[30rem] text-[15px] leading-[1.9] text-[#6f5b62]">
+          <h2 className="mt-2 max-w-[36rem] text-[32px] font-black leading-[1.35] text-foreground">لديك هديّة بانتظارك!</h2>
+          <p className="max-w-[30rem] text-[15px] leading-[1.9] text-muted-foreground">
             اضغط على الصندوق لتكشف مفاجأتك 🎉
           </p>
 
           {open ? (
-            <div className="ck-couponpop mt-3 w-full max-w-[26rem] rounded-2xl border-2 border-dashed border-[#ddbd75] bg-[#fffdfa] p-6" style={{ animation: 'ck-couponpop .5s ease-out both' }}>
-              <p className="text-lg font-black text-[#9e3a5c]">🎉 مبروك! هديتك جاهزة</p>
-              <p className="mt-1 text-sm text-[#6f5b62]">خصم ١٥٪ على أوّل طلب</p>
+            <div className="ck-couponpop mt-3 w-full max-w-[26rem] rounded-2xl border-2 border-dashed border-gold bg-background p-6" style={{ animation: 'ck-couponpop .5s ease-out both' }}>
+              <p className="text-lg font-black text-primary">🎉 مبروك! هديتك جاهزة</p>
+              <p className="mt-1 text-sm text-muted-foreground">خصم ١٥٪ على أوّل طلب</p>
               <div className="mt-4 flex items-center justify-center gap-3">
-                <span className="rounded-md bg-[#fbeef2] px-5 py-2.5 text-lg font-black tracking-[.15em] text-[#9e3a5c]">CAKE15</span>
-                <button onClick={copy} className="rounded-md bg-[#9e3a5c] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#b0506e]">
+                <span className="rounded-md bg-blush px-5 py-2.5 text-lg font-black tracking-[.15em] text-primary">CAKE15</span>
+                <button onClick={copy} className="rounded-md bg-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-rose">
                   {copied ? 'تم النسخ ✓' : 'انسخ الكود'}
                 </button>
               </div>
@@ -65,7 +65,7 @@ export function GiftBox({ storeName }: { storeName: string }) {
                   <span style={S.ribbon} />
                 </span>
               </button>
-              <button onClick={() => setOpen(true)} className="rounded-full bg-[#9e3a5c] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#b0506e]">
+              <button onClick={() => setOpen(true)} className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-rose">
                 👆 اضغط لفتح الهدية
               </button>
             </>

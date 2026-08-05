@@ -1,4 +1,4 @@
-# Pink Cake Design System
+# Cake & Bloom Design System
 
 The single source of truth for look, feel, and tone across every screen.
 Living style guide (rendered, admin-only): **`/design-system`** · DS components: **`src/components/ds/`**
@@ -7,15 +7,15 @@ Living style guide (rendered, admin-only): **`/design-system`** · DS components
 
 ## 1. Brand essence
 
-Pink Cake is a **warm, feminine, pastry-luxe** brand. Every screen — even the kitchen dashboard — should feel like it belongs to a boutique cake shop: soft rose surfaces, generous rounding, gentle motion, and friendly Arabic copy. Professional, never sterile; sweet, never childish.
+Cake & Bloom is a **warm, editorial, pastry-luxe** brand: deep berry on cream, gold as the one decorative metal, heavy Noto Kufi headings, squared cards, and friendly Arabic copy. Every screen — even the kitchen dashboard — should feel like it belongs to the same boutique. Professional, never sterile; sweet, never childish.
 
-The product has three faces sharing one system:
+**One palette, one type ramp, one surface vocabulary, two densities.** The storefront and the staff console differ in *breathing room*, never in language.
 
 | Face | Routes | Personality |
 |---|---|---|
-| **Staff console** | `/dashboard`, `/kitchen`, `/orders`… | Calm, efficient, data-first. Rose-tinted neutrals, one pink CTA per screen. |
-| **Public store** | `/`, `/store`, `/customize`, `/track` | Expressive and appetizing. Gradients, hero imagery, decorative motion allowed. |
-| **Loza marketplace** | `/loza/*` | Separate sub-brand: gold / cream / brown, Tajawal font. Never leaks outside `/loza`. |
+| **Public store** | `/`, `/shop`, `/product/*`, `/track`, `/my-orders`… | Editorial and appetizing. Roomy sections (`py-14`–`py-28`), hero imagery, gold rules, decorative motion allowed. |
+| **Staff console** | `/live`, `/kitchen`, `/orders`… | Same palette, type and surfaces — compact. `space-y-8` sections, dense tables, one brand CTA per screen. |
+| **Loza marketplace** | `/loza/*` | Separate sub-brand: gold / cream / brown, Alexandria font. Fully scoped — never leaks outside `/loza`, and unaffected by the global theme. |
 
 ---
 
@@ -25,16 +25,24 @@ The product has three faces sharing one system:
 
 ### Core tokens (defined in `src/index.css`, mapped in `tailwind.config.ts`)
 
-| Token | Use for |
-|---|---|
-| `primary` / `primary-foreground` | Buttons, links, focus rings, active nav |
-| `accent` | Deeper rose for gradients and highlights |
-| `secondary`, `muted`, `muted-foreground` | Quiet surfaces and secondary text |
-| `background`, `card`, `popover`, `border`, `input`, `ring` | Structure |
-| `destructive` | Errors, deletion, rejection — nothing else |
-| `success`, `warning` (+`-foreground`), `info` (+`-foreground`) | Feedback & stat tones |
-| `pink`, `pink-light`, `pink-dark`, `rose`, `blush` | Brand extras (gradients, decorative) |
-| `sidebar-*` | Dark sidebar scale — sidebar only |
+| Token | Value | Use for |
+|---|---|---|
+| `primary` / `primary-foreground` | berry `#9e3a5c` | Buttons, links, focus rings, active nav, prices |
+| `rose` | `#b0506e` | Eyebrows, second lines of display headings |
+| `gold`, `gold-soft`, `gold-deep` | `#ddbd75` | Hairlines, badges, on-dark CTAs. **Decorative only** |
+| `accent` / `accent-foreground` | blush `#fbeef2` | shadcn's hover surface. **Never the gold** — see below |
+| `background`, `card`, `popover` | cream `#fffdfa` | Structure |
+| `foreground` | ink `#2c2226` | Body text |
+| `secondary`, `muted`, `muted-foreground`, `border`, `input`, `ring` | | Quiet surfaces, secondary text, structure |
+| `blush`, `blush-deep` | | Soft brand washes |
+| `berry-deep`, `berry-dark`, `berry-ink`, `berry-black` | | Dark bands (Reviews, footer) and photo scrims |
+| `seasonal`, `seasonal-wash` | `#e8942f` | The summer collection accent |
+| `destructive` | | Errors, deletion, rejection — nothing else |
+| `success`, `warning`, `info` (+`-foreground`) | | Feedback & stat tones |
+| `pink`, `pink-light`, `pink-dark` | | Legacy aliases of the berry ramp — kept so old class names still work |
+| `sidebar-*` | plum-ink + gold | Console chrome — sidebar only |
+
+> **`--accent` is not the gold.** shadcn resolves `hover:bg-accent` for every ghost/outline button, dropdown row and select item. Point it at a saturated brand color and the whole console turns that color on hover. Gold lives in `--gold`.
 
 Tints come from opacity modifiers, not new colors: `bg-success/10 text-success`.
 
@@ -48,27 +56,30 @@ Tints come from opacity modifiers, not new colors: `bg-success/10 text-success`.
 
 ### Gradients & special surfaces
 
-`gradient-pink` (CTA + icon boxes) · `gradient-blush-warm` / `gradient-rose-deep` (store heroes) · `gradient-cocoa` (dark store sections) · `glass-card` (default staff card surface).
+`gradient-pink` (the anchor CTA + brand icon boxes — a vertical berry gradient) · `gradient-berry-deep` / `gradient-footer-berry` (the Reviews band and footer) · `gradient-blush-warm` (soft store headers) · `gradient-rose-deep` / `gradient-cocoa` (dark store sections) · `glass-card` (default card surface: solid cream + berry lift).
 
 ### Order status
 
-Order status colors live in one place: the `status-*` utility classes in `index.css`, consumed **only** through `<StatusBadge status={...} />`. Never hand-build a status chip; never repurpose status classes for other meanings.
+Order status colors live in one place: the `status-*` utility classes in `index.css`, consumed **only** through `<StatusBadge status={...} />`. Each of the eleven is one `--status-*` hue used as the text color with its own 12% wash as the fill — low-chroma by design, so the set reads as one family on cream. Never hand-build a status chip; never repurpose status classes for other meanings.
 
 ---
 
 ## 3. Typography
 
-Default body font is **Cairo** (set on `<body>`), the app is **RTL** (`<html dir="rtl">`).
+The brand face is **Noto Kufi Arabic** everywhere (set on `<body>` via `font-sans`), the app is **RTL** (`<html dir="rtl">`). Hierarchy comes from size and weight, never from a second family — `.font-display`, `.font-display-latin` and `.font-wedding` all resolve to Noto Kufi 800 and survive only as legacy hooks.
 
 | Role | Classes | Notes |
 |---|---|---|
-| Page title (h1) | `text-3xl font-bold` | One per page, via `<PageHeader />` |
-| Section title (h2) | `text-xl font-bold` | Via `<SectionHeading />` / `<SectionCard />` |
-| Card/field title | `font-semibold` | |
+| Store display (h2) | `<Title variant="display">` — `text-[2.5rem] sm:text-[3.25rem] font-black` | Feature sections |
+| Store section (h2) | `<Title variant="h2">` — `text-3xl sm:text-4xl font-black` | List sections |
+| Eyebrow / kicker | `<Eyebrow>` — `text-xs font-bold tracking-[.08em] text-rose` (`caps` for `text-[11px] uppercase tracking-[.22em]`) | Always above a Title |
+| Lede | `<Lede>` — `text-[15px] leading-8 text-muted-foreground` | Intro paragraph |
+| Console page title (h1) | `text-3xl font-black` | One per page, via `<PageHeader />` |
+| Console section (h2) | `text-xl font-black` | Via `<SectionHeading />` / `<SectionCard />` |
+| Card/field title, buttons, chips | `font-bold` | |
 | Body | default (`text-base`) | |
 | Secondary/meta | `text-sm text-muted-foreground` | |
-| Numbers, codes, prices | `font-sans` (Work Sans) + `dir="ltr"` where mixed | Western digits 0-9 |
-| Latin display (store/celebratory) | `font-display-latin` (Instrument Serif) | Latin text only |
+| Numbers, codes, prices | `dir="ltr"` where mixed | Western digits 0-9 |
 | Loza display | `font-loza-display` (DM Serif Display) | Inside `.loza-theme` only |
 
 **Arabic rules:** no negative letter-spacing, no italics, line-height ≥ 1.5 for paragraphs (`leading-relaxed`).
@@ -77,7 +88,18 @@ Default body font is **Cairo** (set on `<body>`), the app is **RTL** (`<html dir
 
 ## 4. Layout, spacing & radius
 
-**Staff page anatomy** (top to bottom):
+**Store page anatomy** (top to bottom):
+
+```
+<div class="store-surface min-h-screen bg-background text-foreground">
+├─ <Marquee />                    ← the berry ticker
+├─ <StorefrontMasthead />         ← `floating` only on the home page (over the hero)
+├─ <Section variant="list|feature">
+│    └─ <Eyebrow> + <Title> + <Lede>, then the content
+└─ <StorefrontFooter />           ← always closes the page
+```
+
+**Staff page anatomy:**
 
 ```
 MainLayout (sidebar + main, p-6 lg:p-8)
@@ -87,10 +109,11 @@ MainLayout (sidebar + main, p-6 lg:p-8)
    └─ content sections         ← SectionCard, or SectionHeading + self-carded content
 ```
 
-- Page sections: `space-y-8` · grids: `gap-6` (stats) / `gap-4` (dense)
-- Cards: `p-6`, `rounded-2xl` · inner elements: `rounded-xl` / `rounded-lg` · chips & badges: `rounded-full`
-- Store sections breathe more: `py-16`–`py-24`
-- Max content width on wide screens: prefer `max-w-6xl` for document-like pages
+- Console sections: `space-y-8` · grids: `gap-6` (stats) / `gap-4` (dense)
+- Store sections: `<Section variant="list">` = `py-14 lg:py-20`, `variant="feature"` = `py-20 lg:py-28`; horizontal padding is always `px-5 sm:px-8 lg:px-12`
+- Store container widths: `max-w-[1500px]` (default), `max-w-[1400px]` (feature), `max-w-[820px]` (prose)
+- **Radius ladder:** `rounded-full` chips & pills · `rounded-2xl` cards and photo tiles · `rounded-3xl` feature panels · `rounded-xl` buttons · `rounded-lg/md/sm` follow `--radius` (`0.5rem`)
+- Cards: `p-6`
 
 **RTL rules:**
 
@@ -105,8 +128,9 @@ MainLayout (sidebar + main, p-6 lg:p-8)
 
 | Shadow | Use |
 |---|---|
-| `glass-card` (includes `shadow-lg`) | Default staff surface |
-| `shadow-warm` | Pink glow for CTAs and `gradient-pink` icon boxes |
+| `glass-card` | Default card surface — solid cream, border, soft berry lift |
+| `shadow-berry-soft` / `-lg` | The canonical elevation. `-lg` is the hover step |
+| `shadow-warm` | Alias of `shadow-berry-soft` (legacy class name) |
 | `shadow-soft-lift` | Elevated store cards |
 | `shadow-rose-glow` | Hero/promo only |
 | `shadow-loza`, `shadow-loza-lift` | Loza scope only |
@@ -141,10 +165,30 @@ shadcn/ui in `src/components/ui/` — use it before building anything custom. To
 | `<SectionCard />` | unstructured card+heading combos | Carded section with built-in h2. |
 | `<SectionHeading />` | loose h2 rows | Heading above content that brings its own card (tables). |
 
+### Editorial primitives (`src/components/ds/Editorial.tsx`) — the store vocabulary
+
+Shared by both faces; `variant` carries the density. Use these instead of re-declaring the class strings.
+
+| Component | Replaces |
+|---|---|
+| `<Section variant="list"\|"feature"\|"console" width>` | Hand-written section padding + `max-w-*` wrappers |
+| `<Eyebrow tone rule caps>` | The kicker + hairline pattern above every heading |
+| `<Title variant="display"\|"h2"\|"h3" tone>` + `<TitleAccent>` | Hand-written `font-black` headings |
+| `<Lede tone>` | Intro paragraphs |
+| `<Chip tone>` | The badge/pill family (berry, gold, seasonal, success, glass, blush) |
+| `<PhotoTile ratio scrim>` | Photo wells with hover-zoom and one of two canonical scrims |
+| `<GoldRule />` / `<GoldDivider />` | The fading-gold hairline and the ✦ section break |
+
+### Store chrome
+
+`<StorefrontMasthead />` is the one header — `floating` only on the home page. `<StorefrontFooter />` closes every store page. Both live under `StorefrontLayout` in `App.tsx`, which provides the shared cart.
+
 ### Buttons
 
-- **One** gradient CTA per screen: `className="gradient-pink text-white shadow-warm hover:opacity-90 transition-opacity"` — the single most important action.
-- Everything else: standard variants (`default`, `secondary`, `outline`, `ghost`, `link`).
+- **One** anchor CTA per screen: `<Button variant="brand">` (gradient berry + lift) — the single most important action.
+- Storefront variants: `brandFlat` (workhorse berry), `gold` (on dark bands / over photography), `outlineBrand` (berry outline on light), `onDark` (translucent over photos). Sizes `cta` and `pill` are the storefront scale.
+- Console: standard variants (`default`, `secondary`, `outline`, `ghost`, `link`).
+- Base weight is `font-bold` — the brand's buttons are heavy.
 - `destructive` only for destructive actions, always behind a confirm (AlertDialog).
 - Buttons that trigger async work show a spinner and disable while pending.
 
@@ -198,17 +242,14 @@ Warm, simple فصحى. Talk like a friendly shop assistant, not a system.
 
 ---
 
-## 11. Adoption status & migration
+## 11. Adoption status
 
-`Dashboard.tsx` is the reference implementation. Remaining screens to migrate gradually (replace hand-rolled headers/stats/empty/loading states with DS primitives, and raw palette colors with tones):
+The Cake & Bloom unification is complete: the palette, type ramp, surfaces and chrome are global, and `.storefront-theme` no longer exists (the tokens live in `:root`).
 
-- [x] Dashboard
-- [ ] Kitchen (stats + empty states)
-- [ ] BranchOrders / BranchLive (stat tiles use raw `text-blue-600`/`text-green-600`…)
-- [ ] Driver (stats + empty states)
-- [ ] LiveDashboard (stats)
-- [ ] ContactSubmissions (stats use `text-amber-600`/`text-blue-600`…)
-- [ ] Orders / Products / Branches / Users / Reports / Settings (headers + loading/empty)
-- [ ] CustomOrders / BranchPickupScanner (headers)
+**Invariants to keep:**
 
-When migrating: behavior must not change — visuals only converge to the system.
+- No raw Tailwind palette classes (`text-blue-600`, `bg-green-100`…) and no arbitrary brand hex (`bg-[#9e3a5c]`). Both are at zero outside `/loza` and this guide's own examples — keep it that way.
+- `--accent` stays a quiet blush wash; gold is `--gold`.
+- `defaultSettings.colors` in `src/contexts/SettingsContext.tsx` must mirror `:root` — it is written as inline styles on `<html>` and silently wins over the stylesheet.
+- `.loza-theme` is a separate sub-brand and pins its own feedback tokens. Don't let berry leak in, or gold leak out.
+- `npm run check:rtl` has an **empty** baseline: use `ms/me-*`, `ps/pe-*`, `start/end-*`, `text-start/end`, `rounded-s/e-*`, `border-s/e-*`.

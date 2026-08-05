@@ -24,13 +24,13 @@ import { useSettings } from '@/contexts/SettingsContext';
 
 const DEMO_PASSWORD = 'Demo1234!';
 const DEMO_ACCOUNTS = [
-  { email: 'admin@demo.com', label: 'مدير النظام', icon: Shield, color: 'from-rose-500 to-pink-600' },
-  { email: 'callcenter@demo.com', label: 'مركز الاتصال', icon: Headphones, color: 'from-amber-500 to-orange-600' },
-  { email: 'kitchen@demo.com', label: 'المطبخ', icon: ChefHat, color: 'from-emerald-500 to-teal-600' },
-  { email: 'branch@demo.com', label: 'الفرع', icon: StoreIcon, color: 'from-indigo-500 to-violet-600' },
-  { email: 'driver@demo.com', label: 'السائق', icon: Truck, color: 'from-sky-500 to-blue-600' },
-  { email: 'support@demo.com', label: 'الدعم الفني', icon: LifeBuoy, color: 'from-fuchsia-500 to-purple-600' },
-  { email: 'customer@demo.com', label: 'عميل', icon: ShoppingBag, color: 'from-pink-400 to-rose-500' },
+  { email: 'admin@demo.com', label: 'مدير النظام', icon: Shield, color: 'bg-primary' },
+  { email: 'callcenter@demo.com', label: 'مركز الاتصال', icon: Headphones, color: 'bg-seasonal' },
+  { email: 'kitchen@demo.com', label: 'المطبخ', icon: ChefHat, color: 'bg-success' },
+  { email: 'branch@demo.com', label: 'الفرع', icon: StoreIcon, color: 'bg-info' },
+  { email: 'driver@demo.com', label: 'السائق', icon: Truck, color: 'bg-berry-ink' },
+  { email: 'support@demo.com', label: 'الدعم الفني', icon: LifeBuoy, color: 'bg-rose' },
+  { email: 'customer@demo.com', label: 'عميل', icon: ShoppingBag, color: 'bg-gold-deep' },
 ];
 
 const loginSchema = z.object({
@@ -254,11 +254,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blush to-background p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-2xl gradient-pink flex items-center justify-center shadow-warm mx-auto mb-4">
+          <div className="gradient-pink shadow-berry-soft mx-auto mb-4 grid size-20 place-items-center rounded-2xl ring-1 ring-gold/40">
             <Cake className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-2xl font-bold">{settings.storeName}</h1>
@@ -474,7 +474,7 @@ export default function Login() {
         </Card>
 
         {/* Demo Accounts Panel */}
-        <Card className="mt-6 border-dashed border-2 border-primary/30 bg-gradient-to-br from-pink-50/50 to-rose-50/30 dark:from-pink-950/20 dark:to-rose-950/10">
+        <Card className="mt-6 border-dashed border-2 border-primary/30 bg-blush/50">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary" />
@@ -497,7 +497,7 @@ export default function Login() {
                     onClick={() => handleDemoLogin(acc.email)}
                     className="group relative flex items-center gap-2 rounded-lg border bg-card p-2.5 text-start transition-all hover:border-primary hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-md bg-gradient-to-br ${acc.color} flex items-center justify-center text-white shadow-sm`}>
+                    <div className={`grid size-8 shrink-0 place-items-center rounded-md text-white shadow-sm ${acc.color}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
