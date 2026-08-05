@@ -273,6 +273,11 @@ export const USER_BRANCH_ASSIGNMENTS: Record<string, unknown>[] = [
 export const REVIEWS = [
   { id: 'r1', product_id: 'p1', customer_name: 'نورة', rating: 5, comment: 'رائعة جداً وطازجة!', created_at: iso(2000) },
   { id: 'r2', product_id: 'p1', customer_name: 'سارة', rating: 4, comment: 'لذيذة لكن حلوة قليلاً', created_at: iso(5000) },
+  { id: 'r3', product_id: 'p1', customer_name: 'عبدالله', rating: 5, comment: 'طلبتها لعيد ميلاد أمي والكل سأل من وين. التغليف راقي.', created_at: iso(9000) },
+  { id: 'r4', product_id: 'p3', customer_name: 'ريم', rating: 5, comment: 'أفضل ريد فيلفت جربتها في جازان، كريمة الجبن متوازنة مب دسمة.', created_at: iso(1500) },
+  { id: 'r5', product_id: 'p3', customer_name: 'منى', rating: 4, comment: 'وصلت باردة وفي وقتها بالضبط. بس تمنيت الحجم أكبر شوي.', created_at: iso(6200) },
+  { id: 'r6', product_id: 'p2', customer_name: 'فهد', rating: 5, comment: 'صوص التوت طازج فعلاً، ما يشبه الجاهز أبداً.', created_at: iso(3400) },
+  { id: 'r7', product_id: 'p5', customer_name: 'هند', rating: 5, comment: 'كيكة اللوتس عندهم إدمان، طلبتها ثلاث مرات هالشهر.', created_at: iso(800) },
 ];
 
 export const ORDER_LOGS = [

@@ -1,161 +1,227 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowRight, Cake, ChevronLeft, Heart, ShoppingBag, User } from 'lucide-react';
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { useProductRatings } from '@/hooks/useProductRatings';
+import { useProductReviews } from '@/hooks/useProductReviews';
+import { useComplementSuggestions } from '@/hooks/useComplementSuggestions';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useStoreWishlist } from '@/contexts/StoreWishlistContext';
 import { useSettings } from '@/contexts/SettingsContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
+import { Marquee } from '@/components/store/StorefrontDecor';
 import { StoreProductCard } from '@/components/store/StoreProductCard';
-import { FloatingContactButton } from '@/components/store/FloatingContactButton';
-import { BackToTop } from '@/components/store/BackToTop';
+import { StorefrontFooter } from '@/components/store/StorefrontFooter';
+import { ProductReviewDialog } from '@/components/store/ProductReviewDialog';
+import { ProductGallery } from '@/components/store/pdp/ProductGallery';
+import { ProductBuyPanel } from '@/components/store/pdp/ProductBuyPanel';
+import { ProductInfoTabs } from '@/components/store/pdp/ProductInfoTabs';
+import { ProductReviewsPanel } from '@/components/store/pdp/ProductReviewsPanel';
+import { PairsWithRail } from '@/components/store/pdp/PairsWithRail';
+import { StickyBuyBar } from '@/components/store/pdp/StickyBuyBar';
 import { Reveal } from '@/components/Reveal';
-import { RiyalSymbol } from '@/components/ui/riyal';
-import { cn } from '@/lib/utils';
-import {
-  ArrowRight,
-  ChevronLeft,
-  Cake,
-  Heart,
-  Star,
-  Plus,
-  Minus,
-  ShoppingCart,
-  ShoppingBag,
-  Truck,
-  Clock,
-  ShieldCheck,
-  Sparkles,
-  Check,
-  Leaf,
-} from 'lucide-react';
+import { toArabicDigits } from '@/lib/arabicNumerals';
+import { discountPercent, pickRelated, rowGridClass, savingsAmount } from '@/lib/productDetails';
+import type { StoreProduct } from '@/hooks/useCustomerStore';
+
+/** The three promises behind every box — the storefront's craft story, product-side. */
+const CRAFT = [
+  { n: '٠١', title: 'مكوّنات تصل كل صباح', body: 'زبدة وبيض وحليب طازج من موردين نعرفهم بالاسم — لا خلطات جاهزة ولا مواد حافظة.' },
+  { n: '٠٢', title: 'تُخبز بعد طلبك', body: 'ما نخبز للرفّ. طلبك يبدأ من العجين في اليوم نفسه، فتصلك وهي في ذروتها.' },
+  { n: '٠٣', title: 'تصلك مبرّدة ومغلّفة', body: 'علبة فاخرة وبطاقة تهنئة، ونقل مبرّد داخل جازان يحفظ الكريمة كما خرجت من المطبخ.' },
+];
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { settings } = useSettings();
+  const { user } = useAuth();
 
   const { data: products, isLoading } = usePublicStoreProducts();
-  const { addToCart, updateQuantity, cart, count: cartCount, open: openCart } = useStoreCart();
+  const { addToCart, updateQuantity, cart, total: cartTotal, count: cartCount, open: openCart } = useStoreCart();
   const wishlist = useStoreWishlist();
-  const qtyOf = (pid: string) => cart.find((i) => i.product.id === pid)?.quantity ?? 0;
+  const qtyOf = useCallback(
+    (pid: string) => cart.find((i) => i.product.id === pid)?.quantity ?? 0,
+    [cart],
+  );
 
   const product = useMemo(() => products?.find((p) => p.id === id), [products, id]);
-  const { data: ratingsMap } = useProductRatings(product ? [product.id] : []);
+  const ratingIds = useMemo(() => (product ? [product.id] : []), [product]);
+  const { data: ratingsMap } = useProductRatings(ratingIds);
   const rating = product ? ratingsMap?.[product.id] : undefined;
-
-  // Gallery: use images[] when present, else fall back to the single image_url.
-  const galleryImages = useMemo(
-    () =>
-      product?.images && product.images.length > 0
-        ? product.images
-        : product?.image_url
-          ? [product.image_url]
-          : [],
-    [product],
-  );
-  const [activeImage, setActiveImage] = useState(0);
-  useEffect(() => { setActiveImage(0); }, [product?.id]);
-  const mainImage = galleryImages[Math.min(activeImage, Math.max(0, galleryImages.length - 1))] ?? null;
-
-  const related = useMemo(
-    () =>
-      (products || [])
-        .filter((p) => p.id !== id && p.category === product?.category)
-        .slice(0, 4),
-    [products, id, product],
-  );
+  const { data: reviews, isLoading: reviewsLoading } = useProductReviews(product?.id);
 
   const [qty, setQty] = useState(1);
-  const [reviewsOpen, setReviewsOpen] = useState(false);
   const [added, setAdded] = useState(false);
+  const [reviewsOpen, setReviewsOpen] = useState(false);
+  const [ctaOffscreen, setCtaOffscreen] = useState(false);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
-  const goToCart = openCart;
+  // A new product means a fresh decision: reset the quantity and the confirmation.
+  useEffect(() => {
+    setQty(1);
+    setAdded(false);
+  }, [id]);
+
+  // The desktop buy bar only takes over once the real CTA has left the viewport.
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => setCtaOffscreen(!entry.isIntersecting), {
+      rootMargin: '-72px 0px 0px 0px',
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [product?.id]);
+
+  const galleryImages = useMemo(() => {
+    if (product?.images && product.images.length > 0) return product.images;
+    return product?.image_url ? [product.image_url] : [];
+  }, [product]);
+
+  const related = useMemo(
+    () => pickRelated(products, id, product?.category, isSoldOut, 4),
+    [products, id, product?.category],
+  );
+
+  // Add-on suggestions. Only the product itself is excluded up front — on a small
+  // catalogue, also excluding everything "you may also like" took would empty the
+  // rail entirely. Instead the ones already shown below sink to the back, so the
+  // rail prefers fresh picks but never disappears.
+  const complementContext = useMemo(() => (product ? [product] : []), [product]);
+  const complementExclude = useMemo(() => new Set([id ?? '']), [id]);
+  const complementPool = useComplementSuggestions({
+    context: complementContext,
+    excludeIds: complementExclude,
+    ratingsMap,
+    limit: 8,
+  });
+  const complements = useMemo(() => {
+    const alreadyShown = new Set(related.map((p) => p.id));
+    return [...complementPool]
+      .sort((a, b) => Number(alreadyShown.has(a.id)) - Number(alreadyShown.has(b.id)))
+      .slice(0, 3);
+  }, [complementPool, related]);
+
+  // Document head — a shared product link should preview as the cake, not "Pink Cake".
+  useEffect(() => {
+    if (!product) return;
+    const previousTitle = document.title;
+    document.title = `${product.name} · ${settings.storeName}`;
+    const meta = document.querySelector('meta[name="description"]');
+    const previousDescription = meta?.getAttribute('content') ?? null;
+    if (meta && product.description) meta.setAttribute('content', product.description);
+    return () => {
+      document.title = previousTitle;
+      if (meta && previousDescription !== null) meta.setAttribute('content', previousDescription);
+    };
+  }, [product, settings.storeName]);
 
   const soldOut = product ? isSoldOut(product) : false;
+
+  const confirmAdd = () => {
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1600);
+  };
 
   const handleAdd = () => {
     if (!product || soldOut) return;
     addToCart(product, qty);
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 1300);
+    confirmAdd();
   };
 
   const handleBuyNow = () => {
     if (!product || soldOut) return;
     addToCart(product, qty);
-    goToCart();
+    openCart();
   };
 
-  // Shared minimal header — back, brand, cart.
+  const openProduct = (next: StoreProduct) => {
+    navigate(`/product/${next.id}`);
+    window.scrollTo({ top: 0 });
+  };
+
+  const footerJump = (section: string) => {
+    if (section === 'shop' || section === 'seasonal') navigate('/shop');
+    else if (section === 'faq') navigate('/faq');
+    else navigate('/store');
+  };
+
+  // ── Shared shell ──────────────────────────────────────────────────────────
   const header = (
-    <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
-      <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center gap-3">
+    <header className="sticky top-0 z-40 border-b border-[#9e3a5c]/10 bg-[#fffdfa]/95 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-3 px-5 sm:px-8 md:h-[76px] lg:px-12">
         <button
-          onClick={() => navigate('/store')}
-          aria-label="رجوع للمتجر"
-          className="press w-10 h-10 rounded-full border border-border bg-card flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors shrink-0"
+          onClick={() => navigate(-1)}
+          aria-label="رجوع"
+          className="grid size-10 shrink-0 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2]"
         >
-          <ArrowRight className="w-5 h-5" />
+          <ArrowRight size={18} />
         </button>
 
-        <button onClick={() => navigate('/')} className="flex items-center gap-2.5 press group">
-          <div className="w-9 h-9 rounded-xl gradient-pink flex items-center justify-center shadow-rose-glow transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105">
-            <Cake className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div className="hidden sm:block text-start leading-tight">
-            <div className="font-display text-lg">{settings.storeName}</div>
-            <div className="text-[10px] text-muted-foreground tracking-widest uppercase">Patisserie</div>
-          </div>
+        <button onClick={() => navigate('/store')} className="shrink-0 text-start leading-none">
+          <span className="block text-xl font-black tracking-[-.06em] text-[#9e3a5c] sm:text-2xl">
+            {settings.storeName}
+          </span>
+          <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-[#86736c]">حلويات جازان الفاخرة</span>
         </button>
 
-        <button
-          onClick={() => navigate('/wishlist')}
-          aria-label="المفضلة"
-          className="press relative ms-auto rounded-full border border-border bg-card h-10 w-10 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors"
-        >
-          <Heart className="w-5 h-5" />
-          {wishlist.count > 0 && (
-            <span className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow">
-              {wishlist.count}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={goToCart}
-          aria-label="عربة التسوق"
-          className="press relative rounded-full border border-border bg-card h-10 w-10 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-colors"
-        >
-          <ShoppingCart className="w-5 h-5" />
-          {cartCount > 0 && (
-            <span
-              key={cartCount}
-              className="badge-pop absolute -top-1 -start-1 min-w-[20px] h-5 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow"
-            >
-              {cartCount}
-            </span>
-          )}
-        </button>
+        <div className="ms-auto flex shrink-0 items-center gap-2">
+          <button
+            onClick={() => navigate('/wishlist')}
+            aria-label="المفضلة"
+            className="relative grid size-10 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2]"
+          >
+            <Heart size={18} />
+            {wishlist.count > 0 && (
+              <span className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-[#ddbd75] text-[10px] font-bold text-[#9e3a5c]">
+                {toArabicDigits(wishlist.count)}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => navigate(user ? '/my-profile' : '/login')}
+            aria-label={user ? 'حسابي' : 'تسجيل الدخول أو إنشاء حساب'}
+            className="hidden size-10 place-items-center rounded-full border border-[#9e3a5c]/15 text-[#9e3a5c] transition-colors hover:bg-[#fbeef2] sm:grid"
+          >
+            <User size={18} />
+          </button>
+          <button
+            onClick={openCart}
+            aria-label={`السلة تحتوي ${toArabicDigits(cartCount)} منتجات`}
+            className="relative grid size-10 place-items-center rounded-full bg-[#9e3a5c] text-white transition-colors hover:bg-[#b0506e]"
+          >
+            <ShoppingBag size={18} />
+            {cartCount > 0 && (
+              <span
+                key={cartCount}
+                className="badge-pop absolute -top-1 -start-1 grid size-5 place-items-center rounded-full bg-[#ddbd75] text-[10px] font-bold text-[#9e3a5c]"
+              >
+                {toArabicDigits(cartCount)}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );
 
-  // ── Loading ──
+  // ── Loading ───────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="storefront-theme min-h-screen bg-background">
+      <div className="storefront-theme min-h-screen bg-[#fffdfa] text-[#2c2226]">
         {header}
-        <main className="container mx-auto px-4 lg:px-6 py-8">
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            <Skeleton className="aspect-[4/5] rounded-3xl" />
-            <div className="space-y-4 pt-4">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-10 w-3/4" />
-              <Skeleton className="h-5 w-1/3" />
+        <main className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:px-12">
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+            <Skeleton className="aspect-[4/5] rounded-[28px]" />
+            <div className="space-y-5 pt-2">
+              <Skeleton className="h-5 w-28 rounded-full" />
+              <Skeleton className="h-12 w-4/5" />
               <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-14 w-full rounded-full mt-6" />
+              <Skeleton className="h-14 w-1/2" />
+              <Skeleton className="h-[58px] w-full rounded-2xl" />
+              <Skeleton className="h-[54px] w-full rounded-2xl" />
             </div>
           </div>
         </main>
@@ -163,274 +229,181 @@ export default function ProductDetails() {
     );
   }
 
-  // ── Not found ──
+  // ── Not found ─────────────────────────────────────────────────────────────
   if (!product) {
     return (
-      <div className="storefront-theme min-h-screen bg-background">
+      <div className="storefront-theme min-h-screen bg-[#fffdfa] text-[#2c2226]">
         {header}
-        <main className="container mx-auto px-4 lg:px-6 py-20">
-          <div className="max-w-md mx-auto text-center rounded-3xl border border-dashed border-border/60 bg-secondary/30 p-10">
-            <div className="w-16 h-16 mx-auto rounded-full bg-card flex items-center justify-center mb-4">
-              <Cake className="w-7 h-7 text-muted-foreground" />
+        <main className="mx-auto max-w-[1500px] px-5 py-24 sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-md rounded-3xl border border-dashed border-[#9e3a5c]/25 bg-[#fffdfa] px-6 py-14 text-center">
+            <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#fbeef2]">
+              <Cake size={28} className="text-[#b0506e]" />
             </div>
-            <h1 className="font-display text-2xl">لم نجد هذا المنتج</h1>
-            <p className="text-muted-foreground text-sm mt-2">
-              ربما تمت إزالته أو أن الرابط غير صحيح.
+            <h1 className="mt-5 text-2xl font-black tracking-[-.02em]">ما لقينا هذي الكيكة</h1>
+            <p className="mt-2 text-sm leading-7 text-[#7d6870]">
+              يمكن انسحبت من التشكيلة أو الرابط ناقص — تشكيلتنا الكاملة بانتظارك.
             </p>
             <button
-              onClick={() => navigate('/store')}
-              className="press mt-6 inline-flex items-center gap-2 rounded-full h-12 px-7 bg-foreground text-background font-semibold hover:bg-foreground/90 transition-colors"
+              onClick={() => navigate('/shop')}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-[#8a3251] to-[#9e3a5c] px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_rgba(158,58,92,0.8)] transition-transform active:scale-95"
             >
-              <ArrowRight className="w-4 h-4" /> العودة إلى المتجر
+              تصفّح كل المنتجات <ChevronLeft size={16} />
             </button>
           </div>
         </main>
+        <StorefrontFooter storeName={settings.storeName} onNavigate={navigate} onJump={footerJump} />
       </div>
     );
   }
 
-  const lineTotal = product.price * qty;
-
-  const features = [
-    { icon: Leaf, label: 'مكوّنات طازجة مختارة' },
-    { icon: Sparkles, label: 'تُحضّر يدوياً عند الطلب' },
-    { icon: Cake, label: 'تغليف فاخر يليق بالمناسبة' },
-  ];
+  const discount = discountPercent(product.price, product.compare_at_price);
+  const savings = savingsAmount(product.price, product.compare_at_price);
+  const stock = product.stock ?? null;
+  const lowStock = stock != null && stock > 0 && stock <= 8 ? stock : null;
 
   return (
-    <div className="storefront-theme min-h-screen bg-background pb-24 md:pb-0">
+    <div className="storefront-theme min-h-screen bg-[#fffdfa] pb-24 text-[#2c2226] lg:pb-0">
+      <Marquee />
       {header}
 
-      <main className="container mx-auto px-4 lg:px-6 py-5 lg:py-8">
+      <main className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-12">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-5" aria-label="مسار التنقل">
-          <button onClick={() => navigate('/store')} className="hover:text-foreground transition-colors">الرئيسية</button>
-          <ChevronLeft className="w-3.5 h-3.5" />
+        <nav aria-label="مسار التنقل" className="flex items-center gap-1.5 py-5 text-[11px] font-bold text-[#8a6570]">
+          <button onClick={() => navigate('/store')} className="transition-colors hover:text-[#9e3a5c]">الرئيسية</button>
+          <ChevronLeft size={13} className="text-[#ddbd75]" />
           {product.category && (
             <>
-              <span className="hover:text-foreground transition-colors">{product.category}</span>
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <button
+                onClick={() => navigate(`/shop?category=${encodeURIComponent(product.category as string)}`)}
+                className="transition-colors hover:text-[#9e3a5c]"
+              >
+                {product.category}
+              </button>
+              <ChevronLeft size={13} className="text-[#ddbd75]" />
             </>
           )}
-          <span className="text-foreground font-medium line-clamp-1">{product.name}</span>
+          <span className="line-clamp-1 text-[#2c2226]">{product.name}</span>
         </nav>
 
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-14">
-          {/* Gallery */}
-          <Reveal>
-            <div className="md:sticky md:top-24">
-              <div
-                className="relative aspect-[4/5] rounded-[2rem] overflow-hidden border border-border/60 shadow-soft-lift"
-                style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--secondary)))' }}
-              >
-                {mainImage ? (
-                  <img
-                    src={mainImage}
-                    alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Cake className="w-24 h-24 text-primary/30" strokeWidth={1.25} />
-                  </div>
-                )}
+        {/* Hero */}
+        <div className="relative">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 -top-8 h-[380px] bg-[radial-gradient(65%_60%_at_75%_0%,rgba(251,238,242,0.85),transparent)]"
+          />
+          <div className="relative grid gap-9 pb-14 lg:grid-cols-2 lg:gap-14 lg:pb-20">
+            {/* min-w-0 on both columns: a grid item defaults to min-width:auto, so the
+                nowrap (truncating) product names in the add-on rail would otherwise
+                widen the track past a phone viewport. */}
+            <Reveal className="min-w-0">
+              <ProductGallery
+                images={galleryImages}
+                name={product.name}
+                discount={discount}
+                season={product.season}
+                soldOut={soldOut}
+                lowStock={lowStock}
+                isFavorite={wishlist.has(product.id)}
+                onToggleFavorite={() => wishlist.toggle(product)}
+              />
+            </Reveal>
 
-                {product.category && (
-                  <span className="absolute top-4 start-4 px-3 py-1 rounded-full bg-background/85 backdrop-blur text-[11px] font-medium tracking-wide">
-                    {product.category}
-                  </span>
-                )}
+            <Reveal className="min-w-0 space-y-6">
+              <ProductBuyPanel
+                ref={ctaRef}
+                product={product}
+                rating={rating}
+                discount={discount}
+                savings={savings}
+                soldOut={soldOut}
+                qty={qty}
+                added={added}
+                cartTotal={cartTotal}
+                onQtyChange={setQty}
+                onAdd={handleAdd}
+                onBuyNow={handleBuyNow}
+                onSeeReviews={() =>
+                  document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+                onOccasion={(occasion) => navigate(`/shop?occasion=${encodeURIComponent(occasion)}`)}
+                onCustomize={() => navigate('/customize')}
+              />
 
-                <button
-                  onClick={() => wishlist.toggle(product)}
-                  aria-label={wishlist.has(product.id) ? 'إزالة من المفضلة' : 'أضِف للمفضلة'}
-                  aria-pressed={wishlist.has(product.id)}
-                  className={cn(
-                    'press absolute top-4 end-4 w-10 h-10 rounded-full bg-background/85 backdrop-blur flex items-center justify-center transition-colors',
-                    wishlist.has(product.id) && 'text-primary',
-                  )}
-                >
-                  <Heart className={cn('w-5 h-5', wishlist.has(product.id) ? 'fill-primary text-primary' : 'text-foreground/70')} />
-                </button>
-              </div>
+              <PairsWithRail
+                items={complements}
+                inCart={qtyOf}
+                onAdd={(item) => addToCart(item)}
+                onView={openProduct}
+              />
+            </Reveal>
+          </div>
+        </div>
+      </main>
 
-              {galleryImages.length > 1 && (
-                <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1">
-                  {galleryImages.map((src, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImage(i)}
-                      aria-label={`عرض الصورة ${i + 1}`}
-                      aria-current={i === activeImage}
-                      className={cn(
-                        'relative aspect-square w-16 shrink-0 overflow-hidden rounded-xl border-2 transition-colors',
-                        i === activeImage ? 'border-primary' : 'border-border/60 hover:border-primary/40',
-                      )}
-                    >
-                      <img src={src} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+      {/* Craft band — why this cake is worth its price */}
+      <section className="relative overflow-hidden border-y border-[#ddbd75]/30 bg-gradient-to-b from-[#7d2f49] via-[#9e3a5c] to-[#7d2f49] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(221,189,117,0.18),transparent)]"
+        />
+        <div className="relative mx-auto max-w-[1500px]">
+          <Reveal className="flex flex-col items-center text-center">
+            <p className="flex items-center gap-2 text-xs font-bold tracking-[.14em] text-[#ddbd75]">
+              <span className="h-px w-8 bg-[#ddbd75]/50" /> من مطبخنا إليك <span className="h-px w-8 bg-[#ddbd75]/50" />
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-[-.01em] text-white sm:text-4xl">
+              ليش تختلف عن أي كيكة ثانية
+            </h2>
           </Reveal>
-
-          {/* Info */}
-          <Reveal>
-            <div className="md:pt-2">
-              {/* Rating */}
-              <button
-                onClick={() => setReviewsOpen(true)}
-                className="inline-flex items-center gap-1.5 text-sm press"
+          <Reveal className="reveal-grid mt-11 grid gap-5 md:grid-cols-3">
+            {CRAFT.map((item) => (
+              <article
+                key={item.n}
+                className="rounded-2xl bg-white/[0.07] p-7 ring-1 ring-white/10 transition-colors duration-300 hover:bg-white/[0.12]"
               >
-                <span className="flex items-center gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={cn(
-                        'w-4 h-4',
-                        rating && i < Math.round(rating.average_rating)
-                          ? 'fill-warning text-warning'
-                          : 'text-muted-foreground/30',
-                      )}
-                    />
-                  ))}
-                </span>
-                {rating && rating.review_count > 0 ? (
-                  <span className="text-muted-foreground">
-                    <b className="text-foreground font-semibold">{rating.average_rating}</b> · {rating.review_count} تقييم
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">كن أول من يقيّم</span>
-                )}
-              </button>
-
-              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl mt-3 leading-tight">{product.name}</h1>
-
-              {product.description && (
-                <p className="text-muted-foreground mt-4 leading-relaxed max-w-prose">{product.description}</p>
-              )}
-
-              {/* Price */}
-              <div className="mt-6 flex items-end gap-3">
-                <div className="font-display text-4xl text-primary leading-none">
-                  {product.price} <RiyalSymbol className="text-base text-muted-foreground font-sans" />
-                </div>
-                {soldOut ? (
-                  <span className="mb-1 inline-flex items-center gap-1.5 text-xs text-destructive font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-destructive" /> نفد المخزون
-                  </span>
-                ) : (
-                  <span className="mb-1 inline-flex items-center gap-1.5 text-xs text-success">
-                    <span className="w-1.5 h-1.5 rounded-full bg-success" /> متوفّرة الآن
-                  </span>
-                )}
-              </div>
-
-              {/* Features */}
-              <ul className="mt-6 space-y-2.5">
-                {features.map((f) => (
-                  <li key={f.label} className="flex items-center gap-3 text-sm">
-                    <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                      <f.icon className="w-4 h-4" />
-                    </span>
-                    <span className="text-secondary-foreground">{f.label}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Quantity + actions */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <div className="inline-flex items-center rounded-full border border-border bg-card h-[52px] px-1.5">
-                  <button
-                    onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    aria-label="إنقاص الكمية"
-                    disabled={qty <= 1}
-                    className="press w-10 h-10 rounded-full flex items-center justify-center text-foreground disabled:opacity-40 hover:bg-secondary transition-colors"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="w-10 text-center font-semibold tabular-nums">{qty}</span>
-                  <button
-                    onClick={() => setQty((q) => q + 1)}
-                    aria-label="زيادة الكمية"
-                    className="press w-10 h-10 rounded-full flex items-center justify-center text-foreground hover:bg-secondary transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <button
-                  onClick={handleAdd}
-                  disabled={soldOut}
-                  className={cn(
-                    'group press sheen flex-1 min-w-[200px] rounded-full h-[52px] px-7 bg-foreground text-background font-semibold shadow-rose-glow hover:bg-foreground/90 transition-colors flex items-center justify-center gap-2',
-                    added && 'bg-success hover:bg-success',
-                    soldOut && 'opacity-50 cursor-not-allowed hover:bg-foreground',
-                  )}
-                >
-                  {soldOut ? (
-                    'نفد المخزون'
-                  ) : added ? (
-                    <><Check className="w-5 h-5" /> تمت الإضافة</>
-                  ) : (
-                    <><ShoppingBag className="w-5 h-5" /> أضِف إلى العربة</>
-                  )}
-                </button>
-              </div>
-
-              {!soldOut && (
-                <button
-                  onClick={handleBuyNow}
-                  className="press mt-3 w-full rounded-full h-[52px] px-7 border border-border bg-card text-foreground font-semibold hover:border-primary/50 hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
-                >
-                  اشترِ الآن
-                  {qty > 1 && <span className="text-muted-foreground font-normal">· {lineTotal} <RiyalSymbol /></span>}
-                </button>
-              )}
-
-              {/* Trust */}
-              <div className="mt-7 grid grid-cols-3 gap-3 border-t border-border/60 pt-6">
-                {[
-                  { icon: Truck, label: 'توصيل مجاني فوق 200 ر.س' },
-                  { icon: Clock, label: 'تحضير خلال 24 ساعة' },
-                  { icon: ShieldCheck, label: 'دفع آمن 100٪' },
-                ].map((t) => (
-                  <div key={t.label} className="flex flex-col items-center text-center gap-1.5">
-                    <t.icon className="w-5 h-5 text-primary" />
-                    <span className="text-[11px] text-muted-foreground leading-tight">{t.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Custom cross-sell */}
-              <button
-                onClick={() => navigate('/customize')}
-                className="press mt-6 w-full rounded-2xl border border-border/60 bg-secondary/40 p-4 flex items-center gap-3 text-start hover:border-primary/40 transition-colors"
-              >
-                <span className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Sparkles className="w-5 h-5" />
-                </span>
-                <span className="flex-1">
-                  <span className="block text-sm font-semibold">تريد تصميماً خاصاً؟</span>
-                  <span className="block text-xs text-muted-foreground">صمّم كيكتك من الصفر بالشكل والنكهة التي تحبّها.</span>
-                </span>
-                <ChevronLeft className="w-5 h-5 text-muted-foreground" />
-              </button>
-            </div>
+                <span className="text-2xl font-black text-[#ddbd75]">{item.n}</span>
+                <h3 className="mt-3 text-lg font-black text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-white/70">{item.body}</p>
+              </article>
+            ))}
           </Reveal>
         </div>
+      </section>
 
-        {/* Related */}
+      <div className="mx-auto max-w-[1500px] space-y-16 px-5 py-14 sm:px-8 lg:space-y-24 lg:px-12 lg:py-20">
+        <Reveal>
+          <ProductInfoTabs product={product} />
+        </Reveal>
+
+        <Reveal>
+          <ProductReviewsPanel
+            reviews={reviews}
+            isLoading={reviewsLoading}
+            average={rating?.average_rating ?? 0}
+            count={rating?.review_count ?? 0}
+            onWrite={() => setReviewsOpen(true)}
+          />
+        </Reveal>
+
         {related.length > 0 && (
-          <section className="mt-16 lg:mt-24">
-            <div className="flex items-end justify-between gap-3 mb-5">
-              <h2 className="font-display text-2xl md:text-3xl">قد يعجبك أيضاً</h2>
-              <button onClick={() => navigate('/store')} className="text-sm text-primary press inline-flex items-center gap-1">
-                كل المنتجات <ChevronLeft className="w-4 h-4" />
+          <section>
+            <div className="flex flex-col justify-between gap-4 border-b border-[#9e3a5c]/15 pb-6 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-bold tracking-[.08em] text-[#b0506e]">من نفس التشكيلة</p>
+                <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-[#2c2226] sm:text-4xl">قد يعجبك أيضاً</h2>
+              </div>
+              <button
+                onClick={() => navigate('/shop')}
+                className="group/more flex shrink-0 items-center gap-2 self-start rounded-full border border-[#9e3a5c]/25 px-5 py-2.5 text-xs font-bold text-[#9e3a5c] transition-colors hover:border-[#9e3a5c] hover:bg-[#fbeef2] sm:self-auto"
+              >
+                عرض كل المنتجات
+                <ChevronLeft size={15} className="transition-transform duration-300 group-hover/more:-translate-x-1" />
               </button>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+
+            <Reveal
+              className={`reveal-grid mt-8 grid gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-10 ${rowGridClass(related.length)}`}
+            >
               {related.map((p) => (
                 <StoreProductCard
                   key={p.id}
@@ -441,38 +414,26 @@ export default function ProductDetails() {
                   onAdd={() => addToCart(p)}
                   onRemoveOne={() => updateQuantity(p.id, -1)}
                   onToggleFavorite={() => wishlist.toggle(p)}
-                  onView={() => {
-                    navigate(`/product/${p.id}`);
-                    window.scrollTo({ top: 0 });
-                    setQty(1);
-                  }}
+                  onView={() => openProduct(p)}
                 />
               ))}
-            </div>
+            </Reveal>
           </section>
         )}
-      </main>
-
-      {/* Sticky mobile add bar */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/90 backdrop-blur-xl border-t border-border/60 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center gap-3">
-        <div className="shrink-0">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-widest">الإجمالي</div>
-          <div className="font-display text-2xl text-primary leading-none">
-            {lineTotal} <RiyalSymbol className="text-xs text-muted-foreground font-sans" />
-          </div>
-        </div>
-        <button
-          onClick={handleAdd}
-          disabled={soldOut}
-          className={cn(
-            'press flex-1 rounded-full h-12 bg-foreground text-background font-semibold flex items-center justify-center gap-2 transition-colors',
-            added && 'bg-success',
-            soldOut && 'opacity-50 cursor-not-allowed',
-          )}
-        >
-          {soldOut ? 'نفد المخزون' : added ? <><Check className="w-5 h-5" /> تمت الإضافة</> : <><ShoppingBag className="w-5 h-5" /> أضِف إلى العربة</>}
-        </button>
       </div>
+
+      <StorefrontFooter storeName={settings.storeName} onNavigate={navigate} onJump={footerJump} />
+
+      <StickyBuyBar
+        product={product}
+        rating={rating}
+        qty={qty}
+        soldOut={soldOut}
+        added={added}
+        showDesktop={ctaOffscreen}
+        onQtyChange={setQty}
+        onAdd={handleAdd}
+      />
 
       <ProductReviewDialog
         open={reviewsOpen}
@@ -480,9 +441,6 @@ export default function ProductDetails() {
         productId={product.id}
         productName={product.name}
       />
-
-      <FloatingContactButton />
-      <BackToTop />
     </div>
   );
 }
