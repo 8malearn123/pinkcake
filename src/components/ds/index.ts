@@ -9,3 +9,4 @@ export { LoadingState } from './LoadingState';
 export { ErrorState } from './ErrorState';
 export { SkeletonList, SkeletonCards, SkeletonTable } from './Skeletons';
 export { SectionCard, SectionHeading } from './SectionCard';
+export { LocalImageDrop } from './LocalImageDrop';

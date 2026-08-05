@@ -14,8 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { RiyalSymbol } from '@/components/ui/riyal';
-import { EmptyState } from '@/components/ds';
-import { LocalImageDrop } from '@/components/cakeDesign/LocalImageDrop';
+import { EmptyState, LocalImageDrop } from '@/components/ds';
 import { useCakeCatalog } from '@/contexts/CakeCatalogContext';
 import { deletedByMoveLevel, imagesAtOrBelowLevel, imagesUnderValue } from '@/lib/cakeCatalog/catalog';
 import type { CatalogLevel, CatalogValue } from '@/lib/cakeCatalog/types';

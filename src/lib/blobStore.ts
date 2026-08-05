@@ -1,16 +1,20 @@
 /**
- * Cake catalog — binary storage.
+ * Browser-local binary storage, shared by every feature that keeps staff photos
+ * in the browser (the cake catalog and the combos catalog).
  *
  * Image bytes live in IndexedDB, not localStorage: localStorage's ~5 MB quota
  * plus base64's 33% inflation makes it useless for photos, while IndexedDB
  * stores Blobs natively with a far larger budget.
  *
+ * The database and object-store names are REQUIRED parameters, not defaults —
+ * each feature owns its own database. Sharing one would be a data-loss bug:
+ * every store's boot GC deletes blobs its own document doesn't reference, so
+ * feature A's boot would reap feature B's photos.
+ *
  * `indexedDB` is referenced ONLY inside method bodies and the connection is
  * opened lazily on first use. jsdom has no IndexedDB, so touching it at import
  * time would break every test file that transitively imports this module.
  */
-
-import { IDB_NAME, IDB_STORE } from './types';
 
 export interface BlobStore {
   get(id: string): Promise<Blob | null>;
@@ -33,14 +37,14 @@ export class BlobQuotaError extends Error {
   }
 }
 
-export function createIdbBlobStore(): BlobStore {
+export function createIdbBlobStore(dbName: string, storeName: string): BlobStore {
   let connection: Promise<IDBDatabase> | null = null;
 
   const open = () => {
     if (connection) return connection;
     connection = new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open(IDB_NAME, 1);
-      request.onupgradeneeded = () => request.result.createObjectStore(IDB_STORE);
+      const request = indexedDB.open(dbName, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore(storeName);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -54,18 +58,18 @@ export function createIdbBlobStore(): BlobStore {
   const write = async (run: (store: IDBObjectStore) => void) => {
     const db = await open();
     await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, 'readwrite');
+      const tx = db.transaction(storeName, 'readwrite');
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(new BlobQuotaError(tx.error));
       tx.onabort = () => reject(new BlobQuotaError(tx.error));
-      run(tx.objectStore(IDB_STORE));
+      run(tx.objectStore(storeName));
     });
   };
 
   const read = async <T>(run: (store: IDBObjectStore) => IDBRequest<T>): Promise<T | null> => {
     const db = await open();
     return new Promise<T | null>((resolve) => {
-      const request = run(db.transaction(IDB_STORE).objectStore(IDB_STORE));
+      const request = run(db.transaction(storeName).objectStore(storeName));
       request.onsuccess = () => resolve(request.result ?? null);
       request.onerror = () => resolve(null);
     });
@@ -81,8 +85,8 @@ export function createIdbBlobStore(): BlobStore {
       if (ids.length === 0) return found;
       const db = await open();
       await new Promise<void>((resolve) => {
-        const tx = db.transaction(IDB_STORE);
-        const objectStore = tx.objectStore(IDB_STORE);
+        const tx = db.transaction(storeName);
+        const objectStore = tx.objectStore(storeName);
         for (const id of ids) {
           const request = objectStore.get(id) as IDBRequest<Blob>;
           request.onsuccess = () => {
@@ -154,6 +158,8 @@ export function createMemoryBlobStore(initial?: Map<string, Blob>): BlobStore {
   };
 }
 
-export function getDefaultBlobStore(): BlobStore {
-  return typeof indexedDB === 'undefined' ? createMemoryBlobStore() : createIdbBlobStore();
+export function getDefaultBlobStore(dbName: string, storeName: string): BlobStore {
+  return typeof indexedDB === 'undefined'
+    ? createMemoryBlobStore()
+    : createIdbBlobStore(dbName, storeName);
 }
