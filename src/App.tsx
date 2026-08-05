@@ -46,6 +46,7 @@ const BranchLive = lazy(() => import("./pages/BranchLive"));
 const Driver = lazy(() => import("./pages/Driver"));
 const CustomOrders = lazy(() => import("./pages/CustomOrders"));
 const CakeCustomizer = lazy(() => import("./pages/CakeCustomizer"));
+const CustomCakes = lazy(() => import("./pages/CustomCakes"));
 const EventBuilder = lazy(() => import("./pages/EventBuilder"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -131,6 +132,7 @@ const App = () => (
                 <Route path="/product/:id" element={<ProductDetails />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/customize" element={<CakeCustomizer />} />
+                <Route path="/custom-cakes" element={<CustomCakes />} />
               </Route>
 
               {/* Event & hospitality package builder (ضيافة المناسبات) */}

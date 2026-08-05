@@ -14,6 +14,7 @@ import { sortProducts } from '@/lib/shopSort';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import { Marquee, GoldDivider } from '@/components/store/StorefrontDecor';
 import { StoreHero } from '@/components/store/StoreHero';
+import { CustomCakeSection } from '@/components/store/CustomCakeSection';
 import { SeasonalSection } from '@/components/store/SeasonalSection';
 import { ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
 import { StoreProductCard } from '@/components/store/StoreProductCard';
@@ -26,6 +27,8 @@ import { StickyCartBar } from '@/components/store/StickyCartBar';
 import { StorefrontFooter } from '@/components/store/StorefrontFooter';
 import { StoreSearch } from '@/components/store/StoreSearch';
 import { Reveal } from '@/components/Reveal';
+import { useCatalogSession } from '@/hooks/useCatalogSession';
+import { galleryCakes } from '@/lib/cakeSelect';
 
 export default function Store() {
   const { settings } = useSettings();
@@ -35,6 +38,9 @@ export default function Store() {
   const { data: products } = usePublicStoreProducts();
   const { addToCart, updateQuantity, count: cartCount, open: openCart, cart } = useStoreCart();
   const wishlist = useStoreWishlist();
+  // Designable cakes come from the photo catalog, not `products` — the two models
+  // are disjoint, and only a CatalogCake id can seed the studio.
+  const { status: catalogStatus, catalog, urlFor } = useCatalogSession();
   const { combos: comboDefs, urlFor: comboUrlFor } = useCombos();
 
   const [category, setCategory] = useState('الكل');
@@ -78,6 +84,12 @@ export default function Store() {
     return sortProducts(filtered, 'featured', ratingsMap);
   }, [products, category, query, ratingsMap]);
 
+  const designCakes = useMemo(() => galleryCakes(catalog, urlFor), [catalog, urlFor]);
+  // Mirrors CustomCakeSection's own render condition: it shows placeholders while
+  // the catalog hydrates, then hides itself entirely if nothing is designable.
+  const catalogLoading = catalogStatus === 'loading';
+  const showDesignSection = catalogLoading || designCakes.length > 0;
+
   const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
   // Priced against the live catalogue, so hiding a combo in the dashboard or a
   // member selling out removes the card here without a deploy.
@@ -105,10 +117,12 @@ export default function Store() {
     />
   );
 
-  // The combos link is dropped when no combo resolves — CombosSection renders
-  // nothing in that case, and a nav item that scrolls nowhere reads as broken.
+  // The combos and design links are dropped when their sections resolve to
+  // nothing — both render null in that case, and a nav item that scrolls
+  // nowhere reads as broken.
   const NAV = [
     { label: 'كل المنتجات', action: () => scrollToId('shop') },
+    ...(showDesignSection ? [{ label: 'صمّم كيكتك', action: () => scrollToId('custom') }] : []),
     { label: 'تشكيلة الصيف 🥭', action: () => scrollToId('seasonal'), season: true },
     ...(combos.length > 0 ? [{ label: 'الكومبوهات', action: () => scrollToId('combos') }] : []),
     { label: 'تجهيز المناسبات', action: () => navigate('/events') },
@@ -220,6 +234,13 @@ export default function Store() {
           onViewFeatured={() => featured && navigate(`/product/${featured.id}`)}
         />
       </div>
+
+      <CustomCakeSection
+        cakes={designCakes}
+        loading={catalogLoading}
+        onPick={(cakeId) => navigate('/customize', { state: { initial: { cakeId } } })}
+        onViewAll={() => navigate('/custom-cakes')}
+      />
 
       <SeasonalSection products={seasonal} renderCard={renderCard} />
 
