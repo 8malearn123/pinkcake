@@ -9,7 +9,8 @@ export function SeasonalSection({
   renderCard,
 }: {
   products: StoreProduct[];
-  renderCard: (p: StoreProduct) => ReactNode;
+  /** `index` lets the caller mark the first row as above-the-fold (eager images). */
+  renderCard: (p: StoreProduct, index: number) => ReactNode;
 }) {
   if (products.length === 0) return null;
   return (
@@ -32,7 +33,7 @@ export function SeasonalSection({
           </span>
         </Reveal>
         <Reveal className="reveal-grid mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:mt-9 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4">
-          {products.map((p) => renderCard(p))}
+          {products.map((p, index) => renderCard(p, index))}
         </Reveal>
       </div>
     </section>

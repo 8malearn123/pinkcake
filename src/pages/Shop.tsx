@@ -187,9 +187,11 @@ export default function Shop() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
-            {results.map((p) => (
+            {results.map((p, index) => (
               <StoreProductCard
                 key={p.id}
+                // First row only — see StoreProductCard's `priority` note.
+                priority={index < 4}
                 product={p}
                 rating={ratingsMap?.[p.id]}
                 inCart={qtyOf(p.id)}

@@ -1,0 +1,15 @@
+/* Loza's own type — Cairo, Tajawal and DM Serif Display.
+ *
+ * These three families used to be requested from `src/index.css`, in the same
+ * `@import` as the brand face. That put them on the storefront's critical
+ * rendering path for nothing: a CSS `@import` is discovered only AFTER the
+ * stylesheet containing it has downloaded and parsed, so the browser paid an
+ * extra serial round-trip before it could paint anything — and three of the
+ * four families it then downloaded are used exclusively by `.loza-theme`, an
+ * experimental route that is off in production.
+ *
+ * Importing them here instead ties them to LozaShell, which every /loza page
+ * renders and which is lazily routed, so Vite emits this into Loza's own chunk.
+ * The storefront never requests them; /loza still gets exactly what it needs.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=DM+Serif+Display&display=swap');

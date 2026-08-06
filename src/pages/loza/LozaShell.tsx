@@ -1,3 +1,4 @@
+import './loza-fonts.css';
 import { ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, ShoppingBag, Receipt, User } from 'lucide-react';

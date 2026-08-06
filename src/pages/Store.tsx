@@ -92,9 +92,14 @@ export default function Store() {
     return () => cancelAnimationFrame(id);
   }, [jumpTarget]);
 
-  const renderCard = (product: StoreProduct) => (
+  // `index` is the card's position in its own grid: the first row is treated as
+  // above-the-fold and loads eagerly, everything after it stays lazy. Four is
+  // the widest grid (xl:grid-cols-4), so at narrower breakpoints this eagerly
+  // loads at most one extra row — a cheap trade for a fast first paint.
+  const renderCard = (product: StoreProduct, index = 0) => (
     <StoreProductCard
       key={product.id}
+      priority={index < 4}
       product={product}
       rating={ratingsMap?.[product.id]}
       inCart={qtyOf(product.id)}
@@ -212,7 +217,7 @@ export default function Store() {
           <p className="py-20 text-center text-sm text-muted-foreground">لا توجد نتائج لـ «{query}». جرّب كلمة أخرى.</p>
         ) : (
           <Reveal className="reveal-grid mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:mt-9 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
-            {listed.map((product) => renderCard(product))}
+            {listed.map((product, index) => renderCard(product, index))}
           </Reveal>
         )}
       </section>

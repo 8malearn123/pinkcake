@@ -24,3 +24,18 @@ export const LOZA_ENABLED: boolean = (() => {
  */
 export const NOTIFICATIONS_UI_ENABLED: boolean =
   import.meta.env.VITE_ENABLE_NOTIFICATIONS !== 'false';
+
+/**
+ * Supabase Storage image transformation (`/render/image/...`), used by
+ * `@/lib/productImages` to serve card-sized product photos instead of the
+ * full-resolution originals.
+ *
+ * OFF by default and opt-in, because the rendering endpoint is only available
+ * on paid Supabase plans — enabling it on a plan without it would 400 every
+ * product photo. New uploads are downscaled client-side regardless, so this
+ * flag only matters for photos uploaded before that was in place.
+ *   - VITE_IMAGE_TRANSFORM="true" → on
+ *   - anything else               → off (URLs are passed through untouched)
+ */
+export const IMAGE_TRANSFORM_ENABLED: boolean =
+  import.meta.env.VITE_IMAGE_TRANSFORM === 'true';

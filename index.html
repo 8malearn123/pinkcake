@@ -7,8 +7,35 @@
     <meta name="description" content="نظام متكامل لإدارة طلبات الحلويات والكيك">
     <meta name="author" content="Pink Cake" />
 
-    <!-- Preload the storefront hero image (LCP): starts fetching before the JS bundle runs -->
-    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=2000&h=1200&q=85" fetchpriority="high" />
+    <!-- Brand face. This lives here rather than as an `@import` inside index.css
+         so the preload scanner can start it with the first bytes of the HTML,
+         in parallel with the CSS and the JS — an `@import` is only discovered
+         after the importing stylesheet has downloaded and parsed, which put a
+         whole extra round-trip in front of the first paint. Only the family
+         that is actually rendered is requested; Loza's three extra families
+         ship with Loza's own lazily-loaded chunk. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&display=swap"
+    />
+
+    <!-- Warm the image CDN's DNS + TLS before the bundle runs, so the hero (and
+         the combo photos further down) don't pay for the handshake. -->
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+
+    <!-- Preload the storefront hero image (LCP): starts fetching before the JS bundle runs.
+         imagesrcset/imagesizes MUST mirror StoreHero's srcset exactly — a preload that
+         doesn't match what the <img> ends up choosing downloads the hero twice. -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1600&h=960&q=72"
+      imagesrcset="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&h=480&q=72 800w, https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1200&h=720&q=72 1200w, https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1600&h=960&q=72 1600w, https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=2000&h=1200&q=72 2000w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
 
 
     

@@ -46,16 +46,30 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     setIsUploading(true);
 
     try {
-      // Create unique filename
-      const fileExt = file.name.split('.').pop();
+      // Downscale BEFORE upload. A phone photo is 3000–4000px on its longest
+      // edge and lands in a card that is at most 600px wide, so uploading the
+      // original made every storefront visitor download megabytes to look at a
+      // thumbnail. `decodeAndDownscale` caps the long edge at DOWNSCALE_MAX_EDGE
+      // and re-encodes as JPEG — and returns the original untouched if it is
+      // already small enough or if the canvas path fails, so a photo is never
+      // lost to an optimisation. Imported dynamically: it touches `document`.
+      const { decodeAndDownscale } = await import('@/lib/imageDownscale');
+      const { blob } = await decodeAndDownscale(file);
+
+      // The stored object is whatever came back, so the extension has to follow
+      // it — a downscaled PNG is re-encoded as JPEG.
+      const fileExt = blob.type === 'image/jpeg' ? 'jpg' : (file.name.split('.').pop() ?? 'jpg');
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `products/${fileName}`;
 
-      // Upload to Supabase Storage
+      // Upload to Supabase Storage. One year of cache: the filename already
+      // carries a timestamp + random suffix, so an object at a given path is
+      // immutable and re-validating it hourly only cost repeat visitors time.
       const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, file, {
-          cacheControl: '3600',
+        .upload(filePath, blob, {
+          cacheControl: '31536000',
+          contentType: blob.type,
           upsert: false,
         });
 
@@ -75,11 +89,11 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
         title: 'تم الرفع',
         description: 'تم رفع الصورة بنجاح',
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Upload error:', error);
       toast({
         title: 'فشل الرفع',
-        description: error.message || 'حدث خطأ أثناء رفع الصورة',
+        description: error instanceof Error ? error.message : 'حدث خطأ أثناء رفع الصورة',
         variant: 'destructive',
       });
     } finally {

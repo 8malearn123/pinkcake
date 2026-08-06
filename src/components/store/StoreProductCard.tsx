@@ -2,7 +2,9 @@ import { Cake, Check, Flame, Heart, Minus, Plus, ShoppingBag, Zap } from 'lucide
 import { Stars } from '@/components/store/Reviews';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
+import { productImageUrl } from '@/lib/productImages';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
+import { fetchPriority } from '@/lib/imgAttrs';
 
 interface StoreProductCardProps {
   product: StoreProduct;
@@ -13,6 +15,13 @@ interface StoreProductCardProps {
   onRemoveOne: () => void;
   onToggleFavorite: () => void;
   onView?: () => void;
+  /**
+   * True for the handful of cards that render above the fold. Those must NOT be
+   * lazy: `loading="lazy"` defers the request until after layout, which delays
+   * the largest thing on the first screen and hurts LCP. Everything below the
+   * fold stays lazy, which is where the attribute actually pays.
+   */
+  priority?: boolean;
 }
 
 /**
@@ -36,6 +45,7 @@ export function StoreProductCard({
   onRemoveOne,
   onToggleFavorite,
   onView,
+  priority = false,
 }: StoreProductCardProps) {
   const originalPrice = product.compare_at_price ?? undefined;
   const discount =
@@ -52,9 +62,15 @@ export function StoreProductCard({
       <div className="relative aspect-[4/5] overflow-hidden bg-blush">
         {product.image_url ? (
           <img
-            src={product.image_url}
+            src={productImageUrl(product.image_url, 'card')}
             alt={product.name}
-            loading="lazy"
+            // Intrinsic ratio matches the 4/5 frame, so the browser reserves the
+            // box before the bytes arrive and the grid stops reflowing.
+            width={600}
+            height={750}
+            loading={priority ? 'eager' : 'lazy'}
+            {...fetchPriority(priority ? 'high' : 'auto')}
+            decoding="async"
             className="size-full object-cover transition-transform duration-[600ms] ease-out group-hover:scale-105"
           />
         ) : (

@@ -121,7 +121,7 @@ export function buildSeedCatalog(makeId: () => string = newId, now: number = Dat
           id: imageId,
           cakeId,
           path: nextPath,
-          fileName: 'placeholder.jpg',
+          fileName: 'placeholder.svg',
           width: 480,
           height: 360,
           size: 0,

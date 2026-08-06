@@ -4,6 +4,7 @@ import { RiyalSymbol } from '@/components/ui/riyal';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useComplementSuggestions } from '@/hooks/useComplementSuggestions';
 import { toArabicDigits } from '@/lib/arabicNumerals';
+import { productImageUrl } from '@/lib/productImages';
 
 /**
  * In-drawer cross-sell — "أضِف لطلبك" at peak purchase intent. Suggests 2–3
@@ -26,7 +27,7 @@ export function CartCrossSell() {
         {suggestions.map((p) => (
           <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-border/60 p-2">
             {p.image_url ? (
-              <img src={p.image_url} alt={p.name} loading="lazy" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+              <img src={productImageUrl(p.image_url, 'thumb')} alt={p.name} loading="lazy" decoding="async" className="w-12 h-12 rounded-xl object-cover shrink-0" />
             ) : (
               <div className="w-12 h-12 rounded-xl bg-secondary grid place-items-center shrink-0">
                 <Cake className="w-5 h-5 text-muted-foreground" />

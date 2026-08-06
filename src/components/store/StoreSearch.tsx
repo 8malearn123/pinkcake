@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Search, Cake, ArrowLeft, TrendingUp, X } from 'lucide-react';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
 import { RiyalSymbol } from '@/components/ui/riyal';
+import { productImageUrl } from '@/lib/productImages';
 
 interface StoreSearchProps {
   products: StoreProduct[];
@@ -148,7 +149,7 @@ export function StoreSearch({
                       style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--secondary)))' }}
                     >
                       {p.image_url ? (
-                        <img src={p.image_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                        <img src={productImageUrl(p.image_url, 'thumb')} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                       ) : (
                         <Cake className="w-5 h-5 text-primary/40" />
                       )}
@@ -212,7 +213,7 @@ export function StoreSearch({
                     style={{ background: 'linear-gradient(135deg, hsl(var(--blush)), hsl(var(--secondary)))' }}
                   >
                     {p.image_url ? (
-                      <img src={p.image_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      <img src={productImageUrl(p.image_url, 'thumb')} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <Cake className="w-4 h-4 text-primary/40" />
                     )}

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Cake, ChevronLeft, ChevronRight, Expand, Flame, Heart, X } from 'lucide-react';
 import { toArabicDigits } from '@/lib/arabicNumerals';
+import { productImageUrl } from '@/lib/productImages';
+import { fetchPriority } from '@/lib/imgAttrs';
 
 interface ProductGalleryProps {
   images: string[];
@@ -110,8 +112,11 @@ export function ProductGallery({
         >
           {current ? (
             <img
-              src={current}
+              src={productImageUrl(current, 'full')}
               alt={`${name} — صورة ${toArabicDigits(index + 1)}`}
+              // The PDP hero is the page's LCP element: never lazy, always first.
+              {...fetchPriority('high')}
+              decoding="async"
               className="size-full object-cover transition-transform duration-[700ms] ease-out"
               style={{ transform: zoom ? 'scale(1.75)' : 'scale(1)', transformOrigin: origin }}
             />
@@ -226,7 +231,7 @@ export function ProductGallery({
                   : 'opacity-60 hover:opacity-100'
               }`}
             >
-              <img src={src} alt="" loading="lazy" className="size-full object-cover" />
+              <img src={productImageUrl(src, 'thumb')} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
             </button>
           ))}
         </div>
@@ -305,7 +310,7 @@ export function ProductGallery({
                     i === index ? 'ring-2 ring-gold' : 'opacity-45 hover:opacity-80'
                   }`}
                 >
-                  <img src={src} alt="" className="size-full object-cover" />
+                  <img src={productImageUrl(src, 'thumb')} alt="" loading="lazy" className="size-full object-cover" />
                 </button>
               ))}
             </div>

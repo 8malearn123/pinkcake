@@ -2,6 +2,7 @@ import { Cake, Check, Plus } from 'lucide-react';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
+import { productImageUrl } from '@/lib/productImages';
 
 interface PairsWithRailProps {
   items: StoreProduct[];
@@ -48,7 +49,7 @@ export function PairsWithRail({ items, inCart, onAdd, onView }: PairsWithRailPro
                 className="size-16 shrink-0 overflow-hidden rounded-xl bg-blush"
               >
                 {item.image_url ? (
-                  <img src={item.image_url} alt="" loading="lazy" className="size-full object-cover" />
+                  <img src={productImageUrl(item.image_url, 'thumb')} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
                 ) : (
                   <span className="grid size-full place-items-center">
                     <Cake size={22} className="text-rose/40" />

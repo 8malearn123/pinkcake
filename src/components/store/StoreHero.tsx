@@ -2,6 +2,7 @@ import { Truck, Star, ArrowLeft } from 'lucide-react';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
+import { fetchPriority } from '@/lib/imgAttrs';
 
 interface StoreHeroProps {
   onShop: () => void;
@@ -16,6 +17,20 @@ interface StoreHeroProps {
 }
 
 /**
+ * One Unsplash frame at a requested width. `auto=format` lets their CDN serve
+ * WebP/AVIF to browsers that accept it, and q=72 is visually indistinguishable
+ * behind the hero's two scrims while costing roughly half of q=85.
+ *
+ * index.html preloads this image, and its `imagesrcset` must stay identical to
+ * the srcset built from this helper — a preload the <img> doesn't match is a
+ * second download, not a head start.
+ */
+const heroSrc = (width: number) =>
+  `https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=${width}&h=${Math.round(
+    width * 0.6,
+  )}&q=72`;
+
+/**
  * Full-bleed hero — an edge-to-edge cake photograph with the copy set over it.
  * Legibility comes from a flat tint plus a vertical scrim (both direction-neutral,
  * so nothing needs to flip under RTL); every positioned overlay uses logical
@@ -25,11 +40,19 @@ export function StoreHero({ onShop, onCustomize, featured, onViewFeatured }: Sto
   return (
     <section id="top" className="relative isolate min-h-[590px] overflow-hidden bg-foreground lg:min-h-[730px]">
       <img
-        src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=2000&h=1200&q=85"
+        src={heroSrc(1600)}
+        // A phone was downloading the same 2000px, q=85 frame as a desktop —
+        // several hundred KB for a 390px-wide screen, on the app's LCP element
+        // and ahead of every product card in the connection queue. The srcset
+        // lets the browser take the width it will actually paint; `sizes` is
+        // 100vw because the hero always bleeds edge to edge.
+        srcSet={[800, 1200, 1600, 2000].map((w) => `${heroSrc(w)} ${w}w`).join(', ')}
+        sizes="100vw"
         alt="كيكة شوكولاتة فاخرة بصوص الغاناش"
         width={2000}
         height={1200}
         loading="eager"
+        {...fetchPriority('high')}
         decoding="async"
         className="store-hero-img absolute inset-0 size-full object-cover"
       />

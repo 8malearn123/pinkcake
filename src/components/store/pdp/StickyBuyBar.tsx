@@ -3,6 +3,7 @@ import { Stars } from '@/components/store/Reviews';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
+import { productImageUrl } from '@/lib/productImages';
 
 interface StickyBuyBarProps {
   product: StoreProduct;
@@ -67,8 +68,10 @@ export function StickyBuyBar({
           <div className="size-14 shrink-0 overflow-hidden rounded-xl bg-blush">
             {product.image_url ? (
               <img
-                src={product.image_url}
+                src={productImageUrl(product.image_url, 'thumb')}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="size-full object-cover"
               />
             ) : (

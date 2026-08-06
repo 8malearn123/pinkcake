@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { productImageUrl } from '@/lib/productImages';
 
 type Mode = 'delivery' | 'pickup';
 type PayMethod = 'mada' | 'applepay' | 'card' | 'tabby' | 'cod';
@@ -258,7 +259,7 @@ export function CartSheet() {
                 <Card key={item.product.id} className="p-3 border-border/60">
                   <div className="flex gap-3">
                     {item.product.image_url ? (
-                      <img src={item.product.image_url} alt={item.product.name} loading="lazy" className="w-16 h-16 rounded-xl object-cover" />
+                      <img src={productImageUrl(item.product.image_url, 'thumb')} alt={item.product.name} loading="lazy" decoding="async" className="w-16 h-16 rounded-xl object-cover" />
                     ) : designPhotoUrl(item.product.cake_design?.photoImageId) ? (
                       <img
                         src={designPhotoUrl(item.product.cake_design?.photoImageId)}
