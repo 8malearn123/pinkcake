@@ -17,6 +17,7 @@ import { useCreateOrder, CreateOrderData } from '@/hooks/useOrders';
 import { toast } from '@/hooks/use-toast';
 import { validateKsaPhone } from '@/lib/validation';
 import { SectionCard, LoadingState, EmptyState } from '@/components/ds';
+import { CustomerLookup, type CustomerLookupStatus } from '@/components/orders/CustomerLookup';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { Plus, Minus, Trash2, ShoppingBag, Loader2, User, MapPin, StickyNote } from 'lucide-react';
 
@@ -37,6 +38,8 @@ export function NewOrderForm() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  // The order can't be built before a customer is resolved by phone lookup.
+  const [customerStatus, setCustomerStatus] = useState<CustomerLookupStatus>('idle');
   const [branchId, setBranchId] = useState('');
   const [pickupDate, setPickupDate] = useState('');
   const [pickupTime, setPickupTime] = useState('');
@@ -101,6 +104,15 @@ export function NewOrderForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (customerStatus === 'idle') {
+      toast({
+        title: 'حدد العميل أولاً',
+        description: 'استعلم برقم الجوال ثم اختر العميل المسجّل أو أضِفه كعميل جديد.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!customerName || !customerPhone || !branchId || !pickupDate || !pickupTime) {
       toast({
         title: 'حقول ناقصة',
@@ -158,48 +170,21 @@ export function NewOrderForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Customer Information */}
-      <SectionCard title="معلومات العميل" icon={User} contentClassName="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="customerName">اسم العميل *</Label>
-            <Input
-              id="customerName"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="أدخل اسم العميل"
-              className="text-start"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="customerPhone">رقم الجوال *</Label>
-            <Input
-              id="customerPhone"
-              value={customerPhone}
-              onChange={(e) => {
-                setCustomerPhone(e.target.value);
-                if (phoneError) setPhoneError(null);
-              }}
-              placeholder="05xxxxxxxx"
-              className="text-start"
-              dir="ltr"
-              required
-              aria-invalid={!!phoneError}
-              aria-describedby={phoneError ? 'customerPhone-error' : undefined}
-            />
-            {phoneError && (
-              <p id="customerPhone-error" className="text-sm text-destructive">{phoneError}</p>
-            )}
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="customerAddress">العنوان (اختياري)</Label>
-            <Input
-              id="customerAddress"
-              value={customerAddress}
-              onChange={(e) => setCustomerAddress(e.target.value)}
-              placeholder="أدخل عنوان العميل"
-              className="text-start"
-            />
-          </div>
+      <SectionCard title="معلومات العميل" icon={User}>
+        <CustomerLookup
+          value={{ name: customerName, phone: customerPhone, address: customerAddress }}
+          onChange={(patch) => {
+            if (patch.name !== undefined) setCustomerName(patch.name);
+            if (patch.phone !== undefined) {
+              setCustomerPhone(patch.phone);
+              setPhoneError(null);
+            }
+            if (patch.address !== undefined) setCustomerAddress(patch.address);
+          }}
+          status={customerStatus}
+          onStatusChange={setCustomerStatus}
+          errors={{ phone: phoneError ?? undefined }}
+        />
       </SectionCard>
 
       {/* Branch & Pickup */}

@@ -71,6 +71,8 @@ const READ: Record<string, (args: Args) => unknown> = {
   get_order_by_pickup_code: () => d.ORDERS[4],
   get_order_logs_with_user: () => d.ORDER_LOGS,
   get_order_notes: () => [],
+  // Staff customer lookup — returns 0 or 1 rows, like search_customer_by_phone.
+  search_customer_by_phone: (a) => d.findCustomerByPhone(a?.['_phone']),
   get_customer_phone_audited: (a) => {
     const order = d.ORDERS.find((o) => o.id === a?.['_order_id'] || o.customer_id === a?.['_customer_id']);
     return (order?.customer_phone_full as string) ?? '+966512345678';

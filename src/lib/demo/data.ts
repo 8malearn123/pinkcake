@@ -240,6 +240,25 @@ export function pushCustomerOrder(args: Record<string, unknown> | undefined) {
   return { order_id: orderId, order_number: orderNumber };
 }
 
+/**
+ * Customer directory behind the staff phone lookup ("هل العميل مسجّل؟").
+ * Any other number comes back empty so the "add a new customer" path is
+ * reachable in demo mode too.
+ */
+export const CUSTOMERS: { id: string; name: string; phone: string; address: string | null }[] = [
+  { id: 'cu1', name: 'نورة الشمري', phone: '0501110701', address: 'حي الياسمين، شارع 11، الرياض' },
+  { id: 'cu2', name: 'سارة القحطاني', phone: '0501110702', address: 'حي النرجس، شارع 24، الرياض' },
+  { id: 'cu3', name: 'عبدالله الدوسري', phone: '0501110703', address: null },
+];
+
+/** Match on the national significant number, like the real RPC does. */
+export function findCustomerByPhone(raw: unknown) {
+  const nsn = (value: unknown) => String(value ?? '').replace(/\D/g, '').slice(-9);
+  const digits = nsn(raw);
+  if (digits.length < 9) return [];
+  return CUSTOMERS.filter((c) => nsn(c.phone) === digits);
+}
+
 export const SUBMISSIONS = [
   { id: 's1', submission_type: 'contact', customer_name: 'أحمد', phone: '+966••••701', email: 'a@test.co', message: 'هل تتوفر كيكات خالية من الجلوتين؟', status: 'new', internal_notes: null, created_at: iso(45) },
   { id: 's2', submission_type: 'complaint', customer_name: 'منى', phone: '+966••••702', email: null, message: 'تأخر طلبي عن الموعد', status: 'in_progress', internal_notes: 'تم التواصل', created_at: iso(180) },

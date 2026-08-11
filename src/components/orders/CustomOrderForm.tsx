@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react';
-import { useForm, type Path } from 'react-hook-form';
+import { useForm, useFormState, useWatch, type Path, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { nameSchema, ksaPhoneSchema } from '@/lib/validation';
 import { cn } from '@/lib/utils';
+import { CustomerLookup, type CustomerLookupStatus } from '@/components/orders/CustomerLookup';
 
 const customOrderSchema = z.object({
   customerName: nameSchema,
@@ -251,6 +252,8 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [step, setStep] = useState(0);
+  // Step 1 is a lookup, not a blank form: no customer resolved → can't move on.
+  const [customerStatus, setCustomerStatus] = useState<CustomerLookupStatus>('idle');
   const isReview = step === STEPS.length - 1;
 
   const form = useForm<FormData>({
@@ -325,6 +328,14 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
   };
 
   const goNext = async () => {
+    if (step === 0 && customerStatus === 'idle') {
+      toast({
+        title: 'حدد العميل أولاً',
+        description: 'استعلم برقم الجوال ثم اختر العميل المسجّل أو أضِفه كعميل جديد.',
+        variant: 'destructive',
+      });
+      return;
+    }
     const valid = await form.trigger(STEPS[step].fields);
     if (valid) setStep((s) => Math.min(STEPS.length - 1, s + 1));
   };
@@ -356,6 +367,7 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
     form.reset();
     setImageUrl(null);
     setStep(0);
+    setCustomerStatus('idle');
     onSuccess?.();
   };
 
@@ -394,52 +406,11 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
 
         {/* Step 1 — Customer */}
         {step === 0 && (
-          <SectionCard
-            title="معلومات العميل"
-            icon={User}
-            className="animate-fade-in"
-            contentClassName="grid gap-4 md:grid-cols-2"
-          >
-            <FormField
-              control={form.control}
-              name="customerName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>اسم العميل *</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="أدخل اسم العميل" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="customerPhone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>رقم الهاتف *</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="05xxxxxxxx" dir="ltr" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="customerAddress"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>العنوان</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="العنوان (اختياري)" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          <SectionCard title="معلومات العميل" icon={User} className="animate-fade-in">
+            <CustomerStep
+              form={form}
+              status={customerStatus}
+              onStatusChange={setCustomerStatus}
             />
           </SectionCard>
         )}
@@ -816,6 +787,50 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
         </div>
       </form>
     </Form>
+  );
+}
+
+/**
+ * Bridges the shared phone-lookup UI to react-hook-form. It lives in its own
+ * component so the field subscriptions (useWatch/useFormState) re-render the
+ * customer step only — never the whole wizard on every keystroke.
+ */
+function CustomerStep({
+  form,
+  status,
+  onStatusChange,
+}: {
+  form: UseFormReturn<FormData>;
+  status: CustomerLookupStatus;
+  onStatusChange: (status: CustomerLookupStatus) => void;
+}) {
+  const [name, phone, address] = useWatch({
+    control: form.control,
+    name: ['customerName', 'customerPhone', 'customerAddress'],
+  });
+  const { errors } = useFormState({ control: form.control });
+
+  const setField = (field: 'customerName' | 'customerPhone' | 'customerAddress', value: string) =>
+    // Re-validate only a field that's already showing an error, so the message
+    // clears as staff type without validating untouched fields early.
+    form.setValue(field, value, { shouldDirty: true, shouldValidate: !!errors[field] });
+
+  return (
+    <CustomerLookup
+      value={{ name: name ?? '', phone: phone ?? '', address: address ?? '' }}
+      onChange={(patch) => {
+        if (patch.name !== undefined) setField('customerName', patch.name);
+        if (patch.phone !== undefined) setField('customerPhone', patch.phone);
+        if (patch.address !== undefined) setField('customerAddress', patch.address);
+      }}
+      status={status}
+      onStatusChange={onStatusChange}
+      errors={{
+        name: errors.customerName?.message,
+        phone: errors.customerPhone?.message,
+        address: errors.customerAddress?.message,
+      }}
+    />
   );
 }
 
