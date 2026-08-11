@@ -17,6 +17,24 @@ export interface EventOrderPayload {
   event_date: string | null;
   items: { catalog_id: string; name: string; qty: number; unit_price: number }[];
   estimated_subtotal: number;
+  /**
+   * Set when staff build the order for a customer (the admin ضيافة screen).
+   * On the storefront the customer is the signed-in user, so these stay absent
+   * and the backend keeps deriving the customer from auth.uid().
+   */
+  channel?: 'storefront' | 'staff';
+  customer_name?: string;
+  customer_phone?: string;
+  customer_address?: string | null;
+  notes?: string | null;
+}
+
+/** The customer an order is being built for — staff-created orders only. */
+export interface EventOrderCustomer {
+  name: string;
+  phone: string;
+  address?: string;
+  notes?: string;
 }
 
 // `create_event_order` is added by the backend migration (spec file 09 §3.4); it
@@ -55,8 +73,18 @@ export function payloadFromState(
   },
   items: EventLineItem[],
   subtotal: number,
+  customer?: EventOrderCustomer,
 ): EventOrderPayload {
   return {
+    ...(customer
+      ? {
+          channel: 'staff' as const,
+          customer_name: customer.name,
+          customer_phone: customer.phone,
+          customer_address: customer.address?.trim() || null,
+          notes: customer.notes?.trim() || null,
+        }
+      : {}),
     occasion: state.occasion,
     guest_count: state.guestCount,
     serve_styles: state.serveStyles,

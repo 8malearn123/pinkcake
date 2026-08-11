@@ -19,6 +19,7 @@ import {
   Cake,
   CakeSlice,
   Palette,
+  PartyPopper,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarLogo } from './SidebarLogo';
@@ -54,6 +55,7 @@ const menuGroups: MenuGroup[] = [
       { icon: ClipboardList, label: 'جميع الطلبات', path: '/orders', allowedRoles: ['admin', 'call_center'] },
       { icon: PlusCircle, label: 'طلب جديد', path: '/orders/new', allowedRoles: ['admin', 'call_center'] },
       { icon: Cake, label: 'طلب مخصص', path: '/custom-orders', allowedRoles: ['admin', 'customer_support'] },
+      { icon: PartyPopper, label: 'ضيافة مناسبة', path: '/orders/new-event', allowedRoles: ['admin', 'call_center', 'customer_support'] },
     ],
   },
   {

@@ -20,6 +20,7 @@ import { LOZA_ENABLED } from "./lib/featureFlags";
 // on demand.
 const Orders = lazy(() => import("./pages/Orders"));
 const NewOrder = lazy(() => import("./pages/NewOrder"));
+const NewEventOrder = lazy(() => import("./pages/NewEventOrder"));
 const OrderDetails = lazy(() => import("./pages/OrderDetails"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 const Kitchen = lazy(() => import("./pages/Kitchen"));
@@ -196,6 +197,15 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRoles={['admin', 'call_center']}>
                     <NewOrder />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Staff-side ضيافة المناسبات builder (the storefront /events flow) */}
+              <Route
+                path="/orders/new-event"
+                element={
+                  <ProtectedRoute requiredRoles={['admin', 'call_center', 'customer_support']}>
+                    <NewEventOrder />
                   </ProtectedRoute>
                 }
               />
