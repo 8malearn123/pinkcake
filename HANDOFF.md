@@ -189,6 +189,35 @@ Swap the implementation in `getStore()` (`src/lib/combosCatalog/session.ts`) and
 nothing else changes. Bump `COMBOS_SCHEMA_VERSION` in
 `src/lib/combosCatalog/types.ts` whenever the shape or the seed changes.
 
+## Staff order creation (call centre & branch)
+
+Three staff-facing creation flows now share one customer step and one cake
+studio. What the backend needs is all in migrations already in this repo:
+
+- **Customer lookup** — `search_customer_by_phone` matches on the last 9 digits
+  (so `05…`, `+9665…`, `9665…` all hit the same record) and is open to admin,
+  call centre and branch; `upsert_customer_by_phone` dedupes on the same rule.
+  The order forms never start from a blank name field: staff search first, then
+  either use the record found or add a new customer
+  (`src/components/orders/CustomerLookup.tsx`).
+- **Roles** — `customer_support` is merged into `call_center`. Its users were
+  moved by migration and `has_role` treats a `customer_support` check as
+  satisfied by `call_center`, so older policies keep working. Do not assign the
+  old value to anyone new.
+- **Branch creation rights** — `orders`/`order_items` INSERT policies and
+  `create_custom_order` accept the `branch` role, so a branch can raise a
+  regular, custom or event order over the counter.
+- **Cake design on custom orders** — `custom_order_details.cake_design jsonb`
+  holds the `CartCakeDesign` payload built in the staff studio dialog
+  (`src/components/orders/CakeDesignerDialog.tsx`); `create_custom_order` takes
+  it as `_cake_design` and `get_custom_orders_for_review` returns it to the
+  kitchen. (This is the custom-order half of the "designed-cake order payload"
+  item below; the storefront cart half is still open.)
+- **Event/ضيافة orders from staff** — `create_event_order` (still to be built,
+  spec file 09 §3.4) receives the same payload as the storefront plus
+  `channel: 'staff'`, `customer_name`, `customer_phone`, `customer_address` and
+  `notes` when raised from `/orders/new-event`.
+
 ## Quick checklist
 
 - [ ] Add real Supabase env, set `VITE_DEMO_MODE="false"`

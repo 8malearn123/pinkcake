@@ -53,9 +53,9 @@ const menuGroups: MenuGroup[] = [
     items: [
       { icon: MessageCircle, label: 'الرسائل والطلبات', path: '/submissions', allowedRoles: ['admin', 'call_center'] },
       { icon: ClipboardList, label: 'جميع الطلبات', path: '/orders', allowedRoles: ['admin', 'call_center'] },
-      { icon: PlusCircle, label: 'طلب جديد', path: '/orders/new', allowedRoles: ['admin', 'call_center'] },
-      { icon: Cake, label: 'طلب مخصص', path: '/custom-orders', allowedRoles: ['admin', 'call_center'] },
-      { icon: PartyPopper, label: 'ضيافة مناسبة', path: '/orders/new-event', allowedRoles: ['admin', 'call_center'] },
+      { icon: PlusCircle, label: 'طلب جديد', path: '/orders/new', allowedRoles: ['admin', 'call_center', 'branch'] },
+      { icon: Cake, label: 'طلب مخصص', path: '/custom-orders', allowedRoles: ['admin', 'call_center', 'branch'] },
+      { icon: PartyPopper, label: 'ضيافة مناسبة', path: '/orders/new-event', allowedRoles: ['admin', 'call_center', 'branch'] },
     ],
   },
   {

@@ -207,6 +207,7 @@ export type Database = {
       }
       custom_order_details: {
         Row: {
+          cake_design: Json | null
           chef_feasibility: string | null
           chef_notes: string | null
           chef_preparation_time: string | null
@@ -238,6 +239,7 @@ export type Database = {
           writing_text: string | null
         }
         Insert: {
+          cake_design?: Json | null
           chef_feasibility?: string | null
           chef_notes?: string | null
           chef_preparation_time?: string | null
@@ -269,6 +271,7 @@ export type Database = {
           writing_text?: string | null
         }
         Update: {
+          cake_design?: Json | null
           chef_feasibility?: string | null
           chef_notes?: string | null
           chef_preparation_time?: string | null
@@ -956,6 +959,7 @@ export type Database = {
       create_custom_order: {
         Args: {
           _branch_id: string
+          _cake_design?: Json
           _customer_address: string
           _customer_name: string
           _customer_phone: string
@@ -1123,6 +1127,7 @@ export type Database = {
         Args: never
         Returns: {
           branch_name: string
+          cake_design: Json
           created_at: string
           customer_name: string
           design_description: string

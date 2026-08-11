@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { formatSARText } from '@/lib/currency';
-import type { AnyCakeDesign } from '@/lib/cakeStudio';
+import type { Json } from '@/integrations/supabase/types';
+import type { AnyCakeDesign, CartCakeDesign } from '@/lib/cakeStudio';
 
 export interface CustomOrderFormData {
   customerName: string;
@@ -22,6 +23,8 @@ export interface CustomOrderFormData {
   referenceImageUrl?: string;
   referenceOrderId?: string;
   notes?: string;
+  /** Built in the staff cake studio — same payload the storefront produces. */
+  cakeDesign?: CartCakeDesign;
 }
 
 export interface CustomOrderForReview {
@@ -95,6 +98,9 @@ export function useCreateCustomOrder() {
         _reference_image_url: data.referenceImageUrl || null,
         _reference_order_id: data.referenceOrderId || null,
         _notes: data.notes || null,
+        // The studio payload is a plain JSON object; Supabase's generated Json
+        // type just can't see that through the interface.
+        _cake_design: (data.cakeDesign ?? null) as unknown as Json,
       });
 
       if (error) throw error;
@@ -125,7 +131,7 @@ export function useCustomOrdersForReview() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_custom_orders_for_review');
       if (error) throw error;
-      return (data || []) as CustomOrderForReview[];
+      return (data || []) as unknown as CustomOrderForReview[];
     },
     refetchInterval: 30000, // keep the chef's review queue fresh, like kitchen orders
   });

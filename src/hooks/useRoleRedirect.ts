@@ -22,7 +22,7 @@ const ROLE_ALLOWED_ROUTES: Record<AppRole, string[]> = {
     '/submissions', '/custom-orders',
   ],
   kitchen: ['/kitchen', '/orders/:id', '/live'],
-  branch: ['/branch-orders', '/orders/:id'],
+  branch: ['/branch-orders', '/branch-live', '/branch-pickup', '/orders/:id', '/orders/new', '/orders/new-event', '/custom-orders'],
   customer: ['/store', '/my-orders', '/my-orders/:id', '/my-profile'],
   driver: ['/driver', '/orders/:id'],
 };
@@ -78,9 +78,13 @@ export function useRoleRedirect() {
       return path === '/kitchen' || path === '/live' || path.startsWith('/orders/');
     }
 
-    // For branch, allow branch-orders, branch-live, branch-pickup and order details
+    // For branch, allow its own screens, order details and the three order
+    // creation flows (regular / custom / event) it now runs over the counter.
     if (roles.includes('branch')) {
-      return path === '/branch-orders' || path === '/branch-live' || path === '/branch-pickup' || path.startsWith('/orders/');
+      return (
+        path === '/branch-orders' || path === '/branch-live' || path === '/branch-pickup' ||
+        path === '/custom-orders' || path.startsWith('/orders/')
+      );
     }
 
     // For driver, allow driver page and order details

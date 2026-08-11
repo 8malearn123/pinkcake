@@ -35,12 +35,17 @@ import {
   ArrowRight,
   ArrowLeft,
   Pencil,
+  Wand2,
+  Trash2,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { nameSchema, ksaPhoneSchema } from '@/lib/validation';
 import { cn } from '@/lib/utils';
 import { CustomerLookup, type CustomerLookupStatus } from '@/components/orders/CustomerLookup';
+import { CakeDesignerDialog } from '@/components/orders/CakeDesignerDialog';
+import { useCatalogSession } from '@/hooks/useCatalogSession';
+import type { CartCakeDesign } from '@/lib/cakeStudio';
 
 const customOrderSchema = z.object({
   customerName: nameSchema,
@@ -254,6 +259,10 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
   const [step, setStep] = useState(0);
   // Step 1 is a lookup, not a blank form: no customer resolved → can't move on.
   const [customerStatus, setCustomerStatus] = useState<CustomerLookupStatus>('idle');
+  // A cake built in the studio (same payload the storefront sends) — optional:
+  // a written brief is still a valid custom order.
+  const [cakeDesign, setCakeDesign] = useState<CartCakeDesign | null>(null);
+  const [designerOpen, setDesignerOpen] = useState(false);
   const isReview = step === STEPS.length - 1;
 
   const form = useForm<FormData>({
@@ -361,6 +370,7 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
       referenceOrderId: data.referenceOrderId,
       notes: data.notes,
       referenceImageUrl: imageUrl || undefined,
+      cakeDesign: cakeDesign ?? undefined,
     };
 
     await createOrder.mutateAsync(formData);
@@ -368,6 +378,7 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
     setImageUrl(null);
     setStep(0);
     setCustomerStatus('idle');
+    setCakeDesign(null);
     onSuccess?.();
   };
 
@@ -605,6 +616,31 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               )}
             />
 
+            {/* Cake studio — build the exact cake instead of describing it */}
+            <div>
+              <FormLabel>تصميم الكيك</FormLabel>
+              {cakeDesign ? (
+                <CakeDesignCard
+                  design={cakeDesign}
+                  onEdit={() => setDesignerOpen(true)}
+                  onRemove={() => setCakeDesign(null)}
+                />
+              ) : (
+                <div className="mt-2 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-border p-6 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">ابنِ الكيك من الاستوديو</p>
+                    <p className="text-sm text-muted-foreground">
+                      اختر القاعدة والنكهة واللون من الصور المتوفرة — يصل التصميم للمطبخ كما هو.
+                    </p>
+                  </div>
+                  <Button type="button" variant="outline" onClick={() => setDesignerOpen(true)}>
+                    <Wand2 className="me-2 h-4 w-4" />
+                    تصميم الكيك
+                  </Button>
+                </div>
+              )}
+            </div>
+
             {/* Reference image — drag & drop */}
             <div>
               <FormLabel>صورة مرجعية</FormLabel>
@@ -724,6 +760,10 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
               <SummaryRow label="النكهة" value={values.flavor} />
               <SummaryRow label="الحشوة" value={values.filling} />
               <SummaryRow label="مستوى السكر" value={values.sugarLevel} />
+              <SummaryRow
+                label="تصميم الكيك"
+                value={cakeDesign ? [cakeDesign.cakeName, ...cakeDesign.pathLabels].join(' · ') : undefined}
+              />
               <SummaryRow label="نص الكتابة" value={values.writingText} />
               <SummaryRow label="وصف التصميم" value={values.designDescription} />
               <SummaryRow label="ملاحظات" value={values.notes} />
@@ -786,6 +826,12 @@ export function CustomOrderForm({ onSuccess, referenceOrderId }: CustomOrderForm
           )}
         </div>
       </form>
+
+      <CakeDesignerDialog
+        open={designerOpen}
+        onOpenChange={setDesignerOpen}
+        onConfirm={setCakeDesign}
+      />
     </Form>
   );
 }
@@ -831,6 +877,53 @@ function CustomerStep({
         address: errors.customerAddress?.message,
       }}
     />
+  );
+}
+
+/** The chosen studio design: photo (when the catalogue has one) + its labels. */
+function CakeDesignCard({
+  design,
+  onEdit,
+  onRemove,
+}: {
+  design: CartCakeDesign;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
+  const { urlFor } = useCatalogSession();
+  const photo = urlFor(design.photoImageId);
+
+  return (
+    <div className="mt-2 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center">
+      {photo ? (
+        <img src={photo} alt={design.cakeName} className="h-24 w-24 shrink-0 rounded-xl object-cover" />
+      ) : (
+        <span className="grid size-24 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+          <Wand2 className="h-7 w-7" />
+        </span>
+      )}
+      <div className="min-w-0 flex-1">
+        <p className="font-bold text-foreground">{design.cakeName}</p>
+        <dl className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+          {design.pathLabels.map((label, i) => (
+            <div key={`${design.levelLabels[i]}-${label}`} className="flex gap-1">
+              <dt>{design.levelLabels[i]}:</dt>
+              <dd className="font-medium text-foreground">{label}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <div className="flex shrink-0 gap-2">
+        <Button type="button" variant="outline" size="sm" onClick={onEdit}>
+          <Pencil className="me-2 h-3.5 w-3.5" />
+          تعديل
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={onRemove} className="text-destructive">
+          <Trash2 className="me-2 h-3.5 w-3.5" />
+          إزالة
+        </Button>
+      </div>
+    </div>
   );
 }
 

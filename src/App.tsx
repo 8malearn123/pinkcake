@@ -195,7 +195,7 @@ const App = () => (
               <Route
                 path="/orders/new"
                 element={
-                  <ProtectedRoute requiredRoles={['admin', 'call_center']}>
+                  <ProtectedRoute requiredRoles={['admin', 'call_center', 'branch']}>
                     <NewOrder />
                   </ProtectedRoute>
                 }
@@ -204,7 +204,7 @@ const App = () => (
               <Route
                 path="/orders/new-event"
                 element={
-                  <ProtectedRoute requiredRoles={['admin', 'call_center']}>
+                  <ProtectedRoute requiredRoles={['admin', 'call_center', 'branch']}>
                     <NewEventOrder />
                   </ProtectedRoute>
                 }
@@ -316,7 +316,7 @@ const App = () => (
               <Route
                 path="/custom-orders"
                 element={
-                  <ProtectedRoute requiredRoles={['admin', 'call_center']}>
+                  <ProtectedRoute requiredRoles={['admin', 'call_center', 'branch']}>
                     <CustomOrders />
                   </ProtectedRoute>
                 }

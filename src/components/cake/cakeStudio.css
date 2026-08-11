@@ -266,3 +266,12 @@
 @media (min-width: 1180px) {
 .cake-studio .cz-frame {max-width: 1180px; }
 }
+
+/* ── Dialog variant ────────────────────────────────────────────────────────
+   The studio also runs inside a modal (staff building a cake on a custom
+   order). There it is a section of a form, not a full-bleed app: no phone
+   frame, no viewport-tall centring, and a preview sized to the dialog. */
+.cake-studio.in-dialog {display: block; min-height: 0; height: auto; background: none; }
+.cake-studio.in-dialog .stage {height: 230px; min-height: 0; max-height: 230px; border-radius: 18px; }
+.cake-studio.in-dialog .panel {padding: 18px 0 0; overflow: visible; }
+.cake-studio.in-dialog .gallery {grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
