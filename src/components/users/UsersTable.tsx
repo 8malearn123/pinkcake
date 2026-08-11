@@ -29,7 +29,7 @@ type AppRole = Enums<'app_role'>;
 
 // Staff roles. Customers (only the `customer` role, or none) can't be assigned
 // roles or branches, so those row actions are hidden for them.
-const EMPLOYEE_ROLES: AppRole[] = ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer_support'];
+const EMPLOYEE_ROLES: AppRole[] = ['admin', 'call_center', 'kitchen', 'branch', 'driver'];
 const isEmployee = (u: UserWithRole) => u.user_roles.some((r) => EMPLOYEE_ROLES.includes(r.role as AppRole));
 
 interface UsersTableProps {

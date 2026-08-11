@@ -13,7 +13,6 @@
 export type DemoRole =
   | 'admin'
   | 'call_center'
-  | 'customer_support'
   | 'kitchen'
   | 'branch'
   | 'driver'
@@ -27,7 +26,6 @@ export const DEMO_MODE: boolean =
 export const DEMO_ROLES: DemoRole[] = [
   'admin',
   'call_center',
-  'customer_support',
   'kitchen',
   'branch',
   'driver',
@@ -36,8 +34,7 @@ export const DEMO_ROLES: DemoRole[] = [
 
 export const DEMO_ROLE_LABELS: Record<DemoRole, string> = {
   admin: 'مدير',
-  call_center: 'مركز اتصال',
-  customer_support: 'دعم العملاء',
+  call_center: 'مركز الاتصال وخدمة العملاء',
   kitchen: 'المطبخ',
   branch: 'الفرع',
   driver: 'السائق',

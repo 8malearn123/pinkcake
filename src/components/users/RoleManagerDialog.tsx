@@ -13,7 +13,7 @@ import { Plus, X, Loader2 } from 'lucide-react';
 
 type AppRole = Enums<'app_role'>;
 
-const ALL_ROLES: AppRole[] = ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer_support', 'customer'];
+const ALL_ROLES: AppRole[] = ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer'];
 
 interface RoleManagerDialogProps {
   open: boolean;

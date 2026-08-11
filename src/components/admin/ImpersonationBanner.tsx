@@ -6,11 +6,10 @@ import { AlertTriangle, LogOut } from 'lucide-react';
 // Map role names to Arabic
 const roleLabels: Record<string, string> = {
   admin: 'مدير النظام',
-  call_center: 'مركز الاتصال',
+  call_center: 'مركز الاتصال وخدمة العملاء',
   kitchen: 'المطبخ',
   branch: 'مدير الفرع',
   customer: 'عميل',
-  customer_support: 'خدمة العملاء',
   driver: 'سائق',
 };
 

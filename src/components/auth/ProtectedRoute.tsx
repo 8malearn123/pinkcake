@@ -21,7 +21,6 @@ const ADMIN_ONLY_ROUTES = [
 const getRoleLandingPage = (roles: AppRole[]): string => {
   if (roles.includes('admin')) return '/dashboard';
   if (roles.includes('call_center')) return '/dashboard';
-  if (roles.includes('customer_support')) return '/submissions';
   if (roles.includes('kitchen')) return '/kitchen';
   if (roles.includes('branch')) return '/branch-orders';
   if (roles.includes('driver')) return '/driver';

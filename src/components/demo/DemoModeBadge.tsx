@@ -20,7 +20,6 @@ import {
 const ROLE_LANDING: Record<DemoRole, string> = {
   admin: '/dashboard',
   call_center: '/dashboard',
-  customer_support: '/submissions',
   kitchen: '/kitchen',
   branch: '/branch-orders',
   driver: '/driver',

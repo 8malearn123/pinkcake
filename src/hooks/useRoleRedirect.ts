@@ -9,18 +9,21 @@ const ROLE_LANDING_PAGES: Record<AppRole, string> = {
   kitchen: '/kitchen',
   branch: '/branch-orders',
   customer: '/store',
-  customer_support: '/submissions',
   driver: '/driver',
 };
 
-// Define which routes each role can access
+// Define which routes each role can access. Call centre now covers customer
+// support too, so the support screens (submissions, custom & event orders) are
+// part of its surface.
 const ROLE_ALLOWED_ROUTES: Record<AppRole, string[]> = {
   admin: ['*'], // Admin can access all routes
-  call_center: ['/', '/orders', '/orders/new', '/orders/:id', '/live', '/products'],
+  call_center: [
+    '/', '/orders', '/orders/new', '/orders/new-event', '/orders/:id', '/live', '/products',
+    '/submissions', '/custom-orders',
+  ],
   kitchen: ['/kitchen', '/orders/:id', '/live'],
   branch: ['/branch-orders', '/orders/:id'],
   customer: ['/store', '/my-orders', '/my-orders/:id', '/my-profile'],
-  customer_support: ['/submissions', '/orders', '/orders/:id'],
   driver: ['/driver', '/orders/:id'],
 };
 
@@ -42,7 +45,6 @@ export function useRoleRedirect() {
   const getLandingPage = (): string => {
     if (roles.includes('admin')) return '/live';
     if (roles.includes('call_center')) return '/live';
-    if (roles.includes('customer_support')) return '/submissions';
     if (roles.includes('kitchen')) return '/kitchen';
     if (roles.includes('branch')) return '/branch-orders';
     if (roles.includes('driver')) return '/driver';
@@ -64,9 +66,10 @@ export function useRoleRedirect() {
       return false;
     }
 
-    // For call_center, allow dashboard, orders, live, products
+    // For call_center (which now also covers customer support), allow the
+    // dashboard, orders, live, products and the support screens.
     if (roles.includes('call_center')) {
-      const allowedPaths = ['/dashboard', '/orders', '/live', '/products'];
+      const allowedPaths = ['/dashboard', '/orders', '/live', '/products', '/submissions', '/custom-orders'];
       return allowedPaths.some(p => path === p || path.startsWith('/orders'));
     }
 
@@ -85,11 +88,6 @@ export function useRoleRedirect() {
       return path === '/driver' || path.startsWith('/orders/');
     }
 
-    // For customer support, allow submissions, custom-orders and orders
-    if (roles.includes('customer_support')) {
-      return path === '/submissions' || path === '/custom-orders' || path.startsWith('/orders/') || path === '/orders';
-    }
-
     return false;
   };
 
@@ -103,7 +101,6 @@ export function useRoleRedirect() {
     isKitchen: roles.includes('kitchen'),
     isBranch: roles.includes('branch'),
     isCustomer: roles.includes('customer'),
-    isCustomerSupport: roles.includes('customer_support'),
     isDriver: roles.includes('driver'),
   };
 }

@@ -15,7 +15,6 @@ import {
   Users as UsersIcon,
   Search,
   Shield,
-  UserCheck,
   ChefHat,
   Store,
   UserPlus,
@@ -51,7 +50,7 @@ export default function Users() {
     const userRoles = user.user_roles.map(r => r.role);
     const isCustomer = userRoles.includes('customer') || userRoles.length === 0;
     const isEmployee = userRoles.some(role => 
-      ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer_support'].includes(role)
+      ['admin', 'call_center', 'kitchen', 'branch', 'driver'].includes(role)
     );
 
     if (activeFilter === 'customers') return isCustomer && !isEmployee;
@@ -67,24 +66,22 @@ export default function Users() {
     kitchen: users?.filter((u) => u.user_roles.some((r) => r.role === 'kitchen')).length || 0,
     branch: users?.filter((u) => u.user_roles.some((r) => r.role === 'branch')).length || 0,
     drivers: users?.filter((u) => u.user_roles.some((r) => r.role === 'driver')).length || 0,
-    support: users?.filter((u) => u.user_roles.some((r) => r.role === 'customer_support')).length || 0,
     customers: users?.filter((u) => 
       u.user_roles.some((r) => r.role === 'customer') || 
       u.user_roles.length === 0
     ).length || 0,
     employees: users?.filter((u) =>
-      u.user_roles.some((r) => ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer_support'].includes(r.role))
+      u.user_roles.some((r) => ['admin', 'call_center', 'kitchen', 'branch', 'driver'].includes(r.role))
     ).length || 0,
   };
 
   // The role breakdown for the command-bar pipeline.
   const pipeline = [
     { key: 'admins', label: 'مدراء', value: stats.admins, icon: Shield, box: 'bg-primary/10 text-primary' },
-    { key: 'callCenter', label: 'كول سنتر', value: stats.callCenter, icon: UserCheck, box: 'bg-info/10 text-info' },
+    { key: 'callCenter', label: 'مركز الاتصال', value: stats.callCenter, icon: HeadphonesIcon, box: 'bg-info/10 text-info' },
     { key: 'kitchen', label: 'مطبخ', value: stats.kitchen, icon: ChefHat, box: 'bg-warning/10 text-warning' },
     { key: 'branch', label: 'فروع', value: stats.branch, icon: Store, box: 'bg-success/10 text-success' },
     { key: 'drivers', label: 'سائقين', value: stats.drivers, icon: Truck, box: 'bg-info/10 text-info' },
-    { key: 'support', label: 'دعم', value: stats.support, icon: HeadphonesIcon, box: 'bg-info/10 text-info' },
     { key: 'customers', label: 'عملاء', value: stats.customers, icon: UserCircle, box: 'bg-primary/10 text-primary' },
   ];
 

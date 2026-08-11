@@ -197,13 +197,15 @@ export function useRemoveBranchAssignment() {
   });
 }
 
+/* customer_support مُدمج في call_center — تبقى قيمة الـ enum في قاعدة البيانات،
+   فنُبقي لها تسمية احتياطية لو ظهر صف قديم. */
 export const ROLE_LABELS: Record<AppRole, string> = {
   admin: 'مدير النظام',
-  call_center: 'كول سنتر',
+  call_center: 'مركز الاتصال وخدمة العملاء',
+  customer_support: 'مركز الاتصال وخدمة العملاء',
   kitchen: 'المطبخ',
   branch: 'فرع',
   customer: 'عميل',
-  customer_support: 'خدمة العملاء',
   driver: 'سائق توصيل',
 };
 
@@ -211,9 +213,9 @@ export const ROLE_LABELS: Record<AppRole, string> = {
 export const ROLE_COLORS: Record<AppRole, string> = {
   admin: 'bg-primary/10 text-primary',
   call_center: 'bg-info/10 text-info',
+  customer_support: 'bg-info/10 text-info',
   kitchen: 'bg-warning/10 text-warning',
   branch: 'bg-success/10 text-success',
   customer: 'bg-accent/10 text-accent',
-  customer_support: 'bg-info/10 text-info',
   driver: 'bg-muted text-muted-foreground',
 };

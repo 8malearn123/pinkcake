@@ -273,7 +273,7 @@ export const PROFILES: Record<string, unknown>[] = [
   { id: 'u3', user_id: 'u3', full_name: 'موظف الفرع', email: 'branch@pinkcake.test', phone: '+966••••612', phone_full: '+966501110612', roles: ['branch'], avatar_url: null, created_at: iso(60 * 24 * 15) },
   { id: 'u4', user_id: 'u4', full_name: 'سائق التوصيل', email: 'driver@pinkcake.test', phone: '+966••••613', phone_full: '+966501110613', roles: ['driver'], avatar_url: null, created_at: iso(60 * 24 * 10) },
   { id: 'u5', user_id: 'u5', full_name: 'موظفة مركز الاتصال', email: 'callcenter@pinkcake.test', phone: '+966••••614', phone_full: '+966501110614', roles: ['call_center'], avatar_url: null, created_at: iso(60 * 24 * 8) },
-  { id: 'u6', user_id: 'u6', full_name: 'أخصائي خدمة العملاء', email: 'support@pinkcake.test', phone: '+966••••615', phone_full: '+966501110615', roles: ['customer_support'], avatar_url: null, created_at: iso(60 * 24 * 6) },
+  { id: 'u6', user_id: 'u6', full_name: 'موظف خدمة العملاء', email: 'support@pinkcake.test', phone: '+966••••615', phone_full: '+966501110615', roles: ['call_center'], avatar_url: null, created_at: iso(60 * 24 * 6) },
   { id: 'u7', user_id: 'u7', full_name: 'نورة الشمري', email: 'noura@example.com', phone: '+966••••701', phone_full: '+966501110701', roles: ['customer'], avatar_url: null, created_at: iso(60 * 24 * 4) },
   { id: 'u8', user_id: 'u8', full_name: 'سارة القحطاني', email: 'sara@example.com', phone: '+966••••702', phone_full: '+966501110702', roles: ['customer'], avatar_url: null, created_at: iso(60 * 24 * 2) },
 ];

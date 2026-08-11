@@ -143,7 +143,7 @@ export function AddUserDialog({ open, onOpenChange }: AddUserDialogProps) {
     onOpenChange(false);
   };
 
-  const allRoles: AppRole[] = ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer_support', 'customer'];
+  const allRoles: AppRole[] = ['admin', 'call_center', 'kitchen', 'branch', 'driver', 'customer'];
 
   // Show credentials screen after successful creation
   if (createdUserCredentials) {

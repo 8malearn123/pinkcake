@@ -12,9 +12,9 @@ export interface CustomerRecord {
 /**
  * "هل العميل مسجّل؟" — staff lookup by mobile number.
  *
- * Wraps the audited `search_customer_by_phone` RPC (admin / call_center /
- * customer_support only). Resolves to the matching customer, or `null` when the
- * number is unknown — the caller then offers "add a new customer" instead.
+ * Wraps the audited `search_customer_by_phone` RPC (admin / call_center only).
+ * Resolves to the matching customer, or `null` when the number is unknown — the
+ * caller then offers "add a new customer" instead.
  * A miss is a normal result, not an error, so only real failures toast.
  */
 export function useCustomerLookup() {

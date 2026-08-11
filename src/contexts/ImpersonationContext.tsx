@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
-export type AppRole = 'admin' | 'call_center' | 'kitchen' | 'branch' | 'customer' | 'customer_support' | 'driver';
+export type AppRole = 'admin' | 'call_center' | 'kitchen' | 'branch' | 'customer' | 'driver';
 
 interface ImpersonatedUser {
   id: string;
@@ -31,7 +31,6 @@ const IMPERSONATION_KEY = 'admin_impersonation';
 const getRoleLandingPage = (roles: AppRole[]): string => {
   if (roles.includes('admin')) return '/live';
   if (roles.includes('call_center')) return '/live';
-  if (roles.includes('customer_support')) return '/submissions';
   if (roles.includes('kitchen')) return '/kitchen';
   if (roles.includes('branch')) return '/branch-orders';
   if (roles.includes('driver')) return '/driver';

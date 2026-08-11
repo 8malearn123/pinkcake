@@ -53,7 +53,6 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 const getRoleLandingPage = (roles: AppRole[]): string => {
   if (roles.includes('admin')) return '/dashboard';
   if (roles.includes('call_center')) return '/dashboard';
-  if (roles.includes('customer_support')) return '/submissions';
   if (roles.includes('kitchen')) return '/kitchen';
   if (roles.includes('branch')) return '/branch-orders';
   // Default fallback for customer or unknown roles - go to my-orders if customer

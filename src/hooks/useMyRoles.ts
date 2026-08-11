@@ -3,7 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useImpersonation } from '@/contexts/ImpersonationContext';
 
-export type AppRole = 'admin' | 'call_center' | 'kitchen' | 'branch' | 'customer' | 'customer_support' | 'driver';
+/**
+ * أدوار النظام. دُمج دور خدمة العملاء (customer_support) في مركز الاتصال:
+ * حساب مركز الاتصال صار يغطّي الاتصال وخدمة العملاء معاً.
+ */
+export type AppRole = 'admin' | 'call_center' | 'kitchen' | 'branch' | 'customer' | 'driver';
 
 export function useMyRoles() {
   const { user } = useAuth();
