@@ -1,277 +1,384 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Cookie, Store } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
-import { supabase } from '@/integrations/supabase/client';
-import { StatusBadge } from '@/components/ui/StatusBadge';
-import { OrderStatusTimeline } from '@/components/orders/OrderStatusTimeline';
+import { useAuth } from '@/contexts/AuthContext';
+import { useMyOrders, useTrackedOrder } from '@/hooks/useCustomerStore';
+import { useOrderItemLines } from '@/hooks/useOrderItemLines';
+import { useReorder } from '@/hooks/useReorder';
+import { getOrderMoment, type MomentActionKind } from '@/lib/orders/customerMoment';
+import {
+  forgetTrackCode,
+  readTrackCode,
+  rememberTrackCode,
+  resolveTrackDestination,
+} from '@/lib/orders/trackEntry';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
 import { StorefrontFooter } from '@/components/store/StorefrontFooter';
+import { FloatingContactButton } from '@/components/store/FloatingContactButton';
+import { BackToTop } from '@/components/store/BackToTop';
 import { Marquee } from '@/components/store/StorefrontDecor';
-import { Eyebrow, Title } from '@/components/ds';
+import { Reveal } from '@/components/Reveal';
 import {
-  Cookie,
-  MapPin,
-  Calendar, 
-  Clock,
-  Phone,
-  Search,
-  CheckCircle2,
-  Loader2
-} from 'lucide-react';
-import { Enums } from '@/integrations/supabase/types';
-import { RiyalSymbol } from '@/components/ui/riyal';
+  EmptyState,
+  ErrorState,
+  Eyebrow,
+  GoldDivider,
+  Lede,
+  LoadingState,
+  Section,
+  Title,
+} from '@/components/ds';
+import { OrderMomentHero } from '@/components/orders/OrderMomentHero';
+import { OrderItemsGallery } from '@/components/orders/OrderItemsGallery';
+import { OrderInvoicePanel } from '@/components/orders/OrderInvoicePanel';
+import { KeepShoppingBand } from '@/components/orders/KeepShoppingBand';
+import { TrackCodeForm } from '@/components/orders/TrackCodeForm';
 
-type OrderStatus = Enums<'order_status'>;
-
-interface TrackedOrderItem {
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-}
-
-interface TrackedOrder {
-  order_number: string;
-  status: OrderStatus;
-  branch_name: string | null;
-  delivery_date: string | null;
-  delivery_time: string | null;
-  total_amount: number;
-  items: TrackedOrderItem[] | null;
-}
-
+/**
+ * Order status without asking the customer for anything.
+ *
+ * Nobody should have to copy a code out of an SMS. Three ways in, in order:
+ *   1. `?code=` from the confirmation message (src/lib/notifications/templates.ts)
+ *   2. signed in — we already know their orders, so we go straight there
+ *   3. a code that resolved before on this device, replayed automatically
+ *
+ * Only a signed-out visitor we have never seen is asked anything, and even then
+ * the offer is "sign in", with code entry demoted to a last-resort disclosure.
+ * The URL stays the source of truth for the code, so a resolved lookup is
+ * shareable and survives a refresh.
+ */
 export default function TrackOrder() {
   const { settings } = useSettings();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const trackingCode = searchParams.get('code') || '';
-  const [searchCode, setSearchCode] = useState(trackingCode);
-  const [searching, setSearching] = useState(false);
-  const [order, setOrder] = useState<TrackedOrder | null>(null);
-  const [hasSearched, setHasSearched] = useState(false);
+  const { user, isLoading: authLoading } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlCode = searchParams.get('code') || '';
+  const [showForm, setShowForm] = useState(false);
 
-  const fetchOrder = async (code: string) => {
-    if (!code.trim()) return;
-    
-    setSearching(true);
-    setHasSearched(true);
-    
-    try {
-      const { data, error } = await supabase
-        .rpc('get_order_by_tracking_code', { _tracking_code: code.trim() });
-      
-      if (error) {
-        console.error('Error fetching order:', error);
-        setOrder(null);
-        return;
-      }
-      
-      if (data && data.length > 0) {
-        const orderData = data[0];
-        // Parse items from JSON
-        let parsedItems: TrackedOrderItem[] | null = null;
-        if (orderData.items) {
-          try {
-            parsedItems = (Array.isArray(orderData.items) 
-              ? orderData.items 
-              : JSON.parse(orderData.items as string)) as TrackedOrderItem[];
-          } catch {
-            parsedItems = null;
-          }
-        }
-        
-        setOrder({
-          order_number: orderData.order_number,
-          status: orderData.status,
-          branch_name: orderData.branch_name,
-          delivery_date: orderData.delivery_date,
-          delivery_time: orderData.delivery_time,
-          total_amount: orderData.total_amount,
-          items: parsedItems
-        });
-      } else {
-        setOrder(null);
-      }
-    } catch (err) {
-      console.error('Error:', err);
-      setOrder(null);
-    } finally {
-      setSearching(false);
-    }
-  };
+  // Held in state, not read during render: clearing a stale code has to cause a
+  // re-render, and localStorage changes do not.
+  const [rememberedCode, setRememberedCode] = useState(readTrackCode);
 
+  // Decide nothing until auth settles, or we fire a guest code lookup for a
+  // customer we are about to redirect.
+  const ready = !authLoading;
+  // An explicit code in the URL always wins; otherwise replay the last code that
+  // worked on this device — but only for someone we cannot identify.
+  const trackingCode = ready ? urlCode || (user ? '' : rememberedCode) : '';
+
+  // Signed in with no code to honour → answer from their own orders.
+  const resolveFromAccount = ready && !urlCode && !!user;
+  const { data: myOrders, isError: ordersFailed } = useMyOrders({ enabled: resolveFromAccount });
+  const destination = resolveFromAccount
+    ? resolveTrackDestination({ orders: myOrders, failed: ordersFailed })
+    : null;
+
+  const { data: order, isLoading, isError, isFetching, refetch } = useTrackedOrder(trackingCode);
+  const { lines, matched, matchedIds } = useOrderItemLines(order?.items);
+  const reorder = useReorder();
+
+  // Remember a code only once it has actually resolved, so a typo is never
+  // replayed. A remembered code that has stopped resolving is dropped and the
+  // visitor falls through to the sign-in offer — showing "not found" for a code
+  // they never typed would be baffling.
   useEffect(() => {
-    if (trackingCode) {
-      fetchOrder(trackingCode);
+    if (!trackingCode) return;
+    if (order) {
+      // Only for a visitor we cannot identify — a signed-in customer reaches
+      // their orders through their account, so there is nothing to leave behind
+      // on the device for the next person.
+      if (!user) rememberTrackCode(trackingCode);
+    } else if (order === null && !isError && !urlCode) {
+      forgetTrackCode();
+      setRememberedCode('');
     }
-  }, [trackingCode]);
+  }, [trackingCode, order, isError, urlCode, user]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchOrder(searchCode);
+  const submitCode = (code: string) => {
+    setShowForm(false);
+    setSearchParams({ code });
   };
 
-  const formatDate = (date: string | null) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('ar-SA-u-nu-latn');
+  const moment = order
+    ? getOrderMoment({
+        status: order.status,
+        deliveryDate: order.delivery_date,
+        deliveryTime: order.delivery_time,
+        branchName: order.branch_name,
+      })
+    : null;
+
+  const handleAction = (kind: MomentActionKind) => {
+    if (kind === 'reorder') reorder(order?.items);
+    else if (kind === 'shop') navigate('/shop');
+    // A guest has no pricing surface — 'respond' and 'contact' both go to support.
+    else navigate('/contact');
   };
 
-  const formatTime = (time: string | null) => {
-    if (!time) return '-';
-    return time.substring(0, 5);
-  };
-
-  return (
+  const shell = (children: React.ReactNode) => (
     <div className="store-surface min-h-screen bg-background text-foreground">
       <Marquee />
       <StorefrontMasthead />
+      <main>{children}</main>
+      <StorefrontFooter storeName={settings.storeName} onNavigate={navigate} />
+      <FloatingContactButton />
+      <BackToTop />
+    </div>
+  );
 
-      <main className="mx-auto max-w-2xl px-5 py-10 sm:px-8 lg:py-14">
-        <div className="mb-8 border-b border-primary/15 pb-6 text-center">
+  /* ── Hold until we know who is asking. ──────────────────────────────────── */
+  if (!ready) {
+    return shell(
+      <Section variant="list" width="prose">
+        <LoadingState />
+      </Section>,
+    );
+  }
+
+  /* ── Signed in: their own orders answer the question, so never ask. ─────── */
+  if (destination?.kind === 'go') return <Navigate to={destination.to} replace />;
+
+  /* ── Their account is still settling — hold, but only while it really is. ─ */
+  if (destination?.kind === 'wait') {
+    return shell(
+      <Section variant="list" width="prose">
+        <LoadingState />
+      </Section>,
+    );
+  }
+
+  /*
+   * ── Nothing we can resolve — ask, and always leave a way through. ────────
+   *
+   * Reached when the visitor is signed out with no remembered code, AND when a
+   * signed-in customer's order list is empty or failed to load. That second
+   * case is not hypothetical: staff create orders for customers who phoned in,
+   * and get_my_orders is scoped by get_my_customer_id(), so those never appear.
+   * The code field is that customer's only route to their order — it has to
+   * stay reachable here.
+   */
+  if (!trackingCode) {
+    const signedIn = !!user;
+    return shell(
+      <>
+        <Section variant="feature" width="prose">
           <Eyebrow rule="both" caps className="justify-center">
             تتبّع الطلب
           </Eyebrow>
-          <Title variant="h2" as="h1" className="mt-2">
-            أين وصل طلبك؟
+          <Title variant="display" as="h1" className="mt-3 text-center">
+            وين وصلت كيكتك؟
           </Title>
-        </div>
+          <Lede className="mx-auto mt-4 max-w-md text-center">
+            {signedIn
+              ? 'ما لقينا طلباً مرتبطاً بحسابك. إذا طلبت عبر الهاتف، اكتب رمز التتبّع الذي وصلك.'
+              : 'سجّل الدخول وتلقى طلباتك كلها — وحالتها — بدون ما تكتب أي رمز.'}
+          </Lede>
 
-        {/* Search Form */}
-        <div className="glass-card mb-8 rounded-2xl p-6">
-          <form onSubmit={handleSearch} className="flex gap-3">
-            <Input
-              value={searchCode}
-              onChange={(e) => setSearchCode(e.target.value)}
-              placeholder="أدخل رقم التتبع..."
-              dir="ltr"
-              className="text-center"
-            />
-            <Button type="submit" variant="brand" aria-label="بحث" disabled={searching}>
-              {searching ? <Loader2 className="size-5 animate-spin" /> : <Search className="size-5" />}
-            </Button>
-          </form>
-        </div>
-
-        {searching ? (
-          <div className="glass-card rounded-2xl p-12 text-center">
-            <Loader2 className="w-10 h-10 animate-spin mx-auto text-primary" />
-            <p className="mt-4 text-muted-foreground">جاري البحث...</p>
+          <div className="mt-8 flex justify-center">
+            {signedIn ? (
+              <Button variant="brand" size="cta" onClick={() => navigate('/my-orders')}>
+                كل طلباتي
+              </Button>
+            ) : (
+              <Button variant="brand" size="cta" onClick={() => navigate('/login')}>
+                سجّل الدخول
+              </Button>
+            )}
           </div>
-        ) : order ? (
-          <div className="space-y-6 animate-fade-in">
-            {/* Order Status - No customer name displayed for privacy */}
-            <div className="glass-card rounded-2xl p-6 text-center">
-              <StatusBadge status={order.status} className="text-lg px-6 py-2" />
-              <h2 className="text-2xl font-bold mt-4">{order.order_number}</h2>
-              <p className="text-muted-foreground mt-2">
-                يمكنك متابعة حالة طلبك هنا
+
+          {/* The escape hatch. Never remove it — for some customers it is the
+              only way in. */}
+          <div className="mt-8 text-center">
+            {showForm ? (
+              <TrackCodeForm
+                autoFocus
+                // The button above is this page's anchor CTA.
+                submitVariant="outlineBrand"
+                className="mx-auto max-w-sm text-start"
+                onSubmit={submitCode}
+              />
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => setShowForm(true)}>
+                عندي رمز تتبّع
+              </Button>
+            )}
+          </div>
+        </Section>
+        <GoldDivider />
+        <KeepShoppingBand context={[]} stage="studio" />
+      </>,
+    );
+  }
+
+  /* ── Looking it up ──────────────────────────────────────────────────────── */
+  if (isLoading) {
+    return shell(
+      <Section variant="list" width="prose">
+        <div className="glass-card rounded-3xl p-6 sm:p-8">
+          <Skeleton className="h-7 w-24 rounded-full" />
+          <Skeleton className="mt-4 h-9 w-4/5" />
+          <Skeleton className="mt-4 h-7 w-1/2" />
+          <Skeleton className="mt-3 h-4 w-2/3" />
+          <Skeleton className="mt-7 h-1.5 w-full rounded-full" />
+        </div>
+        <Skeleton className="mt-6 aspect-[4/3] w-full rounded-2xl" />
+      </Section>,
+    );
+  }
+
+  /* ── The request failed — deliberately NOT the not-found screen ─────────── */
+  if (isError) {
+    return shell(
+      <Section variant="list" width="prose">
+        <ErrorState
+          title="ما قدرنا نجيب حالة طلبك الآن"
+          description="تحقّق من اتصالك ثم جرّب مرة ثانية."
+          onRetry={() => refetch()}
+          retryLabel="جرّب مرة ثانية"
+        />
+      </Section>,
+    );
+  }
+
+  /* ── No such code. A typo is not an error — never destructive red. ──────── */
+  if (!order || !moment) {
+    return shell(
+      <>
+        <Section variant="list" width="prose">
+          <EmptyState
+            icon={Cookie}
+            title="ما لقينا طلباً بهذا الرمز"
+            description="تأكد من الرمز كما وصلك في الرسالة، أو تواصل معنا ونساعدك."
+            className="rounded-2xl border border-dashed border-border bg-blush/40 py-16"
+            action={
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button variant="brandFlat" size="pill" onClick={() => setShowForm(true)}>
+                  جرّب رمزاً آخر
+                </Button>
+                <Button variant="outlineBrand" size="pill" onClick={() => navigate('/contact')}>
+                  تواصل معنا
+                </Button>
+              </div>
+            }
+          />
+          {/* Not «الرمز الذي أدخلته» — most people tapped a link and typed nothing. */}
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            رمز التتبّع:{' '}
+            <bdi dir="ltr" className="font-bold text-foreground">
+              {trackingCode}
+            </bdi>
+          </p>
+          {showForm && (
+            <TrackCodeForm
+              autoFocus
+              initialCode={trackingCode}
+              pending={isFetching}
+              className="mx-auto mt-6 max-w-sm"
+              onSubmit={submitCode}
+            />
+          )}
+        </Section>
+        <GoldDivider />
+        <KeepShoppingBand context={[]} stage="studio" />
+      </>,
+    );
+  }
+
+  /* ── Found it ───────────────────────────────────────────────────────────── */
+  return shell(
+    <>
+      <Section variant="list" width="prose">
+        <Reveal>
+          <OrderMomentHero
+            moment={moment}
+            orderNumber={order.order_number}
+            onAction={handleAction}
+          />
+        </Reveal>
+
+        {/* get_my_pickup_code is auth-only, so a guest gets the order number. */}
+        {moment.showPickupPass && (
+          <Reveal>
+            <div className="mt-5 glass-card rounded-2xl p-6 text-center">
+              <Eyebrow rule="both" caps className="justify-center">
+                رقم طلبك
+              </Eyebrow>
+              <bdi dir="ltr" className="mt-3 block text-3xl font-black text-primary">
+                {order.order_number}
+              </bdi>
+              <p className="mt-2 text-sm text-muted-foreground">
+                اذكر هذا الرقم عند الكاشير، وكيكتك بانتظارك.
+              </p>
+              <Button variant="ghost" size="sm" className="mt-3" onClick={() => navigate('/login')}>
+                سجّل الدخول لعرض رمز الاستلام
+              </Button>
+            </div>
+          </Reveal>
+        )}
+
+        <Reveal>
+          <OrderItemsGallery lines={lines} className="mt-10" />
+        </Reveal>
+
+        {/* branch_address is not returned by the tracking RPC — never an empty row. */}
+        {order.branch_name && (
+          <Reveal>
+            <div className="mt-8 glass-card rounded-2xl p-5">
+              <Title variant="h3">كيف تستلم</Title>
+              <p className="mt-3 flex items-center gap-2 text-sm">
+                <Store className="size-4 shrink-0 text-primary" />
+                {order.branch_name}
               </p>
             </div>
-
-            {/* Timeline */}
-            <div className="glass-card rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-6 text-center">مراحل الطلب</h3>
-              <div className="overflow-x-auto pb-4">
-                <div className="min-w-[600px]">
-                  <OrderStatusTimeline currentStatus={order.status} />
-                </div>
-              </div>
-            </div>
-
-            {/* Order Details */}
-            {order.items && order.items.length > 0 && (
-              <div className="glass-card rounded-2xl p-6">
-                <h3 className="text-lg font-bold mb-4">تفاصيل الطلب</h3>
-                <div className="space-y-3">
-                  {order.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center py-2 border-b border-border last:border-0">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-success" />
-                        <span>{item.product_name}</span>
-                        <span className="text-muted-foreground">×{item.quantity}</span>
-                      </div>
-                      <span className="font-medium">{item.total_price} <RiyalSymbol /></span>
-                    </div>
-                  ))}
-                  <div className="flex justify-between items-center pt-3 font-bold text-lg">
-                    <span>الإجمالي</span>
-                    <span className="text-primary">{order.total_amount} <RiyalSymbol /></span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Pickup Info */}
-            <div className="glass-card rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">معلومات الاستلام</h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">الفرع</p>
-                    <p className="font-medium">{order.branch_name || '-'}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">التاريخ</p>
-                    <p className="font-medium">{formatDate(order.delivery_date)}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">الوقت</p>
-                    <p className="font-medium">{formatTime(order.delivery_time)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Support */}
-            <div className="glass-card rounded-2xl p-6 text-center">
-              <p className="text-muted-foreground mb-3">لديك استفسار؟</p>
-              <Link to="/contact">
-                <Button variant="outline" className="border-primary text-primary">
-                  <Phone className="w-4 h-4 me-2" />
-                  اتصل بنا
-                </Button>
-              </Link>
-            </div>
-          </div>
-        ) : hasSearched ? (
-          <div className="glass-card rounded-2xl p-12 text-center animate-fade-in">
-            <div className="w-20 h-20 mx-auto rounded-full bg-muted flex items-center justify-center mb-4">
-              <Search className="w-10 h-10 text-muted-foreground" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">لم يتم العثور على الطلب</h3>
-            <p className="text-muted-foreground">
-              تأكد من رقم التتبع وحاول مرة أخرى
-            </p>
-          </div>
-        ) : (
-          <div className="glass-card rounded-2xl p-12 text-center">
-            <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Cookie className="w-10 h-10 text-primary" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">تتبع طلبك بسهولة</h3>
-            <p className="text-muted-foreground">
-              أدخل رقم التتبع المرسل لك لمتابعة حالة طلبك
-            </p>
-          </div>
+          </Reveal>
         )}
-      </main>
 
-      <StorefrontFooter storeName={settings.storeName} onNavigate={navigate} />
-    </div>
+        <Reveal>
+          <OrderInvoicePanel lines={lines} totalAmount={order.total_amount} className="mt-5" />
+        </Reveal>
+
+        <Reveal>
+          <div className="mt-8 rounded-2xl border border-dashed border-border bg-blush/40 p-6 text-center">
+            <Title variant="h3">احفظ طلباتك في مكان واحد</Title>
+            <Lede className="mx-auto mt-2 max-w-sm">
+              سجّل بنفس رقم جوالك وتلقى طلباتك كلها — وحالتها — هنا.
+            </Lede>
+            <Button
+              variant="outlineBrand"
+              size="pill"
+              className="mt-4"
+              onClick={() => navigate('/login')}
+            >
+              سجّل الدخول
+            </Button>
+          </div>
+        </Reveal>
+
+        <div className="mt-8 text-center">
+          <Button variant="ghost" size="sm" onClick={() => setShowForm((v) => !v)}>
+            تتبّع طلباً آخر
+          </Button>
+          {showForm && (
+            <TrackCodeForm
+              autoFocus
+              pending={isFetching}
+              className="mx-auto mt-4 max-w-sm text-start"
+              onSubmit={submitCode}
+            />
+          )}
+        </div>
+      </Section>
+
+      <GoldDivider />
+      <KeepShoppingBand
+        context={matched}
+        excludeIds={matchedIds}
+        stage={moment.stage}
+        reviewProduct={null}
+      />
+    </>,
   );
 }

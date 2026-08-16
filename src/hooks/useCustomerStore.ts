@@ -37,6 +37,8 @@ export interface CustomerOrder {
   created_at: string;
   branch_name: string | null;
   items: {
+    /** Returned by get_my_order_details only — absent on /track and in demo. */
+    id?: string;
     product_name: string;
     quantity: number;
     unit_price: number;
@@ -70,7 +72,8 @@ export function useStoreProducts() {
 }
 
 // Get customer's orders
-export function useMyOrders() {
+/** `enabled` lets /track skip this RPC entirely for a signed-out visitor. */
+export function useMyOrders(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['my-orders'],
     queryFn: async () => {
@@ -78,6 +81,7 @@ export function useMyOrders() {
       if (error) throw error;
       return (data || []) as CustomerOrder[];
     },
+    enabled: options?.enabled ?? true,
   });
 }
 
@@ -94,6 +98,63 @@ export function useMyOrderDetails(orderId: string | undefined) {
       return data?.[0] as CustomerOrderDetails | null;
     },
     enabled: !!orderId,
+  });
+}
+
+export interface TrackedOrder {
+  order_number: string;
+  status: string;
+  branch_name: string | null;
+  delivery_date: string | null;
+  delivery_time: string | null;
+  total_amount: number;
+  items: {
+    product_name: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+  }[] | null;
+}
+
+/**
+ * Guest order lookup by tracking code.
+ *
+ * `data === null` means NOT FOUND; `isError` means the request failed. The two
+ * must render different screens — /track previously collapsed both into
+ * "order not found", so a network blip told the customer their code was wrong
+ * and they retyped a correct code forever.
+ */
+export function useTrackedOrder(code: string | null | undefined) {
+  const trimmed = (code ?? '').trim();
+
+  return useQuery({
+    queryKey: ['tracked-order', trimmed],
+    queryFn: async (): Promise<TrackedOrder | null> => {
+      const { data, error } = await supabase.rpc('get_order_by_tracking_code', {
+        _tracking_code: trimmed,
+      });
+      if (error) throw error;
+
+      const row = data?.[0];
+      if (!row) return null;
+
+      // jsonb_agg over an empty set returns NULL, not [] — and the column has
+      // arrived as both a parsed array and a JSON string.
+      let items: TrackedOrder['items'] = null;
+      try {
+        items = row.items
+          ? ((Array.isArray(row.items)
+              ? row.items
+              : JSON.parse(row.items as string)) as TrackedOrder['items'])
+          : null;
+      } catch {
+        items = null;
+      }
+
+      return { ...row, items } as TrackedOrder;
+    },
+    enabled: !!trimmed,
+    retry: 1,
   });
 }
 

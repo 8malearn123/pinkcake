@@ -1,79 +1,87 @@
 import { QRCodeSVG } from 'qrcode.react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { QrCode, AlertCircle } from 'lucide-react';
+import { Eyebrow, ErrorState } from '@/components/ds';
 import { useMyPickupCode } from '@/hooks/usePickupBarcode';
 
 interface PickupQRCodeProps {
   orderId: string;
   orderStatus: string;
+  orderNumber: string;
 }
 
-export function PickupQRCode({ orderId, orderStatus }: PickupQRCodeProps) {
-  const { data: pickupCode, isLoading, error } = useMyPickupCode(orderId);
-  
-  // Only show for ready_for_pickup status
+/**
+ * The collection pass — shown only once the order is waiting at the branch, and
+ * placed directly under the hero so it is the first thing after the answer.
+ */
+export function PickupQRCode({ orderId, orderStatus, orderNumber }: PickupQRCodeProps) {
+  const { data: pickupCode, isLoading, error, refetch } = useMyPickupCode(orderId);
+
   if (orderStatus !== 'ready_for_pickup') {
     return null;
   }
-  
+
   if (isLoading) {
     return (
-      <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="p-6 flex flex-col items-center gap-4">
-          <Skeleton className="w-48 h-48" />
-          <Skeleton className="w-32 h-4" />
-        </CardContent>
-      </Card>
+      <div className="glass-card rounded-2xl p-6 text-center">
+        <Skeleton className="mx-auto size-48 rounded-xl" />
+        <Skeleton className="mx-auto mt-4 h-4 w-32" />
+      </div>
     );
   }
-  
+
+  // A failure here must never block collection — fall back to the order number,
+  // which the cashier can look the order up by.
   if (error || !pickupCode) {
     return (
-      <Card className="border-destructive/20 bg-destructive/5">
-        <CardContent className="p-6 flex flex-col items-center gap-2 text-center">
-          <AlertCircle className="w-8 h-8 text-destructive" />
-          <p className="text-sm text-destructive">
-            لم نتمكن من تحميل كود الاستلام
-          </p>
-        </CardContent>
-      </Card>
+      <div className="glass-card rounded-2xl p-6 text-center">
+        <ErrorState
+          title="ما قدرنا نعرض رمز الاستلام"
+          description="اذكر رقم طلبك عند الكاشير وبنجهّزه لك."
+          onRetry={() => refetch()}
+          retryLabel="جرّب مرة ثانية"
+          className="py-4"
+        />
+        <bdi dir="ltr" className="mt-2 block text-2xl font-black text-primary">
+          {orderNumber}
+        </bdi>
+      </div>
     );
   }
-  
+
   return (
-    <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-      <CardContent className="p-6 flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2 text-primary">
-          <QrCode className="w-5 h-5" />
-          <span className="font-bold">كود الاستلام</span>
-        </div>
-        
-        <Badge variant="default">
-          جاهز للاستلام
-        </Badge>
-        
-        <div className="bg-white p-4 rounded-xl shadow-md">
-          <QRCodeSVG
-            value={pickupCode}
-            size={180}
-            level="H"
-            includeMargin
-            bgColor="#ffffff"
-            fgColor="#000000"
-          />
-        </div>
-        
-        <div className="text-center space-y-2">
-          <p className="text-sm font-mono bg-muted px-3 py-1 rounded">
-            {pickupCode}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            يرجى إبراز هذا الباركود عند الاستلام من الفرع
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="glass-card rounded-2xl p-6 text-center">
+      <Eyebrow rule="both" caps className="justify-center">
+        رمز الاستلام
+      </Eyebrow>
+
+      <div
+        role="img"
+        aria-label="رمز استلام الطلب"
+        className="mx-auto mt-4 w-fit rounded-xl border border-border p-4"
+      >
+        {/*
+          Hex, not tokens: a QR must be true black on true white to scan
+          reliably. `includeMargin` supplies the white quiet zone, so the
+          wrapper needs no bg-white of its own.
+        */}
+        <QRCodeSVG
+          value={pickupCode}
+          size={180}
+          level="H"
+          includeMargin
+          bgColor="#ffffff"
+          fgColor="#000000"
+        />
+      </div>
+
+      <p className="mt-4">
+        <bdi dir="ltr" className="rounded bg-muted px-3 py-1 font-mono text-lg tracking-widest">
+          {pickupCode}
+        </bdi>
+      </p>
+      <p className="mt-3 text-sm text-muted-foreground">
+        اعرض هذا الرمز عند الكاشير، وكيكتك بانتظارك.
+      </p>
+    </div>
   );
 }

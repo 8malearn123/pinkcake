@@ -172,7 +172,13 @@ export default function EventBuilder() {
 
       <main className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         {phase === 'done' && (
-          <SuccessView tracking={tracking} onTrack={() => navigate('/track')} onHome={() => navigate('/')} />
+          <SuccessView
+            tracking={tracking}
+            // Carry the code we just showed them — sending them to a bare /track
+            // meant retyping a code that was on screen a second ago.
+            onTrack={() => navigate(tracking ? `/track?code=${encodeURIComponent(tracking)}` : '/track')}
+            onHome={() => navigate('/')}
+          />
         )}
 
         {(phase === 'wizard' || phase === 'cart') && (
