@@ -4,6 +4,7 @@
  */
 import * as d from './data';
 import { currentRoles } from './data';
+import { loyaltyRpc } from './loyalty';
 
 type Args = Record<string, unknown> | undefined;
 
@@ -122,7 +123,18 @@ const READ: Record<string, (args: Args) => unknown> = {
   // storefront checkout — appends to the demo orders (and, when a line carries a
   // cake_design, to the chef's custom queue) so the session's own checkout is
   // visible downstream, then returns the confirmation envelope.
-  create_customer_order: (a) => d.pushCustomerOrder(a),
+  //
+  // المكافأة تُصرف هنا لا في نداء منفصل، مطابقةً للدالة الحقيقية: طلب يُنشأ
+  // ومكافأة لا تُصرف (أو العكس) هو بالضبط ما تمنعه المعاملة الواحدة.
+  create_customer_order: (a) => {
+    const res = d.pushCustomerOrder(a) as Record<string, unknown>;
+    const rewardCode = a?.['_reward_code'];
+    if (rewardCode) {
+      const name = loyaltyRpc.__captureReward({ _code: rewardCode });
+      if (name) return { ...res, reward_applied: name };
+    }
+    return res;
+  },
   // mock payment capture — returns a "paid" envelope so checkout can show a
   // processing → paid transition without a real gateway (see HANDOFF).
   mock_capture_payment: () => ({
@@ -144,6 +156,10 @@ const READ: Record<string, (args: Args) => unknown> = {
     if (!match) return { valid: false, message: 'رمز غير صالح أو منتهي الصلاحية' };
     return { valid: true, code, kind: match.kind, value: match.value, message: 'تم تطبيق الكوبون' };
   },
+
+  // «دائرة المناسبات» — حالة حقيقية قابلة للتغيّر في `./loyalty.ts`، لا ردود
+  // ثابتة، وإلا بدت المناسبات تُحفظ والمكافآت تُصرف بلا أن يتغيّر شيء.
+  ...loyaltyRpc,
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {

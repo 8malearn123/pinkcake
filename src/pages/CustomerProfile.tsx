@@ -14,6 +14,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
+import {
+  ConsentToggles,
+  OccasionRegistry,
+  ReferralPanel,
+  RewardsPanel,
+  StampCard,
+} from '@/components/loyalty';
 import { ArrowRight, User, Phone, MapPin, Loader2, Cake, Save, Package, Heart, Truck, ChevronLeft, LogOut } from 'lucide-react';
 
 interface CustomerProfile {
@@ -174,6 +181,14 @@ export default function CustomerProfile() {
             </button>
           ))}
         </div>
+
+        {/* «دائرة المناسبات» — سجل المناسبات هو المحرّك، وما حوله يدعمه.
+            يسبق «بياناتي» عمداً: هذه هي القيمة التي نعود من أجلها. */}
+        <StampCard />
+        <OccasionRegistry />
+        <RewardsPanel />
+        <ReferralPanel />
+        <ConsentToggles />
 
         {/* Profile details */}
         {isLoading ? (

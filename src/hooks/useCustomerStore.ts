@@ -207,6 +207,12 @@ export function useCreateCustomerOrder() {
       paymentMethod?: string | null;
       couponCode?: string | null;
       discount?: number;
+      /**
+       * رمز مكافأة «دائرة المناسبات». يُصرف داخل نفس معاملة إنشاء الطلب، فلا
+       * يبقى احتمال طلب أُنشئ ومكافأة لم تُصرف (أو العكس). المكافأة تُضاف صنفاً
+       * بسعر صفر ولا تُنقص الإجمالي — ليست خصماً.
+       */
+      rewardCode?: string | null;
       items: {
         product_id: string | null;
         product_name: string;
@@ -240,19 +246,23 @@ export function useCreateCustomerOrder() {
         _payment_method: payload.paymentMethod ?? null,
         _coupon_code: payload.couponCode ?? null,
         _discount: payload.discount ?? 0,
+        _reward_code: payload.rewardCode ?? null,
         _items: payload.items,
       });
 
       if (error) throw error;
       const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | string | null;
-      if (typeof row === 'string') return { orderId: row, orderNumber: row };
+      if (typeof row === 'string') return { orderId: row, orderNumber: row, rewardApplied: null as string | null };
       return {
         orderId: String((row as Record<string, unknown>)?.order_id ?? (row as Record<string, unknown>)?.id ?? ''),
         orderNumber: String((row as Record<string, unknown>)?.order_number ?? ''),
+        rewardApplied: ((row as Record<string, unknown>)?.reward_applied as string | null) ?? null,
       };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-orders'] });
+      // الطلب قد يكون صرف مكافأة أو حرّك كرت الأختام، فملخّص الولاء يتغيّر معه.
+      queryClient.invalidateQueries({ queryKey: ['loyalty'] });
     },
     onError: (error) => {
       console.error('Create order error:', error);

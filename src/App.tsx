@@ -56,6 +56,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const DesignSystem = lazy(() => import("./pages/DesignSystem"));
 const CakeDesign = lazy(() => import("./pages/CakeDesign"));
+const Loyalty = lazy(() => import("./pages/Loyalty"));
 const LozaHome = lazy(() => import("./pages/loza/LozaHome"));
 const LozaCustomizer = lazy(() => import("./pages/loza/LozaCustomizer"));
 const LozaCakeDetails = lazy(() => import("./pages/loza/LozaCakeDetails"));
@@ -334,6 +335,15 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRoles={['admin']}>
                     <CakeDesign />
+                  </ProtectedRoute>
+                }
+              />
+              {/* برنامج الولاء «دائرة المناسبات» */}
+              <Route
+                path="/loyalty"
+                element={
+                  <ProtectedRoute requiredRoles={['admin']}>
+                    <Loyalty />
                   </ProtectedRoute>
                 }
               />

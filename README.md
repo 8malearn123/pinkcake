@@ -71,6 +71,11 @@ service-role key belongs only in Edge Functions.
 > **Settings → Notifications**, and run server‑side. Provider API keys live only
 > as Edge Function secrets — see [`docs/notifications.md`](docs/notifications.md).
 
+> The loyalty program **«دائرة المناسبات»** (occasion registry + WhatsApp
+> reminders, stamp card, in‑kind rewards, referrals) is admin‑configured at
+> `/loyalty` and **off by default**. Operator guide, the binding 3 %‑of‑revenue
+> cost ceiling, and the open tax/legal items: [`docs/loyalty.md`](docs/loyalty.md).
+
 ## Scripts
 
 | Script | Does |

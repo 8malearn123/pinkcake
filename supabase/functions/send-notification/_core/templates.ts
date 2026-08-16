@@ -57,6 +57,90 @@ interface RenderCtx {
   track: string;
 }
 
+/* ────────────────────────────────────────────────────────────────────────
+ * تذكيرات المناسبات — «دائرة المناسبات»
+ *
+ * عائلتان منفصلتان عمداً، ولكل واحدة أساس نظامي مختلف:
+ *
+ *   utility   — تذكير مجرّد: لا سعر ولا عرض ولا دعوة للشراء. يستند إلى
+ *               استثناء «التعامل السابق» في اللائحة التنفيذية لنظام حماية
+ *               البيانات (م.٢٨/١)، فلا يستلزم موافقة تسويقية منفصلة.
+ *
+ *   marketing  — يحمل عرضاً أو مكافأة. يقع تحت التسويق المباشر (م.٢٩) الذي
+ *               **لا استثناء فيه**، فلا يُرسل إلا بموافقة صريحة مسجّلة.
+ *
+ * خلط العائلتين هو الخطأ الذي يحوّل تذكيراً مشروعاً إلى مخالفة، ولذلك
+ * الفصل هنا في الشيفرة لا في تعليمات التشغيل.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+export type ReminderKind = 'utility' | 'marketing';
+
+export interface OccasionReminderContext {
+  /** الاسم الذي حفظته العميلة للمناسبة — نص حر، لا هوية طرف ثالث. */
+  label: string;
+  occasionType: string;
+  /** كم يوماً تفصلنا عن المناسبة (١٤ / ٥ / ١). */
+  leadDays: number;
+  storeName: string;
+  /** رابط المتجر، أو null فلا يُذكر رابط. */
+  shopUrl: string | null;
+  kind: ReminderKind;
+}
+
+const OCCASION_NOUNS: Record<string, string> = {
+  birthday: 'عيد ميلاد',
+  anniversary: 'ذكرى زواج',
+  graduation: 'تخرّج',
+  newborn: 'مولود',
+  work: 'مناسبة عمل',
+  other: 'مناسبة',
+};
+
+/** «عيد ميلاد ماما» — الاسم كما حفظته العميلة، مسبوقاً بنوع المناسبة. */
+export function occasionPhrase(occasionType: string, label: string): string {
+  const noun = OCCASION_NOUNS[occasionType] ?? OCCASION_NOUNS.other;
+  return `${noun} ${label.trim()}`;
+}
+
+/**
+ * نصّ التذكير. يُعيد null إن كانت المدّة غير مدعومة، حتى لا تُرسل رسالة
+ * بصياغة عامة لا تناسب توقيتها.
+ */
+export function renderOccasionReminder(ctx: OccasionReminderContext): string | null {
+  const phrase = occasionPhrase(ctx.occasionType, ctx.label);
+
+  if (ctx.kind === 'utility') {
+    // لا سعر، لا خصم، لا «اطلبي الآن» — **ولا رابط متجر**. الرابط دعوة للشراء،
+    // وإرفاقه يحوّل التذكير المجرّد إلى تسويق مباشر. نتجاهل `shopUrl` هنا عمداً
+    // بدل الاعتماد على أن المُنادي مرّر null: القاعدة نظامية، فمكانها القالب لا
+    // موقع الاستدعاء.
+    if (ctx.leadDays >= 14) {
+      return `تذكير من ${ctx.storeName} 🌸\nباقي أسبوعان على ${phrase}.\nحبّينا نذكّرك من بدري عشان يكون عندك وقت للتجهيز.`;
+    }
+    if (ctx.leadDays >= 5) {
+      return `${phrase} بعد خمسة أيام 🎂\nتجهيز الكيك يحتاج ٢٤ ساعة على الأقل، فخلّينا نبدأ من الآن.`;
+    }
+    if (ctx.leadDays >= 1) {
+      return `${phrase} غداً 💝\nإذا ما جهّزتي شيء بعد، كلّمينا ونشوف الممكن.`;
+    }
+    return null;
+  }
+
+  const link = ctx.shopUrl ? `\n${ctx.shopUrl}` : '';
+
+  // العائلة التسويقية: تحمل قيمة صريحة، ولا تُرسل إلا بموافقة مسجّلة.
+  if (ctx.leadDays >= 14) {
+    return `${ctx.storeName} 🌸\nباقي أسبوعان على ${phrase}. اطلبي من بدري واختاري موعد التسليم اللي يناسبك، وأضيفي لمسة التخصيص لطلبك.${link}`;
+  }
+  if (ctx.leadDays >= 5) {
+    return `${phrase} قرّبت 🎂\nاطلبي اليوم واختاري تصميمك من الاستوديو — والتوصيل مجاني فوق ٢٠٠ ريال.${link}`;
+  }
+  if (ctx.leadDays >= 1) {
+    return `${phrase} غداً 💝\nعندنا خيارات جاهزة تُسلَّم اليوم — كلّمينا ونرتّبها لك.${link}`;
+  }
+  return null;
+}
+
 /**
  * Render the message body for a status, or null if the status is not
  * customer-facing. Pure: same input → same output.

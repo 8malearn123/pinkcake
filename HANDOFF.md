@@ -218,9 +218,39 @@ studio. What the backend needs is all in migrations already in this repo:
   `channel: 'staff'`, `customer_name`, `customer_phone`, `customer_address` and
   `notes` when raised from `/orders/new-event`.
 
+## Loyalty — «دائرة المناسبات» (occasion registry, stamps, referrals)
+
+An occasion-led loyalty program (not a points bank). Four migrations
+(`20260816090000` … `20260816120000`), one Edge Function
+(`send-occasion-reminders`), an admin page at `/loyalty`, and the customer
+surface on `/my-profile`. Full operator guide: [`docs/loyalty.md`](docs/loyalty.md).
+
+**Phase 0 of that work fixes two pre-existing defects, independent of loyalty:**
+
+- `customers.phone` had no normalisation, so a number pasted from WhatsApp in
+  Arabic-Indic digits (`٠٥٠١٢٣٤٥٦٧`) silently created a second customer. There is
+  now one `normalize_msisdn()` function, a generated `phone_normalized` column, a
+  **unique index**, and a one-time duplicate merge. `search_customer_by_phone` and
+  `upsert_customer_by_phone` both moved onto it.
+- `create_customer_order` accepted `_delivery_fee`, `_discount`, `_coupon_code`
+  and `_payment_method` from the client and **dropped all four on the floor** —
+  `orders` only had `total_amount`. The columns now exist and are persisted, so
+  rewards can accrue on subtotal rather than on delivery.
+
+Two things deliberately absent, both structural rather than procedural: there is
+**no manual point-grant function anywhere** (accrual derives only from a settled
+order, because the order-creation RPCs are `SECURITY DEFINER`), and **no reward
+is ever a riyal discount** (a free line at price 0 costs ~a third of its face
+value and keeps the VAT base intact).
+
 ## Quick checklist
 
 - [ ] Add real Supabase env, set `VITE_DEMO_MODE="false"`
+- [ ] **Loyalty** — `supabase db push` (review the duplicate-customer merge on a
+      backup first; it is not reversible), deploy `send-occasion-reminders`,
+      schedule it daily at ~10:00 Riyadh, schedule `loyalty_expire_inactive()` and
+      `reconcile_loyalty_balances()` monthly, then enable the program from
+      `/loyalty`. Open legal/tax items are listed in `docs/loyalty.md`.
 - [ ] Apply migrations (`supabase db push`) and regenerate
       `src/integrations/supabase/types.ts`
 - [ ] Confirm `get_my_roles` returns each role; verify each role's screens load
