@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePublicStoreBranches } from '@/hooks/usePublicStore';
 import { useCreateCustomerOrder, useCapturePayment, useValidateCoupon, useCustomerProfile, type AppliedCoupon } from '@/hooks/useCustomerStore';
+import { useMyRewards, useValidateReward, type AppliedReward } from '@/hooks/useLoyalty';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -66,6 +67,9 @@ export function CartSheet() {
   const createOrder = useCreateCustomerOrder();
   const capturePayment = useCapturePayment();
   const validateCoupon = useValidateCoupon();
+  const validateReward = useValidateReward();
+  // السلة مركّبة على كل صفحات المتجر — لا نستعلم عن المكافآت لزائرة غير مسجّلة.
+  const { data: myRewards = [] } = useMyRewards(!!user);
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [mode, setMode] = useState<Mode>('delivery');
@@ -85,6 +89,8 @@ export function CartSheet() {
   const [couponInput, setCouponInput] = useState('');
   const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
   const [couponError, setCouponError] = useState('');
+  const [reward, setReward] = useState<AppliedReward | null>(null);
+  const [rewardError, setRewardError] = useState('');
   const [placed, setPlaced] = useState<
     { orderId: string; orderNumber: string; paid: boolean; method: PayMethod; transactionId?: string } | null
   >(null);
@@ -151,6 +157,24 @@ export function CartSheet() {
 
   const removeCoupon = () => { setCoupon(null); setCouponInput(''); setCouponError(''); };
 
+  // المكافأة صنف مجاني يُضاف، لا خصم يُنقص — لذلك لا تدخل في حساب `discount`
+  // ولا تغيّر الإجمالي. التحقّق يُعاد خادمياً عند إنشاء الطلب أيضاً.
+  const usableRewards = myRewards.filter((r) => r.is_usable && r.redemption_code);
+
+  const applyReward = async (code: string) => {
+    setRewardError('');
+    try {
+      const applied = await validateReward.mutateAsync({ code, subtotal: cartTotal });
+      setReward(applied);
+      toast({ title: 'أضفنا مكافأتك', description: applied.name });
+    } catch (e) {
+      setReward(null);
+      setRewardError(e instanceof Error ? e.message : 'المكافأة غير صالحة');
+    }
+  };
+
+  const removeReward = () => { setReward(null); setRewardError(''); };
+
   const handleCheckout = async () => {
     // Guest checkout: name + phone are collected below, so a logged-out shopper
     // can place the order without a forced-login wall (top abandonment cause);
@@ -182,6 +206,7 @@ export function CartSheet() {
         paymentMethod: payment,
         couponCode: coupon?.code ?? null,
         discount,
+        rewardCode: reward?.code ?? null,
         items,
       });
       if (payment === 'cod') {
@@ -212,6 +237,7 @@ export function CartSheet() {
     setPlaced(null);
     close();
     setCardMessage(''); setNotes(''); setIsGift(false); setGiftToOther(false); setGiftName(''); setGiftPhone('');
+    setReward(null); setRewardError('');
     setPayment(null);
     setCoupon(null); setCouponInput(''); setCouponError('');
   };
@@ -549,6 +575,44 @@ export function CartSheet() {
                   )}
                 </Section>
 
+                {/* مكافآت «دائرة المناسبات» — تظهر فقط لمن لديها مكافأة صالحة،
+                    فلا نُعلن برنامجاً لا تملك العميلة فيه شيئاً بعد. */}
+                {(usableRewards.length > 0 || reward) && (
+                  <Section title="مكافآتي">
+                    {reward ? (
+                      <div className="flex items-center justify-between gap-2 rounded-2xl border border-gold/50 bg-gold-soft/20 p-3">
+                        <span className="flex items-center gap-2 text-sm font-medium">
+                          <Gift className="w-4 h-4 text-gold-deep shrink-0" />
+                          {reward.name}
+                          <span className="text-muted-foreground">مجاناً</span>
+                        </span>
+                        <Button size="icon" variant="ghost" aria-label="إزالة المكافأة" className="h-7 w-7 text-destructive shrink-0" onClick={removeReward}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {usableRewards.map((r) => (
+                          <button
+                            key={r.redemption_code}
+                            type="button"
+                            onClick={() => applyReward(r.redemption_code as string)}
+                            disabled={validateReward.isPending}
+                            className="press flex w-full items-center justify-between gap-3 rounded-2xl border border-border bg-card p-3 text-start transition-colors hover:border-gold/50"
+                          >
+                            <span className="flex min-w-0 items-center gap-2">
+                              <Gift className="w-4 h-4 shrink-0 text-gold-deep" />
+                              <span className="truncate text-sm font-medium">{r.name}</span>
+                            </span>
+                            <span className="shrink-0 text-xs font-semibold text-primary">استخدام</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {rewardError && <p className="text-xs text-destructive mt-1.5">{rewardError}</p>}
+                  </Section>
+                )}
+
                 {/* Summary */}
                 <div className="rounded-2xl border border-border bg-card p-4 space-y-2">
                   <div className="text-sm font-bold mb-1">ملخص الطلب</div>
@@ -567,6 +631,16 @@ export function CartSheet() {
                       )}
                     </div>
                   ))}
+                  {/* سطر المكافأة بسعر صفر: الإجمالي لا يتغيّر. هذا ما يجعلها
+                      تكلّف ثلث قيمتها لا كاملها، ولا تمسّ وعاء الضريبة. */}
+                  {reward && (
+                    <div className="flex justify-between text-[13px] pt-1">
+                      <span className="flex items-center gap-1 text-muted-foreground">
+                        <Gift className="w-3.5 h-3.5 text-gold-deep" /> {reward.name}
+                      </span>
+                      <span className="font-medium text-success">مجاناً</span>
+                    </div>
+                  )}
                   {discount > 0 && (
                     <div className="flex justify-between text-[13px] pt-1 text-success">
                       <span className="flex items-center gap-1">

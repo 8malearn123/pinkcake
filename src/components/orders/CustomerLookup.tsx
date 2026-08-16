@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCustomerLookup } from '@/hooks/useCustomerLookup';
+import { LoyaltyBadge } from '@/components/loyalty';
 import { validateKsaPhone } from '@/lib/validation';
 import { cn } from '@/lib/utils';
 import {
@@ -65,6 +66,9 @@ export function CustomerLookup({
   const [query, setQuery] = useState(value.phone);
   const [queryError, setQueryError] = useState<string | null>(null);
   const [missedPhone, setMissedPhone] = useState<string | null>(null);
+  // The resolved customer id — only used to show the loyalty badge, never
+  // surfaced to the parent form (the create RPCs still upsert by phone).
+  const [matchedId, setMatchedId] = useState<string | null>(null);
 
   const runSearch = async () => {
     const phone = query.trim();
@@ -81,6 +85,7 @@ export function CustomerLookup({
 
     if (customer) {
       setMissedPhone(null);
+      setMatchedId(customer.id);
       onChange({
         name: customer.name,
         phone: customer.phone,
@@ -97,6 +102,7 @@ export function CustomerLookup({
   const startNewCustomer = () => {
     onChange({ name: '', phone: missedPhone ?? query.trim(), address: '' });
     setMissedPhone(null);
+    setMatchedId(null);
     onStatusChange('manual');
   };
 
@@ -105,6 +111,7 @@ export function CustomerLookup({
     setQuery('');
     setQueryError(null);
     setMissedPhone(null);
+    setMatchedId(null);
     lookup.reset();
     onStatusChange('idle');
   };
@@ -216,6 +223,10 @@ export function CustomerLookup({
             <CustomerFact label="رقم الجوال" value={value.phone} ltr />
             <CustomerFact label="العنوان" value={value.address} />
           </dl>
+
+          {/* المكافأة لا الرصيد: رقم على الطاولة يفتح باب المساومة، والشارة
+              تكفي لإتمام العملية. */}
+          <LoyaltyBadge customerId={matchedId} className="mt-4" />
         </div>
       </div>
     );

@@ -34,6 +34,7 @@ const ADMIN_ONLY_ROUTES = [
   '/branches',
   '/reports',
   '/products',
+  '/loyalty',
 ];
 
 export function useRoleRedirect() {
