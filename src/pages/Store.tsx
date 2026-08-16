@@ -17,6 +17,7 @@ import { CustomCakeSection } from '@/components/store/CustomCakeSection';
 import { SeasonalSection } from '@/components/store/SeasonalSection';
 import { ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
 import { StoreProductCard } from '@/components/store/StoreProductCard';
+import { CardRail } from '@/components/store/CardRail';
 import { CombosSection } from '@/components/store/CombosSection';
 import { Reviews } from '@/components/store/Reviews';
 import { EventsSection } from '@/components/store/EventsSection';
@@ -211,9 +212,9 @@ export default function Store() {
         {listed.length === 0 ? (
           <p className="py-20 text-center text-sm text-muted-foreground">لا توجد نتائج لـ «{query}». جرّب كلمة أخرى.</p>
         ) : (
-          <Reveal className="reveal-grid mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:mt-9 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
+          <CardRail className="mt-8 sm:mt-9 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3 xl:grid-cols-4">
             {listed.map((product) => renderCard(product))}
-          </Reveal>
+          </CardRail>
         )}
       </section>
 

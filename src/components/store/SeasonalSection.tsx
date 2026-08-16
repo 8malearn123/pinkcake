@@ -2,6 +2,7 @@ import { Sun } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
 import { Reveal } from '@/components/Reveal';
+import { CardRail } from '@/components/store/CardRail';
 
 // Faithful clone of the design's SeasonalCollection header + the shared card grid.
 export function SeasonalSection({
@@ -31,9 +32,9 @@ export function SeasonalSection({
             نفاد سريع — احجز الآن
           </span>
         </Reveal>
-        <Reveal className="reveal-grid mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:mt-9 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4">
+        <CardRail className="mt-8 sm:mt-9 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-4">
           {products.map((p) => renderCard(p))}
-        </Reveal>
+        </CardRail>
       </div>
     </section>
   );
