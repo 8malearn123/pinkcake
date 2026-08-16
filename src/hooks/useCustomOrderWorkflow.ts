@@ -110,7 +110,8 @@ export function useSendPricingToCustomer() {
 }
 
 // Hook for customers to get their pricing requests
-export function useMyPricingRequests() {
+/** `enabled` lets the order-detail page skip this RPC unless the order is actually awaiting a price response. */
+export function useMyPricingRequests(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['my-pricing-requests'],
     queryFn: async () => {
@@ -118,6 +119,7 @@ export function useMyPricingRequests() {
       if (error) throw error;
       return (data || []) as CustomerPricingRequest[];
     },
+    enabled: options?.enabled ?? true,
   });
 }
 

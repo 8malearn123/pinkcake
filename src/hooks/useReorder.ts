@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
-import { CART_STORAGE_KEY } from '@/contexts/StoreCartContext';
+import { CART_STORAGE_KEY, useStoreCartOptional } from '@/contexts/StoreCartContext';
 import type { CartItem } from '@/hooks/useCustomerStore';
 import { toast } from '@/hooks/use-toast';
 
@@ -11,12 +11,18 @@ type ReorderItem = { product_name: string; quantity: number };
  * the customer to the store with the cart open.
  *
  * Order items only carry `product_name` (no product_id), so we match by name
- * against the live catalogue. `/my-orders` lives OUTSIDE StoreCartProvider, so we
- * merge into the persisted cart (localStorage, key CART_STORAGE_KEY) which the
- * provider re-reads on mount — rather than the in-memory cart context.
+ * against the live catalogue.
+ *
+ * ⚠ /track, /my-orders and /my-orders/:id all DO live inside StoreCartProvider
+ * (App.tsx wraps them in StorefrontLayout). The provider seeds itself from
+ * localStorage once via `useState(loadInitial)` and never remounts across those
+ * routes, then writes the in-memory cart back on every change — so writing
+ * storage and navigating silently lost the reorder. Go through the context when
+ * it is there; keep the storage merge only for a consumer mounted outside it.
  */
 export function useReorder() {
   const { data: products } = usePublicStoreProducts();
+  const cart = useStoreCartOptional();
   const navigate = useNavigate();
 
   return (items: ReorderItem[] | null | undefined) => {
@@ -45,24 +51,34 @@ export function useReorder() {
       return;
     }
 
-    // Merge into the persisted cart (StoreCartProvider re-reads this on mount).
-    let existing: CartItem[] = [];
-    try {
-      const raw = localStorage.getItem(CART_STORAGE_KEY);
-      if (raw) existing = JSON.parse(raw) as CartItem[];
-    } catch {
-      existing = [];
-    }
-    const merged = existing.map((c) => ({ ...c }));
-    for (const m of matched) {
-      const found = merged.find((c) => c.product.id === m.product.id);
-      if (found) found.quantity += m.quantity;
-      else merged.push(m);
-    }
-    try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(merged));
-    } catch {
-      /* storage unavailable — nothing else we can do here */
+    const mergeInto = (existing: CartItem[]) => {
+      const merged = existing.map((c) => ({ ...c }));
+      for (const m of matched) {
+        const found = merged.find((c) => c.product.id === m.product.id);
+        if (found) found.quantity += m.quantity;
+        else merged.push(m);
+      }
+      return merged;
+    };
+
+    if (cart) {
+      cart.setCart(mergeInto);
+      cart.open();
+    } else {
+      // Mounted outside StoreCartProvider — merge into the persisted cart, which
+      // the provider seeds from on its next mount.
+      let existing: CartItem[] = [];
+      try {
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
+        if (raw) existing = JSON.parse(raw) as CartItem[];
+      } catch {
+        existing = [];
+      }
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(mergeInto(existing)));
+      } catch {
+        /* storage unavailable — nothing else we can do here */
+      }
     }
 
     toast({

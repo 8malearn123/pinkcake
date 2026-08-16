@@ -1,262 +1,223 @@
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { ArrowRight, Cake, MapPin, Store } from 'lucide-react';
 import { useMyOrderDetails, useMyOrderRealtime } from '@/hooks/useCustomerStore';
+import { useOrderItemLines } from '@/hooks/useOrderItemLines';
 import { useReorder } from '@/hooks/useReorder';
+import { useMyPricingRequests } from '@/hooks/useCustomOrderWorkflow';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSettings } from '@/contexts/SettingsContext';
+import { getOrderMoment, type MomentActionKind } from '@/lib/orders/customerMoment';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { OrderStatusTimeline } from '@/components/orders/OrderStatusTimeline';
-import { StatusBadge } from '@/components/ui/StatusBadge';
-import { PickupQRCode } from '@/components/orders/PickupQRCode';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
+import { StorefrontFooter } from '@/components/store/StorefrontFooter';
+import { FloatingContactButton } from '@/components/store/FloatingContactButton';
+import { BackToTop } from '@/components/store/BackToTop';
 import { Marquee } from '@/components/store/StorefrontDecor';
-import { Eyebrow, Title } from '@/components/ds';
+import { Reveal } from '@/components/Reveal';
 import {
-  ArrowRight,
-  Calendar,
-  Clock,
-  MapPin,
-  Package,
-  CreditCard,
-  Receipt,
-  Cake,
-  CheckCircle2,
-  AlertCircle,
-  Store,
-  LogOut,
-  Loader2,
-  RefreshCw,
-} from 'lucide-react';
-import { OrderStatus } from '@/types/order';
-import { RiyalSymbol } from '@/components/ui/riyal';
+  EmptyState,
+  ErrorState,
+  GoldDivider,
+  LoadingState,
+  Section,
+  Title,
+} from '@/components/ds';
+import { OrderMomentHero } from '@/components/orders/OrderMomentHero';
+import { OrderItemsGallery } from '@/components/orders/OrderItemsGallery';
+import { OrderInvoicePanel } from '@/components/orders/OrderInvoicePanel';
+import { KeepShoppingBand } from '@/components/orders/KeepShoppingBand';
+import { PickupQRCode } from '@/components/orders/PickupQRCode';
+import { CustomerPricingCard } from '@/components/orders/CustomerPricingCard';
 
+/**
+ * One order, for the customer who placed it.
+ *
+ * Same hero, same gallery, same tail as /track — the two surfaces read from one
+ * narrative module so they can never say different things about one order.
+ */
 export default function MyOrderDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isLoading: authLoading, signOut } = useAuth();
-  const { data: order, isLoading, error } = useMyOrderDetails(id);
+  const { user, isLoading: authLoading } = useAuth();
+  const { settings } = useSettings();
+  const { data: order, isLoading, error, refetch } = useMyOrderDetails(id);
   const reorder = useReorder();
 
-  // Enable realtime updates
   useMyOrderRealtime(id);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/login" replace />;
+  const { lines, matched, matchedIds } = useOrderItemLines(order?.items);
+  const isPricing = order?.status === 'pricing_sent_to_customer';
+  const { data: pricingRequests } = useMyPricingRequests({ enabled: isPricing });
+  const pricingRequest = pricingRequests?.find((r) => r.id === id) ?? null;
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" aria-label="رجوع" onClick={() => navigate('/my-orders')}>
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Skeleton className="h-6 w-40" />
-            </div>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 py-6 space-y-6">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-64 w-full" />
-        </main>
-      </div>
-    );
-  }
-
-  if (error || !order) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md mx-4 text-center p-6">
-          <AlertCircle className="w-16 h-16 mx-auto text-destructive mb-4" />
-          <h2 className="text-xl font-bold mb-2">الطلب غير موجود</h2>
-          <p className="text-muted-foreground mb-4">
-            لم نتمكن من العثور على هذا الطلب
-          </p>
-          <Button onClick={() => navigate('/my-orders')}>
-            العودة لطلباتي
-          </Button>
-        </Card>
-      </div>
-    );
-  }
-
-  const isPaid = order.payment_status === 'paid';
-
-  return (
+  const shell = (children: React.ReactNode) => (
     <div className="store-surface min-h-screen bg-background text-foreground">
       <Marquee />
       <StorefrontMasthead />
+      <main>{children}</main>
+      <StorefrontFooter storeName={settings.storeName} onNavigate={navigate} />
+      <FloatingContactButton />
+      <BackToTop />
+    </div>
+  );
 
-      <main className="mx-auto max-w-3xl space-y-5 px-5 py-10 sm:px-8 lg:py-14">
-        <div className="mb-2 flex flex-wrap items-end justify-between gap-3 border-b border-primary/15 pb-6">
-          <div className="min-w-0">
-            <Eyebrow>طلب</Eyebrow>
-            <Title variant="h2" as="h1" className="mt-2 truncate">
-              {order.order_number}
-            </Title>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outlineBrand" size="pill" onClick={() => navigate('/my-orders')}>
-              <ArrowRight className="size-4" /> كل طلباتي
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => signOut()} className="rounded-full" aria-label="تسجيل الخروج">
-              <LogOut className="size-5" />
-            </Button>
-          </div>
+  // Plain ArrowRight, no .cta-arrow — that class is a physical translateX(-5px)
+  // and nudges toward the end edge, the wrong way for a back arrow in RTL.
+  const backRail = (
+    <div className="mb-6">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="rounded-full"
+        onClick={() => navigate('/my-orders')}
+      >
+        <ArrowRight className="size-4" /> كل طلباتي
+      </Button>
+    </div>
+  );
+
+  if (authLoading) return shell(<LoadingState />);
+  if (!user) return <Navigate to="/login" replace />;
+
+  if (isLoading) {
+    return shell(
+      <Section variant="list" width="prose">
+        {backRail}
+        <div className="glass-card rounded-3xl p-6 sm:p-8">
+          <Skeleton className="h-7 w-24 rounded-full" />
+          <Skeleton className="mt-4 h-9 w-4/5" />
+          <Skeleton className="mt-4 h-7 w-1/2" />
+          <Skeleton className="mt-3 h-4 w-2/3" />
+          <Skeleton className="mt-7 h-1.5 w-full rounded-full" />
         </div>
+        <Skeleton className="mt-6 aspect-[4/3] w-full rounded-2xl" />
+      </Section>,
+    );
+  }
 
-        {/* Status Card */}
-        <Card className="rounded-2xl shadow-berry-soft">
-          <CardContent className="p-5">
+  if (error) {
+    return shell(
+      <Section variant="list" width="prose">
+        {backRail}
+        <ErrorState
+          title="ما قدرنا نجيب تفاصيل طلبك الآن"
+          description="تحقّق من اتصالك ثم جرّب مرة ثانية."
+          onRetry={() => refetch()}
+          retryLabel="جرّب مرة ثانية"
+        />
+      </Section>,
+    );
+  }
 
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-primary" />
-                <span className="font-medium">حالة الطلب</span>
-              </div>
-              <StatusBadge status={order.status as OrderStatus} />
-            </div>
-            
-            {/* Status Timeline */}
-            <div className="overflow-x-auto pb-2">
-              <OrderStatusTimeline
-                currentStatus={order.status as OrderStatus}
-                className="min-w-[600px]"
+  if (!order) {
+    return shell(
+      <Section variant="list" width="prose">
+        {backRail}
+        <EmptyState
+          icon={Cake}
+          title="ما لقينا هذا الطلب"
+          description="ربما الرابط قديم، أو الطلب يخص حساباً آخر."
+          className="rounded-2xl border border-dashed border-border bg-blush/40 py-16"
+          action={
+            <Button variant="brandFlat" size="pill" onClick={() => navigate('/my-orders')}>
+              كل طلباتي
+            </Button>
+          }
+        />
+      </Section>,
+    );
+  }
+
+  const moment = getOrderMoment({
+    status: order.status,
+    deliveryDate: order.delivery_date,
+    deliveryTime: order.delivery_time,
+    branchName: order.branch_name,
+  });
+
+  const handleAction = (kind: MomentActionKind) => {
+    if (kind === 'reorder') reorder(order.items);
+    else if (kind === 'shop') navigate('/shop');
+    else if (kind === 'respond' && pricingRequest) {
+      document.getElementById('pricing-offer')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else navigate('/contact');
+  };
+
+  return shell(
+    <>
+      <Section variant="list" width="prose">
+        {backRail}
+
+        <Reveal>
+          <OrderMomentHero
+            moment={moment}
+            orderNumber={order.order_number}
+            updatedAt={order.updated_at}
+            onAction={handleAction}
+          />
+        </Reveal>
+
+        {moment.showPickupPass && id && (
+          <Reveal>
+            <div className="mt-5">
+              <PickupQRCode
+                orderId={id}
+                orderStatus={order.status}
+                orderNumber={order.order_number}
               />
             </div>
-          </CardContent>
-        </Card>
+          </Reveal>
+        )}
 
-        {/* Pickup QR Code - Only shown when ready for pickup */}
-        {id && <PickupQRCode orderId={id} orderStatus={order.status} />}
-
-        {/* Payment Status */}
-        <Card className="rounded-2xl">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-primary" />
-                <span className="font-medium">حالة الدفع</span>
-              </div>
-              <Badge variant={isPaid ? 'default' : 'secondary'} className="rounded-full">
-                {isPaid ? (
-                  <><CheckCircle2 className="w-3 h-3 me-1" /> تم الدفع</>
-                ) : (
-                  <><AlertCircle className="w-3 h-3 me-1" /> بانتظار الدفع</>
-                )}
-              </Badge>
+        {isPricing && pricingRequest && (
+          <Reveal>
+            <div id="pricing-offer" className="mt-5">
+              <CustomerPricingCard order={pricingRequest} />
             </div>
-            {!isPaid && (
-              <p className="text-sm text-muted-foreground mt-2">سيتم التواصل معك لإتمام عملية الدفع</p>
-            )}
-          </CardContent>
-        </Card>
+          </Reveal>
+        )}
 
-        {/* Delivery Info */}
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 text-xl font-black">
-              <MapPin className="w-4 h-4 text-primary" />
-              معلومات الاستلام
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            {order.branch_name && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">الفرع</span>
-                <span className="font-medium">{order.branch_name}</span>
-              </div>
-            )}
-            {order.branch_address && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">العنوان</span>
-                <span className="font-medium text-end">{order.branch_address}</span>
-              </div>
-            )}
-            {order.delivery_date && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground flex items-center gap-1">
-                  <Calendar className="w-4 h-4" /> التاريخ
-                </span>
-                <span className="font-medium">{format(new Date(order.delivery_date), 'PPP', { locale: ar })}</span>
-              </div>
-            )}
-            {order.delivery_time && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground flex items-center gap-1">
-                  <Clock className="w-4 h-4" /> الوقت
-                </span>
-                <span className="font-medium">{order.delivery_time}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <Reveal>
+          <OrderItemsGallery lines={lines} className="mt-10" />
+        </Reveal>
 
-        {/* Order Items */}
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 text-xl font-black">
-              <Receipt className="w-4 h-4 text-primary" />
-              تفاصيل الطلب
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {order.items?.map((item, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-start gap-2">
-                      <Cake className="w-4 h-4 text-primary mt-1" />
-                      <div>
-                        <p className="font-medium">{item.product_name}</p>
-                        <p className="text-sm text-muted-foreground">{item.quantity} × {item.unit_price} <RiyalSymbol /></p>
-                      </div>
-                    </div>
-                    <span className="font-medium">{item.total_price} <RiyalSymbol /></span>
-                  </div>
-                  {index < (order.items?.length || 0) - 1 && <Separator className="my-3" />}
-                </div>
-              ))}
+        {order.branch_name && (
+          <Reveal>
+            <div className="mt-8 glass-card rounded-2xl p-5">
+              <Title variant="h3">كيف تستلم</Title>
+              <p className="mt-3 flex items-center gap-2 text-sm">
+                <Store className="size-4 shrink-0 text-primary" />
+                {order.branch_name}
+              </p>
+              {/* Absent from the demo order factory — the guard is required. */}
+              {order.branch_address && (
+                <p className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
+                  <MapPin className="size-4 shrink-0" />
+                  {order.branch_address}
+                </p>
+              )}
             </div>
+          </Reveal>
+        )}
 
-            <Separator className="my-4" />
+        <Reveal>
+          <OrderInvoicePanel
+            lines={lines}
+            totalAmount={order.total_amount}
+            paymentStatus={order.payment_status}
+            className="mt-5"
+          />
+        </Reveal>
+      </Section>
 
-            <div className="flex justify-between items-baseline">
-              <span className="font-semibold">المجموع الكلي</span>
-              <span className="font-display text-3xl text-primary">
-                {order.total_amount} <RiyalSymbol className="text-sm text-muted-foreground" />
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Reorder + back to store */}
-        <div className="flex flex-wrap justify-center gap-3 pt-2">
-          {order.items && order.items.length > 0 && (
-            <Button onClick={() => reorder(order.items)} className="rounded-full px-6 h-11 gap-2 bg-foreground text-background hover:bg-foreground/90">
-              <RefreshCw className="w-4 h-4" />
-              أعد الطلب
-            </Button>
-          )}
-          <Button variant="outline" onClick={() => navigate('/store')} className="rounded-full px-6 h-11">
-            <Store className="w-4 h-4 me-2" />
-            العودة للمتجر
-          </Button>
-        </div>
-      </main>
-
-    </div>
+      <GoldDivider />
+      <KeepShoppingBand
+        context={matched}
+        excludeIds={matchedIds}
+        stage={moment.stage}
+        reviewProduct={moment.stage === 'done' ? (matched[0] ?? null) : null}
+      />
+    </>,
   );
 }
