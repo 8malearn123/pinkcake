@@ -28,6 +28,7 @@ const BranchOrders = lazy(() => import("./pages/BranchOrders"));
 const Reports = lazy(() => import("./pages/Reports"));
 const LiveDashboard = lazy(() => import("./pages/LiveDashboard"));
 const Settings = lazy(() => import("./pages/Settings"));
+const Homepage = lazy(() => import("./pages/Homepage"));
 const Products = lazy(() => import("./pages/Products"));
 const Branches = lazy(() => import("./pages/Branches"));
 const Users = lazy(() => import("./pages/Users"));
@@ -279,6 +280,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRoles={['admin']}>
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/homepage"
+                element={
+                  <ProtectedRoute requiredRoles={['admin']}>
+                    <Homepage />
                   </ProtectedRoute>
                 }
               />

@@ -1,11 +1,11 @@
 import { useState, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { Upload, X, Loader2, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { uploadStoreImage } from '@/lib/imageUpload';
 
 interface ImageUploadProps {
   value?: string | null;
@@ -22,73 +22,20 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
-      toast({
-        title: 'نوع ملف غير مدعوم',
-        description: 'يرجى اختيار صورة بصيغة JPG أو PNG أو WebP أو GIF',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: 'حجم الملف كبير جداً',
-        description: 'الحد الأقصى لحجم الصورة هو 5 ميجابايت',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     setIsUploading(true);
+    // التحقّق والرفع في `@/lib/imageUpload` كي يشترك معه محرِّر الصفحة الرئيسية
+    const result = await uploadStoreImage(file, 'products');
+    setIsUploading(false);
+    if (inputRef.current) inputRef.current.value = '';
 
-    try {
-      // Create unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `products/${fileName}`;
-
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      setPreview(urlData.publicUrl);
-      onChange(urlData.publicUrl);
-
-      toast({
-        title: 'تم الرفع',
-        description: 'تم رفع الصورة بنجاح',
-      });
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast({
-        title: 'فشل الرفع',
-        description: error.message || 'حدث خطأ أثناء رفع الصورة',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsUploading(false);
-      // Reset input
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
+    if (result.error) {
+      toast({ ...result.error, variant: 'destructive' });
+      return;
     }
+
+    setPreview(result.url);
+    onChange(result.url);
+    toast({ title: 'تم الرفع', description: 'تم رفع الصورة بنجاح' });
   };
 
   const handleRemove = () => {

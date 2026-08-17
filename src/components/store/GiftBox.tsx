@@ -1,14 +1,25 @@
 import { useState, type CSSProperties } from 'react';
 import { Reveal } from '@/components/Reveal';
+import { CmsText } from '@/components/store/CmsText';
+import { SECTION_DEFAULTS, type SectionContent } from '@/lib/homepage/schema';
 
 // Faithful clone of the final design's "لديك هديّة بانتظارك" gift-box section —
 // an animated berry gift box that reveals a first-order discount on click.
-export function GiftBox({ storeName }: { storeName: string }) {
+export function GiftBox({
+  content = SECTION_DEFAULTS.giftBox,
+  storeName,
+}: {
+  content?: SectionContent['giftBox'];
+  storeName: string;
+}) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const copy = () => {
-    navigator.clipboard?.writeText('CAKE15').then(() => setCopied(true)).catch(() => setCopied(true));
+    navigator.clipboard
+      ?.writeText(content.couponCode)
+      .then(() => setCopied(true))
+      .catch(() => setCopied(true));
   };
 
   const S: Record<string, CSSProperties> = {
@@ -30,20 +41,22 @@ export function GiftBox({ storeName }: { storeName: string }) {
         style={{ background: 'linear-gradient(160deg,#ffffff 0%,#fdf3f6 100%)', padding: '56px 48px', boxShadow: '0 24px 80px -50px hsl(var(--primary)/.5)' }}
       >
         <div className="flex flex-col items-center gap-4">
-          <p className="inline-flex items-center gap-2 rounded-full bg-blush px-4 py-1.5 text-xs font-bold tracking-[.05em] text-rose">
-            🎁 هدية ترحيبية · لزوّار {storeName} لأول مرة
-          </p>
-          <h2 className="mt-2 max-w-[36rem] text-[32px] font-black leading-[1.35] text-foreground">لديك هديّة بانتظارك!</h2>
-          <p className="max-w-[30rem] text-[15px] leading-[1.9] text-muted-foreground">
-            اضغط على الصندوق لتكشف مفاجأتك 🎉
-          </p>
+          {content.badge && (
+            <p className="inline-flex items-center gap-2 rounded-full bg-blush px-4 py-1.5 text-xs font-bold tracking-[.05em] text-rose">
+              <CmsText value={content.badge} vars={{ store: storeName }} />
+            </p>
+          )}
+          <h2 className="mt-2 max-w-[36rem] text-[32px] font-black leading-[1.35] text-foreground">{content.title}</h2>
+          {content.lede && (
+            <p className="max-w-[30rem] text-[15px] leading-[1.9] text-muted-foreground">{content.lede}</p>
+          )}
 
           {open ? (
             <div className="ck-couponpop mt-3 w-full max-w-[26rem] rounded-2xl border-2 border-dashed border-gold bg-background p-6" style={{ animation: 'ck-couponpop .5s ease-out both' }}>
-              <p className="text-lg font-black text-primary">🎉 مبروك! هديتك جاهزة</p>
-              <p className="mt-1 text-sm text-muted-foreground">خصم ١٥٪ على أوّل طلب</p>
+              <p className="text-lg font-black text-primary">{content.openedTitle}</p>
+              {content.rewardLine && <p className="mt-1 text-sm text-muted-foreground">{content.rewardLine}</p>}
               <div className="mt-4 flex items-center justify-center gap-3">
-                <span className="rounded-md bg-blush px-5 py-2.5 text-lg font-black tracking-[.15em] text-primary">CAKE15</span>
+                <span className="rounded-md bg-blush px-5 py-2.5 text-lg font-black tracking-[.15em] text-primary">{content.couponCode}</span>
                 <button onClick={copy} className="rounded-md bg-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-rose">
                   {copied ? 'تم النسخ ✓' : 'انسخ الكود'}
                 </button>
@@ -66,7 +79,7 @@ export function GiftBox({ storeName }: { storeName: string }) {
                 </span>
               </button>
               <button onClick={() => setOpen(true)} className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-rose">
-                👆 اضغط لفتح الهدية
+                {content.buttonLabel}
               </button>
             </>
           )}

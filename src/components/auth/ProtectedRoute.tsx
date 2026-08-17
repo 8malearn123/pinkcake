@@ -12,6 +12,7 @@ interface ProtectedRouteProps {
 // Admin-only routes that should be blocked for branch/kitchen users
 const ADMIN_ONLY_ROUTES = [
   '/settings',
+  '/homepage',
   '/users',
   '/branches',
   '/reports',

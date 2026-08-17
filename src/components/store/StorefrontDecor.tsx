@@ -1,23 +1,20 @@
-import type { ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
-import { RiyalSymbol } from "@/components/ui/riyal";
+import { CmsText } from "@/components/store/CmsText";
+import { visibleItems } from "@/hooks/useHomepageContent";
+import { SECTION_DEFAULTS, type SectionContent } from "@/lib/homepage/schema";
 
 /* ── شريط إعلانات متحرك ── */
-const tickerItems: ReactNode[] = [
-  <>توصيل مجاني داخل جازان للطلبات فوق ٢٠٠ <RiyalSymbol className="text-[0.9em]" /></>,
-  "🥭 موسم المنجا الجازانية متوفر الآن",
-  "اطلب قبل ٣ مساءً لتوصيل الغد",
-  "خصم ١٥٪ على أول طلب مع كود CAKE15",
-  "تورتات طازجة تُخبز يومياً في جازان",
-];
-export function Marquee() {
-  const row = [...tickerItems, ...tickerItems];
+export function Marquee({ content = SECTION_DEFAULTS.marquee }: { content?: SectionContent["marquee"] }) {
+  const items = visibleItems(content.items);
+  if (items.length === 0) return null;
+  // مكرَّرة مرّتين كي يبدو الشريط بلا نهاية أثناء دورة الحركة.
+  const row = [...items, ...items];
   return (
     <div className="overflow-hidden bg-primary py-2.5">
       <div className="marquee flex w-max gap-10 whitespace-nowrap text-[11px] font-medium text-white sm:text-xs">
         {row.map((t, i) => (
           <span key={i} className="flex items-center gap-10">
-            {t}
+            <CmsText value={t.text} />
             <span className="text-gold">✦</span>
           </span>
         ))}

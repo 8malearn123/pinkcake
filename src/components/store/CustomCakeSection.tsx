@@ -1,25 +1,25 @@
-import { ArrowLeft, Camera, Clock, Sparkles, Wand2 } from 'lucide-react';
+import { ArrowLeft, Wand2 } from 'lucide-react';
 import { Reveal } from '@/components/Reveal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CustomCakeCard } from '@/components/store/CustomCakeCard';
+import { iconFor } from '@/lib/homepage/icons';
+import { visibleItems } from '@/hooks/useHomepageContent';
+import { SECTION_DEFAULTS, type SectionContent } from '@/lib/homepage/schema';
+import type { CtaTarget } from '@/lib/homepage/types';
 import type { GalleryCake } from '@/lib/cakeSelect';
 
 interface CustomCakeSectionProps {
+  /** محتوى القسم من لوحة الإدارة؛ يعود إلى النصّ الأصلي حين لا يُمرَّر. */
+  content?: SectionContent['customCake'];
   /** Already filtered to designable cakes (galleryCakes). */
   cakes: GalleryCake[];
   /** The catalog session is still hydrating from localStorage/IndexedDB. */
   loading: boolean;
   /** Opens /customize pre-seeded with this cake. */
   onPick: (cakeId: string) => void;
-  /** Opens the full /custom-cakes listing. */
-  onViewAll: () => void;
+  /** ينفّذ وجهة زرّ القسم. */
+  onCta: (target: CtaTarget) => void;
 }
-
-const TRUST = [
-  { icon: Camera, text: 'كل خيار مصوّر فعلاً في مطبخنا' },
-  { icon: Sparkles, text: 'تعديلات مجانية قبل التأكيد' },
-  { icon: Clock, text: 'جاهزة خلال ٢٤ ساعة' },
-];
 
 /**
  * The home page's design-studio doorway: copy panel beside three real designable
@@ -29,7 +29,13 @@ const TRUST = [
  * Renders skeletons rather than nothing while the catalog hydrates: the section
  * sits directly under the hero, so a late pop-in would shove the fold.
  */
-export function CustomCakeSection({ cakes, loading, onPick, onViewAll }: CustomCakeSectionProps) {
+export function CustomCakeSection({
+  content = SECTION_DEFAULTS.customCake,
+  cakes,
+  loading,
+  onPick,
+  onCta,
+}: CustomCakeSectionProps) {
   if (!loading && cakes.length === 0) return null;
   const shown = cakes.slice(0, 3);
 
@@ -41,41 +47,47 @@ export function CustomCakeSection({ cakes, loading, onPick, onViewAll }: CustomC
       <div className="mx-auto grid max-w-[1500px] gap-9 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-14">
         {/* Copy panel */}
         <Reveal>
-          <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-rose">
-            <span className="h-px w-10 bg-primary/25" /> استوديو التصميم
-          </p>
+          {content.eyebrow && (
+            <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-rose">
+              <span className="h-px w-10 bg-primary/25" /> {content.eyebrow}
+            </p>
+          )}
           <h2 className="mt-4 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
-            صمّم كيكتك
-            <span className="block text-rose">بالضبط كما تتخيّلها.</span>
+            {content.title}
+            {content.titleAccent && <span className="block text-rose">{content.titleAccent}</span>}
           </h2>
-          <p className="mt-5 max-w-lg text-sm leading-8 text-muted-foreground">
-            اختر كيكة، ثم خصّص شكلها ونكهتها ولونها خطوة بخطوة. كل خيار تراه هو صورة كيكة خبزناها
-            فعلاً — لا رسومات ولا تخمين، تشوف كيكتك قبل ما تطلبها.
-          </p>
+          {content.lede && (
+            <p className="mt-5 max-w-lg text-sm leading-8 text-muted-foreground">{content.lede}</p>
+          )}
 
           <ul className="mt-6 grid gap-3">
-            {TRUST.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-2.5 text-sm font-bold text-muted-foreground">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-rose shadow-sm">
-                  <Icon size={14} />
-                </span>
-                {text}
-              </li>
-            ))}
+            {visibleItems(content.trust).map((t) => {
+              const Icon = iconFor(t.icon);
+              return (
+                <li key={t.text} className="flex items-center gap-2.5 text-sm font-bold text-muted-foreground">
+                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-rose shadow-sm">
+                    <Icon size={14} />
+                  </span>
+                  {t.text}
+                </li>
+              );
+            })}
           </ul>
 
-          <button
-            type="button"
-            onClick={onViewAll}
-            className="group/cta mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-all duration-200 hover:from-primary hover:to-rose active:scale-[.98]"
-          >
-            <Wand2 size={17} />
-            شاهد كل التصاميم
-            <ArrowLeft
-              size={16}
-              className="transition-transform duration-300 group-hover/cta:-translate-x-1"
-            />
-          </button>
+          {content.cta.visible && (
+            <button
+              type="button"
+              onClick={() => onCta(content.cta.target)}
+              className="group/cta mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-all duration-200 hover:from-primary hover:to-rose active:scale-[.98]"
+            >
+              <Wand2 size={17} />
+              {content.cta.label}
+              <ArrowLeft
+                size={16}
+                className="transition-transform duration-300 group-hover/cta:-translate-x-1"
+              />
+            </button>
+          )}
         </Reveal>
 
         {/* Cakes — snap rail on phones, 3-up grid from sm */}

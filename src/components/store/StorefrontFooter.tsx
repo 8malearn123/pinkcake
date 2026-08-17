@@ -1,6 +1,7 @@
 import { Clock, Instagram, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCombos } from '@/hooks/useCombos';
+import { useHomepageContent } from '@/hooks/useHomepageContent';
 
 interface StorefrontFooterProps {
   storeName: string;
@@ -27,6 +28,13 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
   // has no catalogue to resolve against, and "staff turned them all off" is the
   // case worth reacting to.
   const { activeCombos } = useCombos();
+  /**
+   * الروابط التي تمرّر إلى أقسام الصفحة الرئيسية تختفي حين يُطفئ المدير قسمها.
+   * يُقرأ هنا لا يُمرَّر خاصيةً: التذييل يُعرض على مسارات أخرى أيضاً، ورابط يعود
+   * بالزائر إلى الرئيسية ليمرّره إلى قسم غير موجود هو رابط ميت أينما كان. الطلب
+   * مشترك في ذاكرة react-query مع الصفحة نفسها، فلا نداء إضافي.
+   */
+  const { isSectionVisible } = useHomepageContent();
 
   return (
     <footer className="mt-2 bg-gradient-to-b from-berry-deep to-berry-dark text-white">
@@ -53,9 +61,13 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
           <nav aria-label="تسوّق">
             <p className="text-sm font-black text-gold">تسوّق</p>
             <ul className="mt-4 space-y-2.5 text-sm text-white/75">
-              <li><button onClick={() => jump('shop')} className="transition-colors hover:text-white">كل المنتجات</button></li>
-              <li><button onClick={() => jump('seasonal')} className="transition-colors hover:text-white">تشكيلة الصيف 🥭</button></li>
-              {activeCombos.length > 0 && (
+              {isSectionVisible('shop') && (
+                <li><button onClick={() => jump('shop')} className="transition-colors hover:text-white">كل المنتجات</button></li>
+              )}
+              {isSectionVisible('seasonal') && (
+                <li><button onClick={() => jump('seasonal')} className="transition-colors hover:text-white">تشكيلة الصيف 🥭</button></li>
+              )}
+              {activeCombos.length > 0 && isSectionVisible('combos') && (
                 <li><button onClick={() => jump('combos')} className="transition-colors hover:text-white">الكومبوهات</button></li>
               )}
               <li><button onClick={() => onNavigate('/custom-cakes')} className="transition-colors hover:text-white">كيكات التصميم الخاص</button></li>
@@ -67,9 +79,13 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
           <nav aria-label="المساعدة">
             <p className="text-sm font-black text-gold">المساعدة</p>
             <ul className="mt-4 space-y-2.5 text-sm text-white/75">
-              <li><button onClick={() => jump('faq')} className="transition-colors hover:text-white">الأسئلة الشائعة</button></li>
+              {isSectionVisible('faq') && (
+                <li><button onClick={() => jump('faq')} className="transition-colors hover:text-white">الأسئلة الشائعة</button></li>
+              )}
               <li><button onClick={() => onNavigate('/events')} className="transition-colors hover:text-white">تجهيز المناسبات</button></li>
-              <li><button onClick={() => jump('branches')} className="transition-colors hover:text-white">فروعنا</button></li>
+              {isSectionVisible('branches') && (
+                <li><button onClick={() => jump('branches')} className="transition-colors hover:text-white">فروعنا</button></li>
+              )}
               <li><button onClick={() => onNavigate('/contact')} className="transition-colors hover:text-white">تواصل معنا</button></li>
             </ul>
           </nav>

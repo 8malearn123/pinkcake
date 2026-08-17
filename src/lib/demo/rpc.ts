@@ -5,6 +5,7 @@
 import * as d from './data';
 import { currentRoles } from './data';
 import { loyaltyRpc } from './loyalty';
+import { homepageRpc } from './homepage';
 
 type Args = Record<string, unknown> | undefined;
 
@@ -178,6 +179,10 @@ const READ: Record<string, (args: Args) => unknown> = {
   // «دائرة المناسبات» — حالة حقيقية قابلة للتغيّر في `./loyalty.ts`، لا ردود
   // ثابتة، وإلا بدت المناسبات تُحفظ والمكافآت تُصرف بلا أن يتغيّر شيء.
   ...loyaltyRpc,
+
+  // إدارة الصفحة الرئيسية — للسبب نفسه: بلا هذه المعالِجات تبدو اللوحة كأنها
+  // تحفظ، ولا يتغيّر شيء على `/`.
+  ...homepageRpc,
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {

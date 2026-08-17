@@ -28,7 +28,7 @@ const noop = () => {};
 
 describe('CustomCakeSection', () => {
   it('shows only the first three cakes, priced in Arabic-Indic digits', () => {
-    render(<CustomCakeSection cakes={five} loading={false} onPick={noop} onViewAll={noop} />);
+    render(<CustomCakeSection cakes={five} loading={false} onPick={noop} onCta={noop} />);
 
     expect(screen.getByRole('button', { name: 'صمّم احتفال كلاسيكي' })).toHaveTextContent('٨٥');
     expect(screen.getByRole('button', { name: 'صمّم قلب حلو' })).toHaveTextContent('٦٠');
@@ -40,23 +40,23 @@ describe('CustomCakeSection', () => {
 
   it('hands the picked cake id up so the studio can be pre-seeded', () => {
     const onPick = vi.fn();
-    render(<CustomCakeSection cakes={five} loading={false} onPick={onPick} onViewAll={noop} />);
+    render(<CustomCakeSection cakes={five} loading={false} onPick={onPick} onCta={noop} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'صمّم قلب حلو' }));
     expect(onPick).toHaveBeenCalledWith('c2');
   });
 
-  it('routes the single CTA to the full listing', () => {
-    const onViewAll = vi.fn();
-    render(<CustomCakeSection cakes={five} loading={false} onPick={noop} onViewAll={onViewAll} />);
+  it('routes the single CTA to the target the admin picked', () => {
+    const onCta = vi.fn();
+    render(<CustomCakeSection cakes={five} loading={false} onPick={noop} onCta={onCta} />);
 
     fireEvent.click(screen.getByRole('button', { name: /شاهد كل التصاميم/ }));
-    expect(onViewAll).toHaveBeenCalledTimes(1);
+    expect(onCta).toHaveBeenCalledWith('/custom-cakes');
   });
 
   it('renders nothing when there is no designable cake to advertise', () => {
     const { container } = render(
-      <CustomCakeSection cakes={[]} loading={false} onPick={noop} onViewAll={noop} />,
+      <CustomCakeSection cakes={[]} loading={false} onPick={noop} onCta={noop} />,
     );
     expect(container).toBeEmptyDOMElement();
   });
@@ -65,7 +65,7 @@ describe('CustomCakeSection', () => {
     // An empty-but-loading catalog must not collapse the section: it sits right
     // under the hero, so a late pop-in would shove the fold.
     const { container } = render(
-      <CustomCakeSection cakes={[]} loading onPick={noop} onViewAll={noop} />,
+      <CustomCakeSection cakes={[]} loading onPick={noop} onCta={noop} />,
     );
     expect(container).not.toBeEmptyDOMElement();
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('صمّم كيكتك');
