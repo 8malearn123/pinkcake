@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,8 +6,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
 import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
+import { StorefrontFooter } from '@/components/store/StorefrontFooter';
+import { FloatingContactButton } from '@/components/store/FloatingContactButton';
+import { BackToTop } from '@/components/store/BackToTop';
 import { Marquee } from '@/components/store/StorefrontDecor';
-import { Eyebrow, Title } from '@/components/ds';
+import { Reveal } from '@/components/Reveal';
+import { Eyebrow, GoldDivider, Lede, Title } from '@/components/ds';
+import { AccountHero, AccountQuickLinks } from '@/components/account';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,7 +26,7 @@ import {
   RewardsPanel,
   StampCard,
 } from '@/components/loyalty';
-import { ArrowRight, User, Phone, MapPin, Loader2, Cake, Save, Package, Heart, Truck, ChevronLeft, LogOut } from 'lucide-react';
+import { Cake, Loader2, LogOut, MapPin, Phone, Save, User } from 'lucide-react';
 
 interface CustomerProfile {
   id: string;
@@ -30,6 +35,19 @@ interface CustomerProfile {
   address: string | null;
 }
 
+/**
+ * «حسابي».
+ *
+ * The page is read in one direction: *who am I here* (the band), *where was I
+ * going* (the shortcuts), *what am I owed* (دائرة المناسبات), and only then
+ * *my details* — the form is settings, not the point of the visit, so it sits
+ * last instead of competing with the program for the fold.
+ *
+ * The panels below are unchanged in behaviour; what they gained is rhythm. A
+ * flat run of seven identical cards reads as a settings screen, and this is a
+ * boutique's account page — the eyebrow bands and the gold breaks are what tell
+ * the eye where one idea ends and the next begins.
+ */
 export default function CustomerProfile() {
   const { user, isLoading: authLoading, signOut } = useAuth();
   const { settings } = useSettings();
@@ -60,6 +78,20 @@ export default function CustomerProfile() {
     }
   }, [profile]);
 
+  /**
+   * A save button that is always live invites the customer to press it and get
+   * «تم الحفظ» for having changed nothing. It disables until something actually
+   * differs from what we already hold.
+   */
+  const isDirty = useMemo(() => {
+    if (!profile) return false;
+    return (
+      name.trim() !== (profile.name || '') ||
+      phone.trim() !== (profile.phone || '') ||
+      address.trim() !== (profile.address || '')
+    );
+  }, [profile, name, phone, address]);
+
   // Update profile mutation
   const updateProfile = useMutation({
     mutationFn: async () => {
@@ -80,7 +112,7 @@ export default function CustomerProfile() {
     },
     onError: (error: Error) => {
       toast({
-        title: 'خطأ',
+        title: 'تعذّر حفظ التعديل',
         description: error.message,
         variant: 'destructive',
       });
@@ -89,31 +121,27 @@ export default function CustomerProfile() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim()) {
       toast({
         title: 'الاسم مطلوب',
+        description: 'نحتاج اسمك ليصلك الطلب باسمك الصحيح.',
         variant: 'destructive',
       });
       return;
     }
-    
+
     if (!phone.trim()) {
       toast({
         title: 'رقم الجوال مطلوب',
+        description: 'نتواصل معك عليه عند التسليم — يبدأ بـ ٠٥.',
         variant: 'destructive',
       });
       return;
     }
-    
+
     updateProfile.mutate();
   };
-
-  const quickLinks = [
-    { icon: Package, title: 'طلباتي', desc: 'تتبّع طلباتك السابقة', to: '/my-orders' },
-    { icon: Heart, title: 'المفضلة', desc: 'منتجاتك المحفوظة', to: '/wishlist' },
-    { icon: Truck, title: 'تتبّع طلب', desc: 'حالة طلبك الحالي', to: '/track' },
-  ];
 
   if (authLoading) {
     return (
@@ -149,161 +177,217 @@ export default function CustomerProfile() {
       <Marquee />
       <StorefrontMasthead />
 
-      <main className="mx-auto max-w-2xl space-y-5 px-5 py-10 sm:px-8 lg:py-14">
-        <div className="mb-2 flex items-center gap-4 border-b border-primary/15 pb-6">
-          <div className="gradient-pink grid size-14 shrink-0 place-items-center rounded-2xl text-primary-foreground">
-            <User className="size-7" />
-          </div>
-          <div className="min-w-0">
-            <Eyebrow>حسابي</Eyebrow>
-            <Title variant="h2" as="h1" className="mt-1 truncate text-2xl sm:text-3xl">
-              {user.email}
+      <AccountHero
+        name={profile?.name ?? null}
+        email={user.email ?? ''}
+        phone={profile?.phone ?? null}
+        isLoading={isLoading}
+      />
+
+      <main className="mx-auto max-w-[820px] px-5 pb-16 sm:px-8 lg:pb-20">
+        {/* Lifted into the scalloped edge of the band, so the shortcuts read as
+            part of the header rather than as the first row of the body. */}
+        <div className="relative z-10 -mt-9">
+          <AccountQuickLinks />
+        </div>
+
+        {/* ── دائرة المناسبات ────────────────────────────────────────────
+            The reason this page is worth opening, so it comes before
+            «بياناتي». The registry drives the program; the rest supports it. */}
+        <section id="occasions" className="scroll-mt-24 pt-14 lg:pt-20">
+          <Reveal>
+            <Eyebrow rule caps>
+              برنامجك
+            </Eyebrow>
+            <Title variant="h2" className="mt-3">
+              دائرة المناسبات
             </Title>
-          </div>
-        </div>
+            <Lede className="mt-3 max-w-xl">
+              نحفظ مناسباتك، ونذكّرك قبلها بوقت كافٍ للتجهيز — وكل طلب مكتمل يقرّبك من
+              مكافأة تُضاف إلى طلبك القادم.
+            </Lede>
+          </Reveal>
 
-        {/* Quick access — the items that moved out of the top nav */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {quickLinks.map((l) => (
-            <button
-              key={l.to}
-              onClick={() => navigate(l.to)}
-              className="press group text-start rounded-2xl border border-border bg-card p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-berry-soft"
-            >
-              <div className="flex items-center justify-between">
-                <span className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <l.icon className="w-5 h-5" />
-                </span>
-                <ChevronLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          <div className="mt-7 space-y-5">
+            <Reveal>
+              <StampCard />
+            </Reveal>
+            <Reveal>
+              <OccasionRegistry />
+            </Reveal>
+            <Reveal>
+              <div id="rewards" className="scroll-mt-24">
+                <RewardsPanel />
               </div>
-              <div className="font-semibold mt-3">{l.title}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{l.desc}</div>
-            </button>
-          ))}
+            </Reveal>
+            <Reveal>
+              <ReferralPanel />
+            </Reveal>
+          </div>
+        </section>
+
+        <div className="py-12 lg:py-16">
+          <GoldDivider />
         </div>
 
-        {/* «دائرة المناسبات» — سجل المناسبات هو المحرّك، وما حوله يدعمه.
-            يسبق «بياناتي» عمداً: هذه هي القيمة التي نعود من أجلها. */}
-        <StampCard />
-        <OccasionRegistry />
-        <RewardsPanel />
-        <ReferralPanel />
-        <ConsentToggles />
+        {/* ── بياناتي ──────────────────────────────────────────────────── */}
+        <section id="details" className="scroll-mt-24">
+          <Reveal>
+            <Eyebrow rule caps>
+              الإعدادات
+            </Eyebrow>
+            <Title variant="h2" className="mt-3">
+              بياناتي
+            </Title>
+            <Lede className="mt-3 max-w-xl">
+              الاسم والجوال اللذان يصل بهما طلبك، والعنوان الذي نوصّل إليه.
+            </Lede>
+          </Reveal>
 
-        {/* Profile details */}
-        {isLoading ? (
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-4 w-48" />
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-20 w-full" />
-            </CardContent>
-          </Card>
-        ) : !profile ? (
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle>لم يتم العثور على الملف الشخصي</CardTitle>
-              <CardDescription>
-                يبدو أن حسابك غير مرتبط بملف عميل
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                بياناتي
-              </CardTitle>
-              <CardDescription>
-                يمكنك تعديل بياناتك الشخصية من هنا
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    الاسم الكامل
-                  </Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="أدخل اسمك الكامل"
-                    required
-                    maxLength={100}
-                  />
-                </div>
+          <div className="mt-7 space-y-5">
+            {isLoading ? (
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className="h-4 w-48" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </CardContent>
+              </Card>
+            ) : !profile ? (
+              <Card>
+                <CardHeader className="text-center">
+                  <CardTitle>لم يتم العثور على الملف الشخصي</CardTitle>
+                  <CardDescription>يبدو أن حسابك غير مرتبط بملف عميل</CardDescription>
+                </CardHeader>
+              </Card>
+            ) : (
+              <Reveal>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="size-5 text-primary" />
+                      بيانات التواصل
+                    </CardTitle>
+                    <CardDescription className="mt-1">
+                      نستخدمها عند التجهيز والتسليم فقط.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      {/* Name */}
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="flex items-center gap-2">
+                          <User className="size-4 text-primary" />
+                          الاسم الكامل
+                        </Label>
+                        <Input
+                          id="name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="أدخل اسمك الكامل"
+                          required
+                          maxLength={100}
+                        />
+                      </div>
 
-                {/* Phone */}
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    رقم الجوال
-                  </Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="05xxxxxxxx"
-                    required
-                    maxLength={20}
-                    dir="ltr"
-                    className="text-end"
-                  />
-                </div>
+                      {/* Phone */}
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="flex items-center gap-2">
+                          <Phone className="size-4 text-primary" />
+                          رقم الجوال
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="05xxxxxxxx"
+                          required
+                          maxLength={20}
+                          dir="ltr"
+                          className="text-end"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          نتواصل معك عليه عند التجهيز والتسليم.
+                        </p>
+                      </div>
 
-                {/* Address */}
-                <div className="space-y-2">
-                  <Label htmlFor="address" className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    العنوان (اختياري)
-                  </Label>
-                  <Textarea
-                    id="address"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="أدخل عنوانك للتوصيل"
-                    rows={3}
-                    maxLength={500}
-                  />
-                </div>
+                      {/* Address */}
+                      <div className="space-y-2">
+                        <Label htmlFor="address" className="flex items-center gap-2">
+                          <MapPin className="size-4 text-primary" />
+                          العنوان (اختياري)
+                        </Label>
+                        <Textarea
+                          id="address"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          placeholder="أدخل عنوانك للتوصيل"
+                          rows={3}
+                          maxLength={500}
+                        />
+                      </div>
 
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={updateProfile.isPending}
-                >
-                  {updateProfile.isPending ? (
-                    <Loader2 className="w-4 h-4 me-2 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4 me-2" />
-                  )}
-                  حفظ التغييرات
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+                      <div className="gold-rule" />
 
-        {/* Logout */}
-        <Button
-          variant="outline"
-          className="w-full justify-center gap-2 text-destructive hover:text-destructive hover:border-destructive/40"
-          onClick={() => signOut()}
-        >
-          <LogOut className="w-4 h-4" />
-          تسجيل الخروج
-        </Button>
+                      {/* Submit */}
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-xs text-muted-foreground">
+                          {isDirty ? 'لديك تعديل غير محفوظ' : 'بياناتك محدّثة'}
+                        </p>
+                        <Button
+                          type="submit"
+                          variant="brandFlat"
+                          size="cta"
+                          disabled={updateProfile.isPending || !isDirty}
+                        >
+                          {updateProfile.isPending ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : (
+                            <Save className="size-4" />
+                          )}
+                          احفظ التغييرات
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </Reveal>
+            )}
+
+            <Reveal>
+              <ConsentToggles />
+            </Reveal>
+          </div>
+
+          {/* Logout — a quiet exit, not a red banner competing with the CTA. */}
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-border px-5 py-4">
+            <div className="min-w-0">
+              <p className="font-bold">تسجيل الخروج</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                مناسباتك ومكافآتك تبقى محفوظة، وتجدينها عند عودتك.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="pill"
+              className="shrink-0 text-destructive hover:border-destructive/40 hover:text-destructive"
+              onClick={() => signOut()}
+            >
+              <LogOut className="size-4" />
+              خروج
+            </Button>
+          </div>
+        </section>
       </main>
+
+      <StorefrontFooter storeName={settings.storeName} onNavigate={navigate} />
+      <FloatingContactButton />
+      <BackToTop />
     </div>
   );
 }
