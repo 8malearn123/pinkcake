@@ -221,27 +221,56 @@ export function useCapturePayment() {
 
 export interface AppliedCoupon {
   code: string;
-  kind: 'percent' | 'fixed';
+  kind: 'percent' | 'fixed' | 'free_delivery';
+  /** نسبة للنوع `percent`، وريالات لغيره (وصفر لكوبون التوصيل). */
   value: number;
+  freeDelivery: boolean;
 }
 
-// Validate a promo code against the (mock) validate_coupon RPC. Resolves with the
+/** ما يحتاجه محرّك القواعد ليحكم على الرمز: قيمة السلة ومحتواها. */
+export interface CouponCheck {
+  code: string;
+  subtotal: number;
+  categories: string[];
+  productIds: string[];
+}
+
+// Validate a promo code against the validate_coupon RPC. Resolves with the
 // applied coupon on success; throws with an Arabic message on an invalid code.
+//
+// السلة تُرسَل مع الرمز لأن القواعد (أدنى قيمة طلب، النطاق، سقف الخصم) تُقيَّم
+// على الخادم لا هنا — التحقّق في المتصفّح وحده يعني رمزاً يُقبل في السلة
+// ويُرفض عند الدفع.
 export function useValidateCoupon() {
   return useMutation({
-    mutationFn: async (code: string): Promise<AppliedCoupon> => {
+    mutationFn: async (input: CouponCheck): Promise<AppliedCoupon> => {
       const client = supabase as unknown as {
         rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
       };
-      const { data, error } = await client.rpc('validate_coupon', { _code: code });
+      const { data, error } = await client.rpc('validate_coupon', {
+        _code: input.code,
+        _subtotal: input.subtotal,
+        _categories: input.categories,
+        _product_ids: input.productIds,
+      });
       if (error) throw error;
       const res = (data ?? {}) as {
-        valid?: boolean; code?: string; kind?: 'percent' | 'fixed'; value?: number; message?: string;
+        valid?: boolean;
+        code?: string;
+        kind?: 'percent' | 'fixed' | 'free_delivery';
+        value?: number;
+        free_delivery?: boolean;
+        message?: string;
       };
       if (!res.valid || !res.kind || typeof res.value !== 'number') {
         throw new Error(res.message || 'رمز غير صالح');
       }
-      return { code: res.code || code, kind: res.kind, value: res.value };
+      return {
+        code: res.code || input.code,
+        kind: res.kind,
+        value: res.value,
+        freeDelivery: !!res.free_delivery,
+      };
     },
   });
 }

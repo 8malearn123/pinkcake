@@ -172,15 +172,21 @@ export function pushCustomerOrder(args: Record<string, unknown> | undefined) {
   const branch =
     BRANCHES.find((b) => b.id === a['_branch_id']) ?? BRANCHES[0];
 
+  const subtotal = items.reduce(
+    (sum, it) => sum + Number(it.unit_price ?? 0) * Number(it.quantity ?? 1),
+    0,
+  );
+
   const orderRow: Record<string, unknown> = {
     id: orderId,
     order_number: orderNumber,
     status: 'paid',
     payment_status: 'paid',
-    total_amount: items.reduce(
-      (sum, it) => sum + Number(it.unit_price ?? 0) * Number(it.quantity ?? 1),
-      0,
-    ),
+    total_amount: subtotal,
+    // كانا يُرسَلان من السلة ويُسقَطان هنا بصمت، فبدا كل طلب بلا كوبون مهما
+    // استُخدم — وهي البيانات نفسها التي تحتسب عليها لوحة أداء التسويق.
+    coupon_code: (a['_coupon_code'] as string | null) ?? null,
+    discount: Number(a['_discount'] ?? 0),
     branch_id: branch.id,
     branch_name: branch.name,
     branches: { id: branch.id, name: branch.name },
@@ -237,7 +243,9 @@ export function pushCustomerOrder(args: Record<string, unknown> | undefined) {
   }
 
   savePushedOrders();
-  return { order_id: orderId, order_number: orderNumber };
+  // `total_amount` يعود مع المغلّف كي تنسب طبقة التسويق الإيراد للكوبون بلا
+  // أن تعيد حساب السلة بنفسها (وتختلف عن الطلب لاحقاً).
+  return { order_id: orderId, order_number: orderNumber, total_amount: subtotal };
 }
 
 /**

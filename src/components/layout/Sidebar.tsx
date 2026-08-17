@@ -20,7 +20,7 @@ import {
   CakeSlice,
   Palette,
   PartyPopper,
-  Heart,
+  Megaphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SidebarLogo } from './SidebarLogo';
@@ -76,7 +76,7 @@ const menuGroups: MenuGroup[] = [
       { icon: CakeSlice, label: 'تصميم الكيك', path: '/cake-design', allowedRoles: ['admin'] },
       { icon: Store, label: 'إدارة الفروع', path: '/branches', allowedRoles: ['admin'] },
       { icon: Users, label: 'المستخدمين', path: '/users', allowedRoles: ['admin'] },
-      { icon: Heart, label: 'دائرة المناسبات', path: '/loyalty', allowedRoles: ['admin'] },
+      { icon: Megaphone, label: 'التسويق', path: '/marketing', allowedRoles: ['admin'] },
       { icon: BarChart3, label: 'التقارير', path: '/reports', allowedRoles: ['admin'] },
     ],
   },

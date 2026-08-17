@@ -2,22 +2,28 @@ import { Truck, Check } from 'lucide-react';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { amountToFreeDelivery, hasFreeDelivery, freeDeliveryPct } from '@/lib/delivery';
+import { useStorefrontPromos } from '@/hooks/useStorefrontPromos';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import { cn } from '@/lib/utils';
 
 /**
- * Free-delivery progress toward the real 200-﷼ threshold — the strongest honest
- * AOV nudge. Reads the live cart total; returns null when the cart is empty.
+ * Free-delivery progress toward the real threshold — the strongest honest AOV
+ * nudge. Reads the live cart total; returns null when the cart is empty.
  * Reused under the header (sticky sub-bar), inside the cart drawer, and in the
- * mobile sticky bar. The saving it promises (the real 25-﷼ fee) is genuine.
+ * mobile sticky bar.
+ *
+ * العتبة من «التسويق» ← «العروض الدائمة»، وهي العتبة نفسها التي تحتسبها السلة
+ * عند الدفع — فالوعد المعروض هنا هو المحتسَب فعلاً، لا رقم مكتوب بجانبه.
  */
 export function FreeDeliveryMeter({ variant = 'bar', className }: { variant?: 'bar' | 'compact'; className?: string }) {
   const { total } = useStoreCart();
-  if (total <= 0) return null;
+  const { offers } = useStorefrontPromos();
+  if (total <= 0 || !offers.showFreeDeliveryMeter) return null;
 
-  const remaining = amountToFreeDelivery(total);
-  const free = hasFreeDelivery(total);
-  const pct = freeDeliveryPct(total);
+  const threshold = offers.freeDeliveryThreshold;
+  const remaining = amountToFreeDelivery(total, threshold);
+  const free = hasFreeDelivery(total, threshold);
+  const pct = freeDeliveryPct(total, threshold);
 
   return (
     <div className={cn('w-full', className)}>

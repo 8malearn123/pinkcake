@@ -3,7 +3,8 @@ import { Check, ChevronLeft, Gift, Minus, Plus, ShieldCheck, ShoppingBag, Sparkl
 import { Stars } from '@/components/store/Reviews';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
-import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD, amountToFreeDelivery, freeDeliveryPct, hasFreeDelivery } from '@/lib/delivery';
+import { amountToFreeDelivery, freeDeliveryPct, hasFreeDelivery } from '@/lib/delivery';
+import { useStorefrontPromos } from '@/hooks/useStorefrontPromos';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
 
 interface ProductBuyPanelProps {
@@ -70,9 +71,11 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
 
   // Free-delivery nudge: what the basket looks like *after* this add — the only
   // framing that answers the question the shopper is actually asking.
+  const { offers } = useStorefrontPromos();
+  const threshold = offers.freeDeliveryThreshold;
   const projected = cartTotal + lineTotal;
-  const unlocksNow = !hasFreeDelivery(cartTotal) && hasFreeDelivery(projected);
-  const remaining = amountToFreeDelivery(projected);
+  const unlocksNow = !hasFreeDelivery(cartTotal, threshold) && hasFreeDelivery(projected, threshold);
+  const remaining = amountToFreeDelivery(projected, threshold);
 
   return (
     <div>
@@ -256,7 +259,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
               <span>هذي الإضافة تخلّي توصيلك مجاني 🎉</span>
             ) : remaining === 0 ? (
               <span className="flex items-baseline gap-1">
-                توصيلك مجاني — تجاوزت {toArabicDigits(FREE_DELIVERY_THRESHOLD)} <RiyalSymbol className="text-[11px]" />
+                توصيلك مجاني — تجاوزت {toArabicDigits(threshold)} <RiyalSymbol className="text-[11px]" />
               </span>
             ) : (
               <span>
@@ -264,14 +267,14 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
                 <b className="text-primary">
                   {toArabicDigits(remaining)} <RiyalSymbol className="text-[11px]" />
                 </b>{' '}
-                على التوصيل المجاني — بدلاً من {toArabicDigits(DELIVERY_FEE)} <RiyalSymbol className="text-[11px]" />
+                على التوصيل المجاني — بدلاً من {toArabicDigits(offers.deliveryFee)} <RiyalSymbol className="text-[11px]" />
               </span>
             )}
           </p>
           <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-gold/25">
             <div
               className="h-full rounded-full bg-gradient-to-r from-gold to-gold transition-[width] duration-700"
-              style={{ width: `${freeDeliveryPct(projected)}%` }}
+              style={{ width: `${freeDeliveryPct(projected, threshold)}%` }}
             />
           </div>
         </div>

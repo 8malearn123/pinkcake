@@ -56,7 +56,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const DesignSystem = lazy(() => import("./pages/DesignSystem"));
 const CakeDesign = lazy(() => import("./pages/CakeDesign"));
-const Loyalty = lazy(() => import("./pages/Loyalty"));
+const Marketing = lazy(() => import("./pages/Marketing"));
 const LozaHome = lazy(() => import("./pages/loza/LozaHome"));
 const LozaCustomizer = lazy(() => import("./pages/loza/LozaCustomizer"));
 const LozaCakeDetails = lazy(() => import("./pages/loza/LozaCakeDetails"));
@@ -338,15 +338,18 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              {/* برنامج الولاء «دائرة المناسبات» */}
+              {/* «التسويق» — الكوبونات والعروض والباقات والحملات وبرنامج الولاء */}
               <Route
-                path="/loyalty"
+                path="/marketing"
                 element={
                   <ProtectedRoute requiredRoles={['admin']}>
-                    <Loyalty />
+                    <Marketing />
                   </ProtectedRoute>
                 }
               />
+              {/* «دائرة المناسبات» صارت تبويباً داخل التسويق — الروابط القديمة
+                  (وخطوة النشر في docs/loyalty.md) تُحوَّل بدل أن تكسر. */}
+              <Route path="/loyalty" element={<Navigate to="/marketing?tab=loyalty" replace />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

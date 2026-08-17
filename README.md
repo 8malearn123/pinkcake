@@ -73,8 +73,16 @@ service-role key belongs only in Edge Functions.
 
 > The loyalty program **«دائرة المناسبات»** (occasion registry + WhatsApp
 > reminders, stamp card, in‑kind rewards, referrals) is admin‑configured at
-> `/loyalty` and **off by default**. Operator guide, the binding 3 %‑of‑revenue
-> cost ceiling, and the open tax/legal items: [`docs/loyalty.md`](docs/loyalty.md).
+> **`/marketing?tab=loyalty`** and **off by default** (`/loyalty` redirects there).
+> Operator guide, the binding 3 %‑of‑revenue cost ceiling, and the open tax/legal
+> items: [`docs/loyalty.md`](docs/loyalty.md).
+
+> **«التسويق»** (`/marketing`, admin‑only) is the one place the growth tools are
+> configured: discount coupons, the storefront's promotional copy (ticker, offer
+> banner, gift box, seasonal band), the permanent offers (free‑delivery threshold,
+> delivery fee), combo bundles, WhatsApp/SMS campaigns, and the loyalty programme.
+> Its state is **demo‑layer only** in this build — see
+> [`docs/marketing.md`](docs/marketing.md) for what that means before go‑live.
 
 ## Scripts
 
