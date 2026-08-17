@@ -36,19 +36,23 @@ COMMENT ON COLUMN public.homepage_sections.content IS
   'تجاوزات المحتوى فقط؛ {} تعني «استخدم النصّ الأصلي من الشفرة»';
 
 -- البذرة: مفتاح وترتيب لكل قسم، بلا محتوى (انظر النقطة ٣ أعلاه).
+-- الأقسام الترويجية (`marquee`, `seasonal`, `offerBanner`, `giftBox`) موجودة هنا
+-- للترتيب والإظهار فقط؛ نصّها يعيش في «التسويق» ويصل المتجرَ عبر
+-- `get_storefront_promos`، فيبقى `content` فارغاً لها دائماً.
 INSERT INTO public.homepage_sections (key, display_order) VALUES
-  ('marquee',     1),
-  ('hero',        2),
-  ('customCake',  3),
-  ('seasonal',    4),
-  ('occasions',   5),
-  ('shop',        6),
-  ('combos',      7),
-  ('reviews',     8),
-  ('events',      9),
-  ('branches',   10),
-  ('faq',        11),
-  ('giftBox',    12)
+  ('marquee',      1),
+  ('hero',         2),
+  ('customCake',   3),
+  ('seasonal',     4),
+  ('occasions',    5),
+  ('offerBanner',  6),
+  ('shop',         7),
+  ('combos',       8),
+  ('reviews',      9),
+  ('events',      10),
+  ('branches',    11),
+  ('faq',         12),
+  ('giftBox',     13)
 ON CONFLICT (key) DO NOTHING;
 
 -- ── الحماية ────────────────────────────────────────────────────────────

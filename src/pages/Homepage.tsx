@@ -26,6 +26,7 @@ import {
 import { usePublicStoreProducts, isSoldOut } from '@/hooks/usePublicStore';
 import { useCombos } from '@/hooks/useCombos';
 import { useCatalogSession } from '@/hooks/useCatalogSession';
+import { useStorefrontPromos } from '@/hooks/useStorefrontPromos';
 import { useSettings } from '@/contexts/SettingsContext';
 import { resolveCombos } from '@/lib/combos';
 import { galleryCakes } from '@/lib/cakeSelect';
@@ -62,6 +63,7 @@ export default function Homepage() {
   const { data: products } = usePublicStoreProducts();
   const { combos: comboDefs, urlFor: comboUrlFor } = useCombos();
   const { status: catalogStatus, catalog, urlFor } = useCatalogSession();
+  const { ticker, slot, offers } = useStorefrontPromos();
 
   const designCakes = useMemo(() => galleryCakes(catalog, urlFor), [catalog, urlFor]);
   const seasonal = useMemo(() => (products ?? []).filter((p) => !!p.season), [products]);
@@ -85,8 +87,24 @@ export default function Homepage() {
     if (catalogStatus !== 'loading' && designCakes.length === 0) {
       out.customCake = 'لا توجد كيكات قابلة للتصميم، فلن يظهر هذا القسم للزبون. أضف كيكة من «تصميم الكيك».';
     }
+
+    // الأقسام الترويجية لها مفتاح إظهار ثانٍ في «التسويق»، والمفتاحان يجتمعان
+    // بـ«و» لا بـ«أو». بلا هذه الأسطر يقلب المدير المفتاح هنا ثم يفتح المتجر
+    // فلا يجد شيئاً، ولا شيء يقول له أين المفتاح الآخر.
+    if (ticker.length === 0) {
+      out.marquee = 'لا توجد عبارات مفعّلة للشريط المتحرك في «التسويق»، فلن يظهر للزبون.';
+    }
+    if (!slot('seasonal_band')) {
+      out.seasonal = 'لا يوجد شريط موسم مفعّل في «التسويق»، فلن يظهر هذا القسم للزبون.';
+    }
+    if (!offers.showOfferBanner || !slot('offer_banner')) {
+      out.offerBanner = 'بانر العرض غير مفعّل في «التسويق»، فلن يظهر للزبون.';
+    }
+    if (!offers.showGiftBox || !slot('gift_box')) {
+      out.giftBox = 'صندوق الهدية غير مفعّل في «التسويق»، فلن يظهر للزبون.';
+    }
     return out;
-  }, [seasonal, combos, designCakes, catalogStatus]);
+  }, [seasonal, combos, designCakes, catalogStatus, ticker, slot, offers]);
 
   const savedContent = useMemo(() => {
     const out = {} as SectionContent;

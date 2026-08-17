@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CustomCakes from '@/pages/CustomCakes';
 import type { GalleryCake } from '@/lib/cakeSelect';
@@ -34,8 +34,10 @@ const gallery = (id: string, name: string, basePrice: number): GalleryCake => ({
   previewUrl: `blob:${id}`,
 });
 
-// التذييل يقرأ أقسام الصفحة الرئيسية كي يُسقط روابط الأقسام المُطفأة، فصار
-// يحتاج عميل react-query مثل أي شاشة أخرى في التطبيق.
+// The page needs a react-query client for two reasons now: its masthead ticker
+// reads the storefront promos (admin-authored in «التسويق»), and its footer reads
+// the homepage section registry so it can drop links to switched-off sections.
+// Retries off so a missing RPC resolves to the built-in fallback copy immediately.
 const renderPage = () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
   return render(

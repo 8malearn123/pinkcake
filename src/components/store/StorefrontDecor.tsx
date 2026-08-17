@@ -1,20 +1,26 @@
 import { MessageCircle } from "lucide-react";
-import { CmsText } from "@/components/store/CmsText";
-import { visibleItems } from "@/hooks/useHomepageContent";
-import { SECTION_DEFAULTS, type SectionContent } from "@/lib/homepage/schema";
+import { RiyalSymbol, RiyalText } from "@/components/ui/riyal";
+import { useStorefrontPromos } from "@/hooks/useStorefrontPromos";
 
 /* ── شريط إعلانات متحرك ── */
-export function Marquee({ content = SECTION_DEFAULTS.marquee }: { content?: SectionContent["marquee"] }) {
-  const items = visibleItems(content.items);
-  if (items.length === 0) return null;
-  // مكرَّرة مرّتين كي يبدو الشريط بلا نهاية أثناء دورة الحركة.
-  const row = [...items, ...items];
+
+/**
+ * النصّ يأتي من «التسويق» ← «العروض والإعلانات» (خانة الشريط المتحرّك).
+ *
+ * الشريط يستدعي الخطّاف بنفسه بدل أن يستقبل عناصره كخاصية، لأنه مركّب في عشرة
+ * مواضع بلا خصائص — تمريرها يعني تعديل عشرة ملفات لتغيير كلمة.
+ */
+export function Marquee() {
+  const { ticker } = useStorefrontPromos();
+  if (ticker.length === 0) return null;
+
+  const row = [...ticker, ...ticker];
   return (
     <div className="overflow-hidden bg-primary py-2.5">
       <div className="marquee flex w-max gap-10 whitespace-nowrap text-[11px] font-medium text-white sm:text-xs">
-        {row.map((t, i) => (
-          <span key={i} className="flex items-center gap-10">
-            <CmsText value={t.text} />
+        {row.map((item, i) => (
+          <span key={`${item.id}-${i}`} className="flex items-center gap-10">
+            <RiyalText text={item.title} className="text-[0.9em]" />
             <span className="text-gold">✦</span>
           </span>
         ))}

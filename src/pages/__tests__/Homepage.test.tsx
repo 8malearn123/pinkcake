@@ -182,12 +182,20 @@ describe('Homepage editing surface', () => {
     expect(within(canvas('صندوق الهدية')).getByLabelText('تحريك صندوق الهدية لأسفل')).toBeDisabled();
   });
 
+  const hasEmptyBadge = (label: string) =>
+    within(canvas(label)).queryByText('لا يوجد محتوى') !== null;
+
   it('warns that an enabled section still will not show when its data source is empty', async () => {
     renderPage();
 
     await waitFor(() => expect(canvas('التشكيلة الموسمية')).toBeInTheDocument());
     expect(within(canvas('التشكيلة الموسمية')).getByText(/لا توجد منتجات معلَّمة بموسم/)).toBeInTheDocument();
-    expect(screen.getAllByText('لا يوجد محتوى')).toHaveLength(3);
+    expect(hasEmptyBadge('التشكيلة الموسمية')).toBe(true);
+    expect(hasEmptyBadge('الكومبوهات')).toBe(true);
+    expect(hasEmptyBadge('استوديو التصميم')).toBe(true);
+    // والأقسام التي لها محتوى فعلاً لا تحمل الشارة.
+    expect(hasEmptyBadge('الواجهة الرئيسية')).toBe(false);
+    expect(hasEmptyBadge('الأسئلة الشائعة')).toBe(false);
   });
 
   it('drops the warning once the data source has something in it', async () => {
@@ -195,9 +203,40 @@ describe('Homepage editing surface', () => {
     renderPage();
 
     await waitFor(() => expect(canvas('التشكيلة الموسمية')).toBeInTheDocument());
-    expect(screen.getAllByText('لا يوجد محتوى')).toHaveLength(2);
+    expect(hasEmptyBadge('التشكيلة الموسمية')).toBe(false);
     // والمعاينة ترسم بالمنتج الحقيقي، لا ببيانات عرض.
     expect(within(canvas('التشكيلة الموسمية')).getByText('تورتة المنجا')).toBeInTheDocument();
+  });
+
+  /**
+   * الأقسام الترويجية لها مفتاح إظهار ثانٍ في «التسويق»، والمفتاحان يجتمعان
+   * بـ«و». اللوحة تُحيل إلى الشاشة المالكة بدل عرض نموذج فارغ.
+   */
+  it('hands a promo section over to «التسويق» instead of showing an empty form', async () => {
+    renderPage();
+
+    await waitFor(() => expect(canvas('الشريط المتحرك')).toBeInTheDocument());
+    fireEvent.click(within(canvas('الشريط المتحرك')).getByRole('button', { name: 'تحرير الشريط المتحرك' }));
+
+    expect(await screen.findByText(/يُحرَّران من «التسويق»/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /الذهاب إلى «التسويق»/ })).toHaveAttribute('href', '/marketing');
+    // ولا نموذج ولا زرّ حفظ.
+    expect(screen.queryByRole('button', { name: /حفظ التغييرات/ })).toBeNull();
+  });
+
+  it('still lets a promo section be reordered and hidden from here', async () => {
+    renderPage();
+
+    await waitFor(() => expect(canvas('صندوق الهدية')).toBeInTheDocument());
+    fireEvent.click(within(canvas('صندوق الهدية')).getByLabelText('إظهار صندوق الهدية'));
+
+    await waitFor(() =>
+      expect(callHomepageRpc).toHaveBeenCalledWith('update_homepage_section', {
+        _key: 'giftBox',
+        _content: null,
+        _is_visible: false,
+      }),
+    );
   });
 
   describe('unsaved-changes guard', () => {

@@ -7,24 +7,9 @@ import { visibleItems } from "@/hooks/useHomepageContent";
 import { SECTION_DEFAULTS, type SectionContent } from "@/lib/homepage/schema";
 import type { CtaTarget } from "@/lib/homepage/types";
 
-/* ── بانر عرض مع عدّاد تنازلي ── */
-export function OfferBanner() {
-  return (
-    <section className="px-5 py-8 sm:px-8 lg:px-12">
-      <Reveal className="shadow-berry-soft mx-auto flex max-w-[1500px] flex-col items-center gap-6 rounded-3xl border border-primary/10 bg-white px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-start">
-        <div className="flex items-center gap-4">
-          <span className="grid size-14 shrink-0 place-items-center rounded-full bg-rose text-white shadow-sm"><Gift size={26} /></span>
-          <div>
-            <p className="text-xs font-bold tracking-[.08em] text-rose">هديّة ترحيبية</p>
-            <h3 className="mt-1 text-xl font-black text-foreground sm:text-2xl">خصم ١٥٪ على أوّل طلب</h3>
-            <p className="mt-1 text-xs text-muted-foreground">استخدم الكود التالي عند إتمام الطلب</p>
-          </div>
-        </div>
-        <span className="shrink-0 rounded-xl border-2 border-dashed border-gold bg-background px-6 py-3 text-lg font-black tracking-[.2em] text-primary">CAKE15</span>
-      </Reveal>
-    </section>
-  );
-}
+/* نسخة ثانية من «بانر العرض» كانت هنا بنصّ ورمز مثبّتين، ولم تكن مركّبة في أي
+   صفحة. حُذفت مع قسم «التسويق»: البانر الحيّ واحد الآن — `store/OfferBanner.tsx`
+   — ويُحرَّر من اللوحة. نسختان بنصّين مختلفين هي كيف يُعلن رمز منتهٍ. */
 
 /* ── تصفّح حسب المناسبة ── */
 type OccasionItem = SectionContent["occasions"]["items"][number];

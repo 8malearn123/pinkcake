@@ -56,11 +56,15 @@ const visibleFlag = z.boolean().default(true);
 
 /* ── مخطّطات الأقسام ───────────────────────────────────────────────────── */
 
-const marqueeSchema = z.object({
-  items: z
-    .array(z.object({ text: requiredText, visible: visibleFlag }))
-    .min(1, 'أضف عبارة واحدة على الأقل'),
-});
+/**
+ * الأقسام الترويجية — الشريط المتحرّك، وبانر العرض، وشريط الموسم، وصندوق
+ * الهدية — محتواها في «التسويق» ← «العروض والإعلانات»، وتقرأه مكوّناتها من
+ * `useStorefrontPromos`. تبقى في السجلّ بمحتوى فارغ لأن ترتيبها وإظهارها
+ * بنية الصفحة، وتلك ملك هذه الشاشة.
+ */
+const promoManagedSchema = z.object({});
+
+const marqueeSchema = promoManagedSchema;
 
 const heroSchema = z.object({
   image: imageSchema,
@@ -83,12 +87,9 @@ const customCakeSchema = z.object({
   cta: ctaSchema,
 });
 
-const seasonalSchema = z.object({
-  eyebrow: optionalText,
-  title: requiredText,
-  lede: optionalText,
-  badge: optionalText,
-});
+const seasonalSchema = promoManagedSchema;
+
+const offerBannerSchema = promoManagedSchema;
 
 const occasionsSchema = z.object({
   eyebrow: optionalText,
@@ -187,15 +188,7 @@ const faqSchema = z.object({
   items: z.array(z.object({ q: requiredText, a: requiredText, visible: visibleFlag })),
 });
 
-const giftBoxSchema = z.object({
-  badge: optionalText,
-  title: requiredText,
-  lede: optionalText,
-  buttonLabel: requiredText,
-  openedTitle: requiredText,
-  rewardLine: optionalText,
-  couponCode: requiredText,
-});
+const giftBoxSchema = promoManagedSchema;
 
 export const SECTION_SCHEMAS = {
   marquee: marqueeSchema,
@@ -203,6 +196,7 @@ export const SECTION_SCHEMAS = {
   customCake: customCakeSchema,
   seasonal: seasonalSchema,
   occasions: occasionsSchema,
+  offerBanner: offerBannerSchema,
   shop: shopSchema,
   combos: combosSchema,
   reviews: reviewsSchema,
@@ -221,16 +215,8 @@ export type SectionContent = {
 const img = (url: string, alt = '') => ({ url, alt });
 
 export const SECTION_DEFAULTS: SectionContent = {
-  // StorefrontDecor.tsx:6-12 — `{riyal}` يُستبدل برمز الريال الرسمي عند العرض.
-  marquee: {
-    items: [
-      { text: 'توصيل مجاني داخل جازان للطلبات فوق ٢٠٠ {riyal}', visible: true },
-      { text: '🥭 موسم المنجا الجازانية متوفر الآن', visible: true },
-      { text: 'اطلب قبل ٣ مساءً لتوصيل الغد', visible: true },
-      { text: 'خصم ١٥٪ على أول طلب مع كود CAKE15', visible: true },
-      { text: 'تورتات طازجة تُخبز يومياً في جازان', visible: true },
-    ],
-  },
+  // الأقسام الترويجية بلا محتوى هنا — مصدره «التسويق». انظر `promoManagedSchema`.
+  marquee: {},
 
   // StoreHero.tsx:28,43,50,53,56,63,70,74,75
   hero: {
@@ -265,13 +251,9 @@ export const SECTION_DEFAULTS: SectionContent = {
     cta: { label: 'شاهد كل التصاميم', target: '/custom-cakes', visible: true },
   },
 
-  // SeasonalSection.tsx:21-33
-  seasonal: {
-    eyebrow: 'تشكيلة الصيف · لفترة محدودة',
-    title: 'موسم المنجا الجازانية 🥭',
-    lede: 'من مزارع جازان مباشرةً — منجا طبيعية طازجة في تورتات وتشيز كيك بنكهة الصيف. متوفرة ما دام الموسم مستمر.',
-    badge: 'نفاد سريع — احجز الآن',
-  },
+  seasonal: {},
+
+  offerBanner: {},
 
   /**
    * StorefrontSections.tsx:25-30,52-73.
@@ -484,16 +466,7 @@ export const SECTION_DEFAULTS: SectionContent = {
     ],
   },
 
-  // GiftBox.tsx:34-49 — `{store}` يُستبدل باسم المتجر من الإعدادات.
-  giftBox: {
-    badge: '🎁 هدية ترحيبية · لزوّار {store} لأول مرة',
-    title: 'لديك هديّة بانتظارك!',
-    lede: 'اضغط على الصندوق لتكشف مفاجأتك 🎉',
-    buttonLabel: '👆 اضغط لفتح الهدية',
-    openedTitle: '🎉 مبروك! هديتك جاهزة',
-    rewardLine: 'خصم ١٥٪ على أوّل طلب',
-    couponCode: 'CAKE15',
-  },
+  giftBox: {},
 };
 
 /* ── واصفات المحرِّر ───────────────────────────────────────────────────── */
@@ -526,18 +499,9 @@ export const SECTION_REGISTRY: Record<SectionKey, SectionDescriptor> = {
   marquee: {
     key: 'marquee',
     label: 'الشريط المتحرك',
-    hint: 'العبارات التي تمرّ أعلى الصفحة. اكتب {riyal} لإدراج رمز الريال.',
-    fields: [
-      {
-        name: 'items',
-        kind: 'list',
-        label: 'العبارات',
-        itemNoun: 'عبارة',
-        itemTitleField: 'text',
-        itemFields: [{ name: 'text', kind: 'text', label: 'النص' }],
-        newItem: () => ({ text: '', visible: true }),
-      },
-    ],
+    hint: 'العبارات التي تمرّ أعلى الصفحة.',
+    managedBy: { label: 'التسويق', path: '/marketing' },
+    fields: [],
   },
 
   hero: {
@@ -604,15 +568,20 @@ export const SECTION_REGISTRY: Record<SectionKey, SectionDescriptor> = {
   seasonal: {
     key: 'seasonal',
     label: 'التشكيلة الموسمية',
-    hint: 'نصوص القسم الموسمي. المنتجات تأتي من المنتجات المعلَّمة بموسم.',
+    hint: 'شريط الموسم. المنتجات تأتي من المنتجات المعلَّمة بموسم.',
+    managedBy: { label: 'التسويق', path: '/marketing' },
     dataDriven: true,
     autoHides: true,
-    fields: [
-      { name: 'eyebrow', kind: 'text', label: 'السطر العلوي' },
-      { name: 'title', kind: 'text', label: 'العنوان' },
-      { name: 'lede', kind: 'textarea', label: 'الوصف' },
-      { name: 'badge', kind: 'text', label: 'الشارة الجانبية' },
-    ],
+    fields: [],
+  },
+
+  offerBanner: {
+    key: 'offerBanner',
+    label: 'بانر العرض',
+    hint: 'شريط العرض الترويجي ورمز الخصم المعلن فيه.',
+    managedBy: { label: 'التسويق', path: '/marketing' },
+    autoHides: true,
+    fields: [],
   },
 
   occasions: {
@@ -820,16 +789,10 @@ export const SECTION_REGISTRY: Record<SectionKey, SectionDescriptor> = {
   giftBox: {
     key: 'giftBox',
     label: 'صندوق الهدية',
-    hint: 'الهدية الترحيبية أسفل الصفحة. اكتب {store} لإدراج اسم المتجر.',
-    fields: [
-      { name: 'badge', kind: 'text', label: 'الشارة العلوية' },
-      { name: 'title', kind: 'text', label: 'العنوان' },
-      { name: 'lede', kind: 'text', label: 'الوصف' },
-      { name: 'buttonLabel', kind: 'text', label: 'نص الزر' },
-      { name: 'openedTitle', kind: 'text', label: 'العنوان بعد الفتح' },
-      { name: 'rewardLine', kind: 'text', label: 'سطر المكافأة' },
-      { name: 'couponCode', kind: 'text', label: 'كود الخصم' },
-    ],
+    hint: 'الهدية الترحيبية أسفل الصفحة ورمز خصمها.',
+    managedBy: { label: 'التسويق', path: '/marketing' },
+    autoHides: true,
+    fields: [],
   },
 };
 

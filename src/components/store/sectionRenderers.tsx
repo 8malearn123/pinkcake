@@ -10,6 +10,7 @@ import { Reviews } from '@/components/store/Reviews';
 import { EventsSection } from '@/components/store/EventsSection';
 import { BranchesSection } from '@/components/store/BranchesSection';
 import { GiftBox } from '@/components/store/GiftBox';
+import { OfferBanner } from '@/components/store/OfferBanner';
 import type { SectionContent } from '@/lib/homepage/schema';
 import type { CtaTarget, SectionKey } from '@/lib/homepage/types';
 import type { ResolvedCombo } from '@/lib/combos';
@@ -59,7 +60,9 @@ export interface SectionRenderContext {
  */
 export function sectionRenderers(ctx: SectionRenderContext): Record<SectionKey, () => ReactNode> {
   return {
-    marquee: () => <Marquee content={ctx.contentOf('marquee')} />,
+    // الأقسام الترويجية تقرأ نصّها من «التسويق» بنفسها عبر `useStorefrontPromos`،
+    // فلا محتوى يُمرَّر إليها من هنا — انظر `managedBy` في السجلّ.
+    marquee: () => <Marquee />,
 
     hero: () => (
       <div className={ctx.heroIsFirst ? '-mt-16 md:-mt-[84px]' : ''}>
@@ -82,12 +85,12 @@ export function sectionRenderers(ctx: SectionRenderContext): Record<SectionKey, 
       />
     ),
 
-    seasonal: () => (
-      <SeasonalSection
-        content={ctx.contentOf('seasonal')}
-        products={ctx.seasonal}
-        renderCard={ctx.renderCard}
-      />
+    seasonal: () => <SeasonalSection products={ctx.seasonal} renderCard={ctx.renderCard} />,
+
+    offerBanner: () => (
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-12">
+        <OfferBanner onShop={() => ctx.onCta('#shop')} />
+      </div>
     ),
 
     occasions: () => <ShopByOccasion content={ctx.contentOf('occasions')} onCta={ctx.onCta} />,
@@ -123,6 +126,6 @@ export function sectionRenderers(ctx: SectionRenderContext): Record<SectionKey, 
 
     faq: () => <FAQ content={ctx.contentOf('faq')} />,
 
-    giftBox: () => <GiftBox content={ctx.contentOf('giftBox')} storeName={ctx.storeName} />,
+    giftBox: () => <GiftBox storeName={ctx.storeName} />,
   };
 }

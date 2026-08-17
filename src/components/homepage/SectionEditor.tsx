@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Info, RotateCcw, Save, X } from 'lucide-react';
+import { ArrowLeft, Info, RotateCcw, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import {
@@ -16,7 +17,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { SECTION_REGISTRY, SECTION_SCHEMAS } from '@/lib/homepage/schema';
-import type { SectionKey } from '@/lib/homepage/types';
+import type { SectionDescriptor, SectionKey } from '@/lib/homepage/types';
 import type { AdminSection } from '@/hooks/useHomepageAdmin';
 import { FieldRenderer } from './FieldRenderer';
 
@@ -35,11 +36,71 @@ interface SectionEditorProps {
 }
 
 /**
+ * قسم نصّه ملك شاشة أخرى: نُحيل إليها بدل عرض نموذج فارغ. الترتيب والإظهار
+ * يبقيان في شريط البطاقة، فالمدير لا يفقد شيئاً من التحكّم بالبنية.
+ */
+function ManagedElsewhere({
+  descriptor,
+  onClose,
+}: {
+  descriptor: SectionDescriptor & { managedBy: NonNullable<SectionDescriptor['managedBy']> };
+  onClose: () => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-3 border-b pb-3">
+        <p className="text-sm text-muted-foreground">{descriptor.hint}</p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={`إغلاق ${descriptor.label}`}
+          className="size-7 shrink-0"
+          onClick={onClose}
+        >
+          <X className="size-4" />
+        </Button>
+      </div>
+
+      <p className="flex items-start gap-2 rounded-lg bg-muted px-4 py-3 text-sm text-muted-foreground">
+        <Info className="mt-0.5 size-4 shrink-0" />
+        نصّ هذا القسم ورمز خصمه يُحرَّران من «{descriptor.managedBy.label}» — محتوى ترويجي له تاريخ
+        بداية ونهاية، فمكانه هناك. الترتيب والإظهار يبقيان من شريط القسم بالأعلى.
+      </p>
+
+      <Button asChild className="w-full gap-2">
+        <Link to={descriptor.managedBy.path}>
+          الذهاب إلى «{descriptor.managedBy.label}»
+          <ArrowLeft className="size-4" />
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+/**
+ * موزّع بلا خطّافات: الفرع المُدار في مكوّن مستقلّ كي لا يتغيّر عدد الخطّافات
+ * بين قسم وآخر.
+ */
+export function SectionEditor(props: SectionEditorProps) {
+  const descriptor = SECTION_REGISTRY[props.section.key];
+  if (descriptor.managedBy) {
+    return (
+      <ManagedElsewhere
+        descriptor={descriptor as SectionDescriptor & { managedBy: NonNullable<SectionDescriptor['managedBy']> }}
+        onClose={props.onClose}
+      />
+    );
+  }
+  return <EditableSection {...props} />;
+}
+
+/**
  * نموذج القسم الواحد، مبنيّ من واصفات `SECTION_REGISTRY` ومتحقَّق منه بمخطّط
  * zod نفسه الذي يحرس المحتوى عند القراءة — فما يرفضه المحرِّر لا يمكن أن يصل
  * إلى الصفحة، وما يقبله لا يمكن أن يسقط لاحقاً إلى النصّ الأصلي بصمت.
  */
-export function SectionEditor({
+function EditableSection({
   section,
   onSave,
   onReset,
@@ -55,6 +116,7 @@ export function SectionEditor({
     resolver: zodResolver(SECTION_SCHEMAS[section.key]),
     defaultValues: section.content as Record<string, unknown>,
   });
+
 
   const { isDirty } = form.formState;
   useEffect(() => onDirtyChange?.(isDirty), [isDirty, onDirtyChange]);
