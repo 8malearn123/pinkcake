@@ -66,7 +66,7 @@ export function StoreHero({
               <span className="h-px w-9 bg-gold/60" /> {eyebrow}
             </p>
           )}
-          <h1 className="mt-5 text-[clamp(2.9rem,6vw,5.8rem)] font-black leading-[1.08] tracking-[-.01em] text-white">
+          <h1 className="mt-5 text-[clamp(2.9rem,6vw,5.8rem)] font-semibold leading-[1.08] tracking-[-.01em] text-white">
             {title}
           </h1>
           {lede && <p className="mt-6 max-w-lg text-sm leading-8 text-white/75 sm:text-base">{lede}</p>}
@@ -74,7 +74,7 @@ export function StoreHero({
             {primaryCta.visible && (
               <button
                 onClick={() => onCta(primaryCta.target)}
-                className="group/cta flex items-center gap-2 rounded-xl bg-gold px-7 py-4 text-sm font-black text-berry-dark shadow-[0_18px_38px_-14px_rgba(0,0,0,0.7)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white"
+                className="group/cta flex items-center gap-2 rounded-xl bg-gold px-7 py-4 text-sm font-semibold text-ink-dark shadow-[0_18px_38px_-14px_rgba(0,0,0,0.7)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white"
               >
                 {primaryCta.label}
                 <ArrowLeft size={16} className="transition-transform duration-300 group-hover/cta:-translate-x-1" />

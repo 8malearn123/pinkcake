@@ -5,15 +5,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Cake & Bloom buttons. `font-bold` is the base weight — the brand's CTAs are
- * heavy, and shadcn's `font-medium` read thin next to the black headings.
+ * Pink Cake buttons. `font-medium` is the base weight. It was `font-bold`, set
+ * to match headings that were themselves set at 800 — with the display ramp
+ * pulled back to the logotype's thin geometric register, bold CTAs became the
+ * heaviest thing on screen and read as shouting.
  *
- * The `brand*` / `gold` / `onDark` variants are the storefront's CTA vocabulary,
- * lifted out of ~14 hand-written class strings so the storefront and the staff
- * console use literally the same component.
+ * The `brand*` / `roseOnDark` / `onDark` variants are the storefront's CTA
+ * vocabulary, lifted out of ~14 hand-written class strings so the storefront
+ * and the staff console use literally the same component.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-bold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -24,14 +26,14 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
 
-        /** The anchor CTA — one per screen. Gradient berry with a lifted glow. */
+        /** The anchor CTA — one per screen. Near-solid rose-ink, lifted on ink. */
         brand:
-          "gradient-pink text-primary-foreground shadow-[0_10px_24px_-10px_hsl(var(--primary)/0.75)] hover:shadow-[0_16px_30px_-10px_hsl(var(--rose)/0.8)] hover:brightness-110 active:scale-[.98]",
-        /** Flat berry — the workhorse CTA for secondary sections. */
+          "gradient-pink text-primary-foreground shadow-[0_10px_24px_-10px_hsl(var(--ink-black)/0.45)] hover:shadow-[0_16px_30px_-10px_hsl(var(--ink-black)/0.5)] hover:brightness-110 active:scale-[.98]",
+        /** Flat rose-ink — the workhorse CTA for secondary sections. */
         brandFlat: "bg-primary text-primary-foreground hover:bg-rose",
-        /** Gold on dark — hero and dark-band CTAs only. */
-        gold: "bg-gold text-primary hover:bg-white",
-        /** Berry outline pill on light surfaces. */
+        /** The logo's own pairing: ink on the brand rose. Hero and dark bands. */
+        roseOnDark: "bg-brand-rose text-brand-ink hover:bg-white",
+        /** Rose-ink outline pill on light surfaces. */
         outlineBrand:
           "border border-primary/25 bg-transparent text-primary hover:border-primary hover:bg-blush",
         /** Translucent outline for use over photography / dark bands. */

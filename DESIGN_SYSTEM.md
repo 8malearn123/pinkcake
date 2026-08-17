@@ -1,4 +1,4 @@
-# Cake & Bloom Design System
+# Pink Cake Design System — «وردي وحبر» / Rose & Ink
 
 The single source of truth for look, feel, and tone across every screen.
 Living style guide (rendered, admin-only): **`/design-system`** · DS components: **`src/components/ds/`**
@@ -7,15 +7,46 @@ Living style guide (rendered, admin-only): **`/design-system`** · DS components
 
 ## 1. Brand essence
 
-Cake & Bloom is a **warm, editorial, pastry-luxe** brand: deep berry on cream, gold as the one decorative metal, heavy Noto Kufi headings, squared cards, and friendly Arabic copy. Every screen — even the kitchen dashboard — should feel like it belongs to the same boutique. Professional, never sterile; sweet, never childish.
+Pink Cake is a **quiet, editorial, two-colour** brand, and the logo is the whole brief: one flat dusty-rose field (`#DBB2B9`) carrying one near-black wordmark (`#1A1919`) set in a thin geometric monoline, closed by a minimal line-art cupcake. There is no third colour, no metal, and no ornament in the identity.
+
+Everything in this system is a tint or a shade of those two, all on hue ~349. Type is light and wide rather than heavy and tight — presence comes from size and the space around it, not from weight. Cards are white on rose paper and lift by whiteness; shadows are cast in ink, never in the brand hue, because a coloured shadow reads as a glow and a glow is the opposite of this mark. Every screen — even the kitchen dashboard — should feel like it belongs to the same boutique. Professional, never sterile; sweet, never childish.
 
 **One palette, one type ramp, one surface vocabulary, two densities.** The storefront and the staff console differ in *breathing room*, never in language.
 
 | Face | Routes | Personality |
 |---|---|---|
-| **Public store** | `/`, `/shop`, `/product/*`, `/track`, `/my-orders`… | Editorial and appetizing. Roomy sections (`py-14`–`py-28`), hero imagery, gold rules, decorative motion allowed. |
+| **Public store** | `/`, `/shop`, `/product/*`, `/track`, `/my-orders`… | Editorial and appetizing. Roomy sections (`py-14`–`py-28`), hero imagery, rose hairlines, decorative motion allowed. |
 | **Staff console** | `/live`, `/kitchen`, `/orders`… | Same palette, type and surfaces — compact. `space-y-8` sections, dense tables, one brand CTA per screen. |
-| **Loza marketplace** | `/loza/*` | Separate sub-brand: gold / cream / brown, Alexandria font. Fully scoped — never leaks outside `/loza`, and unaffected by the global theme. |
+| **Loza marketplace** | `/loza/*` | Separate sub-brand: gold / cream / brown, Alexandria font. Fully scoped — never leaks outside `/loza`, and untouched by the Rose & Ink rebrand. |
+
+---
+
+## 1b. The logo
+
+The mark lives in code, as vector — there is no bitmap, and nothing traced by eye.
+`src/components/brand/logoPaths.ts` holds path data lifted verbatim out of the
+client's master Illustrator file. The wordmarks are outlined type, so those paths
+**are** the logo: there is no font to install and nothing to re-set.
+
+| Use | How |
+|---|---|
+| Arabic lockup «بينك كيك» — the default | `<BrandLogo variant="ar" className="h-11 text-primary" />` |
+| Latin lockup “Pink Cake” | `<BrandLogo variant="en" />` |
+| Cupcake alone — below ~14px, avatars, tight chrome | `<BrandLogo variant="mark" />` |
+| Mark on its rose plate | `<BrandPlate />` |
+| Outside React (email, exports) | `public/brand/pink-cake-{ar,en,mark}.svg` |
+| Social card | `public/brand/og-image.png` (1200×630) |
+| Icons | `public/favicon.svg`, `public/favicon.ico` (16/32/48), `public/apple-touch-icon.png` |
+
+**Sizing is height-driven.** Pass `h-*`; the width follows each lockup's own
+aspect ratio. The paths carry no fill, so `text-*` colours the mark — ink on
+rose, rose on ink, or white over a photo, all from one asset. Pass `decorative`
+when a text wordmark already names the store beside it, so a screen reader
+doesn't say «بينك كيك» twice.
+
+**Never** re-space the lockups, recolour them outside the two brand constants,
+add a stroke, or set the wordmark in a live font. If the mark must sit below
+~14px tall, switch to `variant="mark"` rather than shrinking the lockup.
 
 ---
 
@@ -27,22 +58,26 @@ Cake & Bloom is a **warm, editorial, pastry-luxe** brand: deep berry on cream, g
 
 | Token | Value | Use for |
 |---|---|---|
-| `primary` / `primary-foreground` | berry `#9e3a5c` | Buttons, links, focus rings, active nav, prices |
-| `rose` | `#b0506e` | Eyebrows, second lines of display headings |
-| `gold`, `gold-soft`, `gold-deep` | `#ddbd75` | Hairlines, badges, on-dark CTAs. **Decorative only** |
-| `accent` / `accent-foreground` | blush `#fbeef2` | shadcn's hover surface. **Never the gold** — see below |
-| `background`, `card`, `popover` | cream `#fffdfa` | Structure |
-| `foreground` | ink `#2c2226` | Body text |
-| `secondary`, `muted`, `muted-foreground`, `border`, `input`, `ring` | | Quiet surfaces, secondary text, structure |
+| `brand-rose` | **`#DBB2B9`** | THE logo field. Fixed identity — never customizable, never approximated |
+| `brand-ink` | **`#1A1919`** | THE logo mark. Fixed identity |
+| `primary` / `primary-foreground` | rose-ink `#612e37` | The brand rose shaded (same hue, same chroma, L 28%). Buttons, links, focus rings, prices |
+| `rose` | `#8d4955` | Eyebrows, second lines of display headings |
+| `gold`, `gold-soft`, `gold-deep` | `#DBB2B9` | **Misnomer kept on purpose.** There is no gold — these resolve to the brand rose. Hairlines, badges, on-dark accents. Decorative only |
+| `accent` / `accent-foreground` | blush `#f9f1f2` | shadcn's hover surface. **Never the brand rose** — see below |
+| `background` | rose paper `#fdfbfc` | Page ground |
+| `card`, `popover` | white `#ffffff` | Cards lift off the paper by whiteness, not by shadow |
+| `foreground` | ink `#1A1919` | Body text — the wordmark's own black, verbatim |
+| `secondary`, `muted`, `muted-foreground`, `border`, `ring` | | Quiet surfaces, secondary text, structure |
+| `input` | `#a1878b` | Form-control edge **only** — split from `border` to clear WCAG 1.4.11's 3:1. Do not use it as a decorative hairline |
 | `blush`, `blush-deep` | | Soft brand washes |
-| `berry-deep`, `berry-dark`, `berry-ink`, `berry-black` | | Dark bands (Reviews, footer) and photo scrims |
-| `seasonal`, `seasonal-wash` | `#e8942f` | The summer collection accent |
+| `ink-deep`, `ink-dark`, `ink-ink`, `ink-black` | | Dark bands (Reviews, footer), photo scrims, and **every shadow**. `ink-black` is `#1A1919` exactly. Renamed from `berry-*`: the logo's dark is a near-neutral charcoal, and a deep-rose band would invent a third colour |
+| `seasonal`, `seasonal-wash` | clay `#a15b41` | The summer collection accent. Pulled off signal-orange so it sits beside dusty rose; it no longer shares a value with `warning` |
 | `destructive` | | Errors, deletion, rejection — nothing else |
 | `success`, `warning`, `info` (+`-foreground`) | | Feedback & stat tones |
-| `pink`, `pink-light`, `pink-dark` | | Legacy aliases of the berry ramp — kept so old class names still work |
-| `sidebar-*` | plum-ink + gold | Console chrome — sidebar only |
+| `pink`, `pink-light`, `pink-dark` | | Legacy aliases of the rose-ink ramp — kept so old class names still work |
+| `sidebar-*` | ink field + brand rose | Console chrome only. The active row is the logo's own pairing: brand rose carrying ink. **Not customizable** — see SettingsContext |
 
-> **`--accent` is not the gold.** shadcn resolves `hover:bg-accent` for every ghost/outline button, dropdown row and select item. Point it at a saturated brand color and the whole console turns that color on hover. Gold lives in `--gold`.
+> **`--accent` is not the brand rose.** shadcn resolves `hover:bg-accent` for every ghost/outline button, dropdown row and select item. Point it at a saturated brand color and the whole console takes that fill on hover. The signature field colour is `--brand-rose`.
 
 Tints come from opacity modifiers, not new colors: `bg-success/10 text-success`.
 
@@ -56,7 +91,7 @@ Tints come from opacity modifiers, not new colors: `bg-success/10 text-success`.
 
 ### Gradients & special surfaces
 
-`gradient-pink` (the anchor CTA + brand icon boxes — a vertical berry gradient) · `gradient-berry-deep` / `gradient-footer-berry` (the Reviews band and footer) · `gradient-blush-warm` (soft store headers) · `gradient-rose-deep` / `gradient-cocoa` (dark store sections) · `glass-card` (default card surface: solid cream + berry lift).
+`gradient-pink` (the anchor CTA + brand icon boxes — a near-flat rose-ink step, not a visible ramp) · `gradient-ink-deep` (the Reviews band and footer) · `gradient-blush-warm` (soft store headers, deepest stop is `--brand-rose`) · `gradient-rose-deep` / `gradient-cocoa` (dark store sections) · `glass-card` (default card surface: white + a faint ink lift).
 
 ### Order status
 
@@ -66,23 +101,24 @@ Order status colors live in one place: the `status-*` utility classes in `index.
 
 ## 3. Typography
 
-The brand face is **Noto Kufi Arabic** everywhere (set on `<body>` via `font-sans`), the app is **RTL** (`<html dir="rtl">`). Hierarchy comes from size and weight, never from a second family — `.font-display`, `.font-display-latin` and `.font-wedding` all resolve to Noto Kufi 800 and survive only as legacy hooks.
+The brand face is **Noto Kufi Arabic** everywhere (set on `<body>` via `font-sans`), the app is **RTL** (`<html dir="rtl">`). Hierarchy comes from **size and space, not weight** — the logotype is a thin geometric monoline, so heavy type fights the mark it sits under. `.font-display`, `.font-display-latin` and `.font-wedding` all resolve to Noto Kufi **500** at near-neutral tracking and survive only as legacy hooks.
 
 | Role | Classes | Notes |
 |---|---|---|
-| Store display (h2) | `<Title variant="display">` — `text-[2.5rem] sm:text-[3.25rem] font-black` | Feature sections |
-| Store section (h2) | `<Title variant="h2">` — `text-3xl sm:text-4xl font-black` | List sections |
-| Eyebrow / kicker | `<Eyebrow>` — `text-xs font-bold tracking-[.08em] text-rose` (`caps` for `text-[11px] uppercase tracking-[.22em]`) | Always above a Title |
+| Store display (h2) | `<Title variant="display">` — `text-[2.5rem] sm:text-[3.25rem] font-medium` | Feature sections |
+| Store section (h2) | `<Title variant="h2">` — `text-3xl sm:text-4xl font-medium` | List sections |
+| Eyebrow / kicker | `<Eyebrow>` — `text-xs font-medium tracking-[.08em] text-rose` (`caps` for `text-[11px] uppercase tracking-[.22em]`) | Always above a Title |
 | Lede | `<Lede>` — `text-[15px] leading-8 text-muted-foreground` | Intro paragraph |
-| Console page title (h1) | `text-3xl font-black` | One per page, via `<PageHeader />` |
-| Console section (h2) | `text-xl font-black` | Via `<SectionHeading />` / `<SectionCard />` |
-| Card/field title, buttons, chips | `font-bold` | |
+| Console page title (h1) | `text-3xl font-semibold` | One per page, via `<PageHeader />` |
+| Console section (h2) | `text-xl font-semibold` | Via `<SectionHeading />` / `<SectionCard />` |
+| Card/field title, chips | `font-semibold` | |
+| Buttons | `font-medium` | The base weight in `button.tsx` |
 | Body | default (`text-base`) | |
 | Secondary/meta | `text-sm text-muted-foreground` | |
 | Numbers, codes, prices | `dir="ltr"` where mixed | Western digits 0-9 |
 | Loza display | `font-loza-display` (DM Serif Display) | Inside `.loza-theme` only |
 
-**Arabic rules:** no negative letter-spacing, no italics, line-height ≥ 1.5 for paragraphs (`leading-relaxed`).
+**Arabic rules:** no italics, line-height ≥ 1.5 for paragraphs (`leading-relaxed`). Tracking stays at or very near zero — the display hooks use `-0.005em`, which is the most negative value in the system. **`font-black` is retired app-wide** (outside `/loza`); `font-semibold` is the heaviest weight you should reach for.
 
 ---
 
@@ -92,7 +128,7 @@ The brand face is **Noto Kufi Arabic** everywhere (set on `<body>` via `font-san
 
 ```
 <div class="store-surface min-h-screen bg-background text-foreground">
-├─ <Marquee />                    ← the berry ticker
+├─ <Marquee />                    ← the rose-ink ticker
 ├─ <StorefrontMasthead />         ← `floating` only on the home page (over the hero)
 ├─ <Section variant="list|feature">
 │    └─ <Eyebrow> + <Title> + <Lede>, then the content
@@ -128,9 +164,9 @@ MainLayout (sidebar + main, p-6 lg:p-8)
 
 | Shadow | Use |
 |---|---|
-| `glass-card` | Default card surface — solid cream, border, soft berry lift |
-| `shadow-berry-soft` / `-lg` | The canonical elevation. `-lg` is the hover step |
-| `shadow-warm` | Alias of `shadow-berry-soft` (legacy class name) |
+| `glass-card` | Default card surface — white, border, faint ink lift |
+| `shadow-ink-soft` / `-lg` | The canonical elevation, cast in ink. `-lg` is the hover step |
+| `shadow-warm` | Alias of `shadow-ink-soft` (legacy class name) |
 | `shadow-soft-lift` | Elevated store cards |
 | `shadow-rose-glow` | Hero/promo only |
 | `shadow-loza`, `shadow-loza-lift` | Loza scope only |
@@ -173,11 +209,11 @@ Shared by both faces; `variant` carries the density. Use these instead of re-dec
 |---|---|
 | `<Section variant="list"\|"feature"\|"console" width>` | Hand-written section padding + `max-w-*` wrappers |
 | `<Eyebrow tone rule caps>` | The kicker + hairline pattern above every heading |
-| `<Title variant="display"\|"h2"\|"h3" tone>` + `<TitleAccent>` | Hand-written `font-black` headings |
+| `<Title variant="display"\|"h2"\|"h3" tone>` + `<TitleAccent>` | Hand-written heavy headings |
 | `<Lede tone>` | Intro paragraphs |
-| `<Chip tone>` | The badge/pill family (berry, gold, seasonal, success, glass, blush) |
+| `<Chip tone>` | The badge/pill family (rose-ink, rose, seasonal, success, glass, blush) |
 | `<PhotoTile ratio scrim>` | Photo wells with hover-zoom and one of two canonical scrims |
-| `<GoldRule />` / `<GoldDivider />` | The fading-gold hairline and the ✦ section break |
+| `<GoldRule />` / `<GoldDivider />` | The fading **rose** hairline and the ✦ section break (names kept; there is no gold) |
 
 ### Store chrome
 
@@ -185,10 +221,10 @@ Shared by both faces; `variant` carries the density. Use these instead of re-dec
 
 ### Buttons
 
-- **One** anchor CTA per screen: `<Button variant="brand">` (gradient berry + lift) — the single most important action.
-- Storefront variants: `brandFlat` (workhorse berry), `gold` (on dark bands / over photography), `outlineBrand` (berry outline on light), `onDark` (translucent over photos). Sizes `cta` and `pill` are the storefront scale.
+- **One** anchor CTA per screen: `<Button variant="brand">` (rose-ink + ink lift) — the single most important action.
+- Storefront variants: `brandFlat` (workhorse rose-ink), `roseOnDark` (ink on the brand rose — dark bands / over photography), `outlineBrand` (rose-ink outline on light), `onDark` (translucent over photos). Sizes `cta` and `pill` are the storefront scale.
 - Console: standard variants (`default`, `secondary`, `outline`, `ghost`, `link`).
-- Base weight is `font-bold` — the brand's buttons are heavy.
+- Base weight is `font-medium`. It was `font-bold`, matched to headings that were themselves 800; with the display ramp pulled back, bold CTAs became the heaviest thing on screen.
 - `destructive` only for destructive actions, always behind a confirm (AlertDialog).
 - Buttons that trigger async work show a spinner and disable while pending.
 
@@ -223,9 +259,9 @@ Warm, simple فصحى. Talk like a friendly shop assistant, not a system.
 
 ## 9. Loza sub-brand
 
-- Activated **only** by wrapping the page in `.loza-theme` (re-maps all semantic tokens to gold/cream/brown, switches font to Tajawal, radius to 1rem).
+- Activated **only** by wrapping the page in `.loza-theme` (re-maps all semantic tokens to gold/cream/brown, switches the font stack to Alexandria/Tajawal/Cairo, radius to 1rem).
 - Inside Loza use the same semantic classes (`bg-background`, `text-primary`…) — the scope does the re-skinning. Loza-specific extras: `gradient-loza-gold`, `gradient-loza-header`, `text-gradient-loza`, `shadow-loza`, `font-loza-display`.
-- Pink Cake rose styling must not appear inside `/loza`, and gold styling must not leak out.
+- Pink Cake rose-and-ink styling must not appear inside `/loza`, and Loza's gold must not leak out.
 
 ---
 
@@ -244,12 +280,12 @@ Warm, simple فصحى. Talk like a friendly shop assistant, not a system.
 
 ## 11. Adoption status
 
-The Cake & Bloom unification is complete: the palette, type ramp, surfaces and chrome are global, and `.storefront-theme` no longer exists (the tokens live in `:root`).
+The Rose & Ink rebrand is complete: the palette, type ramp, surfaces and chrome are global, and `.storefront-theme` no longer exists (the tokens live in `:root`).
 
 **Invariants to keep:**
 
 - No raw Tailwind palette classes (`text-blue-600`, `bg-green-100`…) and no arbitrary brand hex (`bg-[#9e3a5c]`). Both are at zero outside `/loza` and this guide's own examples — keep it that way.
-- `--accent` stays a quiet blush wash; gold is `--gold`.
+- `--accent` stays a quiet blush wash; the signature field colour is `--brand-rose`.
 - `defaultSettings.colors` in `src/contexts/SettingsContext.tsx` must mirror `:root` — it is written as inline styles on `<html>` and silently wins over the stylesheet.
-- `.loza-theme` is a separate sub-brand and pins its own feedback tokens. Don't let berry leak in, or gold leak out.
+- `.loza-theme` is a separate sub-brand and pins its own feedback tokens. Don't let rose-ink leak in, or Loza's gold leak out.
 - `npm run check:rtl` has an **empty** baseline: use `ms/me-*`, `ps/pe-*`, `start/end-*`, `text-start/end`, `rounded-s/e-*`, `border-s/e-*`.

@@ -29,7 +29,7 @@ export function PairsWithRail({ items, inCart, onAdd, onView }: PairsWithRailPro
         <span className="h-px w-6 bg-gold" />
         <p className="text-xs font-bold tracking-[.08em] text-rose">تمام معها</p>
       </div>
-      <h2 className="mt-2 text-xl font-black tracking-[-.01em] text-foreground sm:text-2xl">
+      <h2 className="mt-2 text-xl font-semibold tracking-[-.01em] text-foreground sm:text-2xl">
         أضيفيها للطلب وخلّي السفرة كاملة
       </h2>
 
@@ -60,12 +60,12 @@ export function PairsWithRail({ items, inCart, onAdd, onView }: PairsWithRailPro
                 <button
                   type="button"
                   onClick={() => onView(item)}
-                  className="block w-full truncate text-start text-sm font-black text-foreground transition-opacity hover:opacity-60"
+                  className="block w-full truncate text-start text-sm font-semibold text-foreground transition-opacity hover:opacity-60"
                 >
                   {item.name}
                 </button>
                 {item.category && <p className="mt-0.5 text-[11px] text-muted-foreground">{item.category}</p>}
-                <p className="mt-1 flex items-baseline gap-1 text-sm font-black text-primary">
+                <p className="mt-1 flex items-baseline gap-1 text-sm font-semibold text-primary">
                   {toArabicDigits(item.price)} <RiyalSymbol className="text-xs" />
                 </p>
               </div>
@@ -74,7 +74,7 @@ export function PairsWithRail({ items, inCart, onAdd, onView }: PairsWithRailPro
                 type="button"
                 onClick={() => onAdd(item)}
                 aria-label={qty > 0 ? `${item.name} في السلة، أضف المزيد` : `أضف ${item.name} إلى السلة`}
-                className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-black transition-all duration-200 active:scale-95 ${
+                className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all duration-200 active:scale-95 ${
                   qty > 0
                     ? 'bg-success text-white'
                     : 'border-2 border-primary/25 text-primary hover:border-primary hover:bg-blush'

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Cake & Bloom editorial primitives.
+ * Pink Cake editorial primitives.
  *
  * These encode the vocabulary the home page established — section rhythm,
  * eyebrow + hairline + black heading, lede, chips, photo scrims — which was
@@ -85,7 +85,7 @@ export function Eyebrow({ children, tone = 'light', rule, caps, className }: Eye
   return (
     <p
       className={cn(
-        'flex items-center gap-3 font-bold',
+        'flex items-center gap-3 font-medium',
         caps ? 'text-[11px] uppercase tracking-[.22em]' : 'text-xs tracking-[.08em]',
         tone === 'dark' ? 'text-gold' : 'text-rose',
         className,
@@ -120,7 +120,10 @@ export function Title({ children, variant = 'h2', tone = 'light', as, className 
   return (
     <Comp
       className={cn(
-        'font-black tracking-[-.01em]',
+        // 500, not 900. The logotype is a thin geometric monoline; headings set
+        // at weight-900 were the heaviest mark on the page and buried it.
+        // Presence now comes from size and the space around it.
+        'font-medium tracking-[-.005em]',
         TITLE_SIZE[variant],
         tone === 'dark' ? 'text-white' : 'text-foreground',
         className,

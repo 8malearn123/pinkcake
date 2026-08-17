@@ -19,7 +19,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
-import { Cake, Loader2, LogIn, UserPlus, Phone, Mail, MapPin, User, Sparkles, Shield, Headphones, ChefHat, Store as StoreIcon, Truck, LifeBuoy, ShoppingBag } from 'lucide-react';
+import { Loader2, LogIn, UserPlus, Phone, Mail, MapPin, User, Sparkles, Shield, Headphones, ChefHat, Store as StoreIcon, Truck, LifeBuoy, ShoppingBag } from 'lucide-react';
+import { BrandLogo } from '@/components/brand';
 import { useSettings } from '@/contexts/SettingsContext';
 
 const DEMO_PASSWORD = 'Demo1234!';
@@ -28,7 +29,7 @@ const DEMO_ACCOUNTS = [
   { email: 'callcenter@demo.com', label: 'مركز الاتصال', icon: Headphones, color: 'bg-seasonal' },
   { email: 'kitchen@demo.com', label: 'المطبخ', icon: ChefHat, color: 'bg-success' },
   { email: 'branch@demo.com', label: 'الفرع', icon: StoreIcon, color: 'bg-info' },
-  { email: 'driver@demo.com', label: 'السائق', icon: Truck, color: 'bg-berry-ink' },
+  { email: 'driver@demo.com', label: 'السائق', icon: Truck, color: 'bg-ink-ink' },
   { email: 'support@demo.com', label: 'الدعم الفني', icon: LifeBuoy, color: 'bg-rose' },
   { email: 'customer@demo.com', label: 'عميل', icon: ShoppingBag, color: 'bg-gold-deep' },
 ];
@@ -257,11 +258,10 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="gradient-pink shadow-berry-soft mx-auto mb-4 grid size-20 place-items-center rounded-2xl ring-1 ring-gold/40">
-            <Cake className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold">{settings.storeName}</h1>
-          <p className="text-muted-foreground">مرحباً بك</p>
+          <BrandLogo variant="ar" className="mx-auto h-16 text-primary" />
+          {/* The lockup already says the name; the heading stays for readers. */}
+          <h1 className="sr-only">{settings.storeName}</h1>
+          <p className="mt-5 text-muted-foreground">مرحباً بك</p>
         </div>
 
         <Card>

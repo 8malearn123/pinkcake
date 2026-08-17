@@ -1,6 +1,6 @@
 /* Noto Kufi Arabic is the brand face; DM Serif Display + Tajawal/Cairo are kept
    only as Loza's (scoped sub-brand) stack. Amiri went with `.font-wedding`. */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=DM+Serif+Display&family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800;900&family=DM+Serif+Display&family=Noto+Kufi+Arabic:wght@200;300;400;500;600;700;800;900&display=swap');
 
 /* ── Alexandria (self-hosted, 9 weights) — now used only by `.loza-theme`, so
    these lazily download on /loza and nowhere else. ──────────────────────────── */
@@ -20,66 +20,100 @@
 
 @layer base {
   :root {
-    /* ── CAKE & BLOOM — berry / gold / cream. The one brand theme, app-wide.
+    /* ── PINK CAKE — ink on dusty rose. Two colours, straight off the logo.
+       The master artwork is one flat field (#DBB2B9) carrying one near-black
+       wordmark (#1A1919); there is no third colour in the identity. Every
+       token below is a tint or a shade of those two, all on hue ~349, so the
+       whole app renders inside the logotype's own colour world.
        SettingsContext re-writes the customizable subset as inline styles on
        <html> at boot, so its defaults must stay in sync with these values. */
-    --background: 40 60% 99%;        /* #fffdfa cream */
-    --foreground: 336 14% 15%;       /* #2c2226 ink */
 
-    --card: 40 50% 99%;
-    --card-foreground: 336 14% 15%;
+    /* The two brand constants — exact. A colour-picker on the logo file
+       returns these values; they are what the packaging prints. Tint and
+       shade them freely, but never redefine these two. */
+    --brand-rose: 349 36% 77.7%;     /* #DBB2B9 — the field */
+    --brand-ink: 0 2% 10%;           /* #1A1919 — the mark */
 
-    --popover: 40 50% 99%;
-    --popover-foreground: 336 14% 15%;
+    --background: 350 40% 99%;       /* #fdfbfc — rose-white, replaces cream */
+    --foreground: 0 2% 10%;          /* the logo ink, verbatim */
 
-    --primary: 340 46% 42%;          /* #9e3a5c berry */
+    --card: 0 0% 100%;
+    --card-foreground: 0 2% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 2% 10%;
+
+    /* The action colour is the brand rose turned down: identical hue (349) and
+       identical chroma (36%), lightness dropped to 28%. It is the logo's own
+       colour, shaded — not a new one — so `text-primary` prices, links and
+       eyebrows keep a brand presence instead of collapsing into plain ink.
+       Deliberately NOT the rose itself: at 78% lightness that field colour
+       cannot carry white text, and inverting per-component would fracture the
+       button system. The rose is a surface; its shade is the action. */
+    --primary: 349 36% 28%;          /* #612e37 — the rose, shaded. 10.75:1 on white */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 335 42% 95%;        /* #f6ecef blush chip */
-    --secondary-foreground: 340 46% 42%;
+    --secondary: 350 40% 93%;        /* #f4e6e8 blush chip */
+    --secondary-foreground: 349 36% 28%;
 
-    --muted: 335 38% 96%;
-    --muted-foreground: 337 12% 45%; /* #7d6870 */
+    --muted: 350 30% 96%;
+    --muted-foreground: 349 10% 40%; /* #705c60 — 6.0:1 on background */
 
     /* Quiet hover wash. shadcn's `hover:bg-accent` (every ghost/outline button,
-       dropdown row, select item) resolves here — so it must never be the gold,
-       or the whole console turns gold on hover. Decorative gold is `--gold`. */
-    --accent: 335 45% 96%;           /* #fbeef2 blush wash */
-    --accent-foreground: 340 46% 42%;
+       dropdown row, select item) resolves here — so it must never be the brand
+       rose, or the whole console takes a pink fill on hover. The signature
+       field colour is `--brand-rose`. */
+    --accent: 350 42% 96%;           /* #f9f1f2 blush wash */
+    --accent-foreground: 349 36% 28%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 68% 44%;        /* deepened — the old 0 72% 51% sat at 4.8:1 */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 340 28% 90%;
-    --input: 340 28% 90%;
-    --ring: 340 46% 42%;
+    --border: 350 24% 89%;           /* decorative hairline — not a control edge */
+    /* Form-control boundary. Split off from --border because WCAG 1.4.11 wants
+       3:1 for the edge of an input you have to find and click; the old value
+       (shared with --border) sat at ~1.25:1. This is the one token that reads
+       visibly heavier than before — deliberately. */
+    --input: 350 12% 58%;            /* #a1878b — 3.31:1 on card, 3.21:1 on background */
+    --ring: 349 36% 28%;
 
     --radius: 0.5rem;                /* squared, editorial */
 
     /* Brand extras */
-    --pink: 340 46% 42%;             /* alias of primary — legacy class name */
-    --pink-light: 341 46% 62%;
-    --pink-dark: 340 46% 34%;        /* #8a3251 — gradient foot */
-    --rose: 341 40% 50%;             /* #b0506e — eyebrows, second lines */
-    --blush: 335 45% 96%;            /* #fbeef2 */
-    --blush-deep: 338 48% 90%;       /* #f2dbe2 */
-    --gold: 42 60% 66%;              /* #ddbd75 */
-    --gold-soft: 42 55% 82%;
-    --gold-deep: 40 45% 38%;         /* gold as text on cream, AA-safe */
-    --seasonal: 33 82% 55%;          /* #e8942f */
-    --seasonal-wash: 33 100% 95%;    /* #fff4e6 — seasonal band's warm top */
+    --pink: 349 36% 28%;             /* alias of primary — legacy class name */
+    --pink-light: 350 34% 62%;
+    --pink-dark: 349 38% 18%;        /* #3f1c23 — gradient foot */
+    --rose: 349 32% 42%;             /* #8d4955 — eyebrows, second lines */
+    --blush: 350 42% 96%;
+    --blush-deep: 349 36% 88%;
+    /* Gold is gone with Cake & Bloom — the new identity has two colours and
+       neither is metallic. The token names survive because 119 usages read
+       `text-gold` / `border-gold/40` / `gold-rule`, and re-pointing them is a
+       one-line change where renaming them is a 46-file sweep with no visual
+       payoff. What they now resolve to is the brand rose itself, which is what
+       those decorative hairlines and rings wanted all along. */
+    --gold: 349 36% 77.7%;           /* = --brand-rose */
+    --gold-soft: 350 36% 89%;
+    --gold-deep: 349 34% 34%;        /* #743944 — 8.5:1 as text on background */
+    /* Seasonal reads as "limited, not default", so it stays a separate hue —
+       but pulled off the old signal-orange onto a clay that sits beside dusty
+       rose instead of shouting over it. It no longer shares a value with
+       --warning, which must remain a true amber to mean "caution". */
+    --seasonal: 18 44% 44%;          /* #a15b41 clay */
+    --seasonal-wash: 20 55% 96%;     /* the seasonal band's warm top */
 
-    /* Dark berry ramp — the Reviews band, the footer, and photo scrims. Named
-       rather than inlined so the dark bands re-tint with the brand. */
-    --berry-deep: 337 45% 33%;       /* #7d2f49 */
-    --berry-dark: 337 47% 25%;       /* #5f2338 */
-    --berry-ink: 336 40% 20%;        /* #4a1f2e */
-    --berry-black: 337 46% 14%;      /* #34121f */
+    /* Dark ink ramp — the Reviews band, the footer, and photo scrims. The
+       logo's black, carried down in four steps and kept faintly rose so the
+       dark bands read warm rather than as flat neutral grey. */
+    --ink-deep: 350 10% 22%;         /* #3e3234 */
+    --ink-dark: 350 10% 16%;         /* #2d2526 */
+    --ink-ink: 350 8% 12%;           /* #211c1d */
+    --ink-black: 0 2% 10%;           /* #1a1919 — the wordmark's own black, exact */
 
-    /* Feedback — tuned to sit on cream instead of glowing against it */
+    /* Feedback — tuned to sit on the rose-white background, not glow off it */
     --success: 158 47% 33%;          /* #2c7a5f — the storefront's green */
     --success-foreground: 0 0% 100%;
-    --warning: 33 82% 55%;           /* #e8942f — shared with seasonal */
+    --warning: 33 82% 45%;           /* amber — "caution", no longer the seasonal tone */
     --warning-foreground: 33 40% 15%;
     --info: 200 42% 40%;
     --info-foreground: 0 0% 100%;
@@ -94,49 +128,56 @@
     --status-in-transit: 271 30% 44%;
     --status-ready-pickup: 183 44% 28%;
     --status-completed: 152 46% 26%;
-    --status-custom-pending: 340 46% 42%;
+    --status-custom-pending: 349 36% 28%;
     --status-custom-approved: 192 44% 32%;
     --status-custom-rejected: 0 58% 44%;
 
-    /* Console chrome — dark plum-ink, berry active row, gold label + hairline */
-    --sidebar-background: 336 14% 15%;        /* #2c2226 */
-    --sidebar-foreground: 40 30% 94%;
-    --sidebar-primary: 340 46% 42%;
-    --sidebar-primary-foreground: 42 60% 66%; /* gold on the active row */
-    --sidebar-accent: 336 14% 21%;
-    --sidebar-accent-foreground: 40 30% 94%;
-    --sidebar-border: 336 14% 24%;
-    --sidebar-ring: 42 60% 66%;
+    /* Console chrome — the logo, at furniture scale: an ink field with the
+       brand rose marking the active row and ink type sitting on it. That
+       pairing is the artwork itself, so the console opens the same way the
+       packaging does. `--sidebar-primary` is therefore NOT customizable; see
+       the note in SettingsContext. */
+    --sidebar-background: 350 10% 12%;         /* #221c1d — the ink ramp */
+    --sidebar-foreground: 350 16% 92%;
+    --sidebar-primary: 349 36% 77.7%;          /* the brand rose */
+    --sidebar-primary-foreground: 0 2% 10%;    /* ink on rose — 9.26:1 */
+    --sidebar-accent: 350 8% 18%;
+    --sidebar-accent-foreground: 350 16% 92%;
+    --sidebar-border: 350 8% 21%;
+    --sidebar-ring: 349 36% 77.7%;
   }
 
+  /* Dark mode inverts the logo rather than re-tinting it: on an ink field the
+     brand rose becomes the action colour and the ink becomes the type on it —
+     the same two colours, the same pairing, swapped. */
   .dark {
-    --background: 336 14% 9%;
-    --foreground: 40 30% 94%;
+    --background: 350 10% 8%;
+    --foreground: 350 20% 94%;
 
-    --card: 336 14% 12%;
-    --card-foreground: 40 30% 94%;
+    --card: 350 10% 11%;
+    --card-foreground: 350 20% 94%;
 
-    --popover: 336 14% 12%;
-    --popover-foreground: 40 30% 94%;
+    --popover: 350 10% 11%;
+    --popover-foreground: 350 20% 94%;
 
-    --primary: 341 46% 56%;          /* lifted so berry holds on dark */
-    --primary-foreground: 0 0% 100%;
+    --primary: 349 36% 77.7%;        /* the brand rose, now the action */
+    --primary-foreground: 0 2% 10%;  /* ink on rose — 9.26:1 */
 
-    --secondary: 337 16% 20%;
-    --secondary-foreground: 40 30% 92%;
+    --secondary: 350 8% 18%;
+    --secondary-foreground: 350 20% 92%;
 
-    --muted: 337 16% 17%;
-    --muted-foreground: 337 10% 62%;
+    --muted: 350 8% 16%;
+    --muted-foreground: 350 8% 64%;
 
-    --accent: 337 16% 20%;           /* hover wash, still not the gold */
-    --accent-foreground: 40 30% 94%;
+    --accent: 350 8% 18%;            /* hover wash, still not the brand rose */
+    --accent-foreground: 350 20% 94%;
 
     --destructive: 0 62% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 337 16% 20%;
-    --input: 337 16% 20%;
-    --ring: 341 46% 56%;
+    --border: 350 8% 19%;
+    --input: 350 8% 36%;             /* lifted for the same 3:1 control edge */
+    --ring: 349 36% 77.7%;
   }
 
   /* ── LOZA THEME — gold / cream / brown (scoped via .loza-theme) ── */
@@ -260,50 +301,60 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 
-  /* Brand display type — Noto Kufi Arabic at 800 with tight tracking. All three
-     display hooks resolve to the same face: Cake & Bloom has one voice, and the
-     size/weight ramp (not the family) carries the hierarchy. The hooks survive
-     as separate class names only so existing markup keeps working. */
+  /* Brand display type. All three hooks resolve to the same face: Pink Cake has
+     one voice, and the size/weight ramp (not the family) carries hierarchy. The
+     hooks survive as separate class names only so existing markup keeps working.
+
+     Weight dropped 800 → 500 and tracking loosened to match the logotype, which
+     is a thin, low-contrast geometric — headings set at 800 with -0.02em were
+     the literal inverse of the mark they sat under. Hierarchy now comes from
+     size and space, which is what the identity actually asks for. */
   .font-display,
   .font-display-latin,
   .font-wedding {
     font-family: 'Noto Kufi Arabic', 'Alexandria', sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-weight: 500;
+    letter-spacing: -0.005em;
   }
 }
 
 @layer utilities {
+  /* The rose field, softened into a wash — the top of blush bands. Anchored on
+     --brand-rose so the deepest stop is literally the logo's colour. */
   .gradient-blush-warm {
-    background: linear-gradient(135deg, hsl(338 55% 96%) 0%, hsl(340 55% 90%) 50%, hsl(341 46% 82%) 100%);
+    background: linear-gradient(135deg, hsl(350 42% 97%) 0%, hsl(350 38% 90%) 50%, hsl(var(--brand-rose)) 100%);
   }
   .gradient-rose-deep {
-    background: linear-gradient(135deg, hsl(340 46% 42%) 0%, hsl(337 44% 28%) 60%, hsl(336 40% 16%) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--ink-dark)) 60%, hsl(var(--ink-black)) 100%);
   }
   .gradient-cocoa {
-    background: linear-gradient(135deg, hsl(340 44% 32%) 0%, hsl(337 42% 20%) 100%);
+    background: linear-gradient(135deg, hsl(var(--ink-deep)) 0%, hsl(var(--ink-black)) 100%);
   }
-  /* The two dark berry bands the storefront uses for its Reviews section and
-     footer — previously inlined as #7d2f49 → #5f2338 / #4a1f2e stops. */
-  .gradient-berry-deep {
-    background: linear-gradient(to bottom, hsl(337 45% 33%) 0%, hsl(340 46% 42%) 50%, hsl(337 45% 33%) 100%);
+  /* The dark band the storefront uses for its Reviews section and footer.
+     Ink, not berry — the near-black of the wordmark, kept faintly rose. It is
+     the backdrop the brand pink is meant to sit against: the two logo colours,
+     adjacent, nothing else. */
+  .gradient-ink-deep {
+    background: linear-gradient(to bottom, hsl(var(--ink-deep)) 0%, hsl(var(--ink-ink)) 50%, hsl(var(--ink-deep)) 100%);
   }
-  .gradient-footer-berry {
-    background: linear-gradient(to bottom, hsl(337 45% 33%) 0%, hsl(337 47% 25%) 100%);
-  }
+  /* Elevation is cast in the wordmark's black, never in the brand hue. A
+     coloured shadow reads as a glow, and a glow is the opposite of what a
+     two-colour monoline identity wants — so every shadow below resolves to
+     --ink-black at low alpha and the lift comes from the card's whiteness. */
   .shadow-rose-glow {
-    box-shadow: 0 24px 60px -28px hsl(340 46% 34% / 0.55), 0 8px 24px -12px hsl(340 46% 42% / 0.25);
+    box-shadow: 0 24px 60px -28px hsl(var(--ink-black) / 0.30), 0 8px 24px -12px hsl(var(--ink-black) / 0.14);
   }
   .shadow-soft-lift {
-    box-shadow: 0 18px 40px -22px hsl(336 20% 18% / 0.20), 0 4px 12px -6px hsl(336 20% 18% / 0.10);
+    box-shadow: 0 18px 40px -22px hsl(var(--ink-black) / 0.16), 0 4px 12px -6px hsl(var(--ink-black) / 0.08);
   }
   .ring-blush {
     box-shadow: inset 0 0 0 1px hsl(var(--border));
   }
-  /* Fading-gold hairline — the storefront's browse-zone → buy-zone divider. */
+  /* Fading rose hairline — the storefront's browse-zone → buy-zone divider.
+     Was a gold rule; the brand has no gold, so it fades in the field colour. */
   .gold-rule {
     height: 1px;
-    background: linear-gradient(to left, transparent, hsl(var(--gold) / 0.6), transparent);
+    background: linear-gradient(to left, transparent, hsl(var(--brand-rose)), transparent);
   }
   /* Short solid hairline that leads an eyebrow/kicker. */
   .eyebrow-rule {
@@ -324,32 +375,24 @@
 }
 
 @layer utilities {
-  /* The canonical card surface. Cake & Bloom is solid cream + a soft berry
-     lift, not frosted glass — redefining here re-skins every consumer at once
-     (the class name is kept so no sweep is needed). */
+  /* The canonical card surface. Pink Cake cards are pure white on rose paper
+     and lift by whiteness, not by a coloured halo — redefining here re-skins
+     every consumer at once (the class name is kept so no sweep is needed). */
   .glass-card {
     @apply bg-card border border-border;
-    box-shadow: 0 24px 66px -42px hsl(var(--primary) / 0.42);
+    box-shadow: 0 18px 44px -34px hsl(var(--ink-black) / 0.18);
   }
 
-  /* The anchor-CTA fill: a vertical berry gradient, dark foot to primary. */
+  /* The anchor-CTA fill. Kept a gradient so the 57 consumers don't need a
+     sweep, but flattened to a near-solid shade of the brand rose: the identity
+     is two flat colours, and a visible ramp on a button reads as the old
+     theme. Foot to head is one step, not a sweep. */
   .gradient-pink {
-    background: linear-gradient(to top, hsl(var(--pink-dark)) 0%, hsl(var(--primary)) 100%);
-  }
-
-  .gradient-warm {
-    background: linear-gradient(to top, hsl(var(--pink-dark)) 0%, hsl(var(--rose)) 100%);
-  }
-
-  .text-gradient-pink {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--rose)) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    background: linear-gradient(to top, hsl(var(--pink-dark)) 0%, hsl(var(--primary)) 72%);
   }
 
   .shadow-warm {
-    box-shadow: 0 24px 66px -42px hsl(var(--primary) / 0.42);
+    box-shadow: 0 18px 44px -34px hsl(var(--ink-black) / 0.18);
   }
 
   .animate-float {
@@ -418,9 +461,11 @@
   .press { transition: transform 0.12s var(--ease-out-soft); }
   .press:active { transform: scale(0.94); }
 
-  /* Canonical soft-berry elevation — one shadow vocabulary for feature panels */
-  .shadow-berry-soft { box-shadow: 0 24px 66px -42px hsl(var(--primary)/0.42); }
-  .shadow-berry-soft-lg { box-shadow: 0 34px 80px -44px hsl(var(--primary)/0.5); }
+  /* Canonical soft elevation — one shadow vocabulary for feature panels. Was
+     `shadow-berry-*` and, despite the name, resolved to --primary: the panels
+     glowed in the brand colour. Now ink, like every other shadow. */
+  .shadow-ink-soft { box-shadow: 0 20px 52px -40px hsl(var(--ink-black) / 0.20); }
+  .shadow-ink-soft-lg { box-shadow: 0 30px 70px -44px hsl(var(--ink-black) / 0.26); }
 
   /* Hide scrollbar (horizontal chip rows etc.) */
   .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
@@ -474,13 +519,13 @@
 
   /* Occasion + testimonial cards */
   .occasion { transition: transform 0.45s var(--ease-out-soft), box-shadow 0.45s var(--ease-out-soft); }
-  .occasion:hover { transform: translateY(-6px); box-shadow: 0 28px 60px -28px hsl(350 30% 20% / 0.4); }
+  .occasion:hover { transform: translateY(-6px); box-shadow: 0 28px 60px -28px hsl(var(--ink-black) / 0.35); }
   .occasion img { transition: transform 0.8s var(--ease-out-soft); }
   .occasion:hover img { transform: scale(1.09); }
   .occasion .go { transition: opacity 0.35s ease, transform 0.35s var(--ease-out-soft); opacity: 0; transform: translateX(6px); }
   .occasion:hover .go { opacity: 1; transform: none; }
   .tcard { transition: transform 0.4s var(--ease-out-soft), box-shadow 0.4s var(--ease-out-soft); }
-  .tcard:hover { transform: translateY(-4px); box-shadow: 0 26px 50px -28px hsl(350 30% 20% / 0.3); }
+  .tcard:hover { transform: translateY(-4px); box-shadow: 0 26px 50px -28px hsl(var(--ink-black) / 0.26); }
 
   /* Cake configurator preview */
   .tier { position: relative; margin: 0 auto; border-radius: 16px 16px 9px 9px;
@@ -517,7 +562,7 @@
   .badge-pop, .cz-step { animation: none !important; }
 }
 
-/* ── Gift-box section (Cake & Bloom "لديك هديّة بانتظارك") ── */
+/* ── Gift-box section ("لديك هديّة بانتظارك") ── */
 @keyframes ck-bob { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-9px); } }
 @keyframes ck-pulse { 0% { transform: scale(0.7); opacity: 0.55; } 100% { transform: scale(1.7); opacity: 0; } }
 @keyframes ck-couponpop { 0% { opacity: 0; transform: scale(0.9) translateY(12px); } 100% { opacity: 1; transform: none; } }

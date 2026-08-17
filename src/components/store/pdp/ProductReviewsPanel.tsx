@@ -40,12 +40,12 @@ export function ProductReviewsPanel({ reviews, isLoading, average, count, onWrit
       <div className="flex flex-col justify-between gap-4 border-b border-primary/15 pb-6 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-bold tracking-[.08em] text-rose">قالوا عنها</p>
-          <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">آراء من جرّبوها</h2>
+          <h2 className="mt-2 text-3xl font-semibold tracking-[-.01em] text-foreground sm:text-4xl">آراء من جرّبوها</h2>
         </div>
         <button
           type="button"
           onClick={onWrite}
-          className="flex shrink-0 items-center gap-2 self-start rounded-full border-2 border-primary/25 px-5 py-2.5 text-xs font-black text-primary transition-colors hover:border-primary hover:bg-blush sm:self-auto"
+          className="flex shrink-0 items-center gap-2 self-start rounded-full border-2 border-primary/25 px-5 py-2.5 text-xs font-semibold text-primary transition-colors hover:border-primary hover:bg-blush sm:self-auto"
         >
           <MessageSquarePlus size={15} /> اكتبي تقييمك
         </button>
@@ -64,14 +64,14 @@ export function ProductReviewsPanel({ reviews, isLoading, average, count, onWrit
           <div className="mx-auto grid size-14 place-items-center rounded-full bg-blush text-primary">
             <Quote size={22} />
           </div>
-          <p className="mt-4 text-lg font-black text-foreground">ما فيه تقييمات بعد</p>
+          <p className="mt-4 text-lg font-semibold text-foreground">ما فيه تقييمات بعد</p>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-7 text-muted-foreground">
             إذا جرّبتيها، رأيك يساعد غيرك يختار — وما يأخذ أكثر من دقيقة.
           </p>
           <button
             type="button"
             onClick={onWrite}
-            className="mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-6 py-3 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
           >
             <MessageSquarePlus size={16} /> كوني أول من يقيّم
           </button>
@@ -81,7 +81,7 @@ export function ProductReviewsPanel({ reviews, isLoading, average, count, onWrit
           {/* Summary + histogram */}
           <div className="h-fit rounded-3xl bg-gradient-to-b from-blush to-background p-6 ring-1 ring-primary/10">
             <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-black leading-none text-primary">{toArabicDigits(average || 0)}</span>
+              <span className="text-5xl font-semibold leading-none text-primary">{toArabicDigits(average || 0)}</span>
               <span className="text-sm font-bold text-muted-foreground">من ٥</span>
             </div>
             <div className="mt-3">
@@ -126,7 +126,7 @@ export function ProductReviewsPanel({ reviews, isLoading, average, count, onWrit
                   <blockquote className="mt-3.5 grow text-sm leading-7 text-muted-foreground">«{review.text}»</blockquote>
                 )}
                 <figcaption className="mt-5 flex items-center gap-2.5 border-t border-border pt-4">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-blush text-xs font-black text-primary">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-blush text-xs font-semibold text-primary">
                     {review.customer_name.trim().charAt(0)}
                   </span>
                   <span>

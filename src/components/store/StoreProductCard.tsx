@@ -139,7 +139,7 @@ export function StoreProductCard({
       <div className="flex grow flex-col p-4">
         {/* Title doubles as a stretched-link: one keyboard tab-stop + accessible
             name that opens the product across the whole card (media + body). */}
-        <h3 className="text-base font-black leading-6 text-foreground">
+        <h3 className="text-base font-semibold leading-6 text-foreground">
           {onView ? (
             <button
               type="button"
@@ -175,7 +175,7 @@ export function StoreProductCard({
 
           {/* Price hero + concrete savings */}
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="flex items-baseline gap-1 text-2xl font-black leading-none text-primary">
+            <span className="flex items-baseline gap-1 text-2xl font-semibold leading-none text-primary">
               {toArabicDigits(product.price)} <RiyalSymbol className="text-lg" />
             </span>
             {discount > 0 && (

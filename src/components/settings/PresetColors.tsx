@@ -10,24 +10,25 @@ interface ColorPreset {
   accent: string;
 }
 
-/** The first entry is the Cake & Bloom default and must match `:root` in
- *  index.css + `defaultSettings` in SettingsContext. The rest are deeper,
- *  lower-chroma tones chosen to sit on the cream background — the old neon
- *  presets (sky blue, emerald, orange) glowed against it. */
+/** The first entry is the Pink Cake default and must match `:root` in
+ *  index.css + `defaultSettings` in SettingsContext — one click here re-applies
+ *  it as inline styles on <html>, so a stale copy silently un-brands the app.
+ *  The rest are deeper, lower-chroma tones chosen to sit on the rose paper —
+ *  the old neon presets (sky blue, emerald, orange) glowed against it. */
 const presets: ColorPreset[] = [
   {
-    name: 'توتي (الافتراضي)',
-    primary: '340 46% 42%',
-    primaryLight: '341 46% 62%',
-    primaryDark: '340 46% 34%',
-    accent: '341 40% 50%',
+    name: 'وردي وحبر (الافتراضي)',
+    primary: '349 36% 28%',
+    primaryLight: '350 34% 62%',
+    primaryDark: '349 38% 18%',
+    accent: '349 32% 42%',
   },
   {
     name: 'عنّابي داكن',
-    primary: '350 52% 34%',
-    primaryLight: '350 44% 54%',
-    primaryDark: '350 54% 26%',
-    accent: '352 40% 44%',
+    primary: '352 44% 36%',
+    primaryLight: '352 40% 58%',
+    primaryDark: '352 48% 24%',
+    accent: '354 36% 46%',
   },
   {
     name: 'بنفسجي خزامى',

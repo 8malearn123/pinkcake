@@ -32,7 +32,7 @@ export function SeasonalSection({
                 <Sun size={15} /> {promo.eyebrow}
               </p>
             )}
-            <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">
+            <h2 className="mt-2 text-3xl font-semibold tracking-[-.01em] text-foreground sm:text-4xl">
               {promo.title}
             </h2>
             {promo.subtitle && (

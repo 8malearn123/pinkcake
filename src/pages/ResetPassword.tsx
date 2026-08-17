@@ -16,7 +16,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
-import { Cake, Loader2, Lock, CheckCircle2 } from 'lucide-react';
+import { Loader2, Lock, CheckCircle2 } from 'lucide-react';
+import { BrandLogo } from '@/components/brand';
 import { useSettings } from '@/contexts/SettingsContext';
 
 const resetPasswordSchema = z.object({
@@ -106,10 +107,9 @@ export default function ResetPassword() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="gradient-pink shadow-berry-soft mx-auto mb-4 grid size-20 place-items-center rounded-2xl ring-1 ring-gold/40">
-            <Cake className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-2xl font-black tracking-[-.02em]">{settings.storeName}</h1>
+          <BrandLogo variant="ar" className="mx-auto h-16 text-primary" />
+          {/* The lockup already says the name; the heading stays for readers. */}
+          <h1 className="sr-only">{settings.storeName}</h1>
         </div>
 
         <Card>

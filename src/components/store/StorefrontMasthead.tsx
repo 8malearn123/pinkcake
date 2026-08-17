@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, ShoppingBag, User, X } from 'lucide-react';
+import { BrandLogo } from '@/components/brand';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStoreCartOptional } from '@/contexts/StoreCartContext';
@@ -92,23 +93,27 @@ export function StorefrontMasthead({
       )}
     >
       <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-4 px-5 sm:px-8 md:h-[84px] lg:px-12">
-        {/* Brand */}
+        {/* Brand — the real lockup, not type standing in for it. It was set as
+            weight-900 at -.06em tracking, which is the exact opposite of the
+            thin geometric mark it was imitating. */}
         <button
           onClick={() => navigate('/')}
           className="shrink-0 text-start leading-none"
-          aria-label="الصفحة الرئيسية"
+          aria-label={`${settings.storeName} — الصفحة الرئيسية`}
         >
-          <span
+          <BrandLogo
+            variant="ar"
+            decorative
             className={cn(
-              'block text-xl font-black tracking-[-.06em] transition-colors sm:text-2xl',
-              overHero ? 'text-white [text-shadow:0_2px_12px_rgba(0,0,0,.45)]' : 'text-primary',
+              'h-9 transition-colors sm:h-11',
+              overHero
+                ? 'text-white [filter:drop-shadow(0_2px_12px_rgb(0_0_0/.45))]'
+                : 'text-primary',
             )}
-          >
-            {settings.storeName}
-          </span>
+          />
           <span
             className={cn(
-              'mt-1 block text-[9px] font-bold tracking-[.14em] transition-colors',
+              'mt-1.5 block text-[9px] font-medium tracking-[.14em] transition-colors',
               overHero ? 'text-white/75' : 'text-muted-foreground',
             )}
           >

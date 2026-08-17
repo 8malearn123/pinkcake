@@ -52,7 +52,7 @@ export function CustomCakeSection({
               <span className="h-px w-10 bg-primary/25" /> {content.eyebrow}
             </p>
           )}
-          <h2 className="mt-4 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
+          <h2 className="mt-4 text-[2.5rem] font-semibold leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
             {content.title}
             {content.titleAccent && <span className="block text-rose">{content.titleAccent}</span>}
           </h2>
@@ -78,7 +78,7 @@ export function CustomCakeSection({
             <button
               type="button"
               onClick={() => onCta(content.cta.target)}
-              className="group/cta mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-all duration-200 hover:from-primary hover:to-rose active:scale-[.98]"
+              className="group/cta mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-all duration-200 hover:from-primary hover:to-rose active:scale-[.98]"
             >
               <Wand2 size={17} />
               {content.cta.label}

@@ -41,7 +41,7 @@ export function PickupQRCode({ orderId, orderStatus, orderNumber }: PickupQRCode
           retryLabel="جرّب مرة ثانية"
           className="py-4"
         />
-        <bdi dir="ltr" className="mt-2 block text-2xl font-black text-primary">
+        <bdi dir="ltr" className="mt-2 block text-2xl font-semibold text-primary">
           {orderNumber}
         </bdi>
       </div>

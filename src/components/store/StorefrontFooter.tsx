@@ -1,5 +1,6 @@
 import { Clock, Instagram, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { BrandLogo } from '@/components/brand';
 import { useCombos } from '@/hooks/useCombos';
 import { useHomepageContent } from '@/hooks/useHomepageContent';
 
@@ -37,13 +38,15 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
   const { isSectionVisible } = useHomepageContent();
 
   return (
-    <footer className="mt-2 bg-gradient-to-b from-berry-deep to-berry-dark text-white">
+    <footer className="mt-2 bg-gradient-to-b from-ink-deep to-ink-dark text-white">
       <div className="mx-auto max-w-[1500px] px-5 py-14 sm:px-8 lg:px-12 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr] lg:gap-8">
-          {/* Brand + social */}
+          {/* Brand + social — the lockup signs off the page in the brand rose
+              on ink, which is the logo sheet itself. */}
           <div>
-            <p className="text-2xl font-black tracking-[-.04em]">{storeName}</p>
-            <p className="mt-1 text-[10px] font-bold tracking-[.16em] text-gold">حلويات جازان الفاخرة</p>
+            <BrandLogo variant="ar" className="h-14 text-brand-rose" />
+            <span className="sr-only">{storeName}</span>
+            <p className="mt-3 text-[10px] font-medium tracking-[.16em] text-brand-rose/80">حلويات جازان الفاخرة</p>
             <p className="mt-4 max-w-xs text-sm leading-7 text-white/70">
               تورتات وحلويات طازجة تُخبز يومياً في جازان بأجود المكوّنات — لكل مناسبة كيكتها المميزة.
             </p>
@@ -59,7 +62,7 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
 
           {/* Shop */}
           <nav aria-label="تسوّق">
-            <p className="text-sm font-black text-gold">تسوّق</p>
+            <p className="text-sm font-semibold text-gold">تسوّق</p>
             <ul className="mt-4 space-y-2.5 text-sm text-white/75">
               {isSectionVisible('shop') && (
                 <li><button onClick={() => jump('shop')} className="transition-colors hover:text-white">كل المنتجات</button></li>
@@ -77,7 +80,7 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
 
           {/* Help */}
           <nav aria-label="المساعدة">
-            <p className="text-sm font-black text-gold">المساعدة</p>
+            <p className="text-sm font-semibold text-gold">المساعدة</p>
             <ul className="mt-4 space-y-2.5 text-sm text-white/75">
               {isSectionVisible('faq') && (
                 <li><button onClick={() => jump('faq')} className="transition-colors hover:text-white">الأسئلة الشائعة</button></li>
@@ -92,7 +95,7 @@ export function StorefrontFooter({ storeName, onNavigate, onJump }: StorefrontFo
 
           {/* Contact */}
           <div>
-            <p className="text-sm font-black text-gold">تواصل معنا</p>
+            <p className="text-sm font-semibold text-gold">تواصل معنا</p>
             <ul className="mt-4 space-y-3 text-sm text-white/75">
               <li className="flex items-center gap-2.5">
                 <MapPin size={16} className="shrink-0 text-gold" /> صبيا · أبو عريش، جازان

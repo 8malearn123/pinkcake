@@ -35,7 +35,7 @@ export function StickyBuyBar({
 }: StickyBuyBarProps) {
   const lineTotal = product.price * qty;
 
-  const ctaClass = `flex items-center justify-center gap-2 rounded-2xl text-sm font-black text-white transition-all duration-200 active:scale-[.98] ${
+  const ctaClass = `flex items-center justify-center gap-2 rounded-2xl text-sm font-semibold text-white transition-all duration-200 active:scale-[.98] ${
     soldOut
       ? 'cursor-not-allowed bg-muted-foreground'
       : added
@@ -79,7 +79,7 @@ export function StickyBuyBar({
           </div>
 
           <div className="min-w-0">
-            <p className="truncate text-sm font-black text-foreground">
+            <p className="truncate text-sm font-semibold text-foreground">
               {product.name}
             </p>
             {rating && rating.review_count > 0 && (
@@ -93,7 +93,7 @@ export function StickyBuyBar({
           </div>
 
           <div className="ms-auto flex items-center gap-4">
-            <span className="flex items-baseline gap-1.5 text-2xl font-black text-primary">
+            <span className="flex items-baseline gap-1.5 text-2xl font-semibold text-primary">
               {toArabicDigits(lineTotal)} <RiyalSymbol className="text-base" />
             </span>
 
@@ -108,7 +108,7 @@ export function StickyBuyBar({
                 >
                   <Minus size={15} strokeWidth={2.5} />
                 </button>
-                <span className="w-8 text-center text-sm font-black text-foreground">
+                <span className="w-8 text-center text-sm font-semibold text-foreground">
                   {toArabicDigits(qty)}
                 </span>
                 <button
@@ -141,7 +141,7 @@ export function StickyBuyBar({
             <p className="text-[10px] font-bold tracking-[.08em] text-muted-foreground">
               الإجمالي
             </p>
-            <p className="flex items-baseline gap-1 text-xl font-black leading-tight text-primary">
+            <p className="flex items-baseline gap-1 text-xl font-semibold leading-tight text-primary">
               {toArabicDigits(lineTotal)} <RiyalSymbol className="text-xs" />
             </p>
           </div>
@@ -157,7 +157,7 @@ export function StickyBuyBar({
               >
                 <Minus size={15} strokeWidth={2.5} />
               </button>
-              <span className="w-6 text-center text-sm font-black text-foreground">
+              <span className="w-6 text-center text-sm font-semibold text-foreground">
                 {toArabicDigits(qty)}
               </span>
               <button

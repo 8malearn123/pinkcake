@@ -96,7 +96,7 @@ export default function OrderSummaryCanvas({
   flavorNames,
   designName,
 }: Props) {
-  const accent = state.colors[0] || '#be7b7c';
+  const accent = state.colors[0] || '#dbb2b9';
 
   return (
     <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)]">

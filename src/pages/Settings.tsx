@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BrandLogo } from '@/components/brand';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader, SectionCard } from '@/components/ds';
 import { Input } from '@/components/ui/input';
@@ -102,12 +103,12 @@ export default function Settings() {
                   />
                 </div>
 
-                {/* Preview */}
+                {/* Preview — mirrors SidebarLogo exactly. It used to render a
+                    storefront icon while the real console rendered a cake, so
+                    the manager was previewing a mark that never shipped. */}
                 <div className="p-4 rounded-lg bg-sidebar text-sidebar-foreground max-w-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl gradient-pink flex items-center justify-center shadow-warm">
-                      <Store className="w-7 h-7 text-white" />
-                    </div>
+                    <BrandLogo variant="ar" className="h-11 text-brand-rose" />
                     <div>
                       <h3 className="text-lg font-bold">{localStoreName || 'اسم المتجر'}</h3>
                       <p className="text-xs text-sidebar-foreground/60">

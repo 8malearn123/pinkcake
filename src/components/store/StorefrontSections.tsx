@@ -25,7 +25,7 @@ function OccasionCard({ o, onCta }: { o: OccasionItem; onCta: (t: CtaTarget) => 
       className={`group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl text-start shadow-sm ring-1 ring-primary/5 transition-shadow duration-300 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${featured ? "min-h-[260px]" : "min-h-[210px]"} ${o.size === "wide" ? "lg:col-span-2" : ""}`}
     >
       <img src={o.image.url} alt={o.image.alt} className="absolute inset-0 size-full object-cover transition duration-700 group-hover:scale-110" />
-      <div className="absolute inset-0 bg-gradient-to-t from-berry-ink/90 via-berry-ink/25 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink-ink/90 via-ink-ink/25 to-transparent" />
       <span className={`absolute start-4 top-4 grid place-items-center rounded-full bg-white/15 text-gold backdrop-blur-md ring-1 ring-white/25 ${featured ? "size-14" : "size-11"}`}>
         <Icon size={featured ? 26 : 20} />
       </span>
@@ -34,7 +34,7 @@ function OccasionCard({ o, onCta }: { o: OccasionItem; onCta: (t: CtaTarget) => 
       )}
       <div className={`relative text-white ${featured ? "p-6 sm:p-8" : "p-5"}`}>
         {featured && <span className="text-[10px] font-bold tracking-[.12em] text-gold">الأكثر طلباً</span>}
-        <h3 className={`font-black ${featured ? "mt-1 text-2xl sm:text-3xl" : "text-lg"}`}>{o.title}</h3>
+        <h3 className={`font-semibold ${featured ? "mt-1 text-2xl sm:text-3xl" : "text-lg"}`}>{o.title}</h3>
         <p className={`mt-1 leading-5 text-white/75 ${featured ? "max-w-xs text-sm" : "text-xs"}`}>{o.desc}</p>
         <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-gold transition-all duration-300 group-hover:gap-2.5">
           تصفّح الآن <ArrowLeft size={15} />
@@ -63,7 +63,7 @@ export function ShopByOccasion({
         {/* عنوان تحريري */}
         <div className="flex flex-col justify-center lg:col-span-2 lg:ps-6">
           {content.eyebrow && <span className="w-fit rounded-full bg-blush px-4 py-1.5 text-xs font-bold tracking-[.08em] text-rose">{content.eyebrow}</span>}
-          <h2 className="mt-4 text-3xl font-black leading-[1.2] tracking-[-.01em] text-foreground sm:text-[2.6rem]">{content.title}</h2>
+          <h2 className="mt-4 text-3xl font-semibold leading-[1.2] tracking-[-.01em] text-foreground sm:text-[2.6rem]">{content.title}</h2>
           {content.lede && <p className="mt-3 max-w-md text-sm leading-7 text-muted-foreground">{content.lede}</p>}
         </div>
 
@@ -89,7 +89,7 @@ export function HowItWorks() {
           <span className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[.22em] text-rose">
             <span className="h-px w-8 bg-primary/25" /> سهلة وبسيطة <span className="h-px w-8 bg-primary/25" />
           </span>
-          <h2 className="mt-5 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">كيف تطلبين؟</h2>
+          <h2 className="mt-5 text-[2.5rem] font-semibold leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">كيف تطلبين؟</h2>
           <p className="mt-4 max-w-md text-[15px] leading-8 text-muted-foreground">ثلاث خطوات فقط تفصلك عن تورتة مناسبتك القادمة.</p>
         </div>
 
@@ -104,13 +104,13 @@ export function HowItWorks() {
                 <span className="grid size-20 place-items-center rounded-full bg-white text-primary ring-1 ring-primary/12 shadow-[0_0_0_6px_hsl(var(--background)),0_10px_30px_-12px_hsl(var(--primary)/0.35)] transition duration-300 group-hover:bg-primary group-hover:text-gold group-hover:ring-primary">
                   <s.icon size={30} strokeWidth={2} />
                 </span>
-                <span className="absolute -end-2 -top-2 grid size-8 place-items-center rounded-full bg-gold text-xs font-black text-primary ring-4 ring-background">
+                <span className="absolute -end-2 -top-2 grid size-8 place-items-center rounded-full bg-gold text-xs font-semibold text-primary ring-4 ring-background">
                   {s.num}
                 </span>
               </div>
 
               <span className="mt-6 text-[11px] font-bold uppercase tracking-[.18em] text-rose">{s.label}</span>
-              <h3 className="mt-2 text-xl font-black text-foreground">{s.title}</h3>
+              <h3 className="mt-2 text-xl font-semibold text-foreground">{s.title}</h3>
               <p className="mt-2.5 max-w-[16rem] text-sm leading-7 text-muted-foreground">{s.desc}</p>
             </li>
           ))}
@@ -135,7 +135,7 @@ export function FAQ({ content = SECTION_DEFAULTS.faq }: { content?: SectionConte
     <section id="faq" className="mx-auto max-w-[820px] px-5 py-14 sm:px-8 lg:py-20">
       <Reveal className="text-center">
         {content.eyebrow && <p className="text-xs font-bold tracking-[.08em] text-rose">{content.eyebrow}</p>}
-        <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">{content.title}</h2>
+        <h2 className="mt-2 text-3xl font-semibold tracking-[-.01em] text-foreground sm:text-4xl">{content.title}</h2>
       </Reveal>
       <Reveal className="mt-9 divide-y divide-primary/10 border-y border-primary/10">
         {items.map((f, i) => (
@@ -160,7 +160,7 @@ export function Newsletter() {
     <section className="px-5 py-14 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[1500px] overflow-hidden rounded-2xl border border-primary/10 bg-white px-6 py-12 text-center shadow-[0_20px_70px_-45px_hsl(var(--primary)/0.4)] sm:px-12">
         <p className="text-xs font-bold tracking-[.08em] text-rose">انضمي لعائلة كيكة وورد</p>
-        <h2 className="mx-auto mt-2 max-w-xl text-2xl font-black leading-[1.4] text-foreground sm:text-3xl">اشتركي واحصلي على خصم ١٠٪ على أول طلب</h2>
+        <h2 className="mx-auto mt-2 max-w-xl text-2xl font-semibold leading-[1.4] text-foreground sm:text-3xl">اشتركي واحصلي على خصم ١٠٪ على أول طلب</h2>
         <p className="mx-auto mt-3 max-w-md text-sm leading-7 text-muted-foreground">وصلك كل جديد من التورتات والعروض الحصرية أول بأول.</p>
         {done ? (
           <p className="mx-auto mt-6 flex items-center justify-center gap-2 text-sm font-bold text-success"><CheckCircle2 size={18} /> تم الاشتراك! تحقّقي من بريدك للحصول على الكود.</p>

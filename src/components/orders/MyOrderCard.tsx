@@ -36,7 +36,7 @@ export function MyOrderCard({ order }: { order: CustomerOrder }) {
   const overflow = lines.length - shown.length;
 
   return (
-    <div className="group glass-card relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-berry-soft-lg">
+    <div className="group glass-card relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-ink-soft-lg">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         {shown.length > 0 && (
           <div className="flex shrink-0 gap-2">
@@ -70,7 +70,7 @@ export function MyOrderCard({ order }: { order: CustomerOrder }) {
         <div className="min-w-0 flex-1">
           <Link
             to={`/my-orders/${order.id}`}
-            className="text-lg font-black leading-snug after:absolute after:inset-0 after:content-['']"
+            className="text-lg font-semibold leading-snug after:absolute after:inset-0 after:content-['']"
           >
             {moment.headline}
           </Link>
@@ -100,7 +100,7 @@ export function MyOrderCard({ order }: { order: CustomerOrder }) {
 
         {isPast && (
           <div className="relative z-10 flex items-center gap-3 sm:flex-col sm:items-end">
-            <span className="flex items-baseline gap-1 text-2xl font-black leading-none text-primary">
+            <span className="flex items-baseline gap-1 text-2xl font-semibold leading-none text-primary">
               {toArabicDigits(order.total_amount)}{' '}
               <RiyalSymbol className="text-sm text-muted-foreground" />
             </span>

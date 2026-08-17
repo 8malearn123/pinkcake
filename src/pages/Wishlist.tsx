@@ -70,7 +70,7 @@ export default function Wishlist() {
         {/* Empty state / grid */}
         {count === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-blush/40 py-20 text-center">
-            <div className="shadow-berry-soft mx-auto mb-5 grid size-20 place-items-center rounded-full bg-background">
+            <div className="shadow-ink-soft mx-auto mb-5 grid size-20 place-items-center rounded-full bg-background">
               <Heart className="size-9 text-primary" />
             </div>
             <Title variant="h3" as="h3" className="mb-2 text-2xl">

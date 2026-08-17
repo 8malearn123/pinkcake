@@ -161,7 +161,7 @@ export default function ProductDetails() {
         </button>
 
         <button onClick={() => navigate('/store')} className="shrink-0 text-start leading-none">
-          <span className="block text-xl font-black tracking-[-.06em] text-primary sm:text-2xl">
+          <span className="block text-xl font-semibold tracking-[-.06em] text-primary sm:text-2xl">
             {settings.storeName}
           </span>
           <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-muted-foreground">حلويات جازان الفاخرة</span>
@@ -239,13 +239,13 @@ export default function ProductDetails() {
             <div className="mx-auto grid size-16 place-items-center rounded-full bg-blush">
               <Cake size={28} className="text-rose" />
             </div>
-            <h1 className="mt-5 text-2xl font-black tracking-[-.02em]">ما لقينا هذي الكيكة</h1>
+            <h1 className="mt-5 text-2xl font-semibold tracking-[-.02em]">ما لقينا هذي الكيكة</h1>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
               يمكن انسحبت من التشكيلة أو الرابط ناقص — تشكيلتنا الكاملة بانتظارك.
             </p>
             <button
               onClick={() => navigate('/shop')}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
             >
               تصفّح كل المنتجات <ChevronLeft size={16} />
             </button>
@@ -289,7 +289,7 @@ export default function ProductDetails() {
         <div className="relative">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-8 h-[380px] bg-[radial-gradient(65%_60%_at_75%_0%,rgba(251,238,242,0.85),transparent)]"
+            className="pointer-events-none absolute inset-x-0 -top-8 h-[380px] bg-[radial-gradient(65%_60%_at_75%_0%,rgba(249,241,242,0.85),transparent)]"
           />
           <div className="relative grid gap-9 pb-14 lg:grid-cols-2 lg:gap-14 lg:pb-20">
             {/* min-w-0 on both columns: a grid item defaults to min-width:auto, so the
@@ -341,17 +341,17 @@ export default function ProductDetails() {
       </main>
 
       {/* Craft band — why this cake is worth its price */}
-      <section className="relative overflow-hidden border-y border-gold/30 bg-gradient-to-b from-berry-deep via-primary to-berry-deep px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
+      <section className="relative overflow-hidden border-y border-gold/30 bg-gradient-to-b from-ink-deep via-primary to-ink-deep px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(221,189,117,0.18),transparent)]"
+          className="pointer-events-none absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(219,178,185,0.22),transparent)]"
         />
         <div className="relative mx-auto max-w-[1500px]">
           <Reveal className="flex flex-col items-center text-center">
             <p className="flex items-center gap-2 text-xs font-bold tracking-[.14em] text-gold">
               <span className="h-px w-8 bg-gold/50" /> من مطبخنا إليك <span className="h-px w-8 bg-gold/50" />
             </p>
-            <h2 className="mt-3 text-3xl font-black tracking-[-.01em] text-white sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-.01em] text-white sm:text-4xl">
               ليش تختلف عن أي كيكة ثانية
             </h2>
           </Reveal>
@@ -361,8 +361,8 @@ export default function ProductDetails() {
                 key={item.n}
                 className="rounded-2xl bg-white/[0.07] p-7 ring-1 ring-white/10 transition-colors duration-300 hover:bg-white/[0.12]"
               >
-                <span className="text-2xl font-black text-gold">{item.n}</span>
-                <h3 className="mt-3 text-lg font-black text-white">{item.title}</h3>
+                <span className="text-2xl font-semibold text-gold">{item.n}</span>
+                <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
                 <p className="mt-2 text-sm leading-7 text-white/70">{item.body}</p>
               </article>
             ))}
@@ -390,7 +390,7 @@ export default function ProductDetails() {
             <div className="flex flex-col justify-between gap-4 border-b border-primary/15 pb-6 sm:flex-row sm:items-end">
               <div>
                 <p className="text-xs font-bold tracking-[.08em] text-rose">من نفس التشكيلة</p>
-                <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">قد يعجبك أيضاً</h2>
+                <h2 className="mt-2 text-3xl font-semibold tracking-[-.01em] text-foreground sm:text-4xl">قد يعجبك أيضاً</h2>
               </div>
               <button
                 onClick={() => navigate('/shop')}

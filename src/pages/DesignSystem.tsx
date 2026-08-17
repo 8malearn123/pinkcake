@@ -41,11 +41,11 @@ interface TokenSwatch {
 }
 
 const CORE_TOKENS: TokenSwatch[] = [
-  { token: 'primary', cssVar: '--primary', usage: 'التوتي: أزرار، روابط، تركيز' },
-  { token: 'accent', cssVar: '--accent', usage: 'خلفية التمرير الهادئة (hover) — ليست الذهبي' },
+  { token: 'primary', cssVar: '--primary', usage: 'وردي الشعار مُعتَّم: أزرار، روابط، تركيز' },
+  { token: 'accent', cssVar: '--accent', usage: 'خلفية التمرير الهادئة (hover) — ليست وردي الشعار' },
   { token: 'secondary', cssVar: '--secondary', usage: 'خلفيات أزرار ثانوية ورقائق' },
   { token: 'muted', cssVar: '--muted', usage: 'خلفيات خافتة وفواصل' },
-  { token: 'background', cssVar: '--background', usage: 'كريمي — خلفية الصفحات' },
+  { token: 'background', cssVar: '--background', usage: 'ورقي وردي — خلفية الصفحات' },
   { token: 'card', cssVar: '--card', usage: 'خلفية البطاقات' },
   { token: 'border', cssVar: '--border', usage: 'الحدود والفواصل' },
   { token: 'destructive', cssVar: '--destructive', usage: 'حذف وأخطاء فقط' },
@@ -59,14 +59,16 @@ const FEEDBACK_TOKENS: TokenSwatch[] = [
 ];
 
 const BRAND_TOKENS: TokenSwatch[] = [
-  { token: 'primary', cssVar: '--primary', usage: 'التوتي — لون العلامة الأساسي' },
+  { token: 'brand-rose', cssVar: '--brand-rose', usage: 'وردي الشعار #DBB2B9 — لون الهوية، لا يُعدَّل' },
+  { token: 'brand-ink', cssVar: '--brand-ink', usage: 'حبر الشعار #1A1919 — لون الهوية، لا يُعدَّل' },
+  { token: 'primary', cssVar: '--primary', usage: 'وردي الشعار مُعتَّم — الأزرار والأسعار والروابط' },
   { token: 'rose', cssVar: '--rose', usage: 'وردي أفتح: العناوين التمهيدية والسطر الثاني' },
-  { token: 'gold', cssVar: '--gold', usage: 'الذهبي — الخيوط والشارات واللمسات الفاخرة' },
-  { token: 'gold-deep', cssVar: '--gold-deep', usage: 'ذهبي غامق: نص الذهبي على الكريمي' },
+  { token: 'gold', cssVar: '--gold', usage: 'وردي زخرفي — الخيوط والشارات (كان الذهبي)' },
+  { token: 'gold-deep', cssVar: '--gold-deep', usage: 'وردي غامق: نص الزخرفي على الورقي' },
   { token: 'blush', cssVar: '--blush', usage: 'خدّي (خلفيات ناعمة)' },
-  { token: 'seasonal', cssVar: '--seasonal', usage: 'كهرماني موسمي (تشكيلة الصيف)' },
-  { token: 'berry-deep', cssVar: '--berry-deep', usage: 'توتي داكن: نطاقات الآراء والتذييل' },
-  { token: 'berry-ink', cssVar: '--berry-ink', usage: 'حبر توتي: تظليل الصور' },
+  { token: 'seasonal', cssVar: '--seasonal', usage: 'طيني موسمي (تشكيلة الصيف)' },
+  { token: 'ink-deep', cssVar: '--ink-deep', usage: 'حبر داكن: نطاقات الآراء والتذييل' },
+  { token: 'ink-ink', cssVar: '--ink-ink', usage: 'حبر أغمق: تظليل الصور' },
 ];
 
 const ALL_STATUSES = Object.keys(ORDER_STATUS_LABELS) as OrderStatus[];
@@ -104,7 +106,7 @@ export default function DesignSystem() {
         <PageHeader
           icon={Palette}
           title="دليل التصميم"
-          description="المرجع الحي لهوية Cake & Bloom — نفس الإحساس والنبرة في كل شاشة (المتجر ولوحة الموظفين). التفاصيل الكاملة في DESIGN_SYSTEM.md"
+          description="المرجع الحي لهوية Pink Cake «وردي وحبر» — نفس الإحساس والنبرة في كل شاشة (المتجر ولوحة الموظفين). التفاصيل الكاملة في DESIGN_SYSTEM.md"
         />
 
         {/* ─────────── الألوان ─────────── */}
@@ -187,7 +189,7 @@ export default function DesignSystem() {
               </div>
               <div>
                 <p>نص أساسي — نخبز كل كيكة بحب، ونوصلها لباب بيتك طازجة.</p>
-                <ClassChip>text-base (Cairo)</ClassChip>
+                <ClassChip>text-base (Noto Kufi Arabic)</ClassChip>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">نص ثانوي — آخر تحديث قبل 5 دقائق</p>
@@ -195,7 +197,7 @@ export default function DesignSystem() {
               </div>
               <div>
                 <p className="font-sans text-2xl font-bold" dir="ltr">1,250.00 SAR — #ORD-2418</p>
-                <ClassChip>font-sans (Work Sans للأرقام والأكواد)</ClassChip>
+                <ClassChip>font-sans (Noto Kufi Arabic — للأرقام والأكواد أيضاً)</ClassChip>
               </div>
               <div>
                 <p className="font-display-latin text-3xl">Pink Cake — baked with love</p>
@@ -203,7 +205,8 @@ export default function DesignSystem() {
               </div>
             </div>
             <div className="rounded-xl bg-muted/50 p-4 text-sm text-muted-foreground space-y-1 leading-relaxed">
-              <p>• الخط الافتراضي للنصوص العربية: Cairo (مضبوط على body).</p>
+              <p>• الخط الافتراضي لكل النصوص: Noto Kufi Arabic (مضبوط على body) — صوت واحد للتطبيق كله.</p>
+              <p>• عناوين العرض بوزن 500 وتباعد شبه محايد، لتقارب حروف الشعار الهندسية الرفيعة.</p>
               <p>• لا تستخدم تباعد أحرف سالب أو مائل (italic) مع النص العربي.</p>
               <p>• الأرقام والمبالغ والأكواد: أرقام غربية 0-9 مع <span dir="ltr" className="font-mono text-xs">dir="ltr"</span> عند الحاجة.</p>
             </div>

@@ -62,6 +62,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // The two logo constants, reachable as `bg-brand-rose` / `text-brand-ink`.
+        // Everything else in this file is a tint or shade of these two.
+        brand: {
+          rose: "hsl(var(--brand-rose))",
+          ink: "hsl(var(--brand-ink))",
+        },
         pink: {
           DEFAULT: "hsl(var(--pink))",
           light: "hsl(var(--pink-light))",
@@ -81,12 +87,14 @@ export default {
           DEFAULT: "hsl(var(--seasonal))",
           wash: "hsl(var(--seasonal-wash))",
         },
-        // Dark berry ramp — dark bands and photo scrims.
-        berry: {
-          deep: "hsl(var(--berry-deep))",
-          dark: "hsl(var(--berry-dark))",
-          ink: "hsl(var(--berry-ink))",
-          black: "hsl(var(--berry-black))",
+        // Dark ink ramp — dark bands, photo scrims and every shadow. Was
+        // `berry`; the logo's dark is a near-neutral charcoal, and a deep-rose
+        // band would introduce a third colour the identity does not have.
+        ink: {
+          deep: "hsl(var(--ink-deep))",
+          dark: "hsl(var(--ink-dark))",
+          ink: "hsl(var(--ink-ink))",
+          black: "hsl(var(--ink-black))",
         },
         success: {
           DEFAULT: "hsl(var(--success))",

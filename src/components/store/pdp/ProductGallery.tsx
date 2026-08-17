@@ -160,7 +160,7 @@ export function ProductGallery({
           {/* Sold-out veil — honest, and it stops the CTA reading as available */}
           {soldOut && (
             <div className="absolute inset-0 z-10 grid place-items-center bg-foreground/45 backdrop-blur-[2px]">
-              <span className="rounded-full bg-background px-6 py-2.5 text-sm font-black text-primary shadow-xl">
+              <span className="rounded-full bg-background px-6 py-2.5 text-sm font-semibold text-primary shadow-xl">
                 نفدت الكمية حالياً
               </span>
             </div>

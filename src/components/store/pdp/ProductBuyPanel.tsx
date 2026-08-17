@@ -96,7 +96,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
         </span>
       </div>
 
-      <h1 className="mt-4 text-[2rem] font-black leading-[1.15] tracking-[-.03em] text-foreground sm:text-[2.6rem] lg:text-[3rem]">
+      <h1 className="mt-4 text-[2rem] font-semibold leading-[1.15] tracking-[-.03em] text-foreground sm:text-[2.6rem] lg:text-[3rem]">
         {product.name}
       </h1>
 
@@ -109,7 +109,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
         <Stars rating={rating?.average_rating ?? 0} size={16} />
         {reviews > 0 && rating ? (
           <span className="text-muted-foreground">
-            <b className="font-black text-foreground">{toArabicDigits(rating.average_rating)}</b> ·{' '}
+            <b className="font-semibold text-foreground">{toArabicDigits(rating.average_rating)}</b> ·{' '}
             <span className="underline decoration-gold decoration-2 underline-offset-4">
               {toArabicDigits(reviews)} تقييم
             </span>
@@ -130,7 +130,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
 
       {/* Price */}
       <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
-        <span className="flex items-baseline gap-1.5 text-[2.75rem] font-black leading-none text-primary">
+        <span className="flex items-baseline gap-1.5 text-[2.75rem] font-semibold leading-none text-primary">
           {toArabicDigits(product.price)} <RiyalSymbol className="text-2xl" />
         </span>
         {discount > 0 && (
@@ -138,7 +138,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
             <span className="flex items-baseline gap-1 pb-1 text-lg text-muted-foreground line-through">
               {toArabicDigits(product.compare_at_price ?? 0)} <RiyalSymbol className="text-sm" />
             </span>
-            <span className="mb-1 flex items-baseline gap-1 rounded-full bg-gold/20 px-3 py-1 text-xs font-black text-gold-deep">
+            <span className="mb-1 flex items-baseline gap-1 rounded-full bg-gold/20 px-3 py-1 text-xs font-semibold text-gold-deep">
               وفّرت {toArabicDigits(savings)} <RiyalSymbol className="text-[11px]" />
             </span>
           </>
@@ -198,7 +198,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
             >
               <Minus size={17} strokeWidth={2.5} />
             </button>
-            <span className="w-11 text-center text-lg font-black text-foreground">{toArabicDigits(qty)}</span>
+            <span className="w-11 text-center text-lg font-semibold text-foreground">{toArabicDigits(qty)}</span>
             <button
               type="button"
               onClick={() => onQtyChange(qty + 1)}
@@ -214,7 +214,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
           type="button"
           onClick={onAdd}
           disabled={soldOut}
-          className={`flex h-[58px] min-w-[220px] flex-1 items-center justify-center gap-2.5 rounded-2xl text-base font-black text-white shadow-[0_16px_34px_-14px_hsl(var(--primary)/0.8)] transition-all duration-200 active:scale-[.98] ${
+          className={`flex h-[58px] min-w-[220px] flex-1 items-center justify-center gap-2.5 rounded-2xl text-base font-semibold text-white shadow-[0_16px_34px_-14px_hsl(var(--primary)/0.8)] transition-all duration-200 active:scale-[.98] ${
             soldOut
               ? 'cursor-not-allowed bg-muted-foreground shadow-none'
               : added
@@ -243,7 +243,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
         <button
           type="button"
           onClick={onBuyNow}
-          className="mt-3 flex h-[54px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary/25 text-sm font-black text-primary transition-colors hover:border-primary hover:bg-blush active:scale-[.99]"
+          className="mt-3 flex h-[54px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary/25 text-sm font-semibold text-primary transition-colors hover:border-primary hover:bg-blush active:scale-[.99]"
         >
           اشترِ الآن وأكمل الطلب
           <ChevronLeft size={17} />
@@ -285,7 +285,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
         {TRUST.map(({ icon: Icon, title, note }) => (
           <div key={title} className="rounded-2xl bg-secondary/70 px-3 py-3.5 text-center">
             <Icon size={18} className="mx-auto text-primary" />
-            <p className="mt-2 text-[12px] font-black text-foreground">{title}</p>
+            <p className="mt-2 text-[12px] font-semibold text-foreground">{title}</p>
             <p className="mt-0.5 text-[10px] leading-4 text-muted-foreground">{note}</p>
           </div>
         ))}
@@ -301,7 +301,7 @@ export const ProductBuyPanel = forwardRef<HTMLDivElement, ProductBuyPanelProps>(
           <Sparkles size={19} />
         </span>
         <span className="flex-1">
-          <span className="block text-sm font-black text-foreground">تبين تصميماً خاصاً بك؟</span>
+          <span className="block text-sm font-semibold text-foreground">تبين تصميماً خاصاً بك؟</span>
           <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
             اختاري الشكل والنكهة والرسالة — ونجهّزها لمناسبتك.
           </span>

@@ -11,7 +11,7 @@ export function Stars({ rating, size = 13 }: { rating: number; size?: number }) 
           key={i}
           size={size}
           strokeWidth={0}
-          fill={i < Math.round(rating) ? "#ddbd75" : "#d8d5cf"}
+          fill={i < Math.round(rating) ? "#dbb2b9" : "#d9d2d3"}
         />
       ))}
     </span>
@@ -22,9 +22,9 @@ export function Reviews({ content = SECTION_DEFAULTS.reviews }: { content?: Sect
   const testimonials = visibleItems(content.items);
   if (testimonials.length === 0) return null;
   return (
-    <section className="relative overflow-hidden border-y border-gold/30 bg-gradient-to-b from-berry-deep via-primary to-berry-deep px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+    <section className="relative overflow-hidden border-y border-gold/30 bg-gradient-to-b from-ink-deep via-primary to-ink-deep px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
       {/* soft gold glow for depth */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(221,189,117,0.18),transparent)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-24 h-64 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(219,178,185,0.22),transparent)]" />
       <div className="relative mx-auto max-w-[1500px]">
         <Reveal className="flex flex-col items-center text-center">
           {content.eyebrow && (
@@ -32,7 +32,7 @@ export function Reviews({ content = SECTION_DEFAULTS.reviews }: { content?: Sect
               <span className="h-px w-8 bg-gold/50" /> {content.eyebrow} <span className="h-px w-8 bg-gold/50" />
             </p>
           )}
-          <h2 className="mt-3 text-3xl font-black tracking-[-.01em] text-white sm:text-4xl">{content.title}</h2>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-.01em] text-white sm:text-4xl">{content.title}</h2>
           {content.ratingLabel && (
             <div className="mt-4 flex items-center gap-3">
               <Stars rating={5} size={18} />
