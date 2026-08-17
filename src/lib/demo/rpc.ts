@@ -8,6 +8,9 @@ import { loyaltyRpc } from './loyalty';
 
 type Args = Record<string, unknown> | undefined;
 
+/** The signed-in customer's own delivery address — mutable so the edit sticks. */
+let demoOwnAddress: string | null = 'حي الورود، شارع الأمير سلطان، الرياض';
+
 const READ: Record<string, (args: Args) => unknown> = {
   // catalogue
   get_products_for_public_store: () => d.PRODUCTS,
@@ -29,12 +32,27 @@ const READ: Record<string, (args: Args) => unknown> = {
   // identity / role
   get_my_roles: () => currentRoles(),
   get_my_branch: () => [{ id: 'b1', name: 'فرع العليا' }],
+  // Own-profile view. Reads `phone_full`, not the masked `phone`: this is the
+  // customer looking at her own record, and the mask is a staff-side control —
+  // the edit form was otherwise pre-filled with «+966••••600» and would have
+  // saved the bullets back on the first submit.
   get_my_customer_profile: () => [{
     id: d.PROFILES[0].id,
     name: d.PROFILES[0].full_name,
-    phone: d.PROFILES[0].phone,
-    address: 'حي الورود، شارع الأمير سلطان، الرياض',
+    phone: d.PROFILES[0].phone_full,
+    address: demoOwnAddress,
   }],
+  // Persists in demo so «احفظ التغييرات» actually changes the greeting and the
+  // meta pills; unmapped writes return a bare success and the page would snap
+  // back to the seed on the next fetch.
+  update_my_customer_profile: (a) => {
+    const name = String(a?.['_name'] ?? '').trim();
+    const phone = String(a?.['_phone'] ?? '').trim();
+    if (name) d.PROFILES[0].full_name = name;
+    if (phone) d.PROFILES[0].phone_full = phone;
+    demoOwnAddress = (a?.['_address'] as string | null) ?? null;
+    return { success: true, message: 'تم تحديث بياناتك (وضع تجريبي)' };
+  },
   get_all_profiles_for_admin: () => d.PROFILES,
   // "Employees" = anyone with a non-customer role (derived from the live roles table).
   get_employees_secure: () =>
