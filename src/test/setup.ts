@@ -49,3 +49,32 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: () => {},
   }),
 });
+
+/**
+ * jsdom has no ResizeObserver, and Radix measures its thumb with one
+ * (`@radix-ui/react-use-size`). Without this, rendering a <Switch> — and so any
+ * screen with a toggle on it — throws an uncaught ReferenceError mid-commit.
+ * A no-op is enough: layout has no size in jsdom anyway.
+ */
+if (typeof globalThis.ResizeObserver === "undefined") {
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  Object.defineProperty(globalThis, "ResizeObserver", {
+    value: ResizeObserverStub,
+    writable: true,
+    configurable: true,
+  });
+}
+
+/**
+ * jsdom has no layout, so it ships no `scrollIntoView` at all. The storefront
+ * scrolls to sections by id and the homepage editor scrolls the section it
+ * opens into view — both would throw here. A no-op is the honest stub: there is
+ * nothing to scroll.
+ */
+if (typeof Element !== "undefined" && !Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
+}

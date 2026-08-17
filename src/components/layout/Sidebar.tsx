@@ -18,6 +18,7 @@ import {
   Truck,
   Cake,
   CakeSlice,
+  LayoutTemplate,
   Palette,
   PartyPopper,
   Megaphone,
@@ -72,6 +73,7 @@ const menuGroups: MenuGroup[] = [
   {
     label: 'الإدارة',
     items: [
+      { icon: LayoutTemplate, label: 'الصفحة الرئيسية', path: '/homepage', allowedRoles: ['admin'] },
       { icon: Package, label: 'المنتجات', path: '/products', allowedRoles: ['admin'] },
       { icon: CakeSlice, label: 'تصميم الكيك', path: '/cake-design', allowedRoles: ['admin'] },
       { icon: Store, label: 'إدارة الفروع', path: '/branches', allowedRoles: ['admin'] },

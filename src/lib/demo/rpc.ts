@@ -5,6 +5,7 @@
 import * as d from './data';
 import { currentRoles } from './data';
 import { loyaltyRpc } from './loyalty';
+import { homepageRpc } from './homepage';
 import {
   demoAudienceSize,
   marketingRpc,
@@ -186,6 +187,10 @@ const READ: Record<string, (args: Args) => unknown> = {
 
   // «التسويق» — للسبب نفسه: كوبونات وإعلانات وحملات بحالة تتغيّر فعلاً.
   ...marketingRpc,
+
+  // إدارة الصفحة الرئيسية — للسبب نفسه: بلا هذه المعالِجات تبدو اللوحة كأنها
+  // تحفظ، ولا يتغيّر شيء على `/`.
+  ...homepageRpc,
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {

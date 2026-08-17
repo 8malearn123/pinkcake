@@ -4,14 +4,17 @@ import type { StoreProduct } from '@/hooks/useCustomerStore';
 import { Reveal } from '@/components/Reveal';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
+import { SECTION_DEFAULTS, type SectionContent } from '@/lib/homepage/schema';
 
 // Faithful clone of the Cake & Bloom Combos section (featured big + two side).
 // Purely presentational: the caller resolves the admin-authored combos against
 // the live catalogue and passes the priced result in. onAddCombo carts one.
 export function CombosSection({
+  content = SECTION_DEFAULTS.combos,
   combos,
   onAddCombo,
 }: {
+  content?: SectionContent['combos'];
   combos: ResolvedCombo[];
   onAddCombo: (combo: ResolvedCombo) => void;
 }) {
@@ -39,16 +42,17 @@ export function CombosSection({
       <div className="mx-auto max-w-[1400px]">
         <Reveal className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-xl">
-            <span className="flex w-fit items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-gold">
-              <Truck size={14} /> توصيلها كلها علينا 🎁
-            </span>
+            {content.badge && (
+              <span className="flex w-fit items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-gold">
+                <Truck size={14} /> {content.badge}
+              </span>
+            )}
             <h2 className="mt-5 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
-              اجمعها بذكاء،<br /><span className="text-rose">ووفّر أكثر.</span>
+              {content.title}
+              {content.titleAccent && <><br /><span className="text-rose">{content.titleAccent}</span></>}
             </h2>
           </div>
-          <p className="max-w-sm text-[15px] leading-8 text-muted-foreground">
-            توليفات جاهزة اخترناها لك بعناية — كل باقة توفّر عليك أكثر مع <span className="font-bold text-primary">توصيل مجاني</span> تلقائياً.
-          </p>
+          <p className="max-w-sm text-[15px] leading-8 text-muted-foreground">{content.lede}</p>
         </Reveal>
 
         <Reveal className="reveal-grid mt-14 grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-8">

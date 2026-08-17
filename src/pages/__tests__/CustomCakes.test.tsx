@@ -34,17 +34,20 @@ const gallery = (id: string, name: string, basePrice: number): GalleryCake => ({
   previewUrl: `blob:${id}`,
 });
 
-// The page's masthead ticker now reads the storefront promos through react-query
-// (they are admin-authored in «التسويق»), so the page needs a client. Retries off
-// so a missing RPC resolves to the built-in fallback copy immediately.
-const renderPage = () =>
-  render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+// The page needs a react-query client for two reasons now: its masthead ticker
+// reads the storefront promos (admin-authored in «التسويق»), and its footer reads
+// the homepage section registry so it can drop links to switched-off sections.
+// Retries off so a missing RPC resolves to the built-in fallback copy immediately.
+const renderPage = () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+  return render(
+    <QueryClientProvider client={client}>
       <MemoryRouter>
         <CustomCakes />
       </MemoryRouter>
     </QueryClientProvider>,
   );
+};
 
 describe('CustomCakes page', () => {
   beforeEach(() => {

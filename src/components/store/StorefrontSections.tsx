@@ -1,27 +1,37 @@
 import { useState } from "react";
-import { ArrowLeft, Cake, ChevronDown, Gift, Sparkles, Truck, CheckCircle2, Clock } from "lucide-react";
+import { ArrowLeft, Cake, ChevronDown, Gift, Truck, CheckCircle2, Clock } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
+import { toArabicDigits } from "@/lib/arabicNumerals";
+import { iconFor } from "@/lib/homepage/icons";
+import { visibleItems } from "@/hooks/useHomepageContent";
+import { SECTION_DEFAULTS, type SectionContent } from "@/lib/homepage/schema";
+import type { CtaTarget } from "@/lib/homepage/types";
 
 /* نسخة ثانية من «بانر العرض» كانت هنا بنصّ ورمز مثبّتين، ولم تكن مركّبة في أي
    صفحة. حُذفت مع قسم «التسويق»: البانر الحيّ واحد الآن — `store/OfferBanner.tsx`
    — ويُحرَّر من اللوحة. نسختان بنصّين مختلفين هي كيف يُعلن رمز منتهٍ. */
 
 /* ── تصفّح حسب المناسبة ── */
-const occasions = [
-  { title: "أعياد الميلاد", desc: "تصاميم مبهجة لكل الأعمار", count: 18, icon: Cake, image: "https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=600&h=760&q=85" },
-  { title: "حفلات التخرج", desc: "احتفِ بإنجازك بأناقة", count: 9, icon: Sparkles, image: "https://images.unsplash.com/photo-1602351447937-745cb720612f?auto=format&fit=crop&w=600&h=760&q=85" },
-  { title: "المواليد الجدد", desc: "لمسات ناعمة للمولود", count: 12, icon: Gift, image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=600&h=760&q=85" },
-  { title: "المناسبات العائلية", desc: "تورتات تجمع الأحبة", count: 15, icon: Cake, image: "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&w=600&h=760&q=85" },
-];
-function OccasionCard({ o, featured, className = "" }: { o: (typeof occasions)[number]; featured?: boolean; className?: string }) {
+type OccasionItem = SectionContent["occasions"]["items"][number];
+
+function OccasionCard({ o, onCta }: { o: OccasionItem; onCta: (t: CtaTarget) => void }) {
+  const Icon = iconFor(o.icon);
+  const { featured } = o;
   return (
-    <a href="#shop" className={`group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl shadow-sm ring-1 ring-primary/5 transition-shadow duration-300 hover:shadow-xl ${featured ? "min-h-[260px]" : "min-h-[210px]"} ${className}`}>
-      <img src={o.image} alt={o.title} className="absolute inset-0 size-full object-cover transition duration-700 group-hover:scale-110" />
+    <button
+      type="button"
+      onClick={() => onCta(o.target)}
+      aria-label={`تصفّح ${o.title}`}
+      className={`group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl text-start shadow-sm ring-1 ring-primary/5 transition-shadow duration-300 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${featured ? "min-h-[260px]" : "min-h-[210px]"} ${o.size === "wide" ? "lg:col-span-2" : ""}`}
+    >
+      <img src={o.image.url} alt={o.image.alt} className="absolute inset-0 size-full object-cover transition duration-700 group-hover:scale-110" />
       <div className="absolute inset-0 bg-gradient-to-t from-berry-ink/90 via-berry-ink/25 to-transparent" />
       <span className={`absolute start-4 top-4 grid place-items-center rounded-full bg-white/15 text-gold backdrop-blur-md ring-1 ring-white/25 ${featured ? "size-14" : "size-11"}`}>
-        <o.icon size={featured ? 26 : 20} />
+        <Icon size={featured ? 26 : 20} />
       </span>
-      <span className="absolute end-4 top-4 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-primary">{o.count} تصميم</span>
+      {o.count > 0 && (
+        <span className="absolute end-4 top-4 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-primary">{toArabicDigits(o.count)} تصميم</span>
+      )}
       <div className={`relative text-white ${featured ? "p-6 sm:p-8" : "p-5"}`}>
         {featured && <span className="text-[10px] font-bold tracking-[.12em] text-gold">الأكثر طلباً</span>}
         <h3 className={`font-black ${featured ? "mt-1 text-2xl sm:text-3xl" : "text-lg"}`}>{o.title}</h3>
@@ -30,29 +40,36 @@ function OccasionCard({ o, featured, className = "" }: { o: (typeof occasions)[n
           تصفّح الآن <ArrowLeft size={15} />
         </span>
       </div>
-    </a>
+    </button>
   );
 }
 
-export function ShopByOccasion() {
-  const [feature, ...rest] = occasions;
+/**
+ * البلاطات تُرسم بترتيبها المُحرَّر، ومقاس كل بلاطة حقل فيها (`size`) لا موضع
+ * محسوب في الشفرة. النسخة السابقة كانت تفكّ المصفوفة إلى `[feature, ...rest]`
+ * ثم توزّعها يدوياً، فكان المدير سيسحب بطاقة إلى الأول ويجدها ثالثة على الصفحة.
+ */
+export function ShopByOccasion({
+  content = SECTION_DEFAULTS.occasions,
+  onCta,
+}: {
+  content?: SectionContent["occasions"];
+  onCta: (t: CtaTarget) => void;
+}) {
+  const items = visibleItems(content.items);
   return (
     <section className="mx-auto max-w-[1500px] px-5 py-14 sm:px-8 lg:px-12 lg:py-16">
       <Reveal className="reveal-grid grid gap-5 lg:grid-cols-4 lg:grid-rows-[auto_1fr]">
         {/* عنوان تحريري */}
         <div className="flex flex-col justify-center lg:col-span-2 lg:ps-6">
-          <span className="w-fit rounded-full bg-blush px-4 py-1.5 text-xs font-bold tracking-[.08em] text-rose">وش المناسبة؟</span>
-          <h2 className="mt-4 text-3xl font-black leading-[1.2] tracking-[-.01em] text-foreground sm:text-[2.6rem]">تصفّح حسب المناسبة</h2>
-          <p className="mt-3 max-w-md text-sm leading-7 text-muted-foreground">اختر مناسبتك ونعرض لك التورتات المناسبة لها فوراً — من أعياد الميلاد إلى استقبال المواليد.</p>
+          {content.eyebrow && <span className="w-fit rounded-full bg-blush px-4 py-1.5 text-xs font-bold tracking-[.08em] text-rose">{content.eyebrow}</span>}
+          <h2 className="mt-4 text-3xl font-black leading-[1.2] tracking-[-.01em] text-foreground sm:text-[2.6rem]">{content.title}</h2>
+          {content.lede && <p className="mt-3 max-w-md text-sm leading-7 text-muted-foreground">{content.lede}</p>}
         </div>
 
-        {/* بطاقتان صغيرتان أعلى اليسار */}
-        <OccasionCard o={rest[0]} />
-        <OccasionCard o={rest[1]} />
-
-        {/* الصف السفلي: بطاقة مميّزة + بطاقة عريضة — بنفس الارتفاع تماماً */}
-        <OccasionCard o={feature} featured className="lg:col-span-2" />
-        <OccasionCard o={rest[2]} className="lg:col-span-2" />
+        {items.map((o, i) => (
+          <OccasionCard key={`${o.title}-${i}`} o={o} onCta={onCta} />
+        ))}
       </Reveal>
     </section>
   );
@@ -110,24 +127,19 @@ export function HowItWorks() {
 }
 
 /* ── الأسئلة الشائعة ── */
-const faqs = [
-  { q: "كم يحتاج تجهيز الطلب من وقت؟", a: "الطلبات الجاهزة نوصلها في نفس اليوم إذا طلبت قبل ٣ مساءً. التورتات المخصصة تحتاج من ٢٤ إلى ٤٨ ساعة." },
-  { q: "هل التوصيل متاح خارج جازان؟", a: "حالياً نوصّل داخل مدينة جازان فقط، ونعمل على التوسّع لمدن أخرى قريباً." },
-  { q: "هل أقدر أطلب تورتة بنكهة أو تصميم خاص؟", a: "أكيد! من قسم «صمم تورتتك» أرسل لنا التفاصيل ونتواصل معك لتأكيد التصميم والسعر." },
-  { q: "ما هي طرق الدفع المتاحة؟", a: "نقبل مدى، فيزا، ماستركارد، آبل باي، بالإضافة إلى التقسيط عبر تابي." },
-  { q: "هل التورتات مناسبة للحساسية الغذائية؟", a: "نوفّر خيارات خالية من المكسرات عند الطلب. يرجى ذكر أي حساسية في ملاحظات الطلب." },
-];
-export function FAQ() {
+export function FAQ({ content = SECTION_DEFAULTS.faq }: { content?: SectionContent["faq"] }) {
   const [open, setOpen] = useState<number | null>(0);
+  const items = visibleItems(content.items);
+  if (items.length === 0) return null;
   return (
     <section id="faq" className="mx-auto max-w-[820px] px-5 py-14 sm:px-8 lg:py-20">
       <Reveal className="text-center">
-        <p className="text-xs font-bold tracking-[.08em] text-rose">قبل ما تطلب</p>
-        <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">الأسئلة الشائعة</h2>
+        {content.eyebrow && <p className="text-xs font-bold tracking-[.08em] text-rose">{content.eyebrow}</p>}
+        <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">{content.title}</h2>
       </Reveal>
       <Reveal className="mt-9 divide-y divide-primary/10 border-y border-primary/10">
-        {faqs.map((f, i) => (
-          <div key={f.q}>
+        {items.map((f, i) => (
+          <div key={`${f.q}-${i}`}>
             <button onClick={() => setOpen(open === i ? null : i)} className="flex w-full items-center justify-between gap-4 py-4 text-end">
               <span className="text-sm font-bold text-primary">{f.q}</span>
               <ChevronDown size={18} className={`shrink-0 text-rose transition-transform ${open === i ? "rotate-180" : ""}`} />
