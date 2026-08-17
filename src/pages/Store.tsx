@@ -16,6 +16,7 @@ import { StoreHero } from '@/components/store/StoreHero';
 import { CustomCakeSection } from '@/components/store/CustomCakeSection';
 import { SeasonalSection } from '@/components/store/SeasonalSection';
 import { ShopByOccasion, FAQ } from '@/components/store/StorefrontSections';
+import { OfferBanner } from '@/components/store/OfferBanner';
 import { StoreProductCard } from '@/components/store/StoreProductCard';
 import { CardRail } from '@/components/store/CardRail';
 import { CombosSection } from '@/components/store/CombosSection';
@@ -176,6 +177,12 @@ export default function Store() {
       <SeasonalSection products={seasonal} renderCard={renderCard} />
 
       <ShopByOccasion />
+
+      {/* بانر العرض — يُعرض فقط إن كان مفعّلاً من «التسويق»، ويختفي بلا أثر
+          حين لا يكون. كان مكتوباً وغير مركّب في أي صفحة. */}
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-12">
+        <OfferBanner onShop={() => scrollToId('shop')} />
+      </div>
 
       <GoldDivider />
 

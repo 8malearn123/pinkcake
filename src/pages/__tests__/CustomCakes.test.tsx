@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CustomCakes from '@/pages/CustomCakes';
@@ -33,11 +34,16 @@ const gallery = (id: string, name: string, basePrice: number): GalleryCake => ({
   previewUrl: `blob:${id}`,
 });
 
+// The page's masthead ticker now reads the storefront promos through react-query
+// (they are admin-authored in «التسويق»), so the page needs a client. Retries off
+// so a missing RPC resolves to the built-in fallback copy immediately.
 const renderPage = () =>
   render(
-    <MemoryRouter>
-      <CustomCakes />
-    </MemoryRouter>,
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <MemoryRouter>
+        <CustomCakes />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 
 describe('CustomCakes page', () => {

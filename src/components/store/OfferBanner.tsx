@@ -1,15 +1,27 @@
 import { Gift, Truck, ArrowLeft } from 'lucide-react';
 import { RiyalSymbol } from '@/components/ui/riyal';
+import { toArabicDigits } from '@/lib/arabicNumerals';
+import { useStorefrontPromos } from '@/hooks/useStorefrontPromos';
 
 interface OfferBannerProps {
   onShop: () => void;
 }
 
 /**
- * A calm promotional band stating the two REAL offers (free delivery over 200,
- * 10% off the first order). No countdown or fabricated code — honest value only.
+ * شريط العرض الترويجي — محتواه من «التسويق» ← خانة «بانر العرض».
+ *
+ * سطر التوصيل المجاني يقرأ العتبة الحيّة لا رقماً مكتوباً: هذا البانر ومقياس
+ * السلة وصفحة المنتج كانت ثلاثتها تعلن «فوق ٢٠٠» من ثلاثة مصادر، فتغيير
+ * العتبة كان يكذّب اثنين منها.
+ *
+ * لا عدّاد تنازلي ولا رمز مُختلَق — قيمة حقيقية فقط.
  */
 export function OfferBanner({ onShop }: OfferBannerProps) {
+  const { slot, offers } = useStorefrontPromos();
+  const promo = slot('offer_banner');
+
+  if (!offers.showOfferBanner || !promo) return null;
+
   return (
     <section className="rounded-[2rem] gradient-cocoa text-white overflow-hidden relative shadow-soft-lift">
       <div className="absolute inset-0 noise-overlay opacity-25 pointer-events-none" />
@@ -23,18 +35,30 @@ export function OfferBanner({ onShop }: OfferBannerProps) {
             <Gift className="w-6 h-6" />
           </span>
           <div>
-            <p className="text-xs font-bold tracking-[.08em] text-primary">عروضنا الدائمة</p>
-            <h3 className="font-display mt-1 text-xl sm:text-2xl leading-tight">خصم 10٪ على أوّل طلب + توصيلٌ مجاني</h3>
-            <p className="mt-1 flex items-center justify-center gap-1.5 text-xs text-white/70 sm:justify-start">
-              <Truck className="w-3.5 h-3.5 text-primary" /> توصيل مجاني للطلبات فوق 200 <RiyalSymbol />
-            </p>
+            {promo.eyebrow && (
+              <p className="text-xs font-bold tracking-[.08em] text-gold">{promo.eyebrow}</p>
+            )}
+            <h3 className="font-display mt-1 text-xl sm:text-2xl leading-tight">{promo.title}</h3>
+            <div className="mt-1 flex flex-col items-center gap-1 text-xs text-white/70 sm:items-start">
+              {promo.subtitle && <p>{promo.subtitle}</p>}
+              <p className="flex items-center gap-1.5">
+                <Truck className="w-3.5 h-3.5 text-gold" /> توصيل مجاني للطلبات فوق{' '}
+                {toArabicDigits(offers.freeDeliveryThreshold)} <RiyalSymbol />
+              </p>
+            </div>
+            {promo.couponCode && (
+              <span className="mt-3 inline-block rounded-xl border-2 border-dashed border-gold px-5 py-2 text-base font-black tracking-[.2em] text-gold">
+                <bdi dir="ltr">{promo.couponCode}</bdi>
+              </span>
+            )}
           </div>
         </div>
         <button
           onClick={onShop}
           className="group press sheen inline-flex items-center gap-2 rounded-full bg-white px-7 h-12 text-sm font-bold text-foreground shadow-lg transition-transform"
         >
-          تسوّقي الآن <ArrowLeft className="cta-arrow w-4 h-4 text-primary" />
+          {promo.ctaLabel || 'تسوّقي الآن'}{' '}
+          <ArrowLeft className="cta-arrow w-4 h-4 text-primary" />
         </button>
       </div>
     </section>

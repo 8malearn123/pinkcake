@@ -5,6 +5,14 @@
 import * as d from './data';
 import { currentRoles } from './data';
 import { loyaltyRpc } from './loyalty';
+import {
+  demoAudienceSize,
+  marketingRpc,
+  recordCouponUse,
+  validateCouponAgainstState,
+} from './marketing';
+import { renderCampaignBody, sendWindowBlock } from '@/lib/marketing/campaign';
+import type { AudienceKey } from '@/lib/marketing/types';
 
 type Args = Record<string, unknown> | undefined;
 
@@ -146,6 +154,13 @@ const READ: Record<string, (args: Args) => unknown> = {
   // ومكافأة لا تُصرف (أو العكس) هو بالضبط ما تمنعه المعاملة الواحدة.
   create_customer_order: (a) => {
     const res = d.pushCustomerOrder(a) as Record<string, unknown>;
+    // الاستخدام يُسجَّل هنا لا عند التحقّق: رمز جُرِّب في السلة ولم يُكمَل طلبه
+    // ليس استهلاكاً، وتسجيله يستنزف سقف الكوبون بلا بيع.
+    recordCouponUse({
+      code: a?.['_coupon_code'],
+      discount: a?.['_discount'],
+      total: res['total_amount'],
+    });
     const rewardCode = a?.['_reward_code'];
     if (rewardCode) {
       const name = loyaltyRpc.__captureReward({ _code: rewardCode });
@@ -160,24 +175,17 @@ const READ: Record<string, (args: Args) => unknown> = {
     transaction_id: `TXN-${100000 + Math.floor(Math.random() * 900000)}`,
     message: 'تم الدفع بنجاح',
   }),
-  // coupon validation — fixed demo codes → % or SAR off. Real backend replaces
-  // this with a coupons table lookup (admin CRUD is task A2).
-  validate_coupon: (a) => {
-    const code = String(a?.['_code'] ?? '').trim().toUpperCase();
-    const coupons: Record<string, { kind: 'percent' | 'fixed'; value: number }> = {
-      CAKE15: { kind: 'percent', value: 15 }, // the storefront's single headline first-order welcome code
-      WELCOME10: { kind: 'percent', value: 10 },
-      SWEET15: { kind: 'percent', value: 15 },
-      PINK25: { kind: 'fixed', value: 25 },
-    };
-    const match = coupons[code];
-    if (!match) return { valid: false, message: 'رمز غير صالح أو منتهي الصلاحية' };
-    return { valid: true, code, kind: match.kind, value: match.value, message: 'تم تطبيق الكوبون' };
-  },
+  // التحقّق من الكوبون — يقرأ الكوبونات التي أنشأها المدير في «التسويق»
+  // ويشغّل محرّك القواعد نفسه (`src/lib/marketing/coupon.ts`). كان هنا جدول
+  // من أربعة رموز مثبّتة، فكان الرمز الذي يعلنه المتجر لا يملك أحد إيقافه.
+  validate_coupon: (a) => validateCouponAgainstState(a),
 
   // «دائرة المناسبات» — حالة حقيقية قابلة للتغيّر في `./loyalty.ts`، لا ردود
   // ثابتة، وإلا بدت المناسبات تُحفظ والمكافآت تُصرف بلا أن يتغيّر شيء.
   ...loyaltyRpc,
+
+  // «التسويق» — للسبب نفسه: كوبونات وإعلانات وحملات بحالة تتغيّر فعلاً.
+  ...marketingRpc,
 };
 
 export function resolveRpc(name: string, args?: Args): unknown {
@@ -204,7 +212,43 @@ export function resolveFunction(
       if (!impersonatedUser) return { data: { error: 'تعذّر الدخول: المستخدم غير موجود' }, error: null };
       return { data: { success: true, adminId: d.demoUser.id, impersonatedUser }, error: null };
     }
+    case 'send-campaign':
+      return { data: simulateCampaignSend(body), error: null };
     default:
       return { data: { success: true }, error: null };
   }
+}
+
+/**
+ * محاكاة إرسال حملة. تُطبّق الحواجز نفسها التي تطبّقها دالة الحافّة (نافذة
+ * الإرسال قبل كل شيء) كي يرى المستخدم في الوضع التجريبي السلوكَ الحقيقي لا
+ * نجاحاً دائماً — والوضع التجريبي هو ما تعمل به كل المعاينات.
+ */
+function simulateCampaignSend(body?: Record<string, unknown>) {
+  const audience = String(body?.['audience'] ?? 'all_consented') as AudienceKey;
+  const recipients = demoAudienceSize(audience);
+  const sample = renderCampaignBody(
+    String(body?.['body'] ?? ''),
+    (body?.['couponCode'] as string | null) ?? null,
+  );
+
+  const blocked = sendWindowBlock(new Date());
+  if (blocked) {
+    return { dryRun: false, recipients, sent: 0, failed: 0, sample, results: [], blockedReason: blocked };
+  }
+
+  if (body?.['dryRun']) {
+    return { dryRun: true, recipients, sent: 0, failed: 0, sample, results: [], blockedReason: null };
+  }
+
+  // ٪٣ فشل ثابتة — رقم مشتقّ لا عشوائي، كي يبقى الجدول قابلاً لإعادة الإنتاج.
+  const failed = Math.max(1, Math.round(recipients * 0.03));
+  const sent = Math.max(0, recipients - failed);
+  const results = d.CUSTOMERS.slice(0, 5).map((c, i) => ({
+    maskedPhone: `${c.phone.slice(0, 3)}••••${c.phone.slice(-3)}`,
+    ok: i !== 4,
+    error: i === 4 ? 'رقم غير صالح' : null,
+  }));
+
+  return { dryRun: false, recipients, sent, failed, sample, results, blockedReason: null };
 }

@@ -146,7 +146,8 @@ reseeds, and clears the stale blobs.
 ## Storefront combos (browser-local)
 
 The storefront's «الكومبوهات» band (`src/components/store/CombosSection.tsx` on the
-home page) is authored from the dashboard at **`/products?tab=combos`**
+home page) is authored from the dashboard at **`/marketing?tab=combos`**
+(moved there from `/products?tab=combos`, which now redirects)
 (`src/components/combos/CombosTab.tsx`). It uses the same browser-local arrangement
 as the cake catalog, with its **own** database:
 

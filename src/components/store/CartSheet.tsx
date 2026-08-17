@@ -21,7 +21,8 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { CartCrossSell } from '@/components/store/CartCrossSell';
 import { FreeDeliveryMeter } from '@/components/store/FreeDeliveryMeter';
-import { FREE_DELIVERY_THRESHOLD, DELIVERY_FEE } from '@/lib/delivery';
+import { hasFreeDelivery } from '@/lib/delivery';
+import { useStorefrontPromos } from '@/hooks/useStorefrontPromos';
 import { toOrderItems } from '@/lib/orderItems';
 import { useCatalogSession } from '@/hooks/useCatalogSession';
 import { toArabicDigits } from '@/lib/arabicNumerals';
@@ -67,6 +68,7 @@ export function CartSheet() {
   const createOrder = useCreateCustomerOrder();
   const capturePayment = useCapturePayment();
   const validateCoupon = useValidateCoupon();
+  const { offers } = useStorefrontPromos();
   const validateReward = useValidateReward();
   // السلة مركّبة على كل صفحات المتجر — لا نستعلم عن المكافآت لزائرة غير مسجّلة.
   const { data: myRewards = [] } = useMyRewards(!!user);
@@ -130,10 +132,15 @@ export function CartSheet() {
     }
   }, [openCartOnArrival, setOpen]);
 
-  const deliveryFee = mode === 'pickup' || cartTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-  const discount = coupon
-    ? Math.min(cartTotal, coupon.kind === 'percent' ? (cartTotal * coupon.value) / 100 : coupon.value)
-    : 0;
+  // كوبون التوصيل المجاني يُصفّر الرسوم ولا يُحسم من السلة — تمثيله كخصم
+  // بقيمة الرسوم يكذب في اليوم الذي تتغيّر فيه الرسوم من لوحة العروض.
+  const earnedFreeDelivery = hasFreeDelivery(cartTotal, offers.freeDeliveryThreshold);
+  const deliveryFee =
+    mode === 'pickup' || earnedFreeDelivery || coupon?.freeDelivery ? 0 : offers.deliveryFee;
+  const discount =
+    coupon && !coupon.freeDelivery
+      ? Math.min(cartTotal, coupon.kind === 'percent' ? (cartTotal * coupon.value) / 100 : coupon.value)
+      : 0;
   const grandTotal = Math.max(0, cartTotal + deliveryFee - discount);
 
   const startCheckout = () => { setOpen(false); setPlaced(null); setCheckoutOpen(true); };
@@ -143,11 +150,20 @@ export function CartSheet() {
     if (!code) return;
     setCouponError('');
     try {
-      const applied = await validateCoupon.mutateAsync(code);
+      const applied = await validateCoupon.mutateAsync({
+        code,
+        subtotal: cartTotal,
+        categories: cart.map((i) => i.product.category).filter((c): c is string => !!c),
+        productIds: cart.map((i) => i.product.id),
+      });
       setCoupon(applied);
       toast({
         title: 'تم تطبيق الكوبون',
-        description: applied.kind === 'percent' ? `خصم ${applied.value}%` : `خصم ${applied.value} ر.س`,
+        description: applied.freeDelivery
+          ? 'توصيل مجاني'
+          : applied.kind === 'percent'
+            ? `خصم ${applied.value}%`
+            : `خصم ${applied.value} ر.س`,
       });
     } catch (e) {
       setCoupon(null);
@@ -543,7 +559,13 @@ export function CartSheet() {
                         <TicketPercent className="w-4 h-4 text-primary shrink-0" />
                         <bdi dir="ltr" className="font-bold">{coupon.code}</bdi>
                         <span className="text-muted-foreground">
-                          {coupon.kind === 'percent' ? `خصم ${toArabicDigits(coupon.value)}%` : <>خصم {toArabicDigits(coupon.value)} <RiyalSymbol /></>}
+                          {coupon.freeDelivery ? (
+                            'توصيل مجاني'
+                          ) : coupon.kind === 'percent' ? (
+                            `خصم ${toArabicDigits(coupon.value)}%`
+                          ) : (
+                            <>خصم {toArabicDigits(coupon.value)} <RiyalSymbol /></>
+                          )}
                         </span>
                       </span>
                       <Button size="icon" variant="ghost" aria-label="إزالة الكوبون" className="h-7 w-7 text-destructive shrink-0" onClick={removeCoupon}>

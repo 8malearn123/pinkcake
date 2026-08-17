@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
-import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from '@/lib/delivery';
+import { useStorefrontPromos } from '@/hooks/useStorefrontPromos';
 import type { StoreProduct } from '@/hooks/useCustomerStore';
 
 interface ProductInfoTabsProps {
@@ -15,11 +15,12 @@ interface ProductInfoTabsProps {
  *
  * Content is bakery-wide truth plus the product's own description — deliberately
  * not invented per-product specs, since the catalogue has no ingredient or
- * allergen fields. Delivery figures come from `lib/delivery` so this panel can
- * never quote a threshold the cart disagrees with.
+ * allergen fields. Delivery figures come from the live store offers so this
+ * panel can never quote a threshold the cart disagrees with.
  */
 export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
   const [active, setActive] = useState(0);
+  const { offers } = useStorefrontPromos();
 
   const specs: [string, string][] = [
     ['الحجم', 'تكفي من ٨ إلى ١٢ شخصاً'],
@@ -97,11 +98,11 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
           <p>
             رسوم التوصيل{' '}
             <b className="inline-flex items-baseline gap-1 text-foreground">
-              {toArabicDigits(DELIVERY_FEE)} <RiyalSymbol className="text-xs" />
+              {toArabicDigits(offers.deliveryFee)} <RiyalSymbol className="text-xs" />
             </b>
             ، ومجاناً لكل طلب يتجاوز{' '}
             <b className="inline-flex items-baseline gap-1 text-foreground">
-              {toArabicDigits(FREE_DELIVERY_THRESHOLD)} <RiyalSymbol className="text-xs" />
+              {toArabicDigits(offers.freeDeliveryThreshold)} <RiyalSymbol className="text-xs" />
             </b>
             . متاح أيضاً الاستلام من الفرع
             بلا رسوم.

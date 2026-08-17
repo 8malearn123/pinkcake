@@ -2,6 +2,7 @@ import { ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useStoreCart } from '@/contexts/StoreCartContext';
 import { RiyalSymbol } from '@/components/ui/riyal';
 import { amountToFreeDelivery, hasFreeDelivery } from '@/lib/delivery';
+import { useStorefrontPromos } from '@/hooks/useStorefrontPromos';
 
 /**
  * Mobile-only bottom cart bar — a persistent one-tap path to checkout where
@@ -12,12 +13,16 @@ const toAr = (n: number) => n.toString().replace(/\d/g, (d) => '٠١٢٣٤٥٦٧
 
 export function StickyCartBar() {
   const { count, total, open, isOpen } = useStoreCart();
+  // قبل أي خروج مبكّر — الخطّافات لا تُستدعى بشرط.
+  const { offers } = useStorefrontPromos();
+
   // Hide when the cart sheet is open; the z-index sits below modal overlays (z-50)
   // so it never paints over the cart sheet or the checkout dialog's confirm button.
   if (count === 0 || isOpen) return null;
 
-  const remaining = amountToFreeDelivery(total);
-  const free = hasFreeDelivery(total);
+  const threshold = offers.freeDeliveryThreshold;
+  const remaining = amountToFreeDelivery(total, threshold);
+  const free = hasFreeDelivery(total, threshold);
 
   return (
     <div

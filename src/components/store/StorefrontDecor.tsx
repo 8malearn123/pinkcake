@@ -1,23 +1,26 @@
-import type { ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
-import { RiyalSymbol } from "@/components/ui/riyal";
+import { RiyalSymbol, RiyalText } from "@/components/ui/riyal";
+import { useStorefrontPromos } from "@/hooks/useStorefrontPromos";
 
 /* ── شريط إعلانات متحرك ── */
-const tickerItems: ReactNode[] = [
-  <>توصيل مجاني داخل جازان للطلبات فوق ٢٠٠ <RiyalSymbol className="text-[0.9em]" /></>,
-  "🥭 موسم المنجا الجازانية متوفر الآن",
-  "اطلب قبل ٣ مساءً لتوصيل الغد",
-  "خصم ١٥٪ على أول طلب مع كود CAKE15",
-  "تورتات طازجة تُخبز يومياً في جازان",
-];
+
+/**
+ * النصّ يأتي من «التسويق» ← «العروض والإعلانات» (خانة الشريط المتحرّك).
+ *
+ * الشريط يستدعي الخطّاف بنفسه بدل أن يستقبل عناصره كخاصية، لأنه مركّب في عشرة
+ * مواضع بلا خصائص — تمريرها يعني تعديل عشرة ملفات لتغيير كلمة.
+ */
 export function Marquee() {
-  const row = [...tickerItems, ...tickerItems];
+  const { ticker } = useStorefrontPromos();
+  if (ticker.length === 0) return null;
+
+  const row = [...ticker, ...ticker];
   return (
     <div className="overflow-hidden bg-primary py-2.5">
       <div className="marquee flex w-max gap-10 whitespace-nowrap text-[11px] font-medium text-white sm:text-xs">
-        {row.map((t, i) => (
-          <span key={i} className="flex items-center gap-10">
-            {t}
+        {row.map((item, i) => (
+          <span key={`${item.id}-${i}`} className="flex items-center gap-10">
+            <RiyalText text={item.title} className="text-[0.9em]" />
             <span className="text-gold">✦</span>
           </span>
         ))}

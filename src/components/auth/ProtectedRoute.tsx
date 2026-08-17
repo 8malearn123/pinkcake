@@ -16,6 +16,7 @@ const ADMIN_ONLY_ROUTES = [
   '/branches',
   '/reports',
   '/loyalty',
+  '/marketing',
 ];
 
 // Get role-based landing page for redirect with fallback
