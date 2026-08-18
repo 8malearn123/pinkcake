@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { BrandLogo } from '@/components/brand';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
 import { StorefrontMasthead } from '@/components/store/StorefrontMasthead';
@@ -26,7 +27,7 @@ import {
   RewardsPanel,
   StampCard,
 } from '@/components/loyalty';
-import { Cake, Loader2, LogOut, MapPin, Phone, Save, User } from 'lucide-react';
+import { Loader2, LogOut, MapPin, Phone, Save, User } from 'lucide-react';
 
 interface CustomerProfile {
   id: string;
@@ -156,10 +157,8 @@ export default function CustomerProfile() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md mx-4">
           <CardHeader className="text-center">
-            <div className="w-16 h-16 rounded-2xl gradient-pink flex items-center justify-center shadow-warm mx-auto mb-4">
-              <Cake className="w-8 h-8 text-white" />
-            </div>
-            <CardTitle>{settings.storeName}</CardTitle>
+            <BrandLogo variant="ar" className="mx-auto mb-4 h-12 text-primary" />
+            <CardTitle className="sr-only">{settings.storeName}</CardTitle>
             <CardDescription>سجل دخولك للوصول إلى ملفك الشخصي</CardDescription>
           </CardHeader>
           <CardContent>

@@ -33,11 +33,11 @@ export function StatTile({ label, value, icon: Icon, tone = 'neutral', trend, cl
   const styles = TONE_STYLES[tone];
 
   return (
-    <div className={cn('glass-card rounded-2xl p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-berry-soft-lg', className)}>
+    <div className={cn('glass-card rounded-2xl p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-ink-soft-lg', className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-muted-foreground text-sm font-medium">{label}</p>
-          <p className={cn('text-3xl font-black mt-2 tracking-[-.02em]', styles.value)}>{value}</p>
+          <p className={cn('text-3xl font-semibold mt-2 tracking-[-.02em]', styles.value)}>{value}</p>
           {trend && (
             <p
               className={cn(

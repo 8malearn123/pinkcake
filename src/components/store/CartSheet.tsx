@@ -276,7 +276,7 @@ export function CartSheet() {
       <Sheet open={isOpen} onOpenChange={setOpen}>
         <SheetContent side="left" className="store-surface w-full sm:max-w-md flex flex-col">
           <SheetHeader>
-            <SheetTitle className="flex items-center gap-2 font-black text-2xl">
+            <SheetTitle className="flex items-center gap-2 font-semibold text-2xl">
               <ShoppingCart className="w-5 h-5 text-primary" /> سلة المشتريات
             </SheetTitle>
             <SheetDescription>
@@ -315,7 +315,7 @@ export function CartSheet() {
                     )}
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-sm line-clamp-1">{item.product.name}</h4>
-                      <p className="text-primary font-black text-base mt-0.5">
+                      <p className="text-primary font-semibold text-base mt-0.5">
                         {toArabicDigits(item.product.price)} <RiyalSymbol className="text-xs text-muted-foreground" />
                       </p>
                       <div className="flex items-center gap-2 mt-2">
@@ -345,7 +345,7 @@ export function CartSheet() {
                 <FreeDeliveryMeter className="bg-secondary/50 rounded-xl px-3 py-2.5" />
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm text-muted-foreground">المجموع</span>
-                  <span className="font-black text-3xl text-primary">
+                  <span className="font-semibold text-3xl text-primary">
                     {toArabicDigits(cartTotal.toFixed(2))} <RiyalSymbol className="text-sm text-muted-foreground" />
                   </span>
                 </div>
@@ -381,14 +381,14 @@ export function CartSheet() {
               <div className="w-20 h-20 mx-auto rounded-full gradient-pink grid place-items-center text-primary-foreground shadow-rose-glow mb-5">
                 <Check className="w-10 h-10" />
               </div>
-              <h2 className="font-black text-3xl leading-tight">تم تأكيد طلبك!</h2>
+              <h2 className="font-semibold text-3xl leading-tight">تم تأكيد طلبك!</h2>
               <p className="text-muted-foreground mt-2 leading-relaxed max-w-sm mx-auto">
                 {mode === 'delivery' ? 'سنحضّر طلبك ونوصّله في الموعد المحدّد.' : 'سنحضّر طلبك ويكون جاهزاً للاستلام من الفرع.'} سنتواصل معك لتأكيد التفاصيل.
               </p>
               {placed.orderNumber && (
                 <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5">
                   <span className="text-xs text-muted-foreground">رقم الطلب</span>
-                  <span className="font-black text-lg text-primary"><bdi dir="ltr">{placed.orderNumber}</bdi></span>
+                  <span className="font-semibold text-lg text-primary"><bdi dir="ltr">{placed.orderNumber}</bdi></span>
                 </div>
               )}
               <div className="mt-4">
@@ -418,7 +418,7 @@ export function CartSheet() {
           ) : (
             <>
               <div className="px-6 pt-6 pb-3 border-b border-border/60">
-                <h2 className="font-black text-2xl">إتمام الطلب</h2>
+                <h2 className="font-semibold text-2xl">إتمام الطلب</h2>
                 <p className="text-sm text-muted-foreground mt-1">أكمل التفاصيل لتأكيد طلبك.</p>
               </div>
 
@@ -677,7 +677,7 @@ export function CartSheet() {
                   </div>
                   <div className="border-t border-border/60 pt-2 mt-1 flex justify-between items-baseline">
                     <span className="font-bold">الإجمالي</span>
-                    <span className="font-black text-2xl text-primary"><bdi dir="ltr">{toArabicDigits(grandTotal.toFixed(2))}</bdi> <RiyalSymbol className="text-xs text-muted-foreground" /></span>
+                    <span className="font-semibold text-2xl text-primary"><bdi dir="ltr">{toArabicDigits(grandTotal.toFixed(2))}</bdi> <RiyalSymbol className="text-xs text-muted-foreground" /></span>
                   </div>
                 </div>
               </div>

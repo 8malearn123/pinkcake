@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Cake } from "lucide-react";
+import { BrandLogo } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Eyebrow, Title, Lede, GoldDivider } from "@/components/ds";
 
@@ -15,9 +15,7 @@ const NotFound = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blush to-background px-5">
       <div className="text-center">
-        <div className="gradient-pink shadow-berry-soft mx-auto mb-6 grid size-20 place-items-center rounded-2xl text-primary-foreground ring-1 ring-gold/40">
-          <Cake className="size-10" />
-        </div>
+        <BrandLogo variant="mark" decorative className="mx-auto mb-6 h-16 text-primary" />
         <Eyebrow rule="both" caps className="justify-center">
           ٤٠٤
         </Eyebrow>

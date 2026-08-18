@@ -57,7 +57,7 @@ export default function CustomCakes() {
           </button>
 
           <button onClick={() => navigate('/store')} className="shrink-0 text-start leading-none">
-            <span className="block text-xl font-black tracking-[-.06em] text-primary sm:text-2xl">
+            <span className="block text-xl font-semibold tracking-[-.06em] text-primary sm:text-2xl">
               {settings.storeName}
             </span>
             <span className="mt-1 block text-[9px] font-bold tracking-[.14em] text-muted-foreground">
@@ -93,12 +93,12 @@ export default function CustomCakes() {
       </header>
 
       {/* Hero band */}
-      <section className="bg-gradient-to-b from-berry-deep to-primary px-5 py-14 text-white sm:px-8 lg:px-12 lg:py-20">
+      <section className="bg-gradient-to-b from-ink-deep to-primary px-5 py-14 text-white sm:px-8 lg:px-12 lg:py-20">
         <div className="mx-auto max-w-[1500px]">
           <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[.22em] text-gold">
             <span className="h-px w-10 bg-gold/60" /> استوديو التصميم
           </p>
-          <h1 className="mt-4 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] sm:text-[3.25rem]">
+          <h1 className="mt-4 text-[2.5rem] font-semibold leading-[1.05] tracking-[-.01em] sm:text-[3.25rem]">
             كيكات تُصمّم كما تحب
           </h1>
           <p className="mt-5 max-w-xl text-sm leading-8 text-white/75">
@@ -135,13 +135,13 @@ export default function CustomCakes() {
             <div className="mx-auto grid size-16 place-items-center rounded-full bg-blush">
               <Cake size={28} className="text-rose" />
             </div>
-            <h2 className="mt-5 text-2xl font-black tracking-[-.02em]">لا توجد تصاميم جاهزة بعد</h2>
+            <h2 className="mt-5 text-2xl font-semibold tracking-[-.02em]">لا توجد تصاميم جاهزة بعد</h2>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
               نصوّر تشكيلة التصميم الآن — إلى أن تجهز، تشكيلتنا الكاملة بانتظارك.
             </p>
             <button
               onClick={() => navigate('/shop')}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-black text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-t from-pink-dark to-primary px-7 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_-14px_hsl(var(--primary)/0.8)] transition-transform active:scale-95"
             >
               تصفّح كل المنتجات <ChevronLeft size={16} />
             </button>
@@ -149,7 +149,7 @@ export default function CustomCakes() {
         ) : (
           <>
             <div className="flex flex-col justify-between gap-3 border-b border-primary/15 pb-6 sm:flex-row sm:items-end">
-              <h2 className="flex items-center gap-2 text-lg font-black text-foreground">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
                 <Wand2 size={18} className="text-rose" />
                 {toArabicDigits(cakes.length)} تصميم جاهز للتخصيص
               </h2>

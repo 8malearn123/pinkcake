@@ -404,7 +404,7 @@ function SuccessCard({
       <div className="gradient-pink mx-auto mb-6 grid size-20 place-items-center rounded-full text-primary-foreground shadow-warm">
         <Check className="h-10 w-10" />
       </div>
-      <h2 className="text-2xl font-black">تم إنشاء طلب الضيافة</h2>
+      <h2 className="text-2xl font-semibold">تم إنشاء طلب الضيافة</h2>
       <p className="mx-auto mt-3 max-w-md leading-relaxed text-muted-foreground">
         وصل الطلب لفريق المناسبات — يراجع التفاصيل ويؤكّد السعر النهائي مع العميل.
       </p>

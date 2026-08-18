@@ -47,7 +47,7 @@ export function OfferBanner({ onShop }: OfferBannerProps) {
               </p>
             </div>
             {promo.couponCode && (
-              <span className="mt-3 inline-block rounded-xl border-2 border-dashed border-gold px-5 py-2 text-base font-black tracking-[.2em] text-gold">
+              <span className="mt-3 inline-block rounded-xl border-2 border-dashed border-gold px-5 py-2 text-base font-semibold tracking-[.2em] text-gold">
                 <bdi dir="ltr">{promo.couponCode}</bdi>
               </span>
             )}

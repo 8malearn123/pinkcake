@@ -306,7 +306,7 @@ export default function TrackOrder() {
               <Eyebrow rule="both" caps className="justify-center">
                 رقم طلبك
               </Eyebrow>
-              <bdi dir="ltr" className="mt-3 block text-3xl font-black text-primary">
+              <bdi dir="ltr" className="mt-3 block text-3xl font-semibold text-primary">
                 {order.order_number}
               </bdi>
               <p className="mt-2 text-sm text-muted-foreground">

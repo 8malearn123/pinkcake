@@ -77,7 +77,7 @@ export function AccountQuickLinks() {
         <button
           key={l.title}
           onClick={() => navigate(l.to)}
-          className="press group relative overflow-hidden rounded-2xl border border-border bg-card p-4 text-start transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-berry-soft-lg"
+          className="press group relative overflow-hidden rounded-2xl border border-border bg-card p-4 text-start transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-ink-soft-lg"
         >
           {/* Gold hairline that lights on hover — the same cue the store's
               browse→buy divider uses, at card scale. */}
@@ -100,7 +100,7 @@ export function AccountQuickLinks() {
                 الآن
               </span>
             ) : l.count ? (
-              <span className="text-xl font-black tabular-nums text-primary/70 transition-colors duration-300 group-hover:text-primary">
+              <span className="text-xl font-semibold tabular-nums text-primary/70 transition-colors duration-300 group-hover:text-primary">
                 {toArabicDigits(l.count)}
               </span>
             ) : null}

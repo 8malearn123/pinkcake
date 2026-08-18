@@ -1,5 +1,5 @@
 /**
- * Cake & Bloom Design System — المكوّنات الأساسية الموحّدة.
+ * Pink Cake Design System «وردي وحبر» — المكوّنات الأساسية الموحّدة.
  * الدليل المكتوب: DESIGN_SYSTEM.md — الدليل الحي: /design-system (للمدير).
  */
 export {

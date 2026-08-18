@@ -59,7 +59,7 @@ export function OrderItemsGallery({ lines, className }: { lines: OrderLine[]; cl
                 <bdi dir="ltr">×{toArabicDigits(lines[0].quantity)}</bdi>
               </Chip>
             )}
-            <span className="absolute inset-x-0 bottom-0 p-5 text-xl font-black text-white">
+            <span className="absolute inset-x-0 bottom-0 p-5 text-xl font-semibold text-white">
               {lines[0].product_name}
             </span>
           </PhotoTile>

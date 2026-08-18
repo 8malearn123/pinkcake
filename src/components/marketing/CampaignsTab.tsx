@@ -389,7 +389,7 @@ export function CampaignsTab() {
                   <Users className="size-4 text-primary" />
                   {AUDIENCE_LABELS[draft.audience]}
                 </span>
-                <span className="text-lg font-black text-primary tabular-nums">
+                <span className="text-lg font-semibold text-primary tabular-nums">
                   {toArabicDigits(result?.recipients ?? audienceSize)}
                 </span>
               </div>

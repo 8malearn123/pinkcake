@@ -1,11 +1,8 @@
 import { createRoot } from "react-dom/client";
-import "@fontsource/instrument-serif/400.css";
-import "@fontsource/instrument-serif/400-italic.css";
-import "@fontsource/work-sans/300.css";
-import "@fontsource/work-sans/400.css";
-import "@fontsource/work-sans/500.css";
-import "@fontsource/work-sans/600.css";
-import "@fontsource/work-sans/700.css";
+// Instrument Serif + Work Sans (7 weights) used to be pulled in here. They are
+// left over from an earlier identity — no Tailwind key and no CSS rule has
+// referenced either family for some time, so they were downloading on every
+// page load and rendering nowhere. Pink Cake sets in one face; see index.css.
 import "./index.css";
 import { checkSupabaseEnv } from "./lib/env";
 import { DEMO_MODE } from "./lib/demo/config";

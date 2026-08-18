@@ -257,7 +257,7 @@ function QuickLink({
   return (
     <button
       onClick={onClick}
-      className="glass-card flex items-center gap-3 rounded-2xl p-4 text-start transition-all duration-300 hover:-translate-y-0.5 hover:shadow-berry-soft-lg"
+      className="glass-card flex items-center gap-3 rounded-2xl p-4 text-start transition-all duration-300 hover:-translate-y-0.5 hover:shadow-ink-soft-lg"
     >
       <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
         <Icon className="size-5" />

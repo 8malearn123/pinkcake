@@ -77,7 +77,7 @@ export function KeepShoppingBand({
       )}
 
       <Section variant="list" width="wide" className="pt-0">
-        <div className="gradient-berry-deep relative overflow-hidden rounded-2xl p-8 text-white sm:p-12">
+        <div className="gradient-ink-deep relative overflow-hidden rounded-2xl p-8 text-white sm:p-12">
           <div
             aria-hidden
             className="pointer-events-none absolute -top-16 -end-10 size-56 rounded-full bg-gold/15 blur-2xl"
@@ -99,7 +99,7 @@ export function KeepShoppingBand({
                 : 'اختر من الكيكات الجاهزة أو صمّم واحدة على ذوقك.'}
             </Lede>
             <Button
-              variant="gold"
+              variant="roseOnDark"
               size="cta"
               className="mt-6"
               onClick={() => (askForReview ? setReviewOpen(true) : navigate('/shop'))}

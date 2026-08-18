@@ -33,7 +33,7 @@ export function EventsSection({
             )}
             {/* Arabic needs the extra leading at phone sizes: at 1.02 the ق of
                 "تستحق" lands on the damma of "تُنسى" on the line below. */}
-            <h2 className="mt-5 text-[2.5rem] font-black leading-[1.16] tracking-[-.01em] text-foreground sm:text-[3.5rem] sm:leading-[1.05]">
+            <h2 className="mt-5 text-[2.5rem] font-semibold leading-[1.16] tracking-[-.01em] text-foreground sm:text-[3.5rem] sm:leading-[1.05]">
               {content.title}
               {content.titleAccent && <span className="block text-rose">{content.titleAccent}</span>}
             </h2>
@@ -49,12 +49,12 @@ export function EventsSection({
               <img src={g.image.url} alt={g.image.alt} loading="lazy" className="absolute inset-0 size-full object-cover transition duration-700 group-hover:scale-105" />
               {/* Scrim anchored to the bottom rather than washing the whole frame:
                   the caption keeps its contrast and the photography stays bright. */}
-              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-berry-black/90 via-berry-black/35 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink-black/90 via-ink-black/35 to-transparent" />
               {g.tag && (
-                <span className="absolute end-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[10px] font-bold text-berry-ink">{g.tag}</span>
+                <span className="absolute end-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[10px] font-bold text-ink-ink">{g.tag}</span>
               )}
               {/* 13px on phones so the half-width tiles keep their label on one line */}
-              <figcaption className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-3.5 text-[13px] font-black leading-snug text-white sm:p-4 sm:text-sm">
+              <figcaption className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-3.5 text-[13px] font-semibold leading-snug text-white sm:p-4 sm:text-sm">
                 <span className="size-1.5 shrink-0 rounded-full bg-gold" />
                 {/* A photo tile with a label reads as tappable on a phone, so it is
                     one: a stretched link over the whole figure, single tab stop. */}
@@ -72,12 +72,12 @@ export function EventsSection({
         </Reveal>
 
         {/* شريط الدعوة */}
-        <Reveal className="shadow-berry-soft mt-10 flex flex-col gap-6 rounded-3xl border border-primary/10 bg-white p-6 sm:p-9 md:mt-14 md:flex-row md:items-center md:justify-between">
+        <Reveal className="shadow-ink-soft mt-10 flex flex-col gap-6 rounded-3xl border border-primary/10 bg-white p-6 sm:p-9 md:mt-14 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4 sm:gap-5">
             <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-blush text-primary"><PartyPopper size={26} /></span>
             <div>
               {/* leading-tight because this wraps to two lines beside the icon on a phone */}
-              <p className="text-xl font-black leading-tight text-primary sm:text-2xl">{content.cta.title}</p>
+              <p className="text-xl font-semibold leading-tight text-primary sm:text-2xl">{content.cta.title}</p>
               {content.cta.subtitle && (
                 <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground"><Truck size={15} className="shrink-0 text-success" /> {content.cta.subtitle}</p>
               )}

@@ -39,7 +39,7 @@ export function OrderMomentHero({
       </Title>
 
       {moment.readiness && (
-        <p className="mt-4 text-xl font-black leading-snug text-primary sm:text-2xl">
+        <p className="mt-4 text-xl font-semibold leading-snug text-primary sm:text-2xl">
           {moment.readiness}
         </p>
       )}

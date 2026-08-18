@@ -22,7 +22,7 @@ export function BranchesSection({
                 <span className="h-px w-10 bg-primary/25" /> {content.eyebrow}
               </span>
             )}
-            <h2 className="mt-5 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
+            <h2 className="mt-5 text-[2.5rem] font-semibold leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
               {content.title}
               {content.titleAccent && <span className="block text-rose">{content.titleAccent}</span>}
             </h2>
@@ -35,7 +35,7 @@ export function BranchesSection({
           {branches.map((b, i) => (
             <article
               key={`${b.city}-${i}`}
-              className="group grid overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-berry-soft transition duration-300 hover:-translate-y-1 hover:shadow-berry-soft-lg sm:grid-cols-[13rem_1fr]"
+              className="group grid overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-ink-soft transition duration-300 hover:-translate-y-1 hover:shadow-ink-soft-lg sm:grid-cols-[13rem_1fr]"
             >
               {/* الصورة */}
               <div className="relative aspect-[4/3] overflow-hidden sm:aspect-auto sm:h-full">
@@ -45,10 +45,10 @@ export function BranchesSection({
                   loading="lazy"
                   className="absolute inset-0 size-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.08]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-berry-ink/55 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-ink/55 via-transparent to-transparent" />
                 {/* الترقيم مشتقّ من الموضع لا مكتوب في المحتوى: لو كُتب يدوياً
                     لأخفى المدير الفرع الأول وبقيت البطاقة التالية «٠٢». */}
-                <span className="pointer-events-none absolute end-5 top-4 select-none text-[3.5rem] font-black leading-none text-transparent" style={{ WebkitTextStroke: '1.5px rgba(255,255,255,.7)' }}>
+                <span className="pointer-events-none absolute end-5 top-4 select-none text-[3.5rem] font-semibold leading-none text-transparent" style={{ WebkitTextStroke: '1.5px rgba(255,255,255,.7)' }}>
                   {toArabicDigits(String(i + 1).padStart(2, '0'))}
                 </span>
                 <span className="absolute bottom-4 end-4 flex items-center gap-1.5 rounded-full bg-success px-3 py-1.5 text-[11px] font-bold text-white shadow-lg shadow-black/20">
@@ -60,7 +60,7 @@ export function BranchesSection({
               <div className="flex flex-col p-6 sm:p-7">
                 <header>
                   <p className="text-[11px] font-bold uppercase tracking-[.18em] text-rose">فرع</p>
-                  <h3 className="mt-1 text-2xl font-black leading-tight text-foreground">{b.city}</h3>
+                  <h3 className="mt-1 text-2xl font-semibold leading-tight text-foreground">{b.city}</h3>
                   {b.area && (
                     <p className="mt-2 flex items-start gap-2 text-sm leading-6 text-muted-foreground">
                       <MapPin size={16} className="mt-0.5 shrink-0 text-rose" /> {b.area}

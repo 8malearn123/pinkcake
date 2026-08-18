@@ -6,8 +6,8 @@ interface ThemeColors {
   primaryDark: string;
   /** The secondary brand tone (eyebrows, second lines) → `--rose`. NOT shadcn's
    *  `--accent`, which stays a fixed blush hover wash so ghost/outline buttons
-   *  and dropdown rows never take a brand fill. Gold is fixed brand identity
-   *  and is deliberately not customizable. */
+   *  and dropdown rows never take a brand fill. `--brand-rose` and `--brand-ink`
+   *  are the logo's own two colours and are deliberately not customizable. */
   accent: string;
 }
 
@@ -31,17 +31,18 @@ const defaultSettings: Settings = {
   storeName: 'Pink Cake',
   storeDescription: 'نظام إدارة الطلبات',
   colors: {
-    primary: '340 46% 42%',
-    primaryLight: '341 46% 62%',
-    primaryDark: '340 46% 34%',
-    accent: '341 40% 50%',
+    primary: '349 36% 28%',
+    primaryLight: '350 34% 62%',
+    primaryDark: '349 38% 18%',
+    accent: '349 32% 42%',
   },
 };
 
-/** Bumped for Cake & Bloom: the v1 key holds a cached rose palette that would
- *  otherwise pin returning users to the old theme forever (there is no
- *  migration path — the stored object has no version field). */
-const STORAGE_KEY = 'store-settings-v2';
+/** Bumped for the Pink Cake logo rebrand: v2 holds a cached Cake & Bloom berry
+ *  palette that would otherwise pin every returning browser to the old theme
+ *  forever (there is no migration path — the stored object has no version
+ *  field, and these values land as inline styles that beat `:root`). */
+const STORAGE_KEY = 'store-settings-v3';
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
@@ -62,10 +63,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     root.style.setProperty('--pink-dark', settings.colors.primaryDark);
     root.style.setProperty('--rose', settings.colors.accent);
     root.style.setProperty('--ring', settings.colors.primary);
-    root.style.setProperty('--sidebar-primary', settings.colors.primary);
     // `--accent` is intentionally NOT written: it is shadcn's hover surface, so
     // tinting it with a brand color turns every ghost button and dropdown row
-    // into a saturated fill. `--sidebar-ring` stays gold for the same reason.
+    // into a saturated fill.
+    //
+    // `--sidebar-primary` is no longer written either. The console's active nav
+    // row is now the logo's own pairing — the brand rose carrying ink text — and
+    // `primary` is a dark shade, so writing it here painted a near-black row on
+    // a near-black sidebar and the active item vanished. The sidebar's rose and
+    // `--brand-rose`/`--brand-ink` are fixed identity, not theme settings.
   }, [settings]);
 
   const updateSettings = (newSettings: Partial<Settings>) => {

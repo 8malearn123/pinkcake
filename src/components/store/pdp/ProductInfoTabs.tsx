@@ -127,7 +127,7 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
             onClick={() => setActive(i)}
             aria-selected={active === i}
             role="tab"
-            className={`-mb-px border-b-2 px-4 pb-3.5 pt-1 text-sm font-black transition-colors ${
+            className={`-mb-px border-b-2 px-4 pb-3.5 pt-1 text-sm font-semibold transition-colors ${
               active === i
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-muted-foreground'
@@ -151,7 +151,7 @@ export function ProductInfoTabs({ product }: ProductInfoTabsProps) {
               aria-expanded={active === i}
               className="flex w-full items-center justify-between gap-4 py-4 text-start"
             >
-              <span className="text-sm font-black text-foreground">{tab.label}</span>
+              <span className="text-sm font-semibold text-foreground">{tab.label}</span>
               <ChevronDown
                 size={17}
                 className={`shrink-0 text-primary transition-transform duration-300 ${active === i ? 'rotate-180' : ''}`}

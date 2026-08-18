@@ -93,7 +93,7 @@ export function AccountHero({ name, email, phone, isLoading }: AccountHeroProps)
         <div className="flex items-center gap-4 sm:gap-5">
           {/* Monogram — her initial, not a generic person glyph. */}
           <div className="relative shrink-0">
-            <div className="gradient-pink grid size-[72px] place-items-center rounded-[1.75rem] text-[2rem] font-black leading-none text-primary-foreground shadow-berry-soft-lg ring-1 ring-inset ring-white/25">
+            <div className="gradient-pink grid size-[72px] place-items-center rounded-[1.75rem] text-[2rem] font-semibold leading-none text-primary-foreground shadow-ink-soft-lg ring-1 ring-inset ring-white/25">
               {monogram}
             </div>
             {/* The tier reads as a crown pinned to her own initial. The worded
@@ -203,15 +203,15 @@ function NextOccasionTicket({ next }: { next: ReturnType<typeof nextOccasion> })
   const soon = next.days_until <= 14;
 
   return (
-    <div className="mt-8 overflow-hidden rounded-3xl border border-gold/40 bg-card/80 shadow-berry-soft backdrop-blur-sm">
+    <div className="mt-8 overflow-hidden rounded-3xl border border-gold/40 bg-card/80 shadow-ink-soft backdrop-blur-sm">
       <div className="flex flex-wrap items-center gap-4 p-4 sm:gap-5 sm:p-5">
         {/* العدّ التنازلي */}
         <div className="flex size-[68px] shrink-0 flex-col items-center justify-center rounded-2xl border border-gold/40 bg-gold-soft/25 text-gold-deep">
           {next.days_until <= 0 ? (
-            <span className="px-1 text-center text-sm font-black leading-tight">اليوم</span>
+            <span className="px-1 text-center text-sm font-semibold leading-tight">اليوم</span>
           ) : (
             <>
-              <span className="text-[26px] font-black leading-none">
+              <span className="text-[26px] font-semibold leading-none">
                 {toArabicDigits(next.days_until)}
               </span>
               <span className="mt-1 text-[10px] font-bold">
@@ -229,7 +229,7 @@ function NextOccasionTicket({ next }: { next: ReturnType<typeof nextOccasion> })
 
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-bold uppercase tracking-[.22em] text-rose">أقرب مناسبة</p>
-          <p className="mt-1.5 flex items-center gap-2 truncate text-lg font-black">
+          <p className="mt-1.5 flex items-center gap-2 truncate text-lg font-semibold">
             <span aria-hidden>{emoji}</span>
             {next.label}
           </p>

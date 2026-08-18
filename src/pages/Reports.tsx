@@ -216,18 +216,18 @@ export default function Reports() {
         <title>تقرير الطلبات</title>
         <style>
           /* Standalone print document — it opens in its own window, so the app's
-             CSS variables don't reach it. Values are the Cake & Bloom palette
+             CSS variables don't reach it. Values are the Pink Cake palette
              written out literally; keep them in sync with :root in index.css. */
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&display=swap');
-          body { font-family: 'Noto Kufi Arabic', sans-serif; direction: rtl; padding: 20px; color: #2c2226; background: #fffdfa; }
-          h1 { color: #9e3a5c; text-align: center; font-weight: 800; letter-spacing: -0.02em; }
-          h2 { margin-top: 20px; border-bottom: 2px solid #ddbd75; padding-bottom: 5px; font-weight: 800; }
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700&display=swap');
+          body { font-family: 'Noto Kufi Arabic', sans-serif; direction: rtl; padding: 20px; color: #1a1919; background: #fdfbfc; }
+          h1 { color: #612e37; text-align: center; font-weight: 500; letter-spacing: -0.005em; }
+          h2 { margin-top: 20px; border-bottom: 2px solid #dbb2b9; padding-bottom: 5px; font-weight: 500; }
           table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-          th, td { border: 1px solid #e6d5db; padding: 10px; text-align: right; }
-          th { background: #f6ecef; color: #9e3a5c; font-weight: 700; }
+          th, td { border: 1px solid #eadcde; padding: 10px; text-align: right; }
+          th { background: #f4e6e8; color: #612e37; font-weight: 700; }
           .summary { display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
-          .stat { padding: 15px; background: #fbeef2; border-radius: 8px; }
-          .stat-value { font-size: 24px; font-weight: 800; color: #9e3a5c; }
+          .stat { padding: 15px; background: #f9f1f2; border-radius: 8px; }
+          .stat-value { font-size: 24px; font-weight: 700; color: #612e37; }
         </style>
       </head>
       <body>

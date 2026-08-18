@@ -45,7 +45,7 @@ export function ShopGridSection({
             {content.eyebrow && (
               <p className="text-xs font-bold tracking-[.08em] text-rose">{content.eyebrow}</p>
             )}
-            <h2 className="mt-2 text-3xl font-black tracking-[-.01em] text-foreground sm:text-4xl">
+            <h2 className="mt-2 text-3xl font-semibold tracking-[-.01em] text-foreground sm:text-4xl">
               {content.title}
             </h2>
           </div>

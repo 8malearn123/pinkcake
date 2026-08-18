@@ -36,7 +36,7 @@ export function OrderInvoicePanel({
         <AccordionTrigger className="py-4 hover:no-underline">
           <span className="flex w-full items-center justify-between gap-3 pe-3">
             <span className="font-bold">الفاتورة</span>
-            <span className="text-lg font-black text-primary">
+            <span className="text-lg font-semibold text-primary">
               {toArabicDigits(totalAmount)} <RiyalSymbol className="text-sm text-muted-foreground" />
             </span>
           </span>
@@ -74,7 +74,7 @@ export function OrderInvoicePanel({
 
           <div className="flex items-baseline justify-between gap-3">
             <span className="font-bold">المجموع الكلي</span>
-            <span className="text-2xl font-black leading-none text-primary">
+            <span className="text-2xl font-semibold leading-none text-primary">
               {toArabicDigits(totalAmount)} <RiyalSymbol className="text-sm text-muted-foreground" />
             </span>
           </div>

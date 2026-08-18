@@ -80,7 +80,7 @@ export function printReport(
           font-family: 'Cairo', sans-serif;
           direction: rtl;
           padding: 20px;
-          color: #1a1a1a;
+          color: #1a1919;
           background: #fff;
         }
         
@@ -88,11 +88,11 @@ export function printReport(
           text-align: center;
           margin-bottom: 30px;
           padding-bottom: 20px;
-          border-bottom: 2px solid #be7b7c;
+          border-bottom: 2px solid #612e37;
         }
         
         .header h1 {
-          color: #be7b7c;
+          color: #612e37;
           font-size: 28px;
           margin-bottom: 8px;
         }
@@ -117,7 +117,7 @@ export function printReport(
           font-size: 18px;
           margin-bottom: 12px;
           padding-right: 10px;
-          border-right: 4px solid #be7b7c;
+          border-right: 4px solid #612e37;
         }
         
         table {

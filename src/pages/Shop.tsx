@@ -205,7 +205,7 @@ export default function Shop() {
 
         {/* Customize-your-cake CTA */}
         <section className="mt-12 lg:mt-16">
-          <div className="gradient-berry-deep relative overflow-hidden rounded-2xl p-8 text-white sm:p-12">
+          <div className="gradient-ink-deep relative overflow-hidden rounded-2xl p-8 text-white sm:p-12">
             <div aria-hidden className="pointer-events-none absolute -top-16 -end-10 size-56 rounded-full bg-gold/15 blur-2xl" />
             <div aria-hidden className="pointer-events-none absolute -bottom-16 -start-8 size-52 rounded-full bg-white/10 blur-2xl" />
             <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:items-center lg:justify-between lg:text-start">
@@ -224,7 +224,7 @@ export default function Shop() {
                 </Lede>
               </div>
               <Button
-                variant="gold"
+                variant="roseOnDark"
                 size="cta"
                 className="group shrink-0 rounded-full"
                 onClick={() => navigate('/customize')}

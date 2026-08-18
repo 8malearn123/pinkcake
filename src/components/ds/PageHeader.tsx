@@ -17,13 +17,14 @@ export function PageHeader({ title, description, icon: Icon, actions, className 
   return (
     <div className={cn('flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4', className)}>
       <div className="flex items-center gap-3">
+        {/* The page mark echoes the logo plate: ink on the brand rose, flat. */}
         {Icon && (
-          <div className="gradient-pink shadow-berry-soft grid size-12 shrink-0 place-items-center rounded-xl text-primary-foreground ring-1 ring-gold/40">
+          <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-brand-rose text-brand-ink">
             <Icon className="size-6" />
           </div>
         )}
         <div>
-          <h1 className="text-3xl font-black tracking-[-.02em] text-foreground">{title}</h1>
+          <h1 className="text-3xl font-semibold tracking-[-.01em] text-foreground">{title}</h1>
           {description && <p className="mt-1 text-muted-foreground">{description}</p>}
         </div>
       </div>

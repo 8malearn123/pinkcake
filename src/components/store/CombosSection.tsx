@@ -6,7 +6,7 @@ import { RiyalSymbol } from '@/components/ui/riyal';
 import { toArabicDigits } from '@/lib/arabicNumerals';
 import { SECTION_DEFAULTS, type SectionContent } from '@/lib/homepage/schema';
 
-// Faithful clone of the Cake & Bloom Combos section (featured big + two side).
+// Faithful clone of the storefront Combos section (featured big + two side).
 // Purely presentational: the caller resolves the admin-authored combos against
 // the live catalogue and passes the priced result in. onAddCombo carts one.
 export function CombosSection({
@@ -47,7 +47,7 @@ export function CombosSection({
                 <Truck size={14} /> {content.badge}
               </span>
             )}
-            <h2 className="mt-5 text-[2.5rem] font-black leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
+            <h2 className="mt-5 text-[2.5rem] font-semibold leading-[1.05] tracking-[-.01em] text-foreground sm:text-[3.25rem]">
               {content.title}
               {content.titleAccent && <><br /><span className="text-rose">{content.titleAccent}</span></>}
             </h2>
@@ -59,13 +59,13 @@ export function CombosSection({
           {/* featured */}
           <article className="group relative flex min-h-[420px] flex-col justify-end overflow-hidden rounded-3xl text-white shadow-xl lg:row-span-2">
             <img src={featured.heroImage} alt={featured.name} loading="lazy" className="absolute inset-0 size-full object-cover transition duration-[900ms] group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-berry-ink via-berry-ink/55 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink-ink via-ink-ink/55 to-transparent" />
             <span className="absolute end-6 top-6 flex items-center gap-1.5 rounded-full bg-seasonal px-3.5 py-2 text-xs font-bold text-white shadow-lg">
               <Sparkles size={14} /> الأكثر توفيراً
             </span>
             <div className="relative p-7 sm:p-9">
               <span className="text-xs font-bold tracking-[.14em] text-gold">{featured.tagline}</span>
-              <h3 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">{featured.name}</h3>
+              <h3 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">{featured.name}</h3>
               <div className="mt-5 flex items-center gap-4">
                 <Thumbs members={featured.members} />
                 <span className="text-sm text-white/75">{toArabicDigits(featured.members.length)} أصناف مختارة</span>
@@ -73,7 +73,7 @@ export function CombosSection({
               <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <span className="flex items-baseline gap-1.5 text-4xl font-black">{toArabicDigits(featured.price)} <RiyalSymbol className="text-2xl text-white/70" /></span>
+                    <span className="flex items-baseline gap-1.5 text-4xl font-semibold">{toArabicDigits(featured.price)} <RiyalSymbol className="text-2xl text-white/70" /></span>
                     <span className="flex items-baseline gap-1 text-sm text-white/50 line-through">{toArabicDigits(featured.original)} <RiyalSymbol className="text-xs" /></span>
                   </div>
                   <p className="mt-1.5 flex items-center gap-2 text-[13px] font-bold text-gold">
@@ -114,13 +114,13 @@ function SideCombo({
     <article className="group flex overflow-hidden rounded-3xl bg-white ring-1 ring-primary/10 transition duration-300 hover:shadow-xl hover:shadow-primary/5">
       <div className="relative w-32 shrink-0 overflow-hidden sm:w-44">
         <img src={combo.heroImage} alt={combo.name} loading="lazy" className="absolute inset-0 size-full object-cover transition duration-700 group-hover:scale-110" />
-        <span className="absolute bottom-2 end-2 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-black" style={{ color: combo.accent }}>
+        <span className="absolute bottom-2 end-2 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold" style={{ color: combo.accent }}>
           وفّر {toArabicDigits(combo.pct)}٪
         </span>
       </div>
       <div className="flex grow flex-col p-5">
         <span className="text-[11px] font-bold tracking-[.12em]" style={{ color: combo.accent }}>{combo.tagline}</span>
-        <h3 className="mt-1 text-lg font-black leading-tight text-foreground">{combo.name}</h3>
+        <h3 className="mt-1 text-lg font-semibold leading-tight text-foreground">{combo.name}</h3>
         <div className="mt-3">
           <Thumbs members={combo.members} />
         </div>
@@ -128,7 +128,7 @@ function SideCombo({
           <div>
             <p className="flex items-center gap-1 text-[11px] font-bold text-success"><Truck size={12} /> توصيل مجاني</p>
             <div className="mt-0.5 flex items-baseline gap-1.5">
-              <span className="flex items-baseline gap-1 text-xl font-black text-primary">{toArabicDigits(combo.price)} <RiyalSymbol className="text-base" /></span>
+              <span className="flex items-baseline gap-1 text-xl font-semibold text-primary">{toArabicDigits(combo.price)} <RiyalSymbol className="text-base" /></span>
               <span className="flex items-baseline gap-1 text-xs text-muted-foreground line-through">{toArabicDigits(combo.original)} <RiyalSymbol className="text-[10px]" /></span>
             </div>
           </div>

@@ -51,7 +51,7 @@ export function CustomCakeCard({ cake, previewUrl, onPick }: CustomCakeCardProps
 
       {/* Body */}
       <div className="flex grow flex-col p-4">
-        <h3 className="line-clamp-1 text-base font-black leading-6 text-foreground">{cake.name}</h3>
+        <h3 className="line-clamp-1 text-base font-semibold leading-6 text-foreground">{cake.name}</h3>
 
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-bold text-muted-foreground">
           <span className="flex items-center gap-1">
@@ -66,7 +66,7 @@ export function CustomCakeCard({ cake, previewUrl, onPick }: CustomCakeCardProps
           <div className="mb-3 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
           <span className="flex items-baseline gap-1.5 text-primary">
             <span className="text-[11px] font-bold text-muted-foreground">من</span>
-            <span className="flex items-baseline gap-1 text-2xl font-black leading-none">
+            <span className="flex items-baseline gap-1 text-2xl font-semibold leading-none">
               {toArabicDigits(cake.basePrice)} <RiyalSymbol className="text-lg" />
             </span>
           </span>

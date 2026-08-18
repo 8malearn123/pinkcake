@@ -5,9 +5,9 @@ const ROSE = 'hsl(var(--primary))';
 
 // Warm cocoa backdrop with a rose glow + depth (no gold — rose-only system).
 const CARD_BG =
-  'radial-gradient(82% 100% at 84% -4%, hsl(359 31% 55% / .45), transparent 56%), ' +
-  'radial-gradient(72% 92% at 4% 108%, hsl(340 45% 42% / .32), transparent 60%), ' +
-  'linear-gradient(150deg, hsl(25 30% 22%) 0%, hsl(22 32% 15%) 50%, hsl(20 34% 10%) 100%)';
+  'radial-gradient(82% 100% at 84% -4%, hsl(var(--brand-rose) / .34), transparent 56%), ' +
+  'radial-gradient(72% 92% at 4% 108%, hsl(var(--primary) / .38), transparent 60%), ' +
+  'linear-gradient(150deg, hsl(var(--ink-deep)) 0%, hsl(var(--ink-dark)) 50%, hsl(var(--ink-black)) 100%)';
 
 // One editorial cake photograph — warm rose/cocoa tones that pair with the rose accents.
 const CAKE_PHOTO =
@@ -45,7 +45,7 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
             />
             <div
               className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem]"
-              style={{ boxShadow: '0 34px 64px -26px hsl(20 45% 5% / .75)' }}
+              style={{ boxShadow: '0 34px 64px -26px hsl(var(--ink-black) / .75)' }}
             >
               <img
                 src={CAKE_PHOTO}
@@ -57,7 +57,7 @@ export function OccasionsCallout({ onStart }: { onStart: () => void }) {
               {/* gentle scrim, grounding the photo into the cocoa */}
               <div
                 className="absolute inset-0 pointer-events-none"
-                style={{ background: 'linear-gradient(180deg, transparent 52%, hsl(20 28% 11% / .55))' }}
+                style={{ background: 'linear-gradient(180deg, transparent 52%, hsl(var(--ink-black) / .6))' }}
               />
               {/* 1px rose/blush hairline on the frame */}
               <div

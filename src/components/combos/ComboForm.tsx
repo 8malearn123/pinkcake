@@ -74,7 +74,7 @@ const DEFAULTS: ComboFormValues = {
   tagline: '',
   items: [],
   discountPct: 15,
-  accent: '#9e3a5c',
+  accent: '#612e37',
   heroImageUrl: '',
   best: false,
   isActive: true,
@@ -252,12 +252,12 @@ export function ComboForm({
                       <input
                         type="color"
                         aria-label="اختيار اللون المميّز"
-                        value={HEX.test(field.value) ? field.value : '#9e3a5c'}
+                        value={HEX.test(field.value) ? field.value : '#612e37'}
                         onChange={(event) => field.onChange(event.target.value)}
                         className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-border bg-transparent p-1"
                       />
                       <FormControl>
-                        <Input dir="ltr" className="text-start" placeholder="#9e3a5c" {...field} />
+                        <Input dir="ltr" className="text-start" placeholder="#612e37" {...field} />
                       </FormControl>
                     </div>
                     <FormMessage />
@@ -275,7 +275,7 @@ export function ComboForm({
                 </p>
               ) : (
                 <div className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                  <span className="flex items-baseline gap-1.5 text-2xl font-black text-primary">
+                  <span className="flex items-baseline gap-1.5 text-2xl font-semibold text-primary">
                     {toArabicDigits(pricing.price)} <RiyalSymbol className="text-base" />
                   </span>
                   <span className="flex items-baseline gap-1 text-sm text-muted-foreground line-through">
@@ -283,7 +283,7 @@ export function ComboForm({
                   </span>
                   <span
                     className="rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
-                    style={{ backgroundColor: HEX.test(accent) ? accent : '#9e3a5c' }}
+                    style={{ backgroundColor: HEX.test(accent) ? accent : '#612e37' }}
                   >
                     وفّر {toArabicDigits(pricing.save)} ({toArabicDigits(pricing.pct)}٪)
                   </span>

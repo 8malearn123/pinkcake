@@ -275,7 +275,7 @@ export function LoyaltyTab() {
                     </div>
                     <span
                       className={cn(
-                        'shrink-0 text-2xl font-black',
+                        'shrink-0 text-2xl font-semibold',
                         r.metric === 'ledger_drift' && r.value > 0
                           ? 'text-destructive'
                           : r.metric === 'top_decile_share' && r.value > 50
